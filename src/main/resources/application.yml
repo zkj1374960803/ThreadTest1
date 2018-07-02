@@ -1,0 +1,8 @@
+#指定读取的配置文件名
+spring:
+  profiles:
+    active: dev
+
+#根据环境读取logback配置文件名
+logging:
+  config: classpath:logback/logback-${spring.profiles.active}.xml

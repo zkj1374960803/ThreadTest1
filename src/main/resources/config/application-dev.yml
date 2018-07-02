@@ -1,0 +1,96 @@
+#开发环境 配置文件
+server:
+  port: 15999
+  maxPostSize: 20971520
+
+#tomcatJdbc 配置信息
+spring:
+  datasource:
+    url: jdbc:mysql://192.168.0.12:3306/usermanager_platform?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&allowMultiQueries=true&useSSL=false
+    driver-class-name: com.mysql.jdbc.Driver
+    username: project_manage_platform
+    password: project_manage_platform_123456
+
+
+#jedis配置
+redis:
+  database: 0
+  host:  192.168.0.13
+  port: 6379
+  password: zhtqc$123456
+
+  #集群配置
+  cluster:
+    #多个节点以逗号分隔
+    clusterNodes: 192.168.0.13:6380,192.168.0.13:6381,192.168.0.13:6382,192.168.0.13:6383,192.168.0.13:6384,192.168.0.13:6385
+    password: zhtqc$123456
+
+  perfix:
+    sso: ssoserdev:userid
+    userinfo: usercoredev:baseinfo
+    wechatmsg: wechat:message:id
+
+
+#单点登录相关配置
+oauth:
+  center:
+    #认证中心路径
+    url: http://192.168.0.12:8081
+
+
+#本系统相关配置
+base:
+  #本系统域名
+#  url: http://192.168.0.216:15999
+  url: http://localhost:15999
+  #本系统的appid
+  appid: 681fe3bf2bcf4a0f8fc4bc1497d9a4f6
+  #本系统的secret
+  secret: 6c28edbc36214242858fbea49fe58098
+
+#web端配置:
+cookie:
+  #cookie的domain,设置访问域
+  #domain: ccbuluo.cn
+
+#验证码配置
+verification:
+  #本系统是否开启后端验证码校验,有值且为true时,有效
+  check: false
+
+
+#dev开发环境中配置默认登录用户:
+dev-default:
+  #是否开启自动登录 只要有值即可!
+  needLogin: need
+  username: "S0001042"
+  password: "S0001042"
+
+
+#swagger相关配置
+swagger:
+  basePackage: com.ccbuluo
+  title: 售后服务平台PC端接口
+  version: 1.0.0
+  description: 售后服务平台PC端api
+
+#文件上传目录
+upload:
+  dir: uploads/
+
+#thrift微服务配置
+ccbuluo:
+  thrift:
+    service:
+      name: UserManagerService
+      port: 15501
+      ip: 192.168.0.12
+      basePackages: com
+      #loadbalance: precise
+      #precise: 192.168.0.12:15666
+    zookeeper:
+      server: 192.168.0.12:2181
+    provider:
+        usercore: "UserCoreSerService"
+        usermanage: "UserManagerService"
+        wechat: "WechatCoreService"
