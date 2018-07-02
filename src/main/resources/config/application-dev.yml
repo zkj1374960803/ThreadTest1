@@ -63,8 +63,8 @@ verification:
 dev-default:
   #是否开启自动登录 只要有值即可!
   needLogin: need
-  username: "S0001042"
-  password: "S0001042"
+  username: "ZHT00512"
+  password: "ZHT00512"
 
 
 #swagger相关配置
@@ -82,7 +82,7 @@ upload:
 ccbuluo:
   thrift:
     service:
-      name: UserManagerService
+      name: aftersaleService
       port: 15501
       ip: 192.168.0.12
       basePackages: com
