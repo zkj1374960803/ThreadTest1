@@ -7,47 +7,47 @@ import java.util.Date;
 
 /**
  * 实体
- * @author liuduo
+ * @author zhangkangjian
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "实体", description = "")
+@ApiModel(value = "BizServiceLabel", description = "标签实体")
 public class BizServiceLabel {
     /**
      * 
      */
-    @ApiModelProperty(name = "id", value = "")
+    @ApiModelProperty(name = "id", value = "", hidden = true)
     private Long id;
     /**
      * 标签名称
      */
-    @ApiModelProperty(name = "labelName", value = "标签名称")
+    @ApiModelProperty(name = "labelName", value = "标签名称",required = true)
     private String labelName;
     /**
      * 创建人
      */
-    @ApiModelProperty(name = "creator", value = "创建人")
+    @ApiModelProperty(name = "creator", value = "创建人", hidden = true)
     private String creator;
     /**
      * 创建时间
      */
-    @ApiModelProperty(name = "createTime", value = "创建时间")
+    @ApiModelProperty(name = "createTime", value = "创建时间", hidden = true)
     private Date createTime;
     /**
      * 更新人
      */
-    @ApiModelProperty(name = "operator", value = "更新人")
+    @ApiModelProperty(name = "operator", value = "更新人", hidden = true)
     private String operator;
     /**
      * 更新时间
      */
-    @ApiModelProperty(name = "operateTime", value = "更新时间")
+    @ApiModelProperty(name = "operateTime", value = "更新时间", hidden = true)
     private Date operateTime;
     /**
      * 删除标识
      */
-    @ApiModelProperty(name = "deleteFlag", value = "删除标识")
-    private Long deleteFlag;
+    @ApiModelProperty(name = "deleteFlag", value = "删除标识", hidden = true)
+    private Long deleteFlag = 0L;
 
     public void setId(Long id) {
         this.id = id;
