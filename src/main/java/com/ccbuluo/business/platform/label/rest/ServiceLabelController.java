@@ -22,7 +22,7 @@ import java.util.List;
  */
 @Api(tags = "标签(平台端)")
 @RestController
-@RequestMapping("/label/parameter")
+@RequestMapping("/label/label")
 public class ServiceLabelController extends BaseController {
 
     @Resource(name = "labelServiceImpl")
