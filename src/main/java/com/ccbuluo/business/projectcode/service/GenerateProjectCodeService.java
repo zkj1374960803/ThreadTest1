@@ -48,7 +48,7 @@ public class GenerateProjectCodeService {
             return produceCode(prefix, autoIncreasedcodeSize, dbCode, IsrandomCode);
         }
         int i = autoIncreasedcodeSize - 1;
-        return prefix + i +Constants.FLAG_ONE;
+        return prefix + String.format("%0"+i+"d", Constants.FLAG_ONE);
     }
 
 
