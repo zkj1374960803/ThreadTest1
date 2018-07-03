@@ -1,10 +1,11 @@
 package com.ccbuluo.business.platform.storehouse.service;
 
+import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.entity.BizServiceStorehouse;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.business.platform.storehouse.dto.SaveBizServiceStorehouseDTO;
-import com.ccbuluo.business.projectcode.service.GenerateProjectCodeService;
+import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.constants.SystemPropertyHolder;
 import com.ccbuluo.core.thrift.proxy.ThriftProxyServiceFactory;
@@ -53,7 +54,7 @@ public class StoreHouseServiceImpl implements StoreHouseService{
     public int saveStoreHouse(SaveBizServiceStorehouseDTO saveBizServiceStorehouseDTO) {
         try {
             // 生成编码
-            String code = generateProjectCodeService.getCode(PREFIX, Constants.AUTOINCREASEDCODESIZE, FIELDNAME, TRABLENAME, ISTANDOMCODE);
+            String code = generateProjectCodeService.grantCode(CodePrefixEnum.FC);
             BizServiceStorehouse bizServiceStorehouse = create(saveBizServiceStorehouseDTO);
             bizServiceStorehouse.setServicecenterCode(code);
             bizServiceStorehouse.preInsert(userHolder.getLoggedUserId());
