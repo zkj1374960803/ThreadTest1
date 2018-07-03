@@ -47,8 +47,7 @@ public class GenerateProjectCodeService {
             jedisCluster.del(prefix);
             return produceCode(prefix, autoIncreasedcodeSize, dbCode, IsrandomCode);
         }
-        int i = autoIncreasedcodeSize - 1;
-        return prefix + String.format("%0"+i+"d", Constants.FLAG_ONE);
+        return prefix + String.format("%0"+autoIncreasedcodeSize+"d", Constants.FLAG_ONE);
     }
 
 
