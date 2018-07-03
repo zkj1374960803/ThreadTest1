@@ -1,9 +1,9 @@
-package com.ccbuluo.business.entity;
+package com.ccbuluo.business.platform.storehouse.dto;
 
+import com.ccbuluo.business.entity.AftersaleCommonEntity;
+import com.ccbuluo.business.entity.IdEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import java.util.Date;
 
 /**
  * 仓库实体
@@ -11,13 +11,8 @@ import java.util.Date;
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "实体", description = "")
-public class BizServiceStorehouse extends AftersaleCommonEntity{
-    /**
-     * 仓库编号
-     */
-    @ApiModelProperty(name = "storehouseCode", value = "仓库编号")
-    private String storehouseCode;
+@ApiModel(value = "仓库实体", description = "仓库实体")
+public class SaveBizServiceStorehouseDTO extends IdEntity {
     /**
      * 名称
      */
@@ -41,42 +36,20 @@ public class BizServiceStorehouse extends AftersaleCommonEntity{
     /**
      * 
      */
-    @ApiModelProperty(name = "provinceCode", value = "省code")
-    private String provinceCode;
-    /**
-     * 
-     */
-    @ApiModelProperty(name = "provinceName", value = "省名字")
+    @ApiModelProperty(name = "provinceName", value = "")
     private String provinceName;
     /**
      * 
      */
-    @ApiModelProperty(name = "cityCode", value = "市code")
-    private String cityCode;
-    /**
-     * 
-     */
-    @ApiModelProperty(name = "cityName", value = "市名字")
+    @ApiModelProperty(name = "cityName", value = "")
     private String cityName;
     /**
      * 
      */
-    @ApiModelProperty(name = "areaCode", value = "区code")
-    private String areaCode;
-    /**
-     * 
-     */
-    @ApiModelProperty(name = "areaName", value = "区名字")
+    @ApiModelProperty(name = "areaName", value = "")
     private String areaName;
 
 
-    public void setStorehouseCode(String storehouseCode) {
-        this.storehouseCode = storehouseCode;
-    }
-
-    public String getStorehouseCode() {
-        return this.storehouseCode;
-    }
 
     public void setStorehouseName(String storehouseName) {
         this.storehouseName = storehouseName;
@@ -110,13 +83,6 @@ public class BizServiceStorehouse extends AftersaleCommonEntity{
         return this.storehouseStatus;
     }
 
-    public void setProvinceCode(String provinceCode) {
-        this.provinceCode = provinceCode;
-    }
-
-    public String getProvinceCode() {
-        return this.provinceCode;
-    }
 
     public void setProvinceName(String provinceName) {
         this.provinceName = provinceName;
@@ -126,13 +92,6 @@ public class BizServiceStorehouse extends AftersaleCommonEntity{
         return this.provinceName;
     }
 
-    public void setCityCode(String cityCode) {
-        this.cityCode = cityCode;
-    }
-
-    public String getCityCode() {
-        return this.cityCode;
-    }
 
     public void setCityName(String cityName) {
         this.cityName = cityName;
@@ -142,13 +101,6 @@ public class BizServiceStorehouse extends AftersaleCommonEntity{
         return this.cityName;
     }
 
-    public void setAreaCode(String areaCode) {
-        this.areaCode = areaCode;
-    }
-
-    public String getAreaCode() {
-        return this.areaCode;
-    }
 
     public void setAreaName(String areaName) {
         this.areaName = areaName;

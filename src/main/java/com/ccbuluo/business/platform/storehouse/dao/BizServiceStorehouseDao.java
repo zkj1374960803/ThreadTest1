@@ -1,12 +1,15 @@
 package com.ccbuluo.business.platform.storehouse.dao;
 
 import com.ccbuluo.business.entity.BizServiceStorehouse;
+import com.ccbuluo.business.platform.constants.Constants;
+import com.ccbuluo.business.platform.storehouse.dto.SaveBizServiceStorehouseDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -54,15 +57,15 @@ public class BizServiceStorehouseDao extends BaseDao<BizServiceStorehouse> {
      */
     public int update(BizServiceStorehouse entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_service_storehouse SET storehouse_code = :storehouseCode,")
+        sql.append("UPDATE biz_service_storehouse SET ")
             .append("storehouse_name = :storehouseName,")
             .append("storehouse_acreage = :storehouseAcreage,")
             .append("servicecenter_code = :servicecenterCode,")
             .append("storehouse_status = :storehouseStatus,province_code = :provinceCode,")
             .append("province_name = :provinceName,city_code = :cityCode,")
             .append("city_name = :cityName,area_code = :areaCode,area_name = :areaName,")
-            .append("creator = :creator,create_time = :createTime,operator = :operator,")
-            .append("operate_time = :operateTime,delete_flag = :deleteFlag WHERE id= :id");
+            .append("operator = :operator,operate_time = :operateTime WHERE id= :id");
+
         return super.updateForBean(sql.toString(), entity);
     }
 
@@ -75,11 +78,12 @@ public class BizServiceStorehouseDao extends BaseDao<BizServiceStorehouse> {
     public BizServiceStorehouse getById(long id) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,storehouse_code,storehouse_name,storehouse_acreage,")
-            .append("servicecenter_code,storehouse_status,province_code,province_name,")
-            .append("city_code,city_name,area_code,area_name,creator,create_time,operator,")
-            .append("operate_time,delete_flag FROM biz_service_storehouse WHERE id= :id");
+            .append(" servicecenter_code,storehouse_status,province_code,province_name,")
+            .append(" city_code,city_name,area_code,area_name")
+            .append(" FROM biz_service_storehouse WHERE id= :id AND delete_flag = :deleteFlag");
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         return super.findForBean(BizServiceStorehouse.class, sql.toString(), params);
     }
 
@@ -96,5 +100,23 @@ public class BizServiceStorehouseDao extends BaseDao<BizServiceStorehouse> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
         return super.updateForMap(sql.toString(), params);
+    }
+
+    /**
+     * 启停仓库
+     * @param id 仓库id
+     * @param storeHouseStatus 仓库状态
+     * @return  操作是否成功
+     * @author liuduo
+     * @date 2018-07-03 10:37:55
+     */
+    public int editStoreHouseStatus(Long id, Integer storeHouseStatus) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("id", id);
+        params.put("storeHouseStatus", storeHouseStatus);
+
+        String sql = "UPDATE biz_service_storehouse SET storehouse_status = :storeHouseStatus WHERE id = :id";
+
+        return updateForMap(sql, params);
     }
 }
