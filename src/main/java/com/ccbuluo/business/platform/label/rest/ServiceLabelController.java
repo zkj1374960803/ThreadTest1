@@ -37,7 +37,7 @@ public class ServiceLabelController extends BaseController {
      * @date 2018-07-02 16:53:50
      */
     @ApiOperation(value = "添加标签",notes = "【张康健】")
-    @PostMapping("/createLabel")
+    @PostMapping("/createlabel")
     public StatusDto createLabel(BizServiceLabel bizServiceLabel){
         labelServiceImpl.createLabel(bizServiceLabel);
         return StatusDto.buildSuccessStatusDto();
@@ -50,7 +50,7 @@ public class ServiceLabelController extends BaseController {
      * @date 2018-07-03 11:33:04
      */
     @ApiOperation(value = "删除标签",notes = "【张康健】")
-    @PostMapping("/deleteLabel/{id}")
+    @PostMapping("/deletelabel/{id}")
     @ApiImplicitParam(name = "id", value = "标签的id", required = true, paramType = "path")
     public StatusDto deleteLabel(@PathVariable @ApiIgnore Long id){
         labelServiceImpl.deleteLabel(id);
