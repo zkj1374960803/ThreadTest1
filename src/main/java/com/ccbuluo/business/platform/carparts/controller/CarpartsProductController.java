@@ -1,8 +1,7 @@
 package com.ccbuluo.business.platform.carparts.controller;
 
 import com.ccbuluo.business.platform.carparts.service.CarpartsProductService;
-import com.ccbuluo.business.platform.constants.Constants;
-import com.ccbuluo.business.platform.parameter.dto.SaveCarpartsParameterDTO;
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -36,12 +35,11 @@ public class CarpartsProductController {
      */
     @ApiOperation(value = "添加零配件",notes = "【魏俊标】")
     @PostMapping("/save")
-    public StatusDto saveParameter(@ApiParam(name = "SaveParameterDTO对象", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO) {
+    public StatusDto saveParameter(@ApiParam(name = "SaveParameterDTO对象", value = "传入json格式", required = true)
+                                       @RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO) {
         int status = carpartsProductService.saveParameter(saveBasicCarpartsProductDTO);
         if (Constants.YES == status) {
             return StatusDto.buildSuccessStatusDto("保存成功！");
-        } else if (Constants.PLATNUMBER_CHECK == status) {
-            return StatusDto.buildFailureStatusDto("车牌号和车辆id不匹配！");
         }
         return StatusDto.buildFailureStatusDto("保存失败！");
     }

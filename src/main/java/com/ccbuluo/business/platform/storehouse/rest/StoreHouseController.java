@@ -1,7 +1,6 @@
 package com.ccbuluo.business.platform.storehouse.rest;
 
-import com.ccbuluo.business.entity.BizServiceStorehouse;
-import com.ccbuluo.business.platform.constants.Constants;
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.storehouse.dto.SaveBizServiceStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.service.StoreHouseService;
 import com.ccbuluo.core.controller.BaseController;

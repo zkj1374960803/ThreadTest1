@@ -2,12 +2,10 @@ package com.ccbuluo.business.projectcode.dao;
 
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
-import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -17,7 +15,7 @@ import java.util.Map;
  * @date 2018-07-03 09:38:13
  */
 @Repository
-public class GenerateProjectCodeDao extends BaseDao<T> {
+public class GenerateProjectCodeDao<T> extends BaseDao<T> {
 
     @Resource
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;

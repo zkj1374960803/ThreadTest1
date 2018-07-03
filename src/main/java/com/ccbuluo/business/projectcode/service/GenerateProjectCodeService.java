@@ -1,6 +1,6 @@
 package com.ccbuluo.business.projectcode.service;
 
-import com.ccbuluo.business.platform.constants.Constants;
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.projectcode.dao.GenerateProjectCodeDao;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
