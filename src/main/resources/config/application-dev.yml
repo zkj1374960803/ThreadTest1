@@ -26,9 +26,7 @@ redis:
     password: zhtqc$123456
 
   perfix:
-    sso: ssoserdev:userid
-    userinfo: usercoredev:baseinfo
-    wechatmsg: wechat:message:id
+    projectcode: servicedev:projectcode
 
 
 #单点登录相关配置
