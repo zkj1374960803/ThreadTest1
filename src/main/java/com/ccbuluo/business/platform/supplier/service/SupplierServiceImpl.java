@@ -1,13 +1,15 @@
 package com.ccbuluo.business.platform.supplier.service;
 
+import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceSupplier;
+import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
 import com.ccbuluo.business.platform.supplier.dto.EditSupplierDTO;
 import com.ccbuluo.business.platform.supplier.dto.QuerySupplierListDTO;
 import com.ccbuluo.business.platform.supplier.dto.ResultFindSupplierDetailDTO;
 import com.ccbuluo.business.platform.supplier.dto.ResultSupplierListDTO;
-import com.ccbuluo.business.projectcode.service.GenerateProjectCodeService;
+
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.thrift.exception.ThriftRpcException;
@@ -45,7 +47,7 @@ public class SupplierServiceImpl implements SupplierService{
         bizServiceSupplier.setOperator(loggedUserId);
         bizServiceSupplier.setCreator(loggedUserId);
         // 生成供应商编号
-        String code = generateProjectCodeService.getCode(Constants.SUPPLIER_CODE_PREFIX, Constants.AUTOINCREASEDCODESIZE, "supplier_code", "biz_service_supplier", false);
+        String code = generateProjectCodeService.grantCode(CodePrefixEnum.FG);
         bizServiceSupplier.setSupplierCode(code);
         // 信息校验
         checkSupplierInfo(bizServiceSupplier.getId(), bizServiceSupplier.getSupplierPhone(), bizServiceSupplier.getSupplierName());
@@ -125,18 +127,22 @@ public class SupplierServiceImpl implements SupplierService{
      * @param tip 提示语
      * @author zhangkangjian
      * @date 2018-05-23 16:05:19
-     * @version v1.0.1
+     * @version v1.0.0
      */
     private void compareRepeat(String id, List<String> ids, String tip){
         if(id != null){
-            if(ids.size() > 0){
+            if(ids.size() == 1){
                 if(!id.equals(ids.get(0))){
-                    throw new CommonException("404",tip);
+                    throw new CommonException(Constants.ERROR_CODE, tip);
                 }
+            }else if(ids.size() > 1){
+                throw new CommonException(Constants.ERROR_CODE, "此数据已产生重复数据！ " + tip);
             }
         }else {
-            if(ids.size() > 0){
-                throw new CommonException("404",tip);
+            if(ids.size() == 1){
+                throw new CommonException(Constants.ERROR_CODE, tip);
+            }else if(ids.size() > 1){
+                throw new CommonException(Constants.ERROR_CODE, "此数据已产生重复数据！ " + tip);
             }
         }
     }
@@ -148,9 +154,7 @@ public class SupplierServiceImpl implements SupplierService{
      * @param value 验重的值
      * @param fields 验重的字段
      * @param tableName 表名
-     * @param tip 失败提示语 成功不提示
-     * @exception
-     * @return
+     * @param tip 失败提示语 成功不提示语
      * @author zhangkangjian
      * @date 2018-07-03 16:06:48
      */

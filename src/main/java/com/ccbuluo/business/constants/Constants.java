@@ -23,6 +23,8 @@ public class Constants {
     public static final String SUPPLIER_CODE_PREFIX = "FG";
     // 连接符
     public static final String PER_CENT= "%";
+    //错误状态码 1成功，其他失败
+    public static final String ERROR_CODE = "0";
 
 
 }
