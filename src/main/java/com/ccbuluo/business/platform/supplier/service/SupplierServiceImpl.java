@@ -1,0 +1,163 @@
+package com.ccbuluo.business.platform.supplier.service;
+
+import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.entity.BizServiceSupplier;
+import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
+import com.ccbuluo.business.platform.supplier.dto.EditSupplierDTO;
+import com.ccbuluo.business.platform.supplier.dto.QuerySupplierListDTO;
+import com.ccbuluo.business.platform.supplier.dto.ResultFindSupplierDetailDTO;
+import com.ccbuluo.business.platform.supplier.dto.ResultSupplierListDTO;
+import com.ccbuluo.business.projectcode.service.GenerateProjectCodeService;
+import com.ccbuluo.core.common.UserHolder;
+import com.ccbuluo.core.exception.CommonException;
+import com.ccbuluo.core.thrift.exception.ThriftRpcException;
+import com.ccbuluo.db.Page;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
+
+/**
+ * 供应商实现类
+ * @author zhangkangjian
+ * @date 2018-07-03 13:57:26
+ */
+@Service
+public class SupplierServiceImpl implements SupplierService{
+    @Resource(name = "bizServiceSupplierDao")
+    private BizServiceSupplierDao bizServiceSupplierDao;
+    @Autowired
+    private UserHolder userHolder;
+    @Resource(name = "generateProjectCodeService")
+    private GenerateProjectCodeService generateProjectCodeService;
+
+
+    /**
+     * 添加供应商
+     * @param bizServiceSupplier 供应商信息
+     * @author zhangkangjian
+     * @date 2018-07-03 14:32:57
+     */
+    @Override
+    public void createSupplier(BizServiceSupplier bizServiceSupplier) {
+        String loggedUserId = userHolder.getLoggedUserId();
+        bizServiceSupplier.setOperator(loggedUserId);
+        bizServiceSupplier.setCreator(loggedUserId);
+        // 生成供应商编号
+        String code = generateProjectCodeService.getCode(Constants.SUPPLIER_CODE_PREFIX, Constants.AUTOINCREASEDCODESIZE, "supplier_code", "biz_service_supplier", false);
+        bizServiceSupplier.setSupplierCode(code);
+        // 信息校验
+        checkSupplierInfo(bizServiceSupplier.getId(), bizServiceSupplier.getSupplierPhone(), bizServiceSupplier.getSupplierName());
+        bizServiceSupplierDao.saveEntity(bizServiceSupplier);
+    }
+
+    /**
+     * 供应商信息校验
+     * @param id
+     * @param phone 供应商手机号
+     * @param name 供应商姓名
+     * @author zhangkangjian
+     * @date 2018-07-03 16:39:32
+     */
+    private void checkSupplierInfo(Long id, String phone, String name) {
+        // 手机号校验
+        String str = id == null ? null : id.toString();
+        compareRepeat(str , phone, "supplier_phone", "biz_service_supplier", "手机号重复！");
+        // 名字验重
+        compareRepeat(str , name, "supplier_name", "biz_service_supplier", "供应商名称重复！");
+    }
+
+    /**
+     * 编辑供应商
+     * @param editSupplierDTO 供应商信息
+     * @author zhangkangjian
+     * @date 2018-07-03 14:32:57
+     */
+    @Override
+    public void editsupplier(EditSupplierDTO editSupplierDTO) {
+        String loggedUserId = userHolder.getLoggedUserId();
+        editSupplierDTO.setOperator(loggedUserId);
+        checkSupplierInfo(editSupplierDTO.getId(), editSupplierDTO.getSupplierPhone(), editSupplierDTO.getSupplierName());
+        bizServiceSupplierDao.update(editSupplierDTO);
+    }
+
+    /**
+     * 供应商启用/停用接口
+     * @param id 供应商id
+     * @param supplierStatus 停用启用状态 1：启用 0：停用
+     * @author zhangkangjian
+     * @date 2018-07-03 17:09:11
+     */
+    @Override
+    public void updateSupplierStatus(Long id, Integer supplierStatus) {
+        bizServiceSupplierDao.updateSupplierStatus(id, supplierStatus);
+    }
+
+    /**
+     * 查询供应商列表
+     * @param querySupplierListDTO 查询条件
+     * @return List<ResultSupplierListDTO> 供应商列表
+     * @author zhangkangjian
+     * @date 2018-07-04 09:57:21
+     */
+    @Override
+    public Page<ResultSupplierListDTO> querySupplierList(QuerySupplierListDTO querySupplierListDTO) {
+        return bizServiceSupplierDao.querySupplierList(querySupplierListDTO);
+    }
+
+    /**
+     * 查询供应商详情
+     * @param id 供应商id
+     * @return ResultSupplierListDTO 供应商信息
+     * @author zhangkangjian
+     * @date 2018-07-04 10:41:23
+     */
+    @Override
+    public ResultFindSupplierDetailDTO findSupplierDetail(Long id) {
+        return bizServiceSupplierDao.getById(id);
+    }
+
+    /**
+     * 比较两个uuid是否有重复的
+     * @param id 用户的id
+     * @param ids 用户ids
+     * @param tip 提示语
+     * @author zhangkangjian
+     * @date 2018-05-23 16:05:19
+     * @version v1.0.1
+     */
+    private void compareRepeat(String id, List<String> ids, String tip){
+        if(id != null){
+            if(ids.size() > 0){
+                if(!id.equals(ids.get(0))){
+                    throw new CommonException("404",tip);
+                }
+            }
+        }else {
+            if(ids.size() > 0){
+                throw new CommonException("404",tip);
+            }
+        }
+    }
+
+    /**
+     * 重复校验根据id判断
+     * 例子：compareRepeat("2" , "18761326500", "supplier_phone", "biz_service_supplier", "手机号重复！");
+     * @param id
+     * @param value 验重的值
+     * @param fields 验重的字段
+     * @param tableName 表名
+     * @param tip 失败提示语 成功不提示
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-07-03 16:06:48
+     */
+    public void compareRepeat(String id, String value, String fields, String tableName, String tip){
+        List<String> ids = bizServiceSupplierDao.queryIds(value, fields, tableName);
+        compareRepeat(id, ids ,tip);
+    }
+
+
+}

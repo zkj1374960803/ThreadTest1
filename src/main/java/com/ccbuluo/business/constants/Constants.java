@@ -19,6 +19,10 @@ public class Constants {
     public static final int SUCCESSSTATUS = 1;
     // 自增编码的位数
     public static final int AUTOINCREASEDCODESIZE = 6;
+    // 供应商编码前缀
+    public static final String SUPPLIER_CODE_PREFIX = "FG";
+    // 连接符
+    public static final String PER_CENT= "%";
 
 
 }

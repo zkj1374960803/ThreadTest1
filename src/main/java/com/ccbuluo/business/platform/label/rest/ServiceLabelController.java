@@ -18,6 +18,7 @@ import java.util.List;
 /**
  * 标签controller
  * @author zhangkangjian
+ * @version v1.0.0
  * @date 2018-07-02 16:43:46
  */
 @Api(tags = "标签(平台端)")

@@ -1,24 +1,21 @@
-package com.ccbuluo.business.entity;
+package com.ccbuluo.business.platform.supplier.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
 /**
- * 供应商实体
- * @author liuduo
- * @date 2018-05-10 11:43:11
- * @version V1.0.0
+ * 编辑供应商
+ * @author zhangkangjian
+ * @date 2018-07-03 16:32:34
  */
-@ApiModel(value = "BizServiceSupplier", description = "供应商实体")
-public class BizServiceSupplier {
+public class EditSupplierDTO {
     /**
      * 供应商id
      */
-    @ApiModelProperty(name = "id", value = "供应商id", hidden = true)
+    @ApiModelProperty(name = "id", value = "供应商id", required = true)
     private Long id;
     /**
      * 供应商编号
@@ -66,7 +63,7 @@ public class BizServiceSupplier {
     @ApiModelProperty(name = "provinceName", value = "省", required = true)
     private String provinceName;
     /**
-     * 
+     *
      */
     @ApiModelProperty(name = "provinceCode", value = "省code", required = true)
     private String provinceCode;
@@ -76,7 +73,7 @@ public class BizServiceSupplier {
     @ApiModelProperty(name = "cityName", value = "市", required = true)
     private String cityName;
     /**
-     * 
+     *
      */
     @ApiModelProperty(name = "cityCode", value = "市code", required = true)
     private String cityCode;
@@ -86,7 +83,7 @@ public class BizServiceSupplier {
     @ApiModelProperty(name = "areaName", value = "区", required = true)
     private String areaName;
     /**
-     * 
+     *
      */
     @ApiModelProperty(name = "areaCode", value = "区code", required = true)
     private String areaCode;
@@ -95,16 +92,6 @@ public class BizServiceSupplier {
      */
     @ApiModelProperty(name = "majorProduct", value = "主营产品", required = true)
     private String majorProduct;
-    /**
-     * 创建人
-     */
-    @ApiModelProperty(name = "creator", value = "创建人", hidden = true)
-    private String creator;
-    /**
-     * 创建时间
-     */
-    @ApiModelProperty(name = "createTime", value = "创建时间", hidden = true)
-    private Date createTime;
     /**
      * 更新人
      */
@@ -121,69 +108,70 @@ public class BizServiceSupplier {
     @ApiModelProperty(name = "deleteFlag", value = "删除标识", hidden = true)
     private Long deleteFlag = 0L;
 
+    public Long getId() {
+        return id;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
 
-    public Long getId() {
-        return this.id;
+    public String getSupplierCode() {
+        return supplierCode;
     }
 
     public void setSupplierCode(String supplierCode) {
         this.supplierCode = supplierCode;
     }
 
-    public String getSupplierCode() {
-        return this.supplierCode;
+    public String getSupplierName() {
+        return supplierName;
     }
 
     public void setSupplierName(String supplierName) {
         this.supplierName = supplierName;
     }
 
-    public String getSupplierName() {
-        return this.supplierName;
+    public String getLinkman() {
+        return linkman;
     }
 
     public void setLinkman(String linkman) {
         this.linkman = linkman;
     }
 
-    public String getLinkman() {
-        return this.linkman;
+    public String getSupplierPhone() {
+        return supplierPhone;
     }
 
     public void setSupplierPhone(String supplierPhone) {
         this.supplierPhone = supplierPhone;
     }
 
-    public String getSupplierPhone() {
-        return this.supplierPhone;
+    public String getSupplierAddress() {
+        return supplierAddress;
     }
 
     public void setSupplierAddress(String supplierAddress) {
         this.supplierAddress = supplierAddress;
     }
 
-    public String getSupplierAddress() {
-        return this.supplierAddress;
+    public Long getSupplierStatus() {
+        return supplierStatus;
     }
 
     public void setSupplierStatus(Long supplierStatus) {
         this.supplierStatus = supplierStatus;
     }
 
-    public Long getSupplierStatus() {
-        return this.supplierStatus;
+    public String getSupplierNature() {
+        return supplierNature;
     }
 
     public void setSupplierNature(String supplierNature) {
         this.supplierNature = supplierNature;
     }
 
-    public String getSupplierNature() {
-        return this.supplierNature;
-    }
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     public void setEstablishTime(Date establishTime) {
         this.establishTime = establishTime;
@@ -193,101 +181,83 @@ public class BizServiceSupplier {
         return this.establishTime;
     }
 
+    public String getProvinceName() {
+        return provinceName;
+    }
+
     public void setProvinceName(String provinceName) {
         this.provinceName = provinceName;
     }
 
-    public String getProvinceName() {
-        return this.provinceName;
+    public String getProvinceCode() {
+        return provinceCode;
     }
 
     public void setProvinceCode(String provinceCode) {
         this.provinceCode = provinceCode;
     }
 
-    public String getProvinceCode() {
-        return this.provinceCode;
+    public String getCityName() {
+        return cityName;
     }
 
     public void setCityName(String cityName) {
         this.cityName = cityName;
     }
 
-    public String getCityName() {
-        return this.cityName;
+    public String getCityCode() {
+        return cityCode;
     }
 
     public void setCityCode(String cityCode) {
         this.cityCode = cityCode;
     }
 
-    public String getCityCode() {
-        return this.cityCode;
+    public String getAreaName() {
+        return areaName;
     }
 
     public void setAreaName(String areaName) {
         this.areaName = areaName;
     }
 
-    public String getAreaName() {
-        return this.areaName;
+    public String getAreaCode() {
+        return areaCode;
     }
 
     public void setAreaCode(String areaCode) {
         this.areaCode = areaCode;
     }
 
-    public String getAreaCode() {
-        return this.areaCode;
+    public String getMajorProduct() {
+        return majorProduct;
     }
 
     public void setMajorProduct(String majorProduct) {
         this.majorProduct = majorProduct;
     }
 
-    public String getMajorProduct() {
-        return this.majorProduct;
-    }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
-    public String getCreator() {
-        return this.creator;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getCreateTime() {
-        return this.createTime;
+    public String getOperator() {
+        return operator;
     }
 
     public void setOperator(String operator) {
         this.operator = operator;
     }
 
-    public String getOperator() {
-        return this.operator;
+    public Date getOperateTime() {
+        return operateTime;
     }
 
     public void setOperateTime(Date operateTime) {
         this.operateTime = operateTime;
     }
 
-    public Date getOperateTime() {
-        return this.operateTime;
+    public Long getDeleteFlag() {
+        return deleteFlag;
     }
 
     public void setDeleteFlag(Long deleteFlag) {
         this.deleteFlag = deleteFlag;
     }
-
-    public Long getDeleteFlag() {
-        return this.deleteFlag;
-    }
-
-
 }

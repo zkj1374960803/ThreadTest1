@@ -1,12 +1,23 @@
 package com.ccbuluo.business.platform.supplier.dao;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceSupplier;
+import com.ccbuluo.business.platform.supplier.dto.EditSupplierDTO;
+import com.ccbuluo.business.platform.supplier.dto.QuerySupplierListDTO;
+import com.ccbuluo.business.platform.supplier.dto.ResultFindSupplierDetailDTO;
+import com.ccbuluo.business.platform.supplier.dto.ResultSupplierListDTO;
 import com.ccbuluo.dao.BaseDao;
+import com.ccbuluo.db.Page;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,40 +62,40 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
      * 编辑 实体
      * @param entity 实体
      * @return 影响条数
-     * @author liuduo
+     * @author zhangkangjian
      * @date 2018-07-03 09:14:06
      */
-    public int update(BizServiceSupplier entity) {
+    public int update(EditSupplierDTO entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_service_supplier SET supplier_code = :supplierCode,")
+        sql.append("UPDATE biz_service_supplier SET ")
             .append("supplier_name = :supplierName,linkman = :linkman,")
             .append("supplier_phone = :supplierPhone,supplier_address = :supplierAddress,")
             .append("supplier_status = :supplierStatus,supplier_nature = :supplierNature,")
             .append("establish_time = :establishTime,province_name = :provinceName,")
             .append("province_code = :provinceCode,city_name = :cityName,")
             .append("city_code = :cityCode,area_name = :areaName,area_code = :areaCode,")
-            .append("major_product = :majorProduct,creator = :creator,")
-            .append("create_time = :createTime,operator = :operator,")
-            .append("operate_time = :operateTime,delete_flag = :deleteFlag WHERE id= :id");
+            .append("operator = :operator,major_product = :majorProduct,")
+            .append("operate_time = :operateTime WHERE id= :id");
         return super.updateForBean(sql.toString(), entity);
     }
 
     /**
-     * 获取详情
-     * @param id  id
-     * @author liuduo
+     * 获取供应商详情
+     * @param id  供应商id
+     * @return ResultSupplierListDTO 供应商详情
+     * @author zhangkangjian
      * @date 2018-07-03 09:14:06
      */
-    public BizServiceSupplier getById(long id) {
+    public ResultFindSupplierDetailDTO getById(Long id) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,supplier_code,supplier_name,linkman,supplier_phone,")
             .append("supplier_address,supplier_status,supplier_nature,establish_time,")
             .append("province_name,province_code,city_name,city_code,area_name,area_code,")
-            .append("major_product,creator,create_time,operator,operate_time,delete_flag")
+            .append("major_product ")
             .append(" FROM biz_service_supplier WHERE id= :id");
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
-        return super.findForBean(BizServiceSupplier.class, sql.toString(), params);
+        return super.findForBean(ResultFindSupplierDetailDTO.class, sql.toString(), params);
     }
 
     /**
@@ -100,5 +111,97 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
         return super.updateForMap(sql.toString(), params);
+    }
+
+    /**
+     * 查询供应商的id根据手机号
+     * @param supplierPhone 供应商的手机号
+     * @return List<String> 供应商的ids
+     * @author zhangkangjian
+     * @date 2018-07-03 15:31:00
+     */
+    public List<String> querySupplierIdByPhone(String supplierPhone) {
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("supplierPhone", supplierPhone);
+        String sql = "SELECT a.id FROM biz_service_supplier a WHERE a.supplier_phone = :supplierPhone ";
+        return querySingColum(String.class, sql, map);
+    }
+
+    /**
+     * 查询供应商的id根据名称
+     * @param supplierName 供应商的名称
+     * @return List<String> 供应商的ids
+     * @author zhangkangjian
+     * @date 2018-07-03 15:40:42
+     */
+    public List<String> querySupplierIdByName(String supplierName) {
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("supplierName", supplierName);
+        String sql = "SELECT a.id FROM biz_service_supplier a WHERE a.supplier_name = :supplierName ";
+        return querySingColum(String.class, sql, map);
+    }
+    /**
+     * 查询ids
+     * @param value
+     * @param fields 字段
+     * @param tableName 表名称
+     * @return List<String> ids
+     * @author zhangkangjian
+     * @date 2018-07-03 16:04:08
+     */
+    public List<String> queryIds(String value, String fields, String tableName) {
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("value", value);
+        String sql = "SELECT id FROM " + tableName+ "  WHERE " + fields + " = :value ";
+        return querySingColum(String.class, sql, map);
+    }
+
+    /**
+     * 更新供应商的启用停用状态
+     * @param id 供应商的id
+     * @param supplierStatus 供应商的状态
+     * @author zhangkangjian
+     * @date 2018-07-03 17:19:15
+     */
+    public void updateSupplierStatus(Long id, Integer supplierStatus) {
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("id", id);
+        map.put("supplierStatus", supplierStatus);
+        String sql = " UPDATE biz_service_supplier a SET a.supplier_status = :supplierStatus WHERE a.id = :id ";
+        updateForMap(sql, map);
+    }
+    /**
+     * 查询供应商列表
+     * @param querySupplierListDTO 查询条件
+     * @return List<ResultSupplierListDTO> 供应商列表
+     * @author zhangkangjian
+     * @date 2018-07-04 09:59:56
+     */
+    public Page<ResultSupplierListDTO> querySupplierList(QuerySupplierListDTO querySupplierListDTO) {
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT id,supplier_code,supplier_name, ")
+            .append(" linkman,supplier_phone,supplier_address, ")
+            .append(" supplier_status,province_name,city_name,area_name ")
+            .append(" FROM biz_service_supplier ")
+            .append(" WHERE 1 = 1 ");
+        if(StringUtils.isNotBlank(querySupplierListDTO.getProvinceName())){
+            sql.append(" AND province_name = :provinceName ");
+        }
+        if(StringUtils.isNotBlank(querySupplierListDTO.getCityName())){
+            sql.append(" AND city_name = :cityName ");
+        }
+        if(StringUtils.isNotBlank(querySupplierListDTO.getAreaName())){
+            sql.append(" AND area_name = :areaName ");
+        }
+        if(querySupplierListDTO.getSupplierStatus() != null && querySupplierListDTO.getSupplierStatus() != -1){
+            sql.append(" AND supplier_status = :supplierStatus ");
+        }
+        if(StringUtils.isNotBlank(querySupplierListDTO.getKeyword())){
+            String keyword = querySupplierListDTO.getKeyword();
+            querySupplierListDTO.setKeyword(Constants.PER_CENT + keyword + Constants.PER_CENT);
+            sql.append(" AND (supplier_name LIKE :keyword OR linkman like :keyword OR supplier_phone like :keyword ) ");
+        }
+        SqlParameterSource param = new BeanPropertySqlParameterSource(querySupplierListDTO);
+        return queryPageForBean(ResultSupplierListDTO.class, sql.toString(), param, querySupplierListDTO.getOffset(), querySupplierListDTO.getPageSize());
     }
 }

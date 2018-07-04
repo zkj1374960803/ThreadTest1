@@ -3,6 +3,8 @@ package com.ccbuluo.business.platform.label.service;
 import com.ccbuluo.business.entity.BizServiceLabel;
 import com.ccbuluo.business.platform.label.dao.BizServiceLabelDao;
 import com.ccbuluo.business.platform.label.dto.ListLabelDTO;
+import com.ccbuluo.business.platform.supplier.service.SupplierService;
+import com.ccbuluo.business.platform.supplier.service.SupplierServiceImpl;
 import com.ccbuluo.core.common.UserHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ public class LabelServiceImpl implements LabelService {
     private BizServiceLabelDao bizServiceLabelDao;
     @Autowired
     UserHolder userHolder;
+    @Resource(name = "supplierServiceImpl")
+    SupplierServiceImpl supplierServiceImpl;
 
     /**
      * 创建标签
@@ -33,6 +37,10 @@ public class LabelServiceImpl implements LabelService {
         String loggedUserId = userHolder.getLoggedUserId();
         bizServiceLabel.setCreator(loggedUserId);
         bizServiceLabel.setOperator(loggedUserId);
+        // 标签验重
+        Long id = bizServiceLabel.getId();
+        String strId = id == null ? null : id.toString();
+        supplierServiceImpl.compareRepeat(strId, bizServiceLabel.getLabelName(),"label_name", "biz_service_label", "标签名称重复！");
         bizServiceLabelDao.saveEntity(bizServiceLabel);
     }
 
