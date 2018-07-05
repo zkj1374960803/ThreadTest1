@@ -96,7 +96,7 @@ public class BizServiceLabelDao extends BaseDao<BizServiceLabel> {
      * @date 2018-07-03 11:47:54
      */
     public List<ListLabelDTO> findListLabel() {
-        String sql = " SELECT a.id,a.label_name FROM biz_service_label a ";
+        String sql = " SELECT a.id,a.label_name FROM biz_service_label a order by a.id desc";
         return queryListBean(ListLabelDTO.class, sql, Maps.newHashMap());
     }
 }

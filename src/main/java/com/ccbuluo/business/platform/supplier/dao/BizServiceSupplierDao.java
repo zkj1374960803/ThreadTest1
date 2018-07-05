@@ -201,6 +201,7 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
             querySupplierListDTO.setKeyword(Constants.PER_CENT + keyword + Constants.PER_CENT);
             sql.append(" AND (supplier_name LIKE :keyword OR linkman like :keyword OR supplier_phone like :keyword ) ");
         }
+        sql.append(" order by operate_time desc ");
         SqlParameterSource param = new BeanPropertySqlParameterSource(querySupplierListDTO);
         return queryPageForBean(ResultSupplierListDTO.class, sql.toString(), param, querySupplierListDTO.getOffset(), querySupplierListDTO.getPageSize());
     }
