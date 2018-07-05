@@ -32,16 +32,16 @@ public class BizServiceLabelDao extends BaseDao<BizServiceLabel> {
     /**
      * 保存 实体
      * @param entity 实体
-     * @return int 影响条数
+     * @return Long id 新增返回i
      * @author zhangkangjian
      * @date 2018-07-03 09:14:06
      */
-    public int saveEntity(BizServiceLabel entity) {
+    public Long saveEntity(BizServiceLabel entity) {
         StringBuilder sql = new StringBuilder();
         sql.append(" INSERT INTO biz_service_label ( label_name,creator,")
             .append("operator,delete_flag ) VALUES (  :labelName, :creator,")
             .append(" :operator, :deleteFlag )");
-        return super.save(sql.toString(), entity);
+        return super.saveRid(sql.toString(), entity);
     }
 
     /**

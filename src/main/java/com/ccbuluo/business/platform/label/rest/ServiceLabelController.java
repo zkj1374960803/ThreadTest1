@@ -37,11 +37,10 @@ public class ServiceLabelController extends BaseController {
      * @author zhangkangjian
      * @date 2018-07-02 16:53:50
      */
-    @ApiOperation(value = "添加标签",notes = "【张康健】")
+    @ApiOperation(value = "添加标签(成功返回标签信息)",notes = "【张康健】")
     @PostMapping("/createlabel")
-    public StatusDto createLabel(BizServiceLabel bizServiceLabel){
-        labelServiceImpl.createLabel(bizServiceLabel);
-        return StatusDto.buildSuccessStatusDto();
+    public StatusDto<ListLabelDTO> createLabel(BizServiceLabel bizServiceLabel){
+        return StatusDto.buildDataSuccessStatusDto(labelServiceImpl.createLabel(bizServiceLabel));
     }
 
     /**

@@ -19,7 +19,7 @@ public interface LabelService {
      * @author zhangkangjian
      * @date 2018-07-02 16:59:11
      */
-    void createLabel(BizServiceLabel bizServiceLabel);
+    ListLabelDTO createLabel(BizServiceLabel bizServiceLabel);
     /**
      * 删除标签
      * @param id 标签id
