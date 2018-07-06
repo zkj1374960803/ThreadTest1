@@ -4,7 +4,11 @@ import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.projectcode.dao.GenerateProjectCodeDao;
+import com.ccbuluo.core.constants.SystemPropertyHolder;
+import com.ccbuluo.core.thrift.proxy.ThriftProxyServiceFactory;
+import com.ccbuluo.usercoreintf.BasicUserOrganizationService;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +40,7 @@ public class GenerateProjectCodeService {
      * @author liupengfei
      * @date 2018-07-03 17:21:37
      */
-    public String grantCode(CodePrefixEnum prefix){
+    public String grantCode(CodePrefixEnum prefix)  throws TException{
         String newCode = "";
         switch (prefix){
             case FW:    // 服务中心
@@ -74,10 +78,10 @@ public class GenerateProjectCodeService {
      * @param tableName  表名
      * @param isRandomCode 是否有随机码
      * @return 生成的编码
-     * @author liuduo
+     * @author liuduo servicedev:projectcode:FW
      * @date 2018-06-29 10:51:58
      */
-    private String getCode(String prefix, int autoIncreasedcodeSize, String fieldName, String tableName, Boolean isRandomCode) {
+    private String getCode(String prefix, int autoIncreasedcodeSize, String fieldName, String tableName, Boolean isRandomCode) throws TException {
         // 根据前缀从redis中获取最大code
         String redisKey = buildRedisKey(prefix);
         String redisCode = jedisCluster.get(redisKey);
@@ -89,13 +93,17 @@ public class GenerateProjectCodeService {
             return newCode;
         }
         // redis里没有编码，或根据redis生成编码异常时，从数据库中查询
-        // TODO 刘铎 如果是服务中心类型的编码，需要调用内部户中心服务
-        String dbCode = generateProjectCodeDao.getMaxCode(fieldName, tableName);
+        String dbCode = null;
+        // 如果是服务中心类型的编码，需要调用内部户中心服务
+        if (prefix.equals(CodePrefixEnum.FW.toString())) {
+            dbCode = getServer().getMaxCode();
+        } else {
+            dbCode = generateProjectCodeDao.getMaxCode(fieldName, tableName);
+        }
         if (StringUtils.isNotBlank(dbCode)) {
-            jedisCluster.del(prefix);
             return produceCode(prefix, autoIncreasedcodeSize, dbCode, isRandomCode);
         }
-        // 如果第一次时，redis和数据库里都没数据则从1开始
+        // todo 如果第一次时，redis和数据库里都没数据则从1开始,需要判断有没有随机码
         return prefix + String.format("%0"+autoIncreasedcodeSize+"d", Constants.FLAG_ONE);
     }
 
@@ -113,9 +121,14 @@ public class GenerateProjectCodeService {
     private String produceCode(String prefix, int autoIncreasedcodeSize, String code, Boolean isRandomCode) {
         try {
             String redisKey = buildRedisKey(prefix);
-            String substring = code.substring(0, 2);
+            String substring2 = null;
             // 需要自增的字符串
-            String substring2 = code.substring(2, code.length());
+            if (isRandomCode) {
+                substring2 = code.substring(2, code.length()-1);
+            } else {
+                substring2 = code.substring(2, code.length());
+            }
+
             int parkNum = Integer.parseInt(substring2);
             parkNum++;
             String format = String.format("%0"+autoIncreasedcodeSize+"d", parkNum);
@@ -123,9 +136,9 @@ public class GenerateProjectCodeService {
             if (isRandomCode) {
                 Random random = new Random();
                 int randomCode = random.nextInt(10);
-                newCode = substring + format + randomCode;
+                newCode = prefix + format + randomCode;
             } else {
-                newCode = substring + format;
+                newCode = prefix + format;
             }
             // 重新放入redis
             jedisCluster.set(redisKey, newCode);
@@ -140,4 +153,11 @@ public class GenerateProjectCodeService {
     private String buildRedisKey(String prefix){
         return String.format("%s:%s", BusinessPropertyHolder.PROJECTCODE_REDIS_KEYPERFIX, prefix);
     }
+
+
+    private BasicUserOrganizationService.Iface getServer() {
+        return (BasicUserOrganizationService.Iface) ThriftProxyServiceFactory.newInstance(BasicUserOrganizationService.class, SystemPropertyHolder.getUserCoreRpcSerName());
+    }
+
+
 }

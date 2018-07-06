@@ -11,7 +11,7 @@ import java.util.Date;
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "实体", description = "")
+@ApiModel(value = "仓库实体", description = "仓库实体")
 public class BizServiceStorehouse extends AftersaleCommonEntity{
     /**
      * 仓库编号
@@ -39,35 +39,50 @@ public class BizServiceStorehouse extends AftersaleCommonEntity{
     @ApiModelProperty(name = "storehouseStatus", value = "启用、停用")
     private Long storehouseStatus;
     /**
-     * 
+     * 省code
      */
     @ApiModelProperty(name = "provinceCode", value = "省code")
     private String provinceCode;
     /**
-     * 
+     * 省名字
      */
     @ApiModelProperty(name = "provinceName", value = "省名字")
     private String provinceName;
     /**
-     * 
+     * 市code
      */
     @ApiModelProperty(name = "cityCode", value = "市code")
     private String cityCode;
     /**
-     * 
+     * 市名字
      */
     @ApiModelProperty(name = "cityName", value = "市名字")
     private String cityName;
     /**
-     * 
+     * 区code
      */
     @ApiModelProperty(name = "areaCode", value = "区code")
     private String areaCode;
     /**
-     * 
+     * 区名字
      */
     @ApiModelProperty(name = "areaName", value = "区名字")
     private String areaName;
+    /**
+     * 经度
+     */
+    @ApiModelProperty(name = "longitude", value = "经度")
+    private String longitude;
+    /**
+     * 纬度
+     */
+    @ApiModelProperty(name = "latitude", value = "纬度")
+    private String latitude;
+    /**
+     * 详细地址
+     */
+    @ApiModelProperty(name = "storehouseAddress", value = "详细地址")
+    private String storehouseAddress;
 
 
     public void setStorehouseCode(String storehouseCode) {
@@ -158,5 +173,27 @@ public class BizServiceStorehouse extends AftersaleCommonEntity{
         return this.areaName;
     }
 
+    public String getLongitude() {
+        return longitude;
+    }
 
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getStorehouseAddress() {
+        return storehouseAddress;
+    }
+
+    public void setStorehouseAddress(String storehouseAddress) {
+        this.storehouseAddress = storehouseAddress;
+    }
 }

@@ -44,6 +44,8 @@ base:
   appid: 681fe3bf2bcf4a0f8fc4bc1497d9a4f6
   #本系统的secret
   secret: 6c28edbc36214242858fbea49fe58098
+  #顶级服务中心code
+  topservicecenter: "SC000001"
 
 
 cookie:

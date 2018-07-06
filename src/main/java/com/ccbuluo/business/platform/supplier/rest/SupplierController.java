@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.thrift.TException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -40,7 +41,7 @@ public class SupplierController extends BaseController {
      */
     @PostMapping("/createsupplier")
     @ApiOperation(value = "添加供应商",notes = "【张康健】")
-    public StatusDto createSupplier(BizServiceSupplier bizServiceSupplier){
+    public StatusDto createSupplier(BizServiceSupplier bizServiceSupplier) throws TException {
         supplierServiceImpl.createSupplier(bizServiceSupplier);
         return StatusDto.buildSuccessStatusDto();
     }

@@ -24,4 +24,12 @@ public class BusinessPropertyHolder {
         PROJECTCODE_REDIS_KEYPERFIX = projectcodeRedisKeyperfix;
     }
     // endregion
+
+
+    // 顶级服务中心code
+    public static String TOP_SERVICECENTER;
+    @Value("${base.topservicecenter}")
+    public void setTopStore(String topservicecenter) {
+        TOP_SERVICECENTER = topservicecenter;
+    }
 }

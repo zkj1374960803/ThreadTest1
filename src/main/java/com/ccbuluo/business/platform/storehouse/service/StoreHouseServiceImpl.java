@@ -1,20 +1,26 @@
 package com.ccbuluo.business.platform.storehouse.service;
 
 import com.ccbuluo.business.constants.CodePrefixEnum;
-import com.ccbuluo.business.entity.BizServiceStorehouse;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.entity.BizServiceStorehouse;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.business.platform.storehouse.dto.SaveBizServiceStorehouseDTO;
+import com.ccbuluo.business.platform.storehouse.dto.SearchStorehouseListDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.constants.SystemPropertyHolder;
 import com.ccbuluo.core.thrift.proxy.ThriftProxyServiceFactory;
+import com.ccbuluo.db.Page;
 import com.ccbuluo.usercoreintf.BasicUserOrganizationService;
+import com.google.common.collect.Maps;
+import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
 
 /**
  * 仓库service实现
@@ -33,14 +39,6 @@ public class StoreHouseServiceImpl implements StoreHouseService{
     private UserHolder userHolder;
     Logger logger = LoggerFactory.getLogger(getClass());
 
-    // 编码前缀
-    private static final String PREFIX = "FC";
-    // 列名
-    private static final String FIELDNAME = "storehouse_code";
-    // 表名
-    private static final String TRABLENAME = "biz_service_storehouse";
-    // 是否有随机码
-    private static final Boolean ISTANDOMCODE = false;
 
     /**
      * 保存仓库
@@ -51,12 +49,17 @@ public class StoreHouseServiceImpl implements StoreHouseService{
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int saveStoreHouse(SaveBizServiceStorehouseDTO saveBizServiceStorehouseDTO) {
+    public int saveStoreHouse(SaveBizServiceStorehouseDTO saveBizServiceStorehouseDTO) throws TException {
         try {
+            // 名字验重
+            Boolean aboolean = bizServiceStorehouseDao.storeHouseNameCheck(saveBizServiceStorehouseDTO.getStorehouseName());
+            if (aboolean) {
+                return Constants.FAILURE_ONE;
+            }
             // 生成编码
             String code = generateProjectCodeService.grantCode(CodePrefixEnum.FC);
             BizServiceStorehouse bizServiceStorehouse = create(saveBizServiceStorehouseDTO);
-            bizServiceStorehouse.setServicecenterCode(code);
+            bizServiceStorehouse.setStorehouseCode(code);
             bizServiceStorehouse.preInsert(userHolder.getLoggedUserId());
             return bizServiceStorehouseDao.saveEntity(bizServiceStorehouse);
         } catch (Exception e) {
@@ -75,7 +78,7 @@ public class StoreHouseServiceImpl implements StoreHouseService{
      */
     @Override
     public int editStoreHouseStatus(Long id, Integer storeHouseStatus) {
-        return bizServiceStorehouseDao.editStoreHouseStatus(id, storeHouseStatus);
+        return bizServiceStorehouseDao.editStoreHouseStatus(id, storeHouseStatus,userHolder.getLoggedUserId());
     }
 
     /**
@@ -88,6 +91,11 @@ public class StoreHouseServiceImpl implements StoreHouseService{
     @Override
     public int editStoreHouse(SaveBizServiceStorehouseDTO saveBizServiceStorehouseDTO) {
         try {
+            // 名字验重
+            Boolean aboolean = bizServiceStorehouseDao.checkName(saveBizServiceStorehouseDTO.getId(),saveBizServiceStorehouseDTO.getStorehouseName());
+            if (aboolean) {
+                return Constants.FAILURE_ONE;
+            }
             BizServiceStorehouse bizServiceStorehouse = create(saveBizServiceStorehouseDTO);
             bizServiceStorehouse.setId(saveBizServiceStorehouseDTO.getId());
             bizServiceStorehouse.preUpdate(userHolder.getLoggedUserId());
@@ -106,11 +114,41 @@ public class StoreHouseServiceImpl implements StoreHouseService{
      * @date 2018-07-03 11:29:10
      */
     @Override
-    public BizServiceStorehouse getById(Long id) {
-        BizServiceStorehouse bizServiceStorehouse = bizServiceStorehouseDao.getById(id);
-        // 调用服务，查询该仓库是属于哪个服务中心
-//        getServer().getServiceCenterByCode(bizServiceStorehouse.getServicecenterCode());
-        return null;
+    public BizServiceStorehouse getById(Long id) throws TException {
+        return bizServiceStorehouseDao.getById(id);
+    }
+
+    /**
+     * 查询仓库列表
+     * @param provinceName 省
+     * @param cityName 市
+     * @param areaName 区
+     * @param storeHouseStatus 状态
+     * @param keyword 关键字
+     * @param offset 起始数
+     * @param pagesize 每页数
+     * @return 仓库列表
+     * @author liuduo
+     * @date 2018-07-03 14:27:11
+     */
+    @Override
+    public Page<SearchStorehouseListDTO> queryList(String provinceName, String cityName, String areaName, Integer storeHouseStatus, String keyword, Integer offset, Integer pagesize)throws TException  {
+        // 调用服务查询服务中心名称
+        List<String> serviceCenterCode = new ArrayList<>();
+        Map<String, String>  serviceCenterByCodes = Maps.newHashMap();
+        serviceCenterByCodes = getServer().getServiceCenterByCodes(keyword);
+        if (serviceCenterByCodes.size() == 0) {
+            serviceCenterByCodes = getServer().getServiceCenterByCodes(null);
+        }
+        serviceCenterByCodes.forEach((key, value) ->serviceCenterCode.add(key));
+        Page<SearchStorehouseListDTO> storehouseList =  bizServiceStorehouseDao.queryList(provinceName, cityName, areaName, storeHouseStatus, keyword, serviceCenterCode, offset, pagesize);
+        List<SearchStorehouseListDTO> rows = storehouseList.getRows();
+        if (serviceCenterByCodes != null) {
+            for (SearchStorehouseListDTO storeHouse : rows) {
+                storeHouse.setServiceCenterName(serviceCenterByCodes.get(storeHouse.getServicecenterCode()));
+            }
+        }
+        return storehouseList;
     }
 
     private BizServiceStorehouse create(SaveBizServiceStorehouseDTO saveBizServiceStorehouseDTO) {
@@ -122,10 +160,25 @@ public class StoreHouseServiceImpl implements StoreHouseService{
         bizServiceStorehouse.setProvinceName(saveBizServiceStorehouseDTO.getProvinceName());
         bizServiceStorehouse.setCityName(saveBizServiceStorehouseDTO.getCityName());
         bizServiceStorehouse.setAreaName(saveBizServiceStorehouseDTO.getAreaName());
+        bizServiceStorehouse.setLongitude(saveBizServiceStorehouseDTO.getLongitude());
+        bizServiceStorehouse.setLatitude(saveBizServiceStorehouseDTO.getLatitude());
+        bizServiceStorehouse.setStorehouseAddress(saveBizServiceStorehouseDTO.getStorehouseAddress());
         return bizServiceStorehouse;
     }
 
     private BasicUserOrganizationService.Iface getServer() {
         return (BasicUserOrganizationService.Iface) ThriftProxyServiceFactory.newInstance(BasicUserOrganizationService.class, SystemPropertyHolder.getUserCoreRpcSerName());
+    }
+
+    /**
+     * 根据服务中心code查询仓库
+     * @param serviceCenterCode 服务中心code
+     * @return 服务中心关联的仓库
+     * @author liuduo
+     * @date 2018-07-05 10:27:40
+     */
+    @Override
+    public List<BizServiceStorehouse> getStorehousrByCode(String serviceCenterCode) {
+        return bizServiceStorehouseDao.getStorehousrByCode(serviceCenterCode);
     }
 }

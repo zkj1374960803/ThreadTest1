@@ -11,7 +11,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "仓库实体", description = "仓库实体")
+@ApiModel(value = "仓库实体(保存用)", description = "仓库实体(保存用)")
 public class SaveBizServiceStorehouseDTO extends IdEntity {
     /**
      * 名称
@@ -34,20 +34,36 @@ public class SaveBizServiceStorehouseDTO extends IdEntity {
     @ApiModelProperty(name = "storehouseStatus", value = "启用、停用")
     private Long storehouseStatus;
     /**
-     * 
+     * 省
      */
-    @ApiModelProperty(name = "provinceName", value = "")
+    @ApiModelProperty(name = "provinceName", value = "省")
     private String provinceName;
     /**
-     * 
+     * 市
      */
-    @ApiModelProperty(name = "cityName", value = "")
+    @ApiModelProperty(name = "cityName", value = "市")
     private String cityName;
     /**
-     * 
+     * 区
      */
-    @ApiModelProperty(name = "areaName", value = "")
+    @ApiModelProperty(name = "areaName", value = "区")
     private String areaName;
+    /**
+     * 经度
+     */
+    @ApiModelProperty(name = "longitude", value = "经度")
+    private String longitude;
+
+    /**
+     * 纬度
+     */
+    @ApiModelProperty(name = "latitude", value = "纬度")
+    private String latitude;
+    /**
+     * 详细地址
+     */
+    @ApiModelProperty(name = "storehouseAddress", value = "详细地址")
+    private String storehouseAddress;
 
 
 
@@ -110,5 +126,27 @@ public class SaveBizServiceStorehouseDTO extends IdEntity {
         return this.areaName;
     }
 
+    public String getLongitude() {
+        return longitude;
+    }
 
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public String getStorehouseAddress() {
+        return storehouseAddress;
+    }
+
+    public void setStorehouseAddress(String storehouseAddress) {
+        this.storehouseAddress = storehouseAddress;
+    }
 }

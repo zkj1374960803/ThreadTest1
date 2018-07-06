@@ -14,6 +14,7 @@ import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.thrift.exception.ThriftRpcException;
 import com.ccbuluo.db.Page;
+import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +43,7 @@ public class SupplierServiceImpl implements SupplierService{
      * @date 2018-07-03 14:32:57
      */
     @Override
-    public void createSupplier(BizServiceSupplier bizServiceSupplier) {
+    public void createSupplier(BizServiceSupplier bizServiceSupplier) throws TException {
         String loggedUserId = userHolder.getLoggedUserId();
         bizServiceSupplier.setOperator(loggedUserId);
         bizServiceSupplier.setCreator(loggedUserId);
