@@ -17,9 +17,15 @@ import com.ccbuluo.business.platform.servicecenter.servicecenterenum.ServiceCent
 import com.ccbuluo.business.platform.storehouse.dto.SaveBizServiceStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.service.StoreHouseServiceImpl;
 import com.ccbuluo.core.common.UserHolder;
-import com.ccbuluo.core.constants.SystemPropertyHolder;
-import com.ccbuluo.core.thrift.proxy.ThriftProxyServiceFactory;
-import com.ccbuluo.usercoreintf.*;
+import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
+import com.ccbuluo.usercoreintf.dto.EditServiceCenterDTO;
+import com.ccbuluo.usercoreintf.dto.OrgWorkplaceDTO;
+import com.ccbuluo.usercoreintf.dto.ServiceCenterWorkplaceDTO;
+import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
+import com.ccbuluo.usercoreintf.model.BasicUserWorkplace;
+import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
+import com.ccbuluo.usercoreintf.service.BasicUserWorkplaceService;
+import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
@@ -51,6 +57,12 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
     private LabelServiceCenterService labelServiceCenterService;
     @Autowired
     private StoreHouseServiceImpl storeHouseService;
+    @ThriftRPCClient("UserCoreSerService")
+    private BasicUserOrganizationService orgService;
+    @ThriftRPCClient("UserCoreSerService")
+    private BasicUserWorkplaceService workplaceService;
+    @ThriftRPCClient("UserCoreSerService")
+    private InnerUserInfoService userService;
 
     private static final String AFTERSALESERVICECENTER = "(售后服务中心所属职场)";
 
@@ -110,7 +122,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
         basicUserWorkplace.setLatitude(saveServiceCenterDTO.getLatitude());
         basicUserWorkplace.setCreator(userHolder.getLoggedUserId());
         basicUserWorkplace.setOperator(userHolder.getLoggedUserId());
-        return getWorkplaceServer().save(basicUserWorkplace);
+        return workplaceService.save(basicUserWorkplace);
     }
 
     /**
@@ -123,7 +135,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
     @Override
     public SearchServiceCenterDTO getByCode(String serviceCenterCode) throws TException {
         // 查询服务中心和职场
-        OrgWorkplaceDTO byCode = getOrgServer().getByCode(serviceCenterCode);
+        OrgWorkplaceDTO byCode = orgService.getByCode(serviceCenterCode);
         // 查询标签
         List<BizServiceLabel> bizServiceLabelList = labelServiceCenterService.getLabelServiceCenterByCode(serviceCenterCode);
         // 查询仓库
@@ -160,7 +172,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
         editServiceCenterDTO.setOperateTime(System.currentTimeMillis());
         editServiceCenterDTO.setOperator(userHolder.getLoggedUserId());
         // 修改服务中心名称
-        int status = getOrgServer().editServiceCenter(editServiceCenterDTO);
+        int status = orgService.editServiceCenter(editServiceCenterDTO);
         if (status == Constants.SUCCESSSTATUS) {
             // 修改标签与服务中心关联关系
             int affected = labelServiceCenterService.editLabelServiceCenter(serviceCenterCode, labels);
@@ -180,7 +192,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
      */
     @Override
     public ServiceCenterWorkplaceDTO getWorkplaceByCode(String serviceCenterCode) throws TException {
-        return getWorkplaceServer().getWorkplaceByCode(serviceCenterCode);
+        return workplaceService.getWorkplaceByCode(serviceCenterCode);
     }
 
     /**
@@ -194,7 +206,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
     public int editWorkplace(ServiceCenterWorkplaceDTO serviceCenterWorkplaceDTO) throws TException {
         serviceCenterWorkplaceDTO.setOperator(userHolder.getLoggedUserId());
         serviceCenterWorkplaceDTO.setOperateTime(System.currentTimeMillis());
-        return getWorkplaceServer().editServiceCenterWorkplace(serviceCenterWorkplaceDTO);
+        return workplaceService.editServiceCenterWorkplace(serviceCenterWorkplaceDTO);
     }
 
     /**
@@ -206,7 +218,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
      */
     @Override
     public Map<String, Object> queryList(SearchListDTO searchListDTO) throws TException, IOException {
-        String serviceCenterList = getOrgServer().queryServiceCenterList(searchListDTO.getProvince(),
+        String serviceCenterList = orgService.queryServiceCenterList(searchListDTO.getProvince(),
                                                                          searchListDTO.getCity() ,
                                                                          searchListDTO.getArea() ,
                                                                          searchListDTO.getStatus(),
@@ -224,7 +236,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
             return Collections.emptyMap();
         }
         // 统计门店下用户的数量
-        Map<Long, Long> storeUserNumber = getInnerUserInfoService().queryCountUserNumberByOrgId(ids);
+        Map<Long, Long> storeUserNumber = userService.queryCountUserNumberByOrgId(ids);
         for (Map<String, Object> map : rows) {
             Long id = ((Integer) map.get("id")).longValue();
             map.put("serviceCenterUserNumber", storeUserNumber.get(id));
@@ -242,7 +254,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
      */
     @Override
     public int editOrgStatus(String serviceCenterCode, Integer serviceCenterStatus) throws TException {
-        return getOrgServer().editOrgStatus(serviceCenterCode, serviceCenterStatus, userHolder.getLoggedUserId());
+        return orgService.editOrgStatus(serviceCenterCode, serviceCenterStatus, userHolder.getLoggedUserId());
     }
 
     /**
@@ -313,40 +325,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
         basicUserOrganization.setCreator(userHolder.getLoggedUserId());
         basicUserOrganization.setOperator(userHolder.getLoggedUserId());
         basicUserOrganization.setTopOrgCode(BusinessPropertyHolder.TOP_SERVICECENTER);
-        Long id = getOrgServer().save(basicUserOrganization);
+        Long id = orgService.save(basicUserOrganization);
         return id;
     }
-
-
-    /**
-    * 获取组织架构服务
-    * @return 用户服务中心组织架构服务
-    * @author liuduo
-    * @date 2018-07-04 10:38:44
-    */
-    private BasicUserOrganizationService.Iface getOrgServer() {
-        return (BasicUserOrganizationService.Iface) ThriftProxyServiceFactory.newInstance(BasicUserOrganizationService.class, SystemPropertyHolder.getUserCoreRpcSerName());
-    }
-
-    /**
-     * 获取职场服务
-     * @return 用户服务中心职场服务
-     * @author liuduo
-     * @date 2018-07-04 10:38:44
-     */
-    private BasicUserWorkplaceService.Iface getWorkplaceServer() {
-        return (BasicUserWorkplaceService.Iface) ThriftProxyServiceFactory.newInstance(BasicUserWorkplaceService.class, SystemPropertyHolder.getUserCoreRpcSerName());
-    }
-    /**
-     * 获取用户服务
-     * @return 用户服务中心用户服务
-     * @author liuduo
-     * @date 2018-07-04 10:38:44
-     */
-    private InnerUserInfoService.Iface getInnerUserInfoService() {
-        return (InnerUserInfoService.Iface) ThriftProxyServiceFactory.newInstance(InnerUserInfoService.class, SystemPropertyHolder.getUserCoreRpcSerName());
-    }
-
-
-
 }

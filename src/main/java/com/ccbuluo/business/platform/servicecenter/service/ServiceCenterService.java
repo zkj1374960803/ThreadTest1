@@ -3,7 +3,7 @@ package com.ccbuluo.business.platform.servicecenter.service;
 import com.ccbuluo.business.platform.servicecenter.dto.SaveServiceCenterDTO;
 import com.ccbuluo.business.platform.servicecenter.dto.SearchListDTO;
 import com.ccbuluo.business.platform.servicecenter.dto.SearchServiceCenterDTO;
-import com.ccbuluo.usercoreintf.ServiceCenterWorkplaceDTO;
+import com.ccbuluo.usercoreintf.dto.ServiceCenterWorkplaceDTO;
 import org.apache.thrift.TException;
 import java.io.IOException;
 import java.util.Map;

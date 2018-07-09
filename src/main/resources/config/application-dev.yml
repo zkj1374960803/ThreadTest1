@@ -1,6 +1,6 @@
 #开发环境 配置文件
 server:
-  port: 15999
+  port: 15201
   maxPostSize: 20971520
 
 #tomcatJdbc 配置信息
@@ -40,7 +40,7 @@ oauth:
 base:
   #本系统域名
 #  url: http://192.168.0.216:15999
-  url: http://localhost:15999
+  url: http://localhost:15201
   #本系统的appid
   appid: 681fe3bf2bcf4a0f8fc4bc1497d9a4f6
   #本系统的secret
@@ -82,15 +82,7 @@ upload:
 ccbuluo:
   thrift:
     service:
-      name: aftersaleService
-      port: 15501
-      ip: 192.168.0.12
       basePackages: com
-      #loadbalance: precise
-      #precise: 192.168.0.12:15666
     zookeeper:
       server: 192.168.0.12:2181
-    provider:
-        usercore: "UserCoreSerService"
-        usermanage: "UserManagerService"
-        wechat: "WechatCoreService"
+
