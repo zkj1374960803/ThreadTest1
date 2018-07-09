@@ -4,9 +4,8 @@ import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.projectcode.dao.GenerateProjectCodeDao;
-import com.ccbuluo.core.constants.SystemPropertyHolder;
-import com.ccbuluo.core.thrift.proxy.ThriftProxyServiceFactory;
-import com.ccbuluo.usercoreintf.BasicUserOrganizationService;
+import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
+import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
@@ -32,6 +31,8 @@ public class GenerateProjectCodeService {
     private JedisCluster jedisCluster;
     @Autowired
     private GenerateProjectCodeDao generateProjectCodeDao;
+    @ThriftRPCClient("UserCoreSerService")
+    private BasicUserOrganizationService userService;
 
     /**
      * 根据前缀生成相应的编码
@@ -96,7 +97,7 @@ public class GenerateProjectCodeService {
         String dbCode = null;
         // 如果是服务中心类型的编码，需要调用内部户中心服务
         if (prefix.equals(CodePrefixEnum.FW.toString())) {
-            dbCode = getServer().getMaxCode();
+            dbCode = userService.getMaxCode();
         } else {
             dbCode = generateProjectCodeDao.getMaxCode(fieldName, tableName);
         }
@@ -155,9 +156,6 @@ public class GenerateProjectCodeService {
     }
 
 
-    private BasicUserOrganizationService.Iface getServer() {
-        return (BasicUserOrganizationService.Iface) ThriftProxyServiceFactory.newInstance(BasicUserOrganizationService.class, SystemPropertyHolder.getUserCoreRpcSerName());
-    }
 
 
 }
