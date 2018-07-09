@@ -57,16 +57,16 @@ public class BizServiceProjectcodeDao extends BaseDao<BizServiceProjectcode> {
 
     /**
      * 获取详情
-     * @param id  id
+     * @param codePrefix  前缀
      * @author liuduo
      * @date 2018-07-06 12:42:43
      */
-    public BizServiceProjectcode getById(long id) {
+    public BizServiceProjectcode getById(String codePrefix) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("count", Constants.FLAG_ONE);
-        params.put("id", id);
+        params.put("codePrefix", codePrefix);
 
-        String sql = "SELECT id,code_prefix,current_count + :count as current_count FROM biz_service_projectcode WHERE id= :id";
+        String sql = "SELECT id,code_prefix,current_count + :count as current_count FROM biz_service_projectcode WHERE code_prefix= :codePrefix";
 
         return super.findForBean(BizServiceProjectcode.class, sql, params);
     }
