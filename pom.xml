@@ -39,6 +39,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.ccbuluo</groupId>
+            <artifactId>basic-merchandise-intf</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 
     <build>
