@@ -92,7 +92,6 @@ public class GenerateProjectCodeService {
     private String getCode(String prefix, int autoIncreasedcodeSize, String fieldName, String tableName, int randomlength, String order) throws TException {
         // 根据前缀从redis中获取最大code
         String redisKey = buildRedisKey(prefix);
-        jedisCluster.del(redisKey);//暂时处理TODO
         String redisCode = jedisCluster.get(redisKey);
         String newCode = "";
         if (StringUtils.isNotBlank(redisCode)) {
