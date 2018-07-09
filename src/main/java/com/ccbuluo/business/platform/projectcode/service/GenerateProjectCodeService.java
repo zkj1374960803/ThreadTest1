@@ -46,21 +46,25 @@ public class GenerateProjectCodeService {
         switch (prefix){
             case FW:    // 服务中心
                 newCode = getCode(prefix.toString(), 5, "org_code",
-                        "basic_user_organization", true);
+                        "basic_user_organization", 3);
                 break;
             case FC:    // 仓库
                 newCode = getCode(prefix.toString(), 6, "storehouse_code",
-                        "biz_service_storehouse", false);
+                        "biz_service_storehouse", 3);
                 break;
             case FG:    //供应商
                 newCode = getCode(prefix.toString(), 6, "supplier_code",
-                        "biz_service_supplier", false);
+                        "biz_service_supplier", 3);
                 break;
             case FK:    //零配件分类
                 break;
             case FM:    //零配件模板
+                newCode = getCode(prefix.toString(), 5, "parameter_code",
+                        "basic_carparts_parameter", 3);
                 break;
             case FP:    //零配件
+                newCode = getCode(prefix.toString(), 6, "carparts_code",
+                        "basic_carparts_product", 3);
                 break;
             case FS:    //员工
                 break;
@@ -77,18 +81,18 @@ public class GenerateProjectCodeService {
      * @param autoIncreasedcodeSize 自动增长的位数
      * @param fieldName  表中对应的编码字段名
      * @param tableName  表名
-     * @param isRandomCode 是否有随机码
+     * @param randomlength 随机码的长度
      * @return 生成的编码
      * @author liuduo servicedev:projectcode:FW
      * @date 2018-06-29 10:51:58
      */
-    private String getCode(String prefix, int autoIncreasedcodeSize, String fieldName, String tableName, Boolean isRandomCode) throws TException {
+    private String getCode(String prefix, int autoIncreasedcodeSize, String fieldName, String tableName, int randomlength) throws TException {
         // 根据前缀从redis中获取最大code
         String redisKey = buildRedisKey(prefix);
         String redisCode = jedisCluster.get(redisKey);
         String newCode = "";
         if (StringUtils.isNotBlank(redisCode)) {
-            newCode =  produceCode(prefix, autoIncreasedcodeSize, redisCode, isRandomCode);
+            newCode =  produceCode(prefix, autoIncreasedcodeSize, redisCode, randomlength);
         }
         if(StringUtils.isNotBlank(redisCode)){
             return newCode;
@@ -99,12 +103,16 @@ public class GenerateProjectCodeService {
         if (prefix.equals(CodePrefixEnum.FW.toString())) {
             dbCode = userService.getMaxCode();
         } else {
-            dbCode = generateProjectCodeDao.getMaxCode(fieldName, tableName);
+            dbCode = generateProjectCodeDao.getMaxCode(prefix);
         }
         if (StringUtils.isNotBlank(dbCode)) {
-            return produceCode(prefix, autoIncreasedcodeSize, dbCode, isRandomCode);
+            return produceCode(prefix, autoIncreasedcodeSize, dbCode, randomlength);
         }
         // todo 如果第一次时，redis和数据库里都没数据则从1开始,需要判断有没有随机码
+        //更新数据库数据
+        generateProjectCodeDao.updateMaxCode(prefix,Constants.FLAG_ONE);
+        //第一次值保存到redis
+        jedisCluster.set(prefix, String.valueOf(Constants.FLAG_ONE));
         return prefix + String.format("%0"+autoIncreasedcodeSize+"d", Constants.FLAG_ONE);
     }
 
@@ -114,35 +122,25 @@ public class GenerateProjectCodeService {
      * @param prefix 前缀
      * @param autoIncreasedcodeSize
      * @param code
-     * @param isRandomCode
+     * @param randomlength 随机码位数
      * @return 最新的编码
      * @author liupengfei
      * @date 2018-07-03 17:08:07
      */
-    private String produceCode(String prefix, int autoIncreasedcodeSize, String code, Boolean isRandomCode) {
+    private String produceCode(String prefix, int autoIncreasedcodeSize, String code, int randomlength) {
         try {
             String redisKey = buildRedisKey(prefix);
-            String substring2 = null;
             // 需要自增的字符串
-            if (isRandomCode) {
-                substring2 = code.substring(2, code.length()-1);
-            } else {
-                substring2 = code.substring(2, code.length());
-            }
-
-            int parkNum = Integer.parseInt(substring2);
+            int parkNum = Integer.parseInt(code);
             parkNum++;
             String format = String.format("%0"+autoIncreasedcodeSize+"d", parkNum);
-            String newCode = "";
-            if (isRandomCode) {
-                Random random = new Random();
-                int randomCode = random.nextInt(10);
-                newCode = prefix + format + randomCode;
-            } else {
-                newCode = prefix + format;
-            }
+            //获取随机数
+            int randomCode = getRandom(randomlength);
+            String newCode = prefix + format + randomCode;
             // 重新放入redis
             jedisCluster.set(redisKey, newCode);
+            //更新数据库记录值
+            generateProjectCodeDao.updateMaxCode(prefix,parkNum);
             return newCode;
         }catch (Exception exp){
             logger.error(String.format("前缀%s生成编码时异常"), exp);
@@ -155,6 +153,16 @@ public class GenerateProjectCodeService {
         return String.format("%s:%s", BusinessPropertyHolder.PROJECTCODE_REDIS_KEYPERFIX, prefix);
     }
 
+
+    /**
+     * 获取不同位数的随机码
+     * @param randomlength 随机码位数
+     * @author weijb
+     * @date 2018-07-09 17:01:36
+     */
+    private int getRandom(int randomlength){
+        return 0;
+    }
 
 
 
