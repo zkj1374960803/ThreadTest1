@@ -1,11 +1,13 @@
 package com.ccbuluo.business.platform.projectcode.dao;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -25,18 +27,18 @@ public class GenerateProjectCodeDao extends BaseDao<String> {
         return namedParameterJdbcTemplate;
     }
 
-    public String getMaxCode(String fieldName, String tableName) {
+    public String getMaxCode(String prefix) {
         Map<String, Object> params = Maps.newHashMap();
-        params.put("fieldName", fieldName);
-        params.put("tableName", tableName);
-
+        params.put("prefix", prefix);
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT ")
-            .append(fieldName)
-            .append(" FROM ")
-            .append(tableName)
-            .append("  ORDER BY id DESC LIMIT 0,1");
-
+        sql.append("SELECT current_count FROM BIZ_SERVICE_PROJECTCODE WHERE code_prefix = :prefix");
         return findForObject(sql.toString(), params, String.class);
+    }
+    public void updateMaxCode(String prefix, Integer currentCount){
+        String sql = "UPDATE BIZ_SERVICE_PROJECTCODE SET current_count = :currentCount WHERE code_prefix = :prefix";
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("prefix", prefix);
+        map.put("currentCount", currentCount);
+        updateForMap(sql, map);
     }
 }
