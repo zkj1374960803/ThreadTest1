@@ -7,6 +7,7 @@ import com.ccbuluo.business.platform.supplier.dto.ResultFindSupplierDetailDTO;
 import com.ccbuluo.business.platform.supplier.dto.ResultSupplierListDTO;
 import com.ccbuluo.business.platform.supplier.service.SupplierService;
 import com.ccbuluo.core.controller.BaseController;
+import com.ccbuluo.core.thrift.annotation.ThriftRPCServer;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.Api;
@@ -105,5 +106,8 @@ public class SupplierController extends BaseController {
     public StatusDto<ResultFindSupplierDetailDTO> findSupplierDetail(@PathVariable Long id){
         return StatusDto.buildDataSuccessStatusDto(supplierServiceImpl.findSupplierDetail(id));
     }
+
+
+
 
 }
