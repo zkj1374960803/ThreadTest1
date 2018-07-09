@@ -4,17 +4,15 @@ import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.servicecenter.dto.SaveServiceCenterDTO;
 import com.ccbuluo.business.platform.servicecenter.dto.SearchListDTO;
 import com.ccbuluo.business.platform.servicecenter.service.ServiceCenterService;
-import com.ccbuluo.core.constants.SystemPropertyHolder;
 import com.ccbuluo.core.controller.BaseController;
-import com.ccbuluo.core.thrift.proxy.ThriftProxyServiceFactory;
+import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.http.StatusDto;
-import com.ccbuluo.usercoreintf.BasicUserOrganizationService;
-import com.ccbuluo.usercoreintf.ServiceCenterWorkplaceDTO;
+import com.ccbuluo.usercoreintf.dto.ServiceCenterWorkplaceDTO;
+import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import io.swagger.annotations.*;
 import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.IOException;
 import java.util.Map;
 
@@ -31,6 +29,8 @@ public class ServiceCenterController extends BaseController {
 
     @Autowired
     private ServiceCenterService serviceCenterService;
+    @ThriftRPCClient("UserCoreSerService")
+    private BasicUserOrganizationService orgService;
 
     /**
      * 保存服务中心
@@ -163,7 +163,7 @@ public class ServiceCenterController extends BaseController {
                                              @RequestParam(required = false) String city,
                                              @RequestParam(required = false) String area,
                                              @RequestParam(required = false) String name) throws TException {
-        return StatusDto.buildDataSuccessStatusDto(getOrgServer().queryServiceCenter(province, city, area, name));
+        return StatusDto.buildDataSuccessStatusDto(orgService.queryServiceCenter(province, city, area, name));
     }
 
 
@@ -186,18 +186,5 @@ public class ServiceCenterController extends BaseController {
             return StatusDto.buildSuccessStatusDto("编辑成功！");
         }
         return StatusDto.buildFailureStatusDto("编辑失败！");
-    }
-
-
-
-
-    /**
-     * 获取组织架构服务
-     * @return 用户服务中心组织架构服务
-     * @author liuduo
-     * @date 2018-07-04 10:38:44
-     */
-    private BasicUserOrganizationService.Iface getOrgServer() {
-        return (BasicUserOrganizationService.Iface) ThriftProxyServiceFactory.newInstance(BasicUserOrganizationService.class, SystemPropertyHolder.getUserCoreRpcSerName());
     }
 }

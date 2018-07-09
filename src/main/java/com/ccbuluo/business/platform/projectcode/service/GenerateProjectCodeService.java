@@ -32,7 +32,7 @@ public class GenerateProjectCodeService {
     @Autowired
     private GenerateProjectCodeDao generateProjectCodeDao;
     @ThriftRPCClient("UserCoreSerService")
-    private BasicUserOrganizationService userService;
+    private BasicUserOrganizationService orgService;
 
     /**
      * 根据前缀生成相应的编码
@@ -97,7 +97,7 @@ public class GenerateProjectCodeService {
         String dbCode = null;
         // 如果是服务中心类型的编码，需要调用内部户中心服务
         if (prefix.equals(CodePrefixEnum.FW.toString())) {
-            dbCode = userService.getMaxCode();
+            dbCode = orgService.getMaxCode();
         } else {
             dbCode = generateProjectCodeDao.getMaxCode(fieldName, tableName);
         }

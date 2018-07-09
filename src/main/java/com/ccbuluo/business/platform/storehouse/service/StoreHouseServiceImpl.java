@@ -9,9 +9,10 @@ import com.ccbuluo.business.platform.storehouse.dto.SearchStorehouseListDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.constants.SystemPropertyHolder;
+import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.core.thrift.proxy.ThriftProxyServiceFactory;
 import com.ccbuluo.db.Page;
-import com.ccbuluo.usercoreintf.BasicUserOrganizationService;
+import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.google.common.collect.Maps;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
@@ -37,6 +38,10 @@ public class StoreHouseServiceImpl implements StoreHouseService{
     private GenerateProjectCodeService generateProjectCodeService;
     @Autowired
     private UserHolder userHolder;
+    @ThriftRPCClient("UserCoreSerService")
+    private BasicUserOrganizationService orgService;
+
+
     Logger logger = LoggerFactory.getLogger(getClass());
 
 
@@ -136,9 +141,9 @@ public class StoreHouseServiceImpl implements StoreHouseService{
         // 调用服务查询服务中心名称
         List<String> serviceCenterCode = new ArrayList<>();
         Map<String, String>  serviceCenterByCodes = Maps.newHashMap();
-        serviceCenterByCodes = getServer().getServiceCenterByCodes(keyword);
+        serviceCenterByCodes = orgService.getServiceCenterByCodes(keyword);
         if (serviceCenterByCodes.size() == 0) {
-            serviceCenterByCodes = getServer().getServiceCenterByCodes(null);
+            serviceCenterByCodes = orgService.getServiceCenterByCodes(null);
         }
         serviceCenterByCodes.forEach((key, value) ->serviceCenterCode.add(key));
         Page<SearchStorehouseListDTO> storehouseList =  bizServiceStorehouseDao.queryList(provinceName, cityName, areaName, storeHouseStatus, keyword, serviceCenterCode, offset, pagesize);
@@ -166,9 +171,6 @@ public class StoreHouseServiceImpl implements StoreHouseService{
         return bizServiceStorehouse;
     }
 
-    private BasicUserOrganizationService.Iface getServer() {
-        return (BasicUserOrganizationService.Iface) ThriftProxyServiceFactory.newInstance(BasicUserOrganizationService.class, SystemPropertyHolder.getUserCoreRpcSerName());
-    }
 
     /**
      * 根据服务中心code查询仓库
