@@ -1,20 +1,20 @@
 package com.ccbuluo.business.platform.category.rest;
 
+import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
-import com.ccbuluo.http.StatusDto;
-import com.ccbuluo.http.StatusDtoThriftBean;
-import com.ccbuluo.http.StatusDtoThriftList;
-import com.ccbuluo.http.StatusDtoThriftUtils;
+import com.ccbuluo.http.*;
 
 import com.ccbuluo.merchandiseintf.carparts.category.dto.QueryCategoryListDTO;
 import com.ccbuluo.merchandiseintf.carparts.category.service.CarpartsCategoryService;
 import com.ccbuluo.merchandiseintf.carparts.entity.BasicCarpartsCategory;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
@@ -27,8 +27,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/category/category")
 public class CategoryController extends BaseController {
-    @ThriftRPCClient("CarpartsCategoryService")
+    @ThriftRPCClient("BasicMerchandiseSer")
     private CarpartsCategoryService carpartsCategoryService;
+    @Autowired
+    UserHolder userHolder;
 
     /**
      * 查询树形列表
@@ -51,8 +53,16 @@ public class CategoryController extends BaseController {
      * @date 2018-07-05 17:50:48
      */
     @ApiOperation(value = "添加分类",notes = "【张康健】")
-    @GetMapping("/create")
-    public StatusDto<BasicCarpartsCategory> create(BasicCarpartsCategory carpartsCategory){
+    @PostMapping("/create")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "categoryName", value = "分类名称", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "parentCode", value = "父级分类code", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "sortNo", value = "排序号", required = true, paramType = "query")
+    })
+    public StatusDto<BasicCarpartsCategory> create(@ApiIgnore BasicCarpartsCategory carpartsCategory){
+        String loggedUserId = userHolder.getLoggedUserId();
+        carpartsCategory.setCreator(loggedUserId);
+        carpartsCategory.setOperator(loggedUserId);
         StatusDtoThriftBean<BasicCarpartsCategory> bean = carpartsCategoryService.create(carpartsCategory);
         return StatusDtoThriftUtils.resolve(bean, BasicCarpartsCategory.class);
     }
@@ -67,7 +77,12 @@ public class CategoryController extends BaseController {
      * @date 2018-07-06 15:18:09
      */
     @ApiOperation(value = "编辑分类",notes = "【张康健】")
-    @GetMapping("/edit")
+    @PostMapping("/edit")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "id", value = "当前分类id", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "categoryName", value = "当前分类name", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "parentCode", value = "父级分类code", required = true, paramType = "query")
+    })
     public StatusDto<String> edit(Long id, String categoryName, String parentCode){
         StatusDtoThriftBean<String> edit = carpartsCategoryService.edit(id, categoryName, parentCode);
         return StatusDtoThriftUtils.resolve(edit, String.class);
@@ -89,16 +104,17 @@ public class CategoryController extends BaseController {
 
     /**
      * 删除分类
-     * @param code 当前分类的code
+     * @param categoryCode 当前分类的code
      * @return StatusDtoThriftBean<Boolean> 删除成功 true
      * @author zhangkangjian
      * @date 2018-07-09 09:16:25
      */
     @ApiOperation(value = "删除分类",notes = "【张康健】")
-    @GetMapping("/deletecategory")
-    public StatusDto<Boolean> deleteCategory(String code){
-        StatusDtoThriftBean<Boolean> booleanStatusDtoThriftBean = carpartsCategoryService.deleteCategory(code);
-        return StatusDtoThriftUtils.resolve(booleanStatusDtoThriftBean, Boolean.class);
+    @PostMapping("/deletecategory")
+    @ApiImplicitParam(name = "categoryCode", value = "当前分类code", required = true, paramType = "query")
+    public StatusDto<Boolean> deleteCategory(String categoryCode){
+        StatusDtoThriftBoolean<Boolean> booleanStatusDtoThriftBoolean = carpartsCategoryService.deleteCategory(categoryCode);
+        return StatusDtoThriftUtils.resolve(booleanStatusDtoThriftBoolean, Boolean.class);
     }
 
 }
