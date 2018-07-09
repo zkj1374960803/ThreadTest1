@@ -4,6 +4,7 @@ import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.controller.BaseController;
+import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftUtils;
@@ -28,7 +29,7 @@ import javax.annotation.Resource;
 @RequestMapping("/sfterSales/carpartsProduct")
 public class CarpartsProductController extends BaseController {
 
-    @Resource
+    @ThriftRPCClient("BasicMerchandiseSer")
     CarpartsProductService carpartsProductService;
     @Resource
     private GenerateProjectCodeService generateProjectCodeService;

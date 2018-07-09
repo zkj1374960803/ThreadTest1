@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.JedisCluster;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -46,25 +48,25 @@ public class GenerateProjectCodeService {
         switch (prefix){
             case FW:    // 服务中心
                 newCode = getCode(prefix.toString(), 5, "org_code",
-                        "basic_user_organization", 3);
+                        "basic_user_organization", 3,"A#B#C");
                 break;
             case FC:    // 仓库
                 newCode = getCode(prefix.toString(), 6, "storehouse_code",
-                        "biz_service_storehouse", 3);
+                        "biz_service_storehouse", 3,"A#B#C");
                 break;
             case FG:    //供应商
                 newCode = getCode(prefix.toString(), 6, "supplier_code",
-                        "biz_service_supplier", 3);
+                        "biz_service_supplier", 3,"A#B#C");
                 break;
             case FK:    //零配件分类
                 break;
             case FM:    //零配件模板
                 newCode = getCode(prefix.toString(), 5, "parameter_code",
-                        "basic_carparts_parameter", 3);
+                        "basic_carparts_parameter", 3,"A#B#C");
                 break;
             case FP:    //零配件
                 newCode = getCode(prefix.toString(), 6, "carparts_code",
-                        "basic_carparts_product", 3);
+                        "basic_carparts_product", 3,"A#B#C");
                 break;
             case FS:    //员工
                 break;
@@ -82,17 +84,19 @@ public class GenerateProjectCodeService {
      * @param fieldName  表中对应的编码字段名
      * @param tableName  表名
      * @param randomlength 随机码的长度
+     * @param order 编码生成的组合A:代表前缀，B:代表自增，C:代表随机码（比如：A#B#C值为：FM+00001+323）
      * @return 生成的编码
      * @author liuduo servicedev:projectcode:FW
      * @date 2018-06-29 10:51:58
      */
-    private String getCode(String prefix, int autoIncreasedcodeSize, String fieldName, String tableName, int randomlength) throws TException {
+    private String getCode(String prefix, int autoIncreasedcodeSize, String fieldName, String tableName, int randomlength, String order) throws TException {
         // 根据前缀从redis中获取最大code
         String redisKey = buildRedisKey(prefix);
+        jedisCluster.del(redisKey);//暂时处理TODO
         String redisCode = jedisCluster.get(redisKey);
         String newCode = "";
         if (StringUtils.isNotBlank(redisCode)) {
-            newCode =  produceCode(prefix, autoIncreasedcodeSize, redisCode, randomlength);
+            newCode =  produceCode(prefix, autoIncreasedcodeSize, redisCode, randomlength, order);
         }
         if(StringUtils.isNotBlank(redisCode)){
             return newCode;
@@ -106,7 +110,7 @@ public class GenerateProjectCodeService {
             dbCode = generateProjectCodeDao.getMaxCode(prefix);
         }
         if (StringUtils.isNotBlank(dbCode)) {
-            return produceCode(prefix, autoIncreasedcodeSize, dbCode, randomlength);
+            return produceCode(prefix, autoIncreasedcodeSize, dbCode, randomlength, order);
         }
         // todo 如果第一次时，redis和数据库里都没数据则从1开始,需要判断有没有随机码
         //更新数据库数据
@@ -127,7 +131,7 @@ public class GenerateProjectCodeService {
      * @author liupengfei
      * @date 2018-07-03 17:08:07
      */
-    private String produceCode(String prefix, int autoIncreasedcodeSize, String code, int randomlength) {
+    private String produceCode(String prefix, int autoIncreasedcodeSize, String code, int randomlength, String order) {
         try {
             String redisKey = buildRedisKey(prefix);
             // 需要自增的字符串
@@ -135,8 +139,9 @@ public class GenerateProjectCodeService {
             parkNum++;
             String format = String.format("%0"+autoIncreasedcodeSize+"d", parkNum);
             //获取随机数
-            int randomCode = getRandom(randomlength);
-            String newCode = prefix + format + randomCode;
+            String randomCode = getRandom(randomlength);
+
+            String newCode = getNewCode(prefix,format,randomCode,order);
             // 重新放入redis
             jedisCluster.set(redisKey, newCode);
             //更新数据库记录值
@@ -160,10 +165,38 @@ public class GenerateProjectCodeService {
      * @author weijb
      * @date 2018-07-09 17:01:36
      */
-    private int getRandom(int randomlength){
-        return 0;
+    private String getRandom(int randomlength){
+        StringBuilder randomCode = new StringBuilder();
+        Random random = new Random();
+        randomCode.append(random.nextInt(10)).append(random.nextInt(10)).append(random.nextInt(10));
+        return randomCode.toString();
     }
 
+    /**
+     *
+     * @param prefix 前缀
+     *  @param format 自增
+     *   @param randomCode 随机码
+     *    @param order 组合顺序
+     * @return
+     * @exception
+     * @author weijb
+     * @date 2018-07-09 17:44:17
+     */
+    private String getNewCode(String prefix , String format ,String randomCode,String order){
+        StringBuilder newCode = new StringBuilder();
+        Map<String,String> map = new HashMap<String,String>();
+        map.put("A",prefix);
+        map.put("B",format);
+        map.put("C",randomCode);
+        if(null != order){
+            String[] ord = order.split("#");
+            if(ord.length == 3){
+                newCode.append(map.get(ord[0])).append(map.get(ord[1])).append(map.get(ord[2]));
+            }
+        }
+        return newCode.toString();
+    }
 
 
 }

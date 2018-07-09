@@ -84,5 +84,5 @@ ccbuluo:
     service:
       basePackages: com
     zookeeper:
-      server: 192.168.0.12:2181
+      server: localhost:2181
 
