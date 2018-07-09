@@ -1,5 +1,7 @@
 package com.ccbuluo.business.platform.category.rest;
 
+import com.ccbuluo.business.constants.CodePrefixEnum;
+import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
@@ -9,6 +11,7 @@ import com.ccbuluo.merchandiseintf.carparts.category.dto.QueryCategoryListDTO;
 import com.ccbuluo.merchandiseintf.carparts.category.service.CarpartsCategoryService;
 import com.ccbuluo.merchandiseintf.carparts.entity.BasicCarpartsCategory;
 import io.swagger.annotations.*;
+import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -31,6 +35,8 @@ public class CategoryController extends BaseController {
     private CarpartsCategoryService carpartsCategoryService;
     @Autowired
     UserHolder userHolder;
+    @Resource
+    GenerateProjectCodeService generateProjectCodeService;
 
     /**
      * 查询树形列表
@@ -52,17 +58,18 @@ public class CategoryController extends BaseController {
      * @author zhangkangjian
      * @date 2018-07-05 17:50:48
      */
-    @ApiOperation(value = "添加分类",notes = "【张康健】")
+    @ApiOperation(value = "添加分类（添加成功返回分类信息）",notes = "【张康健】")
     @PostMapping("/create")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "categoryName", value = "分类名称", required = true, paramType = "query"),
         @ApiImplicitParam(name = "parentCode", value = "父级分类code", required = true, paramType = "query"),
         @ApiImplicitParam(name = "sortNo", value = "排序号", required = true, paramType = "query")
     })
-    public StatusDto<BasicCarpartsCategory> create(@ApiIgnore BasicCarpartsCategory carpartsCategory){
+    public StatusDto<BasicCarpartsCategory> create(@ApiIgnore BasicCarpartsCategory carpartsCategory) throws TException {
         String loggedUserId = userHolder.getLoggedUserId();
         carpartsCategory.setCreator(loggedUserId);
         carpartsCategory.setOperator(loggedUserId);
+        carpartsCategory.setCategoryCode(generateProjectCodeService.grantCode(CodePrefixEnum.FP));
         StatusDtoThriftBean<BasicCarpartsCategory> bean = carpartsCategoryService.create(carpartsCategory);
         return StatusDtoThriftUtils.resolve(bean, BasicCarpartsCategory.class);
     }
@@ -90,15 +97,16 @@ public class CategoryController extends BaseController {
 
     /**
      * 查询分类（下拉框）
-     * @param code 查询一级分类（不必传值） 查询二级必传
+     * @param parentCode 查询一级分类（不必传值） 查询二级或三级必传
      * @return StatusDtoThriftList<BasicCarpartsCategory> 分类列表
      * @author zhangkangjian
      * @date 2018-07-09 09:55:28
      */
     @ApiOperation(value = "查询分类（下拉框）",notes = "【张康健】")
     @GetMapping("/querycategoryselectlist")
-    public StatusDto<List<QueryCategoryListDTO>> queryCategoryList(String code){
-        StatusDtoThriftList<QueryCategoryListDTO> list = carpartsCategoryService.queryCategoryList(code);
+    @ApiImplicitParam(name = "parentCode", value = "父级分类code（查询一级分类（不传值） 查询二级或三级必传）", paramType = "query")
+    public StatusDto<List<QueryCategoryListDTO>> queryCategoryList(String parentCode){
+        StatusDtoThriftList<QueryCategoryListDTO> list = carpartsCategoryService.queryCategorySelectList(parentCode);
         return StatusDtoThriftUtils.resolve(list, QueryCategoryListDTO.class);
     }
 
