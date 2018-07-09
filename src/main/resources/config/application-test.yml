@@ -6,7 +6,7 @@ server:
 #tomcatJdbc 配置信息
 spring:
   datasource:
-    url: jdbc:mysql://192.168.0.22:3306/usermanager_platform?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&allowMultiQueries=true&useSSL=false
+    url: jdbc:mysql://192.168.0.22:3306/aftersale_repairing_platform?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&allowMultiQueries=true&useSSL=false
     driver-class-name: com.mysql.jdbc.Driver
     username: project_manage_platform
     password: project_manage_platform_123456
@@ -80,14 +80,7 @@ swagger:
 ccbuluo:
   thrift:
     service:
-      name: UserManagerService
-      port: 15531
-      ip: 192.168.0.22
       basePackages: com
     zookeeper:
       server: 192.168.0.22:2181
-    provider:
-      usercore: "UserCoreSerService"
-      usermanage: "UserManagerService"
-      wechat: "WechatCoreService"
 
