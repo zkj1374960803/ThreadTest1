@@ -26,7 +26,7 @@ import javax.annotation.Resource;
  */
 @Api(tags = "零配件管理(平台端)")
 @RestController
-@RequestMapping("/sfterSales/carpartsProduct")
+@RequestMapping("/afterSales/carpartsProduct")
 public class CarpartsProductController extends BaseController {
 
     @ThriftRPCClient("BasicMerchandiseSer")
@@ -73,8 +73,7 @@ public class CarpartsProductController extends BaseController {
         }
         saveBasicCarpartsProductDTO.setCarpartsCode(carpartsCode);
         saveBasicCarpartsProductDTO.setCreator(userHolder.getLoggedUserId());
-        carpartsProductService.saveCarpartsProduct(saveBasicCarpartsProductDTO);
-        return StatusDto.buildSuccessStatusDto();
+        return StatusDtoThriftUtils.resolve(carpartsProductService.saveCarpartsProduct(saveBasicCarpartsProductDTO),String.class);
     }
     /**
      * 编辑零部件
@@ -97,8 +96,7 @@ public class CarpartsProductController extends BaseController {
         }
         saveBasicCarpartsProductDTO.setCategoryCode(categoryCode);
         saveBasicCarpartsProductDTO.setOperator(userHolder.getLoggedUserId());
-        carpartsProductService.editCarpartsProduct(saveBasicCarpartsProductDTO);
-        return StatusDto.buildSuccessStatusDto();
+        return StatusDtoThriftUtils.resolve(carpartsProductService.editCarpartsProduct(saveBasicCarpartsProductDTO),String.class);
     }
     /**
      * 删除零部件
@@ -158,7 +156,7 @@ public class CarpartsProductController extends BaseController {
         String categoryCode = "";
         if(null != CategoryCodePath){
             String[] code = CategoryCodePath.split(",");
-            if(code.length >= 2){//不允许只选择一级分类（至少要选择两级）
+            if(code.length >= 3){//不允许只选择一级分类（至少要选择两级）
                 categoryCode = code[code.length - 1];
             }else{
                 return "";

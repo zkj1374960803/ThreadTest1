@@ -27,10 +27,10 @@ import java.util.List;
  */
 @Api(tags = "零配件参数管理(平台端)")
 @RestController
-@RequestMapping("/sfterSales/carpartsparameter")
+@RequestMapping("/afterSales/carpartsparameter")
 public class CarpartsParameterController extends BaseController {
 
-    @ThriftRPCClient("CarpartsParameterService")
+    @ThriftRPCClient("BasicMerchandiseSer")
     CarpartsParameterService carpartsParameterService;
     @Resource
     private GenerateProjectCodeService generateProjectCodeService;
