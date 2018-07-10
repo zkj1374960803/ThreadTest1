@@ -143,8 +143,8 @@ public class GenerateProjectCodeService {
             String randomCode = getRandom(randomlength);
 
             String newCode = getNewCode(prefix,format,randomCode,order);
-            // 重新放入redis.valueOf(parkNum));
-            jedisCluster.set(redisKey, String
+            // 重新放入redis
+            jedisCluster.set(redisKey, String.valueOf(parkNum));
             //更新数据库记录值
             generateProjectCodeDao.updateMaxCode(prefix,parkNum);
             return newCode;
