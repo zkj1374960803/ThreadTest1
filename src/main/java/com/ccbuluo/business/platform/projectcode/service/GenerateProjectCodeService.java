@@ -59,6 +59,8 @@ public class GenerateProjectCodeService {
                         "biz_service_supplier", 3,"A#B#C");
                 break;
             case FK:    //零配件分类
+                newCode = getCode(prefix.toString(), 6, "basic_carparts_category",
+                    "basic_carparts_category", 3,"A#B#C");
                 break;
             case FM:    //零配件模板
                 newCode = getCode(prefix.toString(), 5, "parameter_code",
