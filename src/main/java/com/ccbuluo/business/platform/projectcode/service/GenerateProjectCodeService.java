@@ -47,28 +47,22 @@ public class GenerateProjectCodeService {
         String newCode = "";
         switch (prefix){
             case FW:    // 服务中心
-                newCode = getCode(prefix.toString(), 5, "org_code",
-                        "basic_user_organization", 3,"A#B#C");
+                newCode = getCode(prefix.toString(), 5, 3,"A#B#C");
                 break;
             case FC:    // 仓库
-                newCode = getCode(prefix.toString(), 6, "storehouse_code",
-                        "biz_service_storehouse", 3,"A#B#C");
+                newCode = getCode(prefix.toString(), 6, 3,"A#B#C");
                 break;
             case FG:    //供应商
-                newCode = getCode(prefix.toString(), 6, "supplier_code",
-                        "biz_service_supplier", 3,"A#B#C");
+                newCode = getCode(prefix.toString(), 6, 3,"A#B#C");
                 break;
             case FK:    //零配件分类
-                newCode = getCode(prefix.toString(), 4, "basic_carparts_category",
-                    "basic_carparts_category", 3,"A#B#C");
+                newCode = getCode(prefix.toString(), 6, 3,"A#B#C");
                 break;
             case FM:    //零配件模板
-                newCode = getCode(prefix.toString(), 5, "parameter_code",
-                        "basic_carparts_parameter", 3,"A#B#C");
+                newCode = getCode(prefix.toString(), 5, 3,"A#B#C");
                 break;
             case FP:    //零配件
-                newCode = getCode(prefix.toString(), 6, "carparts_code",
-                        "basic_carparts_product", 3,"A#B#C");
+                newCode = getCode(prefix.toString(), 6, 3,"A#B#C");
                 break;
             case FS:    //员工
                 break;
@@ -82,22 +76,20 @@ public class GenerateProjectCodeService {
     /**
      * 生成各种code
      * @param prefix 前缀
-     * @param autoIncreasedcodeSize 自动增长的位数
-     * @param fieldName  表中对应的编码字段名
-     * @param tableName  表名
+     * @param autoIncreasedcodeLength 自动增长的位数
      * @param randomlength 随机码的长度
      * @param order 编码生成的组合A:代表前缀，B:代表自增，C:代表随机码（比如：A#B#C值为：FM+00001+323）
      * @return 生成的编码
      * @author liuduo servicedev:projectcode:FW
      * @date 2018-06-29 10:51:58
      */
-    private String getCode(String prefix, int autoIncreasedcodeSize, String fieldName, String tableName, int randomlength, String order) throws TException {
+    private String getCode(String prefix, int autoIncreasedcodeLength, int randomlength, String order) throws TException {
         // 根据前缀从redis中获取最大code
         String redisKey = buildRedisKey(prefix);
         String redisCode = jedisCluster.get(redisKey);
         String newCode = "";
         if (StringUtils.isNotBlank(redisCode)) {
-            newCode =  produceCode(prefix, autoIncreasedcodeSize, redisCode, randomlength, order);
+            newCode =  produceCode(prefix, autoIncreasedcodeLength, redisCode, randomlength, order);
         }
         if(StringUtils.isNotBlank(redisCode)){
             return newCode;
@@ -111,14 +103,13 @@ public class GenerateProjectCodeService {
             dbCode = generateProjectCodeDao.getMaxCode(prefix);
         }
         if (StringUtils.isNotBlank(dbCode)) {
-            return produceCode(prefix, autoIncreasedcodeSize, dbCode, randomlength, order);
+            return produceCode(prefix, autoIncreasedcodeLength, dbCode, randomlength, order);
         }
-        // todo 如果第一次时，redis和数据库里都没数据则从1开始,需要判断有没有随机码
         //更新数据库数据
         generateProjectCodeDao.updateMaxCode(prefix,Constants.FLAG_ONE);
         //第一次值保存到redis
         jedisCluster.set(prefix, String.valueOf(Constants.FLAG_ONE));
-        return prefix + String.format("%0"+autoIncreasedcodeSize+"d", Constants.FLAG_ONE);
+        return prefix + String.format("%0"+autoIncreasedcodeLength+"d", Constants.FLAG_ONE);
     }
 
 
@@ -144,7 +135,7 @@ public class GenerateProjectCodeService {
 
             String newCode = getNewCode(prefix,format,randomCode,order);
             // 重新放入redis
-            jedisCluster.set(redisKey, newCode);
+            jedisCluster.set(redisKey, String.valueOf(parkNum));
             //更新数据库记录值
             generateProjectCodeDao.updateMaxCode(prefix,parkNum);
             return newCode;

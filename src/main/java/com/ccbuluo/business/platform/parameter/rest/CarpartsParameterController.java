@@ -27,10 +27,10 @@ import java.util.List;
  */
 @Api(tags = "零配件参数管理(平台端)")
 @RestController
-@RequestMapping("/sfterSales/carpartsparameter")
+@RequestMapping("/afterSales/carpartsparameter")
 public class CarpartsParameterController extends BaseController {
 
-    @ThriftRPCClient("CarpartsParameterService")
+    @ThriftRPCClient("BasicMerchandiseSer")
     CarpartsParameterService carpartsParameterService;
     @Resource
     private GenerateProjectCodeService generateProjectCodeService;
@@ -70,8 +70,7 @@ public class CarpartsParameterController extends BaseController {
     @PostMapping("/editCarpartsParameter")
     public StatusDto editCarpartsParameter(@ApiParam(name = "saveBasicCarpartsParameterDTO", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsParameterDTO saveBasicCarpartsParameterDTO) {
         saveBasicCarpartsParameterDTO.setOperator(userHolder.getLoggedUserId());
-        carpartsParameterService.editCarpartsParameter(saveBasicCarpartsParameterDTO);
-        return StatusDto.buildSuccessStatusDto();
+        return StatusDtoThriftUtils.resolve(carpartsParameterService.editCarpartsParameter(saveBasicCarpartsParameterDTO), String.class);
     }
 
     /**
