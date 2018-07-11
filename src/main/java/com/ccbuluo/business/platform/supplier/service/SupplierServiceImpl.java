@@ -14,6 +14,7 @@ import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.thrift.exception.ThriftRpcException;
 import com.ccbuluo.db.Page;
+import com.ccbuluo.http.StatusDto;
 import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,16 +44,20 @@ public class SupplierServiceImpl implements SupplierService{
      * @date 2018-07-03 14:32:57
      */
     @Override
-    public void createSupplier(BizServiceSupplier bizServiceSupplier) throws TException {
+    public StatusDto<String> createSupplier(BizServiceSupplier bizServiceSupplier) throws TException {
         String loggedUserId = userHolder.getLoggedUserId();
         bizServiceSupplier.setOperator(loggedUserId);
         bizServiceSupplier.setCreator(loggedUserId);
         // 生成供应商编号
-        String code = generateProjectCodeService.grantCode(CodePrefixEnum.FG);
-        bizServiceSupplier.setSupplierCode(code);
+        StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FG);
+        if(!stringStatusDto.isSuccess()){
+            return StatusDto.buildFailure("生成供应商编号失败！");
+        }
+        bizServiceSupplier.setSupplierCode(stringStatusDto.getData());
         // 信息校验
         checkSupplierInfo(bizServiceSupplier.getId(), bizServiceSupplier.getSupplierPhone(), bizServiceSupplier.getSupplierName());
         bizServiceSupplierDao.saveEntity(bizServiceSupplier);
+        return StatusDto.buildSuccessStatusDto();
     }
 
     /**

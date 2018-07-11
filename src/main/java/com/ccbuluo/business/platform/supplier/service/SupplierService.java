@@ -6,6 +6,7 @@ import com.ccbuluo.business.platform.supplier.dto.QuerySupplierListDTO;
 import com.ccbuluo.business.platform.supplier.dto.ResultFindSupplierDetailDTO;
 import com.ccbuluo.business.platform.supplier.dto.ResultSupplierListDTO;
 import com.ccbuluo.db.Page;
+import com.ccbuluo.http.StatusDto;
 import org.apache.thrift.TException;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public interface SupplierService {
      * @author zhangkangjian
      * @date 2018-07-03 14:32:57
      */
-    void createSupplier(BizServiceSupplier bizServiceSupplier) throws TException;
+    StatusDto<String> createSupplier(BizServiceSupplier bizServiceSupplier) throws TException;
     /**
      * 编辑供应商
      * @param editSupplierDTO 供应商信息
