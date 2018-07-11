@@ -46,15 +46,10 @@ public class CarpartsParameterController extends BaseController {
      */
     @ApiOperation(value = "添加参数",notes = "【魏俊标】")
     @PostMapping("/saveCarpartsParameter")
-    public StatusDto saveCarpartsParameter(@ApiParam(name = "saveBasicCarpartsParameterDTO对象", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsParameterDTO saveBasicCarpartsParameterDTO) {
+    public StatusDto saveCarpartsParameter(@ApiParam(name = "saveBasicCarpartsParameterDTO对象", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsParameterDTO saveBasicCarpartsParameterDTO)  throws TException {
         // 生成编码
-        String carpartsCode = null;
-        try {
-            carpartsCode = generateProjectCodeService.grantCode(CodePrefixEnum.FM);
-        } catch (TException e) {
-            e.printStackTrace();
-        }
-        saveBasicCarpartsParameterDTO.setParameterCode(carpartsCode);
+        StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FM);
+        saveBasicCarpartsParameterDTO.setParameterCode(stringStatusDto.getData());
         saveBasicCarpartsParameterDTO.setCreator(userHolder.getLoggedUserId());
         carpartsParameterService.saveCarpartsParameter(saveBasicCarpartsParameterDTO);
         return StatusDto.buildSuccessStatusDto();

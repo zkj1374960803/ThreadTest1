@@ -55,15 +55,10 @@ public class CarpartsProductController extends BaseController {
      */
     @ApiOperation(value = "添加零配件",notes = "【魏俊标】")
     @PostMapping("/saveCarpartsProduct")
-    public StatusDto<SaveBasicCarpartsProductDTO> saveCarpartsProduct(@ApiParam(name = "basicCarpartsProduct对象", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO) {
+    public StatusDto<SaveBasicCarpartsProductDTO> saveCarpartsProduct(@ApiParam(name = "basicCarpartsProduct对象", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO)  throws TException {
         // 生成编码
-        String carpartsCode = null;
-        try {
-            carpartsCode = generateProjectCodeService.grantCode(CodePrefixEnum.FP);
-        } catch (TException e) {
-            e.printStackTrace();
-        }
-        saveBasicCarpartsProductDTO.setCarpartsCode(carpartsCode);
+        StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FP);
+        saveBasicCarpartsProductDTO.setCarpartsCode(stringStatusDto.getData());
         saveBasicCarpartsProductDTO.setCreator(userHolder.getLoggedUserId());
         StatusDtoThriftBean<SaveBasicCarpartsProductDTO> bean = carpartsProductService.saveCarpartsProduct(saveBasicCarpartsProductDTO);
         return StatusDtoThriftUtils.resolve(bean, SaveBasicCarpartsProductDTO.class);
