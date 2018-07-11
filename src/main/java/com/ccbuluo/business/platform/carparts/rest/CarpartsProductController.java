@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.carparts.rest;
 
 import com.ccbuluo.business.constants.CodePrefixEnum;
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.controller.BaseController;
@@ -55,13 +56,16 @@ public class CarpartsProductController extends BaseController {
      */
     @ApiOperation(value = "添加零配件",notes = "【魏俊标】")
     @PostMapping("/saveCarpartsProduct")
-    public StatusDto<SaveBasicCarpartsProductDTO> saveCarpartsProduct(@ApiParam(name = "basicCarpartsProduct对象", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO)  throws TException {
+    public StatusDto<String> saveCarpartsProduct(@ApiParam(name = "basicCarpartsProduct对象", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO){
         // 生成编码
         StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FP);
+        //获取code失败
+        if(!Constants.SUCCESS_CODE.equals(stringStatusDto.getCode())){
+            return stringStatusDto;
+        }
         saveBasicCarpartsProductDTO.setCarpartsCode(stringStatusDto.getData());
         saveBasicCarpartsProductDTO.setCreator(userHolder.getLoggedUserId());
-        StatusDtoThriftBean<SaveBasicCarpartsProductDTO> bean = carpartsProductService.saveCarpartsProduct(saveBasicCarpartsProductDTO);
-        return StatusDtoThriftUtils.resolve(bean, SaveBasicCarpartsProductDTO.class);
+        return carpartsProductService.saveCarpartsProduct(saveBasicCarpartsProductDTO);
     }
     /**
      * 编辑零部件
@@ -75,8 +79,7 @@ public class CarpartsProductController extends BaseController {
     @PostMapping("/editCarpartsProduct")
     public StatusDto<String> editCarpartsProduct(@ApiParam(name = "saveBasicCarpartsProductDTO", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO) {
         saveBasicCarpartsProductDTO.setOperator(userHolder.getLoggedUserId());
-        StatusDtoThriftBean<String> edit = carpartsProductService.editCarpartsProduct(saveBasicCarpartsProductDTO);
-        return StatusDtoThriftUtils.resolve(edit, String.class);
+        return carpartsProductService.editCarpartsProduct(saveBasicCarpartsProductDTO);
     }
     /**
      * 删除零部件
