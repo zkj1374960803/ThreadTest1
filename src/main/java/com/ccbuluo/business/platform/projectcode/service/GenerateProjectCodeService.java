@@ -96,7 +96,6 @@ public class GenerateProjectCodeService {
             String newCode = "";
             // 根据前缀从redis中获取最大code
             String redisKey = buildRedisKey(prefix);
-            jedisCluster.del(redisKey);
             String redisCodeStr = jedisCluster.get(redisKey);
             if (StringUtils.isNotBlank(redisCodeStr)) {
                 Integer redisCode = Integer.parseInt(redisCodeStr);
