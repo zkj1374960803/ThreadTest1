@@ -36,7 +36,7 @@ public class CategoryServiceImpl {
      * @author zhangkangjian
      * @date 2018-07-11 11:38:01
      */
-    public StatusDto<BasicCarpartsCategory> create(BasicCarpartsCategory carpartsCategory) throws TException {
+    public StatusDto<BasicCarpartsCategory> create(BasicCarpartsCategory carpartsCategory) {
         String loggedUserId = userHolder.getLoggedUserId();
         carpartsCategory.setCreator(loggedUserId);
         carpartsCategory.setOperator(loggedUserId);

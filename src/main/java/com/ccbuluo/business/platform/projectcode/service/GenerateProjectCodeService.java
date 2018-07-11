@@ -76,9 +76,6 @@ public class GenerateProjectCodeService {
                         BizErrorCodeEnum.CODE_UNKONEPREFIX.getMessage());
                     break;
         }
-        if(!Constants.SUCCESS_CODE.equals(resultDto.getCode())){
-            throw new CommonException(resultDto.getCode(), resultDto.getMessage());
-        }
         return resultDto;
     }
 
