@@ -104,7 +104,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
             StatusDtoThriftLong<Long> serviceCenterId = createServiceCenter(saveServiceCenterDTO, serviceCenterCode);
             if (serviceCenterId.getCode().equals(Constants.ERROR_CODE)) {
                 return StatusDto.buildFailure(serviceCenterId.getMessage());
-            } else if (status == Constants.SUCCESSSTATUS) {
+            } else if (serviceCenterId.getCode().equals(Constants.SUCCESS_CODE)) {
                 return StatusDto.buildSuccessStatusDto(SAVESUCCESS);
             }
 
