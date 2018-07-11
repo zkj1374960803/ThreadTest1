@@ -70,8 +70,7 @@ public class CarpartsParameterController extends BaseController {
     @PostMapping("/editCarpartsParameter")
     public StatusDto editCarpartsParameter(@ApiParam(name = "saveBasicCarpartsParameterDTO", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsParameterDTO saveBasicCarpartsParameterDTO) {
         saveBasicCarpartsParameterDTO.setOperator(userHolder.getLoggedUserId());
-        carpartsParameterService.editCarpartsParameter(saveBasicCarpartsParameterDTO);
-        return StatusDto.buildSuccessStatusDto();
+        return StatusDtoThriftUtils.resolve(carpartsParameterService.editCarpartsParameter(saveBasicCarpartsParameterDTO), String.class);
     }
 
     /**
