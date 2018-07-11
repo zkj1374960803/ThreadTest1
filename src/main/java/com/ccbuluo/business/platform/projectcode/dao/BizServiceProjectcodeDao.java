@@ -36,8 +36,8 @@ public class BizServiceProjectcodeDao extends BaseDao<BizServiceProjectcode> {
     public int saveEntity(BizServiceProjectcode entity) {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO biz_service_projectcode ( code_prefix,current_count,")
-            .append("create_time,update_time ) VALUES (  :codePrefix,")
-            .append(" :currentCount, :createTime, :updateTime )");
+            .append("create_time) VALUES (  :codePrefix,")
+            .append(" :currentCount, :createTime)");
         return super.save(sql.toString(), entity);
     }
 
@@ -61,7 +61,7 @@ public class BizServiceProjectcodeDao extends BaseDao<BizServiceProjectcode> {
      * @author liuduo
      * @date 2018-07-06 12:42:43
      */
-    public BizServiceProjectcode getById(String codePrefix) {
+    public BizServiceProjectcode getMaxCode(String codePrefix) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("count", Constants.FLAG_ONE);
         params.put("codePrefix", codePrefix);

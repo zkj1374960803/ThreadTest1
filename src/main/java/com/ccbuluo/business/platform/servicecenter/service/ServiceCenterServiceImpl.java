@@ -33,8 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -65,6 +63,8 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
     private InnerUserInfoService userService;
 
     private static final String AFTERSALESERVICECENTER = "(售后服务中心所属职场)";
+    private static final String SAVEFAILURE = "保存失败！";
+    private static final String SAVESUCCESS = "保存成功！";
 
     /**
      * 保存服务中心
@@ -78,39 +78,45 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
     public StatusDto<String> saveServiceCenter(SaveServiceCenterDTO saveServiceCenterDTO){
         try {
             // 生成服务中心code
-            String serviceCenterCode = generateProjectCodeService.grantCode(CodePrefixEnum.FW);
+            String serviceCenterCode = null;
+            StatusDto<String> serviceCenterDTO = generateProjectCodeService.grantCode(CodePrefixEnum.FW);
+            if (serviceCenterDTO.getCode().equals(Constants.SUCCESS_CODE)) {
+                serviceCenterCode = serviceCenterDTO.getData();
+            } else {
+                return serviceCenterDTO;
+            }
             // 保存标签
             int[] ids = saveLableServiceCenter(saveServiceCenterDTO, serviceCenterCode);
             if (ids.length == 0) {
-                return StatusDto.buildFailure("保存失败！");
+                return StatusDto.buildFailure(SAVEFAILURE);
             }
             // 保存仓库
             int status = saveStoreHouse(saveServiceCenterDTO, serviceCenterCode);
             if (status == Constants.FAILURE_ONE) {
                 return StatusDto.buildFailure("仓库名字已存在，请核对！");
             } else if (status == Constants.FAILURESTATUS) {
-                return StatusDto.buildFailure("保存失败！");
-            } else {
-                return StatusDto.buildSuccessStatusDto("保存成功！");
+                return StatusDto.buildFailure(SAVEFAILURE);
+            } else if (status == Constants.SUCCESSSTATUS) {
+                return StatusDto.buildSuccessStatusDto(SAVESUCCESS);
             }
 
             // 保存服务中心
             StatusDtoThriftLong<Long> serviceCenterId = createServiceCenter(saveServiceCenterDTO, serviceCenterCode);
             if (serviceCenterId.getCode().equals(Constants.ERROR_CODE)) {
                 return StatusDto.buildFailure(serviceCenterId.getMessage());
-            } else {
-                return StatusDto.buildSuccessStatusDto("保存成功！");
+            } else if (status == Constants.SUCCESSSTATUS) {
+                return StatusDto.buildSuccessStatusDto(SAVESUCCESS);
             }
 
             // 保存职场
             StatusDto<String> workplaceStatus = crteateWorkplace(saveServiceCenterDTO, serviceCenterCode);
             if (workplaceStatus.getCode().equals(Constants.ERROR_CODE)) {
-                return StatusDto.buildFailure("保存失败！");
+                return StatusDto.buildFailure(SAVEFAILURE);
             }
-            return StatusDto.buildSuccessStatusDto("保存成功！");
+            return StatusDto.buildSuccessStatusDto(SAVESUCCESS);
         } catch (Exception e) {
-            logger.error("保存失败！", e);
-            return StatusDto.buildFailure("保存失败！");
+            logger.error(SAVEFAILURE, e);
+            return StatusDto.buildFailure(SAVEFAILURE);
         }
     }
 
@@ -328,7 +334,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
      * @author liuduo
      * @date 2018-07-04 10:33:43
      */
-    private StatusDtoThriftLong<Long> createServiceCenter(SaveServiceCenterDTO saveServiceCenterDTO, String serviceCenterCode) throws TException {
+    private StatusDtoThriftLong<Long> createServiceCenter(SaveServiceCenterDTO saveServiceCenterDTO, String serviceCenterCode)  {
         // 保存服务中心
         BasicUserOrganization basicUserOrganization = new BasicUserOrganization();
         basicUserOrganization.setOrgCode(serviceCenterCode);

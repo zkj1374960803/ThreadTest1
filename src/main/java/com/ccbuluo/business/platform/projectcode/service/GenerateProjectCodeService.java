@@ -4,7 +4,8 @@ import com.ccbuluo.business.constants.BizErrorCodeEnum;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
-import com.ccbuluo.business.platform.projectcode.dao.GenerateProjectCodeDao;
+import com.ccbuluo.business.entity.BizServiceProjectcode;
+import com.ccbuluo.business.platform.projectcode.dao.BizServiceProjectcodeDao;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.JedisCluster;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -35,7 +37,7 @@ public class GenerateProjectCodeService {
     @Autowired
     private JedisCluster jedisCluster;
     @Autowired
-    private GenerateProjectCodeDao generateProjectCodeDao;
+    private BizServiceProjectcodeDao bizServiceProjectcodeDao;
     @ThriftRPCClient("UserCoreSerService")
     private BasicUserOrganizationService orgService;
 
@@ -47,7 +49,7 @@ public class GenerateProjectCodeService {
      * @date 2018-07-03 17:21:37
      */
     @Transactional(rollbackFor = Exception.class)
-    public synchronized StatusDto<String> grantCode(CodePrefixEnum prefix)  throws TException{
+    public synchronized StatusDto<String> grantCode(CodePrefixEnum prefix) {
         StatusDto<String> resultDto;
         switch (prefix){
             case FW:    // 服务中心
@@ -88,24 +90,27 @@ public class GenerateProjectCodeService {
      * @date 2018-06-29 10:51:58
      */
     @Transactional(rollbackFor = Exception.class)
-     StatusDto<String> getCode(String prefix, int autoIncreasedcodeLength, int randomlength, String order) throws TException {
+     StatusDto<String> getCode(String prefix, int autoIncreasedcodeLength, int randomlength, String order)  {
         try {
             StatusDto<String> newCodeDto = StatusDto.buildSuccessStatusDto();
             String newCode = "";
             // 根据前缀从redis中获取最大code
             String redisKey = buildRedisKey(prefix);
-            String redisCode = jedisCluster.get(redisKey);
-            if (StringUtils.isNotBlank(redisCode)) {
-                newCode = produceCode(prefix, autoIncreasedcodeLength, redisCode, randomlength, order);
+            String redisCodeStr = jedisCluster.get(redisKey);
+            if (StringUtils.isNotBlank(redisCodeStr)) {
+                Integer redisCode = Integer.parseInt(redisCodeStr);
+                redisCode++;
+                newCode = produceCode(prefix, autoIncreasedcodeLength, redisCode.toString(), randomlength, order);
             }
             if (StringUtils.isNotBlank(newCode)) {
                 newCodeDto.setData(newCode);
                 return newCodeDto;
             }
+
             // redis里没有编码，或根据redis生成编码异常时，从数据库中查询
-            String dbCode = generateProjectCodeDao.getMaxCode(prefix);
-            if (StringUtils.isNotBlank(dbCode)) {
-                newCode = produceCode(prefix, autoIncreasedcodeLength, dbCode, randomlength, order);
+            BizServiceProjectcode maxCode = bizServiceProjectcodeDao.getMaxCode(prefix);
+            if (maxCode != null && maxCode.getCurrentCount() != null) {
+                newCode = produceCode(prefix, autoIncreasedcodeLength, maxCode.getCurrentCount().toString(), randomlength, order);
             }
             if (StringUtils.isNotBlank(newCode)){
                 newCodeDto.setData(newCode);
@@ -113,7 +118,7 @@ public class GenerateProjectCodeService {
             }
 
             // 该前缀的编码第一次生成，从自增部分从1开始
-            produceCode(prefix, autoIncreasedcodeLength, null, randomlength, order);
+            newCode = produceCode(prefix, autoIncreasedcodeLength, null, randomlength, order);
             newCodeDto.setData(newCode);
             return newCodeDto;
         }
@@ -128,7 +133,7 @@ public class GenerateProjectCodeService {
      * 根据上次的自增段计数值，生成最新编码
      * @param prefix 前缀
      * @param autoIncreasedcodeSize
-     * @param code 老的自增段计数值
+     * @param code 新的自增段计数值
      * @param randomlength 随机码位数
      * @return 最新的编码
      * @author liupengfei
@@ -145,7 +150,6 @@ public class GenerateProjectCodeService {
             }
             else {
                 parkNum = Integer.parseInt(code);
-                parkNum++;
             }
             String format = String.format("%0"+autoIncreasedcodeSize+"d", parkNum);
             // 获取随机数
@@ -153,7 +157,20 @@ public class GenerateProjectCodeService {
             String newCode = getNewCode(prefix,format,randomCode,order);
 
             // 更新数据库记录值
-            generateProjectCodeDao.updateMaxCode(prefix,parkNum);
+            if(StringUtils.isEmpty(code)){
+                parkNum = Constants.FLAG_ONE;
+                BizServiceProjectcode bizServiceProjectcode = new BizServiceProjectcode();
+                bizServiceProjectcode.setCodePrefix(prefix);
+                bizServiceProjectcode.setCurrentCount(parkNum);
+                bizServiceProjectcode.setCreateTime(new Date());
+                bizServiceProjectcodeDao.saveEntity(bizServiceProjectcode);
+            } else {
+                BizServiceProjectcode bizServiceProjectcode = new BizServiceProjectcode();
+                bizServiceProjectcode.setCodePrefix(prefix);
+                bizServiceProjectcode.setCurrentCount(parkNum);
+                bizServiceProjectcode.setUpdateTime(new Date());
+                bizServiceProjectcodeDao.update(bizServiceProjectcode);
+            }
             // 数据库更新成功之后再更新重新放入redis，
             jedisCluster.set(redisKey, String.valueOf(parkNum));
 

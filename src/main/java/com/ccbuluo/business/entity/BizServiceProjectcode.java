@@ -22,7 +22,7 @@ public class BizServiceProjectcode extends IdEntity{
      *  现在最大的自增数
      */
     @ApiModelProperty(name = "currentCount", value = "现在最大的自增数")
-    private Long currentCount;
+    private Integer currentCount;
     /**
      * 创建时间
      */
@@ -47,11 +47,11 @@ public class BizServiceProjectcode extends IdEntity{
         return this.codePrefix;
     }
 
-    public void setCurrentCount(Long currentCount) {
+    public void setCurrentCount(Integer currentCount) {
         this.currentCount = currentCount;
     }
 
-    public Long getCurrentCount() {
+    public Integer getCurrentCount() {
         return this.currentCount;
     }
 

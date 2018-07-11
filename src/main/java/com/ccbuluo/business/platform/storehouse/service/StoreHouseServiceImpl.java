@@ -12,6 +12,7 @@ import com.ccbuluo.core.constants.SystemPropertyHolder;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.core.thrift.proxy.ThriftProxyServiceFactory;
 import com.ccbuluo.db.Page;
+import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.google.common.collect.Maps;
 import org.apache.thrift.TException;
@@ -62,7 +63,13 @@ public class StoreHouseServiceImpl implements StoreHouseService{
                 return Constants.FAILURE_ONE;
             }
             // 生成编码
-            String code = generateProjectCodeService.grantCode(CodePrefixEnum.FC);
+            String code = null;
+            StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FC);
+            if (stringStatusDto.getCode().equals(Constants.SUCCESS_CODE)) {
+                code = stringStatusDto.getData();
+            } else {
+                return Constants.FAILURESTATUS;
+            }
             BizServiceStorehouse bizServiceStorehouse = create(saveBizServiceStorehouseDTO);
             bizServiceStorehouse.setStorehouseCode(code);
             bizServiceStorehouse.preInsert(userHolder.getLoggedUserId());
