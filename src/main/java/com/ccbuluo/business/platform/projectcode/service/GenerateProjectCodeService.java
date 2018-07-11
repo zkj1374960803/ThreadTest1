@@ -53,22 +53,22 @@ public class GenerateProjectCodeService {
         StatusDto<String> resultDto;
         switch (prefix){
             case FW:    // 服务中心
-                resultDto = getCode(prefix.toString(), 5, 3,"A#B#C");
+                resultDto = getCode(prefix.toString(), 5, 1,"#A##B##C#");
                 break;
             case FC:    // 仓库
-                resultDto = getCode(prefix.toString(), 6, 3,"A#B#C");
+                resultDto = getCode(prefix.toString(), 6, 0,"#A##B#");
                 break;
             case FG:    // 供应商
-                resultDto = getCode(prefix.toString(), 6, 3,"A#B#C");
+                resultDto = getCode(prefix.toString(), 6, 0,"#A##B#");
                 break;
             case FK:    // 零配件分类
-                resultDto = getCode(prefix.toString(), 6, 3,"A#B#C");
+                resultDto = getCode(prefix.toString(), 6, 0,"#A##B#");
                 break;
             case FM:    // 零配件模板
-                resultDto = getCode(prefix.toString(), 5, 3,"A#B#C");
+                resultDto = getCode(prefix.toString(), 5, 0,"#A##B#");
                 break;
             case FP:    // 零配件
-                resultDto = getCode(prefix.toString(), 6, 3,"A#B#C");
+                resultDto = getCode(prefix.toString(), 6, 1,"#A##B##C#");
                 break;
             default:
                 resultDto = StatusDto.buildStatusDtoWithCode(BizErrorCodeEnum.CODE_UNKONEPREFIX.getErrorCode(),
@@ -84,7 +84,7 @@ public class GenerateProjectCodeService {
      * @param prefix 前缀
      * @param autoIncreasedcodeLength 自动增长的位数
      * @param randomlength 随机码的长度
-     * @param order 编码生成的组合A:代表前缀，B:代表自增，C:代表随机码（比如：A#B#C值为：FM+00001+323）
+     * @param order 编码生成的组合A:代表前缀，B:代表自增，C:代表随机码（比如：#A##B##C#值为：FM+00001+323）
      * @return 生成的编码
      * @author liuduo servicedev:projectcode:FW
      * @date 2018-06-29 10:51:58
@@ -96,6 +96,7 @@ public class GenerateProjectCodeService {
             String newCode = "";
             // 根据前缀从redis中获取最大code
             String redisKey = buildRedisKey(prefix);
+            jedisCluster.del(redisKey);
             String redisCodeStr = jedisCluster.get(redisKey);
             if (StringUtils.isNotBlank(redisCodeStr)) {
                 Integer redisCode = Integer.parseInt(redisCodeStr);
@@ -196,7 +197,13 @@ public class GenerateProjectCodeService {
     private String getRandom(int randomlength){
         StringBuilder randomCode = new StringBuilder();
         Random random = new Random();
-        randomCode.append(random.nextInt(10)).append(random.nextInt(10)).append(random.nextInt(10));
+        if(randomlength == 0){
+            return "";
+        }
+        for(int i=0; i < randomlength; i++){
+            randomCode.append(random.nextInt(10));
+        }
+//        randomCode.append(random.nextInt(10)).append(random.nextInt(10)).append(random.nextInt(10));
         return randomCode.toString();
     }
 
@@ -205,25 +212,20 @@ public class GenerateProjectCodeService {
      * @param prefix 前缀
      * @param format 自增
      * @param randomCode 随机码
-     * @param order 组合顺序
+     * @param order 组合顺序#A##B##C#
      * @return
      * @exception
      * @author weijb
      * @date 2018-07-09 17:44:17
      */
     private String getNewCode(String prefix , String format ,String randomCode,String order){
-        StringBuilder newCode = new StringBuilder();
+        String newCode = "";
         Map<String,String> map = new HashMap<String,String>();
         map.put("A",prefix);
         map.put("B",format);
         map.put("C",randomCode);
-        if(null != order){
-            String[] ord = order.split("#");
-            if(ord.length == 3){
-                newCode.append(map.get(ord[0])).append(map.get(ord[1])).append(map.get(ord[2]));
-            }
-        }
-        return newCode.toString();
+        newCode = order.replace("#A#",prefix).replace("#B#",format).replace("#C#",randomCode);
+        return newCode;
     }
 
 }
