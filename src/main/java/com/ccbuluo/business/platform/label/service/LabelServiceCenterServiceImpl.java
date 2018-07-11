@@ -11,8 +11,11 @@ import com.ccbuluo.business.platform.servicecenter.service.ServiceCenterService;
 import com.ccbuluo.business.platform.servicecenter.service.ServiceCenterServiceImpl;
 import com.ccbuluo.core.common.UserHolder;
 import net.bytebuddy.asm.Advice;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -30,6 +33,8 @@ public class LabelServiceCenterServiceImpl implements LabelServiceCenterService 
     @Autowired
     private ServiceCenterServiceImpl serviceCenterService;
 
+    Logger logger = LoggerFactory.getLogger(getClass());
+
     /**
      * 保存标签与服务中心关联关系
      * @param lableList 标签与服务中心关联关系
@@ -38,8 +43,14 @@ public class LabelServiceCenterServiceImpl implements LabelServiceCenterService 
      * @date 2018-07-04 17:59:22
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int[] save(List<LabelServiceCenterDTO> lableList) {
-        return labelServiceCenterDao.saveEntity(lableList);
+        try {
+            return labelServiceCenterDao.saveEntity(lableList);
+        } catch (Exception e) {
+            logger.error("关联失败！", e);
+            throw e;
+        }
     }
 
     /**
@@ -63,18 +74,24 @@ public class LabelServiceCenterServiceImpl implements LabelServiceCenterService 
      * @date 2018-07-05 11:38:58
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public int editLabelServiceCenter(String serviceCenterCode, String labels) {
-        // 删除之前关联的
-        int affected = labelServiceCenterDao.delLabelServiceCenter(serviceCenterCode);
-        if (affected == Constants.FAILURESTATUS) {
-            return Constants.FAILURESTATUS;
+        try {
+            // 删除之前关联的
+            int affected = labelServiceCenterDao.delLabelServiceCenter(serviceCenterCode);
+            if (affected == Constants.FAILURESTATUS) {
+                return Constants.FAILURESTATUS;
+            }
+            SaveServiceCenterDTO saveServiceCenterDTO = new SaveServiceCenterDTO();
+            saveServiceCenterDTO.setLabelIds(labels);
+            int[] ints = serviceCenterService.saveLableServiceCenter(saveServiceCenterDTO, serviceCenterCode);
+            if (ints.length == 0) {
+                return Constants.FAILURESTATUS;
+            }
+            return Constants.SUCCESSSTATUS;
+        } catch (Exception e) {
+            logger.error("关联失败！", e);
+            throw e;
         }
-        SaveServiceCenterDTO saveServiceCenterDTO = new SaveServiceCenterDTO();
-        saveServiceCenterDTO.setLabelIds(labels);
-        int[] ints = serviceCenterService.saveLableServiceCenter(saveServiceCenterDTO, serviceCenterCode);
-        if (ints.length == 0) {
-            return Constants.FAILURESTATUS;
-        }
-        return Constants.SUCCESSSTATUS;
     }
 }

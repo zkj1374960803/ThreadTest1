@@ -20,9 +20,9 @@ public class SearchListDTO {
     private String keyword;//关键字
     @ApiModelProperty(name = "status", value = "状态", example = "1")
     private String status;//状态
-    @ApiModelProperty(name = "offset", value = "起始数", example = "0")
+    @ApiModelProperty(name = "offset", value = "起始数", example = "0", required = true)
     private int offset;//起始数
-    @ApiModelProperty(name = "pagesize", value = "每页数", example = "10")
+    @ApiModelProperty(name = "pagesize", value = "每页数", example = "10", required = true)
     private int pagesize;//每页数
 
     public String getProvince() {

@@ -16,53 +16,53 @@ public class SaveBizServiceStorehouseDTO extends IdEntity {
     /**
      * 名称
      */
-    @ApiModelProperty(name = "storehouseName", value = "名称")
+    @ApiModelProperty(name = "storehouseName", value = "名称", required = true)
     private String storehouseName;
     /**
      * 仓库面积单位平米
      */
-    @ApiModelProperty(name = "storehouseAcreage", value = "仓库面积单位平米")
+    @ApiModelProperty(name = "storehouseAcreage", value = "仓库面积单位平米", required = true)
     private Double storehouseAcreage;
     /**
      * 所属服务中心code（组织结构code）
      */
-    @ApiModelProperty(name = "servicecenterCode", value = "所属服务中心code（组织结构code）")
+    @ApiModelProperty(name = "servicecenterCode", value = "所属服务中心code（组织结构code）", required = true)
     private String servicecenterCode;
     /**
      * 启用、停用
      */
-    @ApiModelProperty(name = "storehouseStatus", value = "启用、停用")
+    @ApiModelProperty(name = "storehouseStatus", value = "启用、停用", required = true)
     private Long storehouseStatus;
     /**
      * 省
      */
-    @ApiModelProperty(name = "provinceName", value = "省")
+    @ApiModelProperty(name = "provinceName", value = "省", required = true)
     private String provinceName;
     /**
      * 市
      */
-    @ApiModelProperty(name = "cityName", value = "市")
+    @ApiModelProperty(name = "cityName", value = "市", required = true)
     private String cityName;
     /**
      * 区
      */
-    @ApiModelProperty(name = "areaName", value = "区")
+    @ApiModelProperty(name = "areaName", value = "区", required = true)
     private String areaName;
     /**
      * 经度
      */
-    @ApiModelProperty(name = "longitude", value = "经度")
+    @ApiModelProperty(name = "longitude", value = "经度", required = true)
     private String longitude;
 
     /**
      * 纬度
      */
-    @ApiModelProperty(name = "latitude", value = "纬度")
+    @ApiModelProperty(name = "latitude", value = "纬度", required = true)
     private String latitude;
     /**
      * 详细地址
      */
-    @ApiModelProperty(name = "storehouseAddress", value = "详细地址")
+    @ApiModelProperty(name = "storehouseAddress", value = "详细地址", required = true)
     private String storehouseAddress;
 
 

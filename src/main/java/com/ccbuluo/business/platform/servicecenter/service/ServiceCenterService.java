@@ -3,6 +3,10 @@ package com.ccbuluo.business.platform.servicecenter.service;
 import com.ccbuluo.business.platform.servicecenter.dto.SaveServiceCenterDTO;
 import com.ccbuluo.business.platform.servicecenter.dto.SearchListDTO;
 import com.ccbuluo.business.platform.servicecenter.dto.SearchServiceCenterDTO;
+import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftBean;
+import com.ccbuluo.http.StatusDtoThriftPage;
+import com.ccbuluo.usercoreintf.dto.QueryServiceCenterDTO;
 import com.ccbuluo.usercoreintf.dto.ServiceCenterWorkplaceDTO;
 import org.apache.thrift.TException;
 import java.io.IOException;
@@ -22,7 +26,7 @@ public interface ServiceCenterService {
      * @author liuduo
      * @date 2018-07-04 09:40:53
      */
-    int saveServiceCenter(SaveServiceCenterDTO saveServiceCenterDTO)  throws TException;
+    StatusDto<String> saveServiceCenter(SaveServiceCenterDTO saveServiceCenterDTO)  throws TException;
 
     /**
      * 服务中心详情
@@ -37,12 +41,12 @@ public interface ServiceCenterService {
      * 编辑服务中心
      * @param serviceCenterCode 服务中心code
      * @param serviceCenterName 服务中心名称
-     * @param labels 标签ids
+     * @param labelIds 标签ids
      * @return 编辑是否成功
      * @author liuduo
      * @date 2018-07-05 11:10:30
      */
-    int editServiceCenter(String serviceCenterCode, String serviceCenterName, String labels) throws TException;
+    StatusDto<String> editServiceCenter(String serviceCenterCode, String serviceCenterName, String labelIds) throws TException;
 
     /**
     * 根据服务中心code查询职场
@@ -51,7 +55,7 @@ public interface ServiceCenterService {
     * @author liuduo
     * @date 2018-07-05 13:49:42
     */
-    ServiceCenterWorkplaceDTO getWorkplaceByCode(String serviceCenterCode)  throws TException ;
+    StatusDtoThriftBean<ServiceCenterWorkplaceDTO> getWorkplaceByCode(String serviceCenterCode)  throws TException ;
 
     /**
      * 编辑职场
@@ -60,7 +64,7 @@ public interface ServiceCenterService {
      * @author liuduo
      * @date 2018-07-05 14:09:09
      */
-    int editWorkplace(ServiceCenterWorkplaceDTO serviceCenterWorkplaceDTO) throws TException;
+    StatusDto<String> editWorkplace(ServiceCenterWorkplaceDTO serviceCenterWorkplaceDTO);
 
     /**
      * 查询服务中心列表
@@ -69,15 +73,15 @@ public interface ServiceCenterService {
      * @author liuduo
      * @date 2018-07-03 14:27:11
      */
-    Map<String, Object> queryList(SearchListDTO searchListDTO) throws TException, IOException;
+    StatusDtoThriftPage<QueryServiceCenterDTO> queryList(SearchListDTO searchListDTO) ;
 
     /**
      * 服务中心启停
-     * @param erviceCenterCode 服务中心code
+     * @param serviceCenterCode 服务中心code
      * @param serviceCenterStatus 服务中心状态
      * @return 操作是否成功
      * @author liuduo
      * @date 2018-07-06 10:11:00
      */
-    int editOrgStatus(String erviceCenterCode, Integer serviceCenterStatus) throws TException;
+    StatusDto<String> editOrgStatus(String serviceCenterCode, Integer serviceCenterStatus) throws TException;
 }

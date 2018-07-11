@@ -18,9 +18,9 @@ import com.ccbuluo.business.platform.storehouse.dto.SaveBizServiceStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.service.StoreHouseServiceImpl;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
-import com.ccbuluo.usercoreintf.dto.EditServiceCenterDTO;
-import com.ccbuluo.usercoreintf.dto.OrgWorkplaceDTO;
-import com.ccbuluo.usercoreintf.dto.ServiceCenterWorkplaceDTO;
+import com.ccbuluo.db.Page;
+import com.ccbuluo.http.*;
+import com.ccbuluo.usercoreintf.dto.*;
 import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import com.ccbuluo.usercoreintf.model.BasicUserWorkplace;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
@@ -75,39 +75,46 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int saveServiceCenter(SaveServiceCenterDTO saveServiceCenterDTO)  throws TException{
+    public StatusDto<String> saveServiceCenter(SaveServiceCenterDTO saveServiceCenterDTO){
         try {
             // 生成服务中心code
             String serviceCenterCode = generateProjectCodeService.grantCode(CodePrefixEnum.FW);
-            // 保存服务中心
-            Long serviceCenterId = createServiceCenter(saveServiceCenterDTO, serviceCenterCode);
-            if (serviceCenterId == null) {
-                return Constants.FAILURESTATUS;
-            } else if (serviceCenterId == Constants.LONG_FLAG_DEFAULT) {
-                return Constants.FAILURE_TWO;
-            } else if (serviceCenterId == Constants.LONG_ORG_ERROR) {
-                return Constants.ORG_ERROR;
-            }
-            // 保存职场
-            int workplaceStatus = crteateWorkplace(saveServiceCenterDTO, serviceCenterCode);
-            if (workplaceStatus == Constants.FAILURESTATUS) {
-                return Constants.FAILURESTATUS;
-            }
             // 保存标签
             int[] ids = saveLableServiceCenter(saveServiceCenterDTO, serviceCenterCode);
             if (ids.length == 0) {
-                return Constants.FAILURESTATUS;
+                return StatusDto.buildFailure("保存失败！");
             }
             // 保存仓库
             int status = saveStoreHouse(saveServiceCenterDTO, serviceCenterCode);
-            return status;
+            if (status == Constants.FAILURE_ONE) {
+                return StatusDto.buildFailure("仓库名字已存在，请核对！");
+            } else if (status == Constants.FAILURESTATUS) {
+                return StatusDto.buildFailure("保存失败！");
+            } else {
+                return StatusDto.buildSuccessStatusDto("保存成功！");
+            }
+
+            // 保存服务中心
+            StatusDtoThriftLong<Long> serviceCenterId = createServiceCenter(saveServiceCenterDTO, serviceCenterCode);
+            if (serviceCenterId.getCode().equals(Constants.ERROR_CODE)) {
+                return StatusDto.buildFailure(serviceCenterId.getMessage());
+            } else {
+                return StatusDto.buildSuccessStatusDto("保存成功！");
+            }
+
+            // 保存职场
+            StatusDto<String> workplaceStatus = crteateWorkplace(saveServiceCenterDTO, serviceCenterCode);
+            if (workplaceStatus.getCode().equals(Constants.ERROR_CODE)) {
+                return StatusDto.buildFailure("保存失败！");
+            }
+            return StatusDto.buildSuccessStatusDto("保存成功！");
         } catch (Exception e) {
             logger.error("保存失败！", e);
-            throw e;
+            return StatusDto.buildFailure("保存失败！");
         }
     }
 
-    private int crteateWorkplace(SaveServiceCenterDTO saveServiceCenterDTO, String serviceCenterCode) throws TException {
+    private StatusDto<String> crteateWorkplace(SaveServiceCenterDTO saveServiceCenterDTO, String serviceCenterCode) {
         // 保存职场
         BasicUserWorkplace basicUserWorkplace = new BasicUserWorkplace();
         basicUserWorkplace.setWorkplaceName(saveServiceCenterDTO.getServiceCenterName()+AFTERSALESERVICECENTER);
@@ -133,22 +140,24 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
      * @date 2018-07-05 09:15:47
      */
     @Override
-    public SearchServiceCenterDTO getByCode(String serviceCenterCode) throws TException {
+    public SearchServiceCenterDTO getByCode(String serviceCenterCode) {
         // 查询服务中心和职场
-        OrgWorkplaceDTO byCode = orgService.getByCode(serviceCenterCode);
+        StatusDtoThriftBean<OrgWorkplaceDTO> byCode = orgService.getByCode(serviceCenterCode);
+        StatusDto<OrgWorkplaceDTO> resolve = StatusDtoThriftUtils.resolve(byCode, OrgWorkplaceDTO.class);
+        OrgWorkplaceDTO data = resolve.getData();
         // 查询标签
         List<BizServiceLabel> bizServiceLabelList = labelServiceCenterService.getLabelServiceCenterByCode(serviceCenterCode);
         // 查询仓库
         List<BizServiceStorehouse> bizServiceStorehouseLis = storeHouseService.getStorehousrByCode(serviceCenterCode);
         SearchServiceCenterDTO searchServiceCenterDTO = new SearchServiceCenterDTO();
-        searchServiceCenterDTO.setServiceCenterName(byCode.getOrgName());
-        searchServiceCenterDTO.setServiceCenterCode(byCode.getOrgCode());
-        searchServiceCenterDTO.setServiceCenterStatus(byCode.getOrgStatus());
-        searchServiceCenterDTO.setPrincipalPhone(byCode.getPrincipalPhone());
-        searchServiceCenterDTO.setSignTime(byCode.getSignTime());
-        searchServiceCenterDTO.setSignoutTime(byCode.getSignoutTime());
-        searchServiceCenterDTO.setAddress(byCode.getAddress());
-        searchServiceCenterDTO.setRemark(byCode.getRemark());
+        searchServiceCenterDTO.setServiceCenterName(data.getOrgName());
+        searchServiceCenterDTO.setServiceCenterCode(data.getOrgCode());
+        searchServiceCenterDTO.setServiceCenterStatus(data.getOrgStatus());
+        searchServiceCenterDTO.setPrincipalPhone(data.getPrincipalPhone());
+        searchServiceCenterDTO.setSignTime(data.getSignTime());
+        searchServiceCenterDTO.setSignoutTime(data.getSignoutTime());
+        searchServiceCenterDTO.setAddress(data.getAddress());
+        searchServiceCenterDTO.setRemark(data.getRemark());
         searchServiceCenterDTO.setLabels(bizServiceLabelList);
         searchServiceCenterDTO.setStorehouseList(bizServiceStorehouseLis);
 
@@ -159,28 +168,31 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
      * 编辑服务中心
      * @param serviceCenterCode 服务中心code
      * @param serviceCenterName 服务中心名称
-     * @param labels 标签ids
+     * @param labelIds 标签ids
      * @return 编辑是否成功
      * @author liuduo
      * @date 2018-07-05 11:10:30
      */
     @Override
-    public int editServiceCenter(String serviceCenterCode, String serviceCenterName, String labels) throws TException {
+    public StatusDto<String> editServiceCenter(String serviceCenterCode, String serviceCenterName, String labelIds)  {
         EditServiceCenterDTO editServiceCenterDTO = new EditServiceCenterDTO();
         editServiceCenterDTO.setServiceCenterCode(serviceCenterCode);
         editServiceCenterDTO.setServiceCenterName(serviceCenterName);
         editServiceCenterDTO.setOperateTime(System.currentTimeMillis());
         editServiceCenterDTO.setOperator(userHolder.getLoggedUserId());
         // 修改服务中心名称
-        int status = orgService.editServiceCenter(editServiceCenterDTO);
-        if (status == Constants.SUCCESSSTATUS) {
+        StatusDto<String> status = orgService.editServiceCenter(editServiceCenterDTO);
+        if (status.getCode().equals(Constants.SUCCESS_CODE)) {
             // 修改标签与服务中心关联关系
-            int affected = labelServiceCenterService.editLabelServiceCenter(serviceCenterCode, labels);
+            int affected = labelServiceCenterService.editLabelServiceCenter(serviceCenterCode, labelIds);
             if (affected == Constants.FAILURESTATUS) {
-                return Constants.FAILURESTATUS;
+                return StatusDto.buildFailure("编辑失败！");
             }
         }
-        return status;
+        if (status.getCode().equals(Constants.ERROR_CODE)) {
+            return StatusDto.buildFailure(status.getMessage());
+        }
+        return StatusDto.buildSuccessStatusDto("编辑成功！");
     }
 
     /**
@@ -191,7 +203,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
      * @date 2018-07-05 13:49:42
      */
     @Override
-    public ServiceCenterWorkplaceDTO getWorkplaceByCode(String serviceCenterCode) throws TException {
+    public StatusDtoThriftBean<ServiceCenterWorkplaceDTO> getWorkplaceByCode(String serviceCenterCode) {
         return workplaceService.getWorkplaceByCode(serviceCenterCode);
     }
 
@@ -203,7 +215,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
      * @date 2018-07-05 14:09:09
      */
     @Override
-    public int editWorkplace(ServiceCenterWorkplaceDTO serviceCenterWorkplaceDTO) throws TException {
+    public StatusDto<String> editWorkplace(ServiceCenterWorkplaceDTO serviceCenterWorkplaceDTO) {
         serviceCenterWorkplaceDTO.setOperator(userHolder.getLoggedUserId());
         serviceCenterWorkplaceDTO.setOperateTime(System.currentTimeMillis());
         return workplaceService.editServiceCenterWorkplace(serviceCenterWorkplaceDTO);
@@ -217,31 +229,31 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
      * @date 2018-07-03 14:27:11
      */
     @Override
-    public Map<String, Object> queryList(SearchListDTO searchListDTO) throws TException, IOException {
-        String serviceCenterList = orgService.queryServiceCenterList(searchListDTO.getProvince(),
+    public StatusDtoThriftPage<QueryServiceCenterDTO> queryList(SearchListDTO searchListDTO) {
+        StatusDtoThriftPage<QueryServiceCenterDTO> serviceCenterList = orgService.queryServiceCenterList(searchListDTO.getProvince(),
                                                                          searchListDTO.getCity() ,
                                                                          searchListDTO.getArea() ,
                                                                          searchListDTO.getStatus(),
                                                                          searchListDTO.getKeyword(),
                                                                          searchListDTO.getOffset(),
                                                                          searchListDTO.getPagesize());
-        ObjectMapper mapper = new ObjectMapper();
-        // 要返回的对象
-        Map<String, Object> obj = mapper.readValue(serviceCenterList, new TypeReference<Map<String, Object>>() {});
-        // 服务中心集合
-        List<Map<String, Object>> rows = (List<Map<String, Object>>)obj.get("rows");
-        List<Long> ids = rows.stream().map(a -> ((Integer)a.get("id")).longValue()).collect(Collectors.toList());
+        StatusDto<Page<QueryServiceCenterDTO>> resolve = StatusDtoThriftUtils.resolve(serviceCenterList, QueryServiceCenterDTO.class);
+        Page<QueryServiceCenterDTO> data = resolve.getData();
+        List<QueryServiceCenterDTO> rows = data.getRows();
+        List<Long> ids = rows.stream().map(a -> a.getId()).collect(Collectors.toList());
 
         if (ids.size() == 0) {
-            return Collections.emptyMap();
+            return StatusDtoThriftUtils.build(null);
         }
         // 统计门店下用户的数量
-        Map<Long, Long> storeUserNumber = userService.queryCountUserNumberByOrgId(ids);
-        for (Map<String, Object> map : rows) {
-            Long id = ((Integer) map.get("id")).longValue();
-            map.put("serviceCenterUserNumber", storeUserNumber.get(id));
+        StatusDtoThriftList<QueryCountUserNumberDTO> storeUserNumber = userService.queryCountUserNumberByOrgId(ids);
+        StatusDto<List<QueryCountUserNumberDTO>> resolve1 = StatusDtoThriftUtils.resolve(storeUserNumber, QueryCountUserNumberDTO.class);
+        List<QueryCountUserNumberDTO> data1 = resolve1.getData();
+        Map<Long, Long> collect = data1.stream().collect(Collectors.toMap(a -> a.getStoreId(), b -> b.getCountNum()));
+        for (QueryServiceCenterDTO serviceCenterDTO : rows) {
+            serviceCenterDTO.setServiceCenterUserNumber(collect.get(serviceCenterDTO.getId()));
         }
-        return obj;
+        return StatusDtoThriftUtils.buildSuccess(data);
     }
 
     /**
@@ -253,7 +265,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
      * @date 2018-07-06 10:11:00
      */
     @Override
-    public int editOrgStatus(String serviceCenterCode, Integer serviceCenterStatus) throws TException {
+    public StatusDto<String> editOrgStatus(String serviceCenterCode, Integer serviceCenterStatus) throws TException {
         return orgService.editOrgStatus(serviceCenterCode, serviceCenterStatus, userHolder.getLoggedUserId());
     }
 
@@ -316,7 +328,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
      * @author liuduo
      * @date 2018-07-04 10:33:43
      */
-    private Long createServiceCenter(SaveServiceCenterDTO saveServiceCenterDTO, String serviceCenterCode) throws TException {
+    private StatusDtoThriftLong<Long> createServiceCenter(SaveServiceCenterDTO saveServiceCenterDTO, String serviceCenterCode) throws TException {
         // 保存服务中心
         BasicUserOrganization basicUserOrganization = new BasicUserOrganization();
         basicUserOrganization.setOrgCode(serviceCenterCode);
@@ -325,7 +337,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
         basicUserOrganization.setCreator(userHolder.getLoggedUserId());
         basicUserOrganization.setOperator(userHolder.getLoggedUserId());
         basicUserOrganization.setTopOrgCode(BusinessPropertyHolder.TOP_SERVICECENTER);
-        Long id = orgService.save(basicUserOrganization);
+        StatusDtoThriftLong<Long> id = orgService.save(basicUserOrganization);
         return id;
     }
 }

@@ -15,72 +15,72 @@ public class SaveServiceCenterDTO{
     /**
      * 服务中心名称
      */
-    @ApiModelProperty(name = "serviceCenterName", value = "服务中心名称")
+    @ApiModelProperty(name = "serviceCenterName", value = "服务中心名称", required = true)
     private String serviceCenterName;
     /**
      * 省
      */
-    @ApiModelProperty(name = "province", value = "省")
+    @ApiModelProperty(name = "province", value = "省", required = true)
     private String province;
     /**
      * 省code
      */
-    @ApiModelProperty(name = "provinceCode", value = "省code")
+    @ApiModelProperty(name = "provinceCode", value = "省code", required = false)
     private Double provinceCode;
     /**
      * 市
      */
-    @ApiModelProperty(name = "city", value = "市")
+    @ApiModelProperty(name = "city", value = "市", required = true)
     private String city;
     /**
      * 市code
      */
-    @ApiModelProperty(name = "cityCode", value = "市code")
+    @ApiModelProperty(name = "cityCode", value = "市code", required = false)
     private Long cityCode;
     /**
      * 区
      */
-    @ApiModelProperty(name = "area", value = "区")
+    @ApiModelProperty(name = "area", value = "区", required = true)
     private String area;
     /**
      * 区code
      */
-    @ApiModelProperty(name = "areaCode", value = "区code")
+    @ApiModelProperty(name = "areaCode", value = "区code", required = false)
     private String areaCode;
     /**
      * 经度
      */
-    @ApiModelProperty(name = "longitude", value = "经度")
+    @ApiModelProperty(name = "longitude", value = "经度", required = true)
     private String longitude;
     /**
      * 纬度
      */
-    @ApiModelProperty(name = "latitude", value = "纬度")
+    @ApiModelProperty(name = "latitude", value = "纬度", required = true)
     private String latitude;
     /**
      * 详情地址
      */
-    @ApiModelProperty(name = "address", value = "详情地址")
+    @ApiModelProperty(name = "address", value = "详情地址", required = true)
     private String address;
     /**
      * 仓库名称
      */
-    @ApiModelProperty(name = "storehouseName", value = "仓库名称")
+    @ApiModelProperty(name = "storehouseName", value = "仓库名称", required = true)
     private String storehouseName;
     /**
      * 仓库状态
      */
-    @ApiModelProperty(name = "storehouseStatus", value = "仓库状态")
+    @ApiModelProperty(name = "storehouseStatus", value = "仓库状态", required = true)
     private Integer storehouseStatus;
     /**
      * 仓库面积
      */
-    @ApiModelProperty(name = "storehouseAcreage", value = "仓库面积")
+    @ApiModelProperty(name = "storehouseAcreage", value = "仓库面积", required = true)
     private Double storehouseAcreage;
     /**
      * 标签ids
      */
-    @ApiModelProperty(name = "labelIds", value = "标签ids")
+    @ApiModelProperty(name = "labelIds", value = "标签ids", required = true)
     private String labelIds;
 
     public String getServiceCenterName() {

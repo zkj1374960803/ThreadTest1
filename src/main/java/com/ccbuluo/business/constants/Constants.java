@@ -26,6 +26,7 @@ public class Constants {
     public static final String PER_CENT= "%";
     //错误状态码 1成功，其他失败
     public static final String ERROR_CODE = "0";
+    public static final String SUCCESS_CODE = "1";
 
     public static final String COMMA = ",";
 

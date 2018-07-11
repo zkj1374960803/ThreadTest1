@@ -7,6 +7,8 @@ import com.ccbuluo.business.platform.servicecenter.service.ServiceCenterService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftPage;
+import com.ccbuluo.usercoreintf.dto.QueryServiceCenterDTO;
 import com.ccbuluo.usercoreintf.dto.ServiceCenterWorkplaceDTO;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import io.swagger.annotations.*;
@@ -42,17 +44,7 @@ public class ServiceCenterController extends BaseController {
     @ApiOperation(value = "服务中心保存", notes = "【刘铎】")
     @PostMapping("/save")
     public StatusDto saveServiceCenter(@ApiParam(name = "服务中心对象", value = "传入json格式", required = true)SaveServiceCenterDTO saveServiceCenterDTO)  throws TException {
-        int status = serviceCenterService.saveServiceCenter(saveServiceCenterDTO);
-        if (status == Constants.FAILURESTATUS) {
-            return StatusDto.buildSuccessStatusDto("保存失败！");
-        } else if (status == Constants.FAILURE_ONE) {
-            return StatusDto.buildFailureStatusDto("仓库名字已存在，请核对！");
-        } else if (status == Constants.FAILURE_TWO) {
-            return StatusDto.buildFailureStatusDto("服务中心名字已存在，请核对！");
-        } else if (status == Constants.ORG_ERROR) {
-            return StatusDto.buildFailureStatusDto("没有顶级服务中心，请核对！");
-        }
-        return StatusDto.buildFailureStatusDto("保存成功！");
+        return serviceCenterService.saveServiceCenter(saveServiceCenterDTO);
     }
 
     /**
@@ -74,7 +66,7 @@ public class ServiceCenterController extends BaseController {
      * 编辑服务中心
      * @param serviceCenterCode 服务中心code
      * @param serviceCenterName 服务中心名称
-     * @param labels 标签ids
+     * @param labelIds 标签ids
      * @return 编辑是否成功
      * @author liuduo
      * @date 2018-07-05 11:10:30
@@ -82,19 +74,13 @@ public class ServiceCenterController extends BaseController {
     @ApiOperation(value = "编辑服务中心", notes = "【刘铎】")
     @ApiImplicitParams({@ApiImplicitParam(name = "serviceCenterCode", value = "服务中心code",  required = true, paramType = "query"),
         @ApiImplicitParam(name = "serviceCenterName", value = "服务中心名字",  required = true, paramType = "query"),
-        @ApiImplicitParam(name = "labels", value = "标签ids",  required = true, paramType = "query"),})
+        @ApiImplicitParam(name = "labelIds", value = "标签ids",  required = true, paramType = "query"),})
     @GetMapping("/edit")
-    public StatusDto editServiceCenter(@RequestParam String serviceCenterCode,
+    public StatusDto<String> editServiceCenter(@RequestParam String serviceCenterCode,
                                        @RequestParam String serviceCenterName,
-                                       @RequestParam String labels) throws TException {
+                                       @RequestParam String labelIds) throws TException {
 
-        int status = serviceCenterService.editServiceCenter(serviceCenterCode, serviceCenterName, labels);
-        if (status == Constants.FAILURE_ONE) {
-            return StatusDto.buildFailureStatusDto("服务中心名字已存在，请核对！");
-        } else if (status == Constants.FAILURESTATUS) {
-            return StatusDto.buildFailureStatusDto("编辑失败！");
-        }
-        return StatusDto.buildSuccessStatusDto("编辑成功");
+        return serviceCenterService.editServiceCenter(serviceCenterCode, serviceCenterName, labelIds);
     }
 
 
@@ -123,11 +109,12 @@ public class ServiceCenterController extends BaseController {
     @ApiOperation(value = "编辑服务中心职场", notes = "【刘铎】")
     @PostMapping("/editworkplace")
     public StatusDto editWorkplace(@ApiParam(name = "服务中心职场对象", value = "传入json格式", required = true)ServiceCenterWorkplaceDTO serviceCenterWorkplaceDTO) throws TException {
-        int status = serviceCenterService.editWorkplace(serviceCenterWorkplaceDTO);
-        if (status == Constants.SUCCESSSTATUS) {
-            return StatusDto.buildSuccessStatusDto("编辑成功！");
+        StatusDto<String> stringStatusDto = serviceCenterService.editWorkplace(serviceCenterWorkplaceDTO);
+        String code = stringStatusDto.getCode();
+        if (code.equals(Constants.ERROR_CODE)) {
+            return StatusDto.buildSuccessStatusDto("编辑失败！");
         }
-        return StatusDto.buildFailureStatusDto("编辑失败！");
+        return StatusDto.buildFailureStatusDto("编辑成功！");
     }
 
     /**
@@ -139,8 +126,8 @@ public class ServiceCenterController extends BaseController {
      */
     @ApiOperation(value = "服务中心列表", notes = "【刘铎】")
     @PostMapping("/list")
-    public StatusDto<Map<String, Object>> queryList(@ApiParam(name = "服务中心查询对象", value = "传入json格式", required = true)SearchListDTO searchListDTO) throws TException, IOException {
-        return StatusDto.buildDataSuccessStatusDto(serviceCenterService.queryList(searchListDTO));
+    public StatusDtoThriftPage<QueryServiceCenterDTO> queryList(@ApiParam(name = "服务中心查询对象", value = "传入json格式", required = true)SearchListDTO searchListDTO) {
+        return serviceCenterService.queryList(searchListDTO);
     }
 
     /**
@@ -169,22 +156,22 @@ public class ServiceCenterController extends BaseController {
 
     /**
      * 服务中心启停
-     * @param erviceCenterCode 服务中心code
+     * @param serviceCenterCode 服务中心code
      * @param serviceCenterStatus 服务中心状态
      * @return 操作是否成功
      * @author liuduo
      * @date 2018-07-06 10:11:00
      */
     @ApiOperation(value = "服务中心启停", notes = "【刘铎】")
-    @ApiImplicitParams({@ApiImplicitParam(name = "erviceCenterCode", value = "服务中心code",  required = true, paramType = "query",dataType = "string"),
+    @ApiImplicitParams({@ApiImplicitParam(name = "serviceCenterCode", value = "服务中心code",  required = true, paramType = "query",dataType = "string"),
         @ApiImplicitParam(name = "serviceCenterStatus", value = "状态",  required = true, paramType = "query", dataType = "integer")})
     @GetMapping("/editstatus")
-    public StatusDto editOrgStatus(@RequestParam String erviceCenterCode,
+    public StatusDto editOrgStatus(@RequestParam String serviceCenterCode,
                                           @RequestParam Integer serviceCenterStatus) throws TException {
-        int status = serviceCenterService.editOrgStatus(erviceCenterCode, serviceCenterStatus);
-        if (status == Constants.SUCCESSSTATUS) {
-            return StatusDto.buildSuccessStatusDto("编辑成功！");
+        StatusDto<String> stringStatusDto = serviceCenterService.editOrgStatus(serviceCenterCode, serviceCenterStatus);
+        if (stringStatusDto.equals(Constants.ERROR_CODE)) {
+            return StatusDto.buildSuccessStatusDto("编辑失败！");
         }
-        return StatusDto.buildFailureStatusDto("编辑失败！");
+        return StatusDto.buildFailureStatusDto("编辑成功！");
     }
 }
