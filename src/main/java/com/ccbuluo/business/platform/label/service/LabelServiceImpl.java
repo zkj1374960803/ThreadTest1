@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -69,5 +70,23 @@ public class LabelServiceImpl implements LabelService {
     @Override
     public List<ListLabelDTO> findListLabel() {
         return bizServiceLabelDao.findListLabel();
+    }
+
+    /**
+     * 编辑标签
+     * @param id 标签id
+     * @param labelName 标签名称
+     * @author zhangkangjian
+     * @date 2018-07-11 18:33:14
+     */
+    @Override
+    public void editlabel(Long id, String labelName) {
+        supplierServiceImpl.compareRepeat(String.valueOf(id), labelName,"label_name", "biz_service_label", "标签名称重复！");
+        BizServiceLabel label = new BizServiceLabel();
+        label.setId(id);
+        label.setLabelName(labelName);
+        label.setOperator(userHolder.getLoggedUserId());
+        label.setOperateTime(new Date());
+        bizServiceLabelDao.editlabel(label);
     }
 }

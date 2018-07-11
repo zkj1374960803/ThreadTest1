@@ -69,5 +69,24 @@ public class ServiceLabelController extends BaseController {
         return StatusDto.buildDataSuccessStatusDto(labelServiceImpl.findListLabel());
     }
 
+    /**
+     * 编辑标签
+     * @param id 标签id
+     * @param labelName 标签名称
+     * @return StatusDto<String> 状态DTO
+     * @author zhangkangjian
+     * @date 2018-07-03 11:40:29
+     */
+    @ApiOperation(value = "编辑标签",notes = "【张康健】")
+    @PostMapping("/editlabel")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "id", value = "标签的id", required = true, paramType = "query", dataType = "Long"),
+        @ApiImplicitParam(name = "labelName", value = "标签名称", required = true, paramType = "query", dataType = "String")
+    })
+    public StatusDto<String> editlabel(Long id, String labelName){
+        labelServiceImpl.editlabel(id, labelName);
+        return StatusDto.buildSuccessStatusDto();
+    }
+
 
 }
