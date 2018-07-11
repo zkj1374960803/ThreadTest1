@@ -69,9 +69,9 @@ public class CategoryController extends BaseController {
         String loggedUserId = userHolder.getLoggedUserId();
         carpartsCategory.setCreator(loggedUserId);
         carpartsCategory.setOperator(loggedUserId);
-        carpartsCategory.setCategoryCode(generateProjectCodeService.grantCode(CodePrefixEnum.FP));
+        carpartsCategory.setCategoryCode(generateProjectCodeService.grantCode(CodePrefixEnum.FK));
         StatusDtoThriftBean<BasicCarpartsCategory> bean = carpartsCategoryService.create(carpartsCategory);
-        return StatusDtoThriftUtils.resolve(bean, BasicCarpartsCategory.class);
+            return StatusDtoThriftUtils.resolve(bean, BasicCarpartsCategory.class);
     }
 
     /**
