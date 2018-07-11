@@ -43,8 +43,7 @@ public class SupplierController extends BaseController {
     @PostMapping("/createsupplier")
     @ApiOperation(value = "添加供应商",notes = "【张康健】")
     public StatusDto createSupplier(BizServiceSupplier bizServiceSupplier) throws TException {
-        supplierServiceImpl.createSupplier(bizServiceSupplier);
-        return StatusDto.buildSuccessStatusDto();
+        return supplierServiceImpl.createSupplier(bizServiceSupplier);
     }
     
     /**
