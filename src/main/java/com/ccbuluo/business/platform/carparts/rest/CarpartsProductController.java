@@ -7,6 +7,7 @@ import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftBean;
 import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.EditBasicCarpartsProductDTO;
@@ -54,26 +55,13 @@ public class CarpartsProductController extends BaseController {
      */
     @ApiOperation(value = "添加零配件",notes = "【魏俊标】")
     @PostMapping("/saveCarpartsProduct")
-    public StatusDto saveCarpartsProduct(@ApiParam(name = "basicCarpartsProduct对象", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO) {
-        String categoryCode = getCodeByCategoryCodePath(saveBasicCarpartsProductDTO.getCategoryCodePath());
-        saveBasicCarpartsProductDTO.setCategoryCode(categoryCode);
-        //分类要至少选择到二级
-        if(StringUtils.isBlank(categoryCode)){
-            StatusDto statusDTO = new StatusDto();
-            statusDTO.setCode("0");
-            statusDTO.setMessage("不能在一级分类下面建参数项！");
-            return statusDTO;
-        }
+    public StatusDto<SaveBasicCarpartsProductDTO> saveCarpartsProduct(@ApiParam(name = "basicCarpartsProduct对象", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO)  throws TException {
         // 生成编码
-        String carpartsCode = null;
-        try {
-            carpartsCode = generateProjectCodeService.grantCode(CodePrefixEnum.FP);
-        } catch (TException e) {
-            e.printStackTrace();
-        }
-        saveBasicCarpartsProductDTO.setCarpartsCode(carpartsCode);
+        StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FP);
+        saveBasicCarpartsProductDTO.setCarpartsCode(stringStatusDto.getData());
         saveBasicCarpartsProductDTO.setCreator(userHolder.getLoggedUserId());
-        return StatusDtoThriftUtils.resolve(carpartsProductService.saveCarpartsProduct(saveBasicCarpartsProductDTO),String.class);
+        StatusDtoThriftBean<SaveBasicCarpartsProductDTO> bean = carpartsProductService.saveCarpartsProduct(saveBasicCarpartsProductDTO);
+        return StatusDtoThriftUtils.resolve(bean, SaveBasicCarpartsProductDTO.class);
     }
     /**
      * 编辑零部件
@@ -85,18 +73,10 @@ public class CarpartsProductController extends BaseController {
      */
     @ApiOperation(value = "编辑零配件",notes = "【魏俊标】")
     @PostMapping("/editCarpartsProduct")
-    public StatusDto editCarpartsProduct(@ApiParam(name = "saveBasicCarpartsProductDTO", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO) {
-        String categoryCode = getCodeByCategoryCodePath(saveBasicCarpartsProductDTO.getCategoryCodePath());
-        //分类要至少选择到二级
-        if(StringUtils.isBlank(categoryCode)){
-            StatusDto statusDTO = new StatusDto();
-            statusDTO.setCode("0");
-            statusDTO.setMessage("不能在一级分类下面建参数项！");
-            return statusDTO;
-        }
-        saveBasicCarpartsProductDTO.setCategoryCode(categoryCode);
+    public StatusDto<String> editCarpartsProduct(@ApiParam(name = "saveBasicCarpartsProductDTO", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO) {
         saveBasicCarpartsProductDTO.setOperator(userHolder.getLoggedUserId());
-        return StatusDtoThriftUtils.resolve(carpartsProductService.editCarpartsProduct(saveBasicCarpartsProductDTO),String.class);
+        StatusDtoThriftBean<String> edit = carpartsProductService.editCarpartsProduct(saveBasicCarpartsProductDTO);
+        return StatusDtoThriftUtils.resolve(edit, String.class);
     }
     /**
      * 删除零部件
@@ -151,17 +131,4 @@ public class CarpartsProductController extends BaseController {
         return StatusDtoThriftUtils.resolve(carpartsProductService.queryCarpartsProductList(categoryCode, carpartsName, offset, pageSize),BasicCarpartsProductDTO.class);
     }
 
-    public String getCodeByCategoryCodePath(String CategoryCodePath){
-        //获取末级配件分类
-        String categoryCode = "";
-        if(null != CategoryCodePath){
-            String[] code = CategoryCodePath.split(",");
-            if(code.length >= 3){//不允许只选择一级分类（至少要选择两级）
-                categoryCode = code[code.length - 1];
-            }else{
-                return "";
-            }
-        }
-        return categoryCode;
-    }
 }
