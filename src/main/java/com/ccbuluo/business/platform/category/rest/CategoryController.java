@@ -1,6 +1,6 @@
 package com.ccbuluo.business.platform.category.rest;
 
-import com.ccbuluo.business.constants.CodePrefixEnum;
+import com.ccbuluo.business.platform.category.service.CategoryServiceImpl;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.controller.BaseController;
@@ -37,6 +37,8 @@ public class CategoryController extends BaseController {
     UserHolder userHolder;
     @Resource
     GenerateProjectCodeService generateProjectCodeService;
+    @Resource
+    CategoryServiceImpl categoryServiceImpl;
 
     /**
      * 查询树形列表
@@ -66,13 +68,7 @@ public class CategoryController extends BaseController {
         @ApiImplicitParam(name = "sortNo", value = "排序号", required = true, paramType = "query")
     })
     public StatusDto<BasicCarpartsCategory> create(@ApiIgnore BasicCarpartsCategory carpartsCategory) throws TException {
-        String loggedUserId = userHolder.getLoggedUserId();
-        carpartsCategory.setCreator(loggedUserId);
-        carpartsCategory.setOperator(loggedUserId);
-        StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FK);
-        carpartsCategory.setCategoryCode(stringStatusDto.getData());
-        StatusDtoThriftBean<BasicCarpartsCategory> bean = carpartsCategoryService.create(carpartsCategory);
-            return StatusDtoThriftUtils.resolve(bean, BasicCarpartsCategory.class);
+        return categoryServiceImpl.create(carpartsCategory);
     }
 
     /**
