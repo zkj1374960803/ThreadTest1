@@ -34,4 +34,12 @@ public interface LabelService {
      * @date 2018-07-03 11:46:25
      */
     List<ListLabelDTO> findListLabel();
+    /**
+     * 编辑标签
+     * @param id 标签id
+     * @param labelName 标签名称
+     * @author zhangkangjian
+     * @date 2018-07-11 18:33:14
+     */
+    void editlabel(Long id, String labelName);
 }

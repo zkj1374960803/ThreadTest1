@@ -99,4 +99,17 @@ public class BizServiceLabelDao extends BaseDao<BizServiceLabel> {
         String sql = " SELECT a.id,a.label_name FROM biz_service_label a order by a.id desc";
         return queryListBean(ListLabelDTO.class, sql, Maps.newHashMap());
     }
+
+    /**
+     * 编辑标签
+     * @param label 标签实体
+     * @author zhangkangjian
+     * @date 2018-07-11 18:33:14
+     */
+    public void editlabel(BizServiceLabel label) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_service_label SET label_name = :labelName,")
+            .append("operator = :operator,operate_time = :operateTime WHERE id = :id ");
+        super.updateForBean(sql.toString(), label);
+    }
 }
