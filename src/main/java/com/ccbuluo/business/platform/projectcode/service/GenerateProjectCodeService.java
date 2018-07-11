@@ -219,10 +219,6 @@ public class GenerateProjectCodeService {
      */
     private String getNewCode(String prefix , String format ,String randomCode,String order){
         String newCode = "";
-        Map<String,String> map = new HashMap<String,String>();
-        map.put("A",prefix);
-        map.put("B",format);
-        map.put("C",randomCode);
         newCode = order.replace("#A#",prefix).replace("#B#",format).replace("#C#",randomCode);
         return newCode;
     }
