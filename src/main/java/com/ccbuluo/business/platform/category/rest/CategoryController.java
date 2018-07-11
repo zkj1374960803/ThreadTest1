@@ -67,7 +67,7 @@ public class CategoryController extends BaseController {
         @ApiImplicitParam(name = "parentCode", value = "父级分类code", required = true, paramType = "query"),
         @ApiImplicitParam(name = "sortNo", value = "排序号", required = true, paramType = "query")
     })
-    public StatusDto<BasicCarpartsCategory> create(@ApiIgnore BasicCarpartsCategory carpartsCategory) throws TException {
+    public StatusDto<BasicCarpartsCategory> create(@ApiIgnore BasicCarpartsCategory carpartsCategory) {
         return categoryServiceImpl.create(carpartsCategory);
     }
 
