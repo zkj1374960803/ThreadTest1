@@ -6,6 +6,7 @@ import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.platform.projectcode.dao.BizServiceProjectcodeDao;
+import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
@@ -75,6 +76,9 @@ public class GenerateProjectCodeService {
                         BizErrorCodeEnum.CODE_UNKONEPREFIX.getMessage());
                     break;
         }
+        if(!Constants.SUCCESS_CODE.equals(resultDto.getCode())){
+            throw new CommonException(resultDto.getCode(), resultDto.getMessage());
+        }
         return resultDto;
     }
 
@@ -98,6 +102,11 @@ public class GenerateProjectCodeService {
             String redisKey = buildRedisKey(prefix);
             String redisCodeStr = jedisCluster.get(redisKey);
             if (StringUtils.isNotBlank(redisCodeStr)) {
+                //判断当前值是否超出了范围
+                if(checkCode(autoIncreasedcodeLength, redisCodeStr)){
+                    return StatusDto.buildStatusDtoWithCode(BizErrorCodeEnum.CODE_OVERRANGE.getErrorCode(),
+                            BizErrorCodeEnum.CODE_OVERRANGE.getMessage());
+                }
                 Integer redisCode = Integer.parseInt(redisCodeStr);
                 redisCode++;
                 newCode = produceCode(prefix, autoIncreasedcodeLength, redisCode.toString(), randomlength, order);
@@ -110,6 +119,11 @@ public class GenerateProjectCodeService {
             // redis里没有编码，或根据redis生成编码异常时，从数据库中查询
             BizServiceProjectcode maxCode = bizServiceProjectcodeDao.getMaxCode(prefix);
             if (maxCode != null && maxCode.getCurrentCount() != null) {
+                //判断当前值是否超出了范围
+                if(checkCode(autoIncreasedcodeLength, maxCode.getCurrentCount().toString())){
+                    return StatusDto.buildStatusDtoWithCode(BizErrorCodeEnum.CODE_OVERRANGE.getErrorCode(),
+                            BizErrorCodeEnum.CODE_OVERRANGE.getMessage());
+                }
                 newCode = produceCode(prefix, autoIncreasedcodeLength, maxCode.getCurrentCount().toString(), randomlength, order);
             }
             if (StringUtils.isNotBlank(newCode)){
@@ -221,6 +235,27 @@ public class GenerateProjectCodeService {
         String newCode = "";
         newCode = order.replace("#A#",prefix).replace("#B#",format).replace("#C#",randomCode);
         return newCode;
+    }
+    /**
+     * 判断当前自增值是否大于数值位数
+     * @param autoIncreasedcodeSize 自增值的位数
+     * @param code 当前自增值
+     * @return
+     * @exception
+     * @author weijb
+     * @date 2018-07-11 16:40:49
+     */
+    private boolean checkCode(int autoIncreasedcodeSize, String code){
+        boolean result = false;
+        StringBuilder autoSize = new StringBuilder();
+        for(int i=0; i < autoIncreasedcodeSize; i++){
+            autoSize.append("9");
+        }
+        //如果当前值大于定义的最大值
+        if(Integer.parseInt(code) > Integer.parseInt(autoSize.toString())){
+            result = true;
+        }
+        return result;
     }
 
 }
