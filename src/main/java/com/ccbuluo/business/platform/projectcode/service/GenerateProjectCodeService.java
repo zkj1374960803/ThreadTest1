@@ -105,7 +105,6 @@ public class GenerateProjectCodeService {
         if (StringUtils.isNotBlank(dbCode)) {
             return produceCode(prefix, autoIncreasedcodeLength, dbCode, randomlength, order);
         }
-        // todo 如果第一次时，redis和数据库里都没数据则从1开始,需要判断有没有随机码
         //更新数据库数据
         generateProjectCodeDao.updateMaxCode(prefix,Constants.FLAG_ONE);
         //第一次值保存到redis
