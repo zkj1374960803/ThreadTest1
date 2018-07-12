@@ -17,6 +17,7 @@ import com.ccbuluo.business.platform.servicecenter.servicecenterenum.ServiceCent
 import com.ccbuluo.business.platform.storehouse.dto.SaveBizServiceStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.service.StoreHouseServiceImpl;
 import com.ccbuluo.core.common.UserHolder;
+import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.*;
@@ -88,35 +89,31 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
             // 保存标签
             int[] ids = saveLableServiceCenter(saveServiceCenterDTO, serviceCenterCode);
             if (ids.length == 0) {
-                return StatusDto.buildFailure(SAVEFAILURE);
+                throw new CommonException("",SAVEFAILURE);
             }
             // 保存仓库
             int status = saveStoreHouse(saveServiceCenterDTO, serviceCenterCode);
             if (status == Constants.FAILURE_ONE) {
-                return StatusDto.buildFailure("仓库名字已存在，请核对！");
+                throw new CommonException("","仓库名字已存在，请核对！");
             } else if (status == Constants.FAILURESTATUS) {
-                return StatusDto.buildFailure(SAVEFAILURE);
-            } else if (status == Constants.SUCCESSSTATUS) {
-                return StatusDto.buildSuccessStatusDto(SAVESUCCESS);
+                throw new CommonException("",SAVEFAILURE);
             }
 
             // 保存服务中心
             StatusDtoThriftLong<Long> serviceCenterId = createServiceCenter(saveServiceCenterDTO, serviceCenterCode);
             if (serviceCenterId.getCode().equals(Constants.ERROR_CODE)) {
-                return StatusDto.buildFailure(serviceCenterId.getMessage());
-            } else if (serviceCenterId.getCode().equals(Constants.SUCCESS_CODE)) {
-                return StatusDto.buildSuccessStatusDto(SAVESUCCESS);
+                throw new CommonException("",serviceCenterId.getMessage());
             }
 
             // 保存职场
             StatusDto<String> workplaceStatus = crteateWorkplace(saveServiceCenterDTO, serviceCenterCode);
             if (workplaceStatus.getCode().equals(Constants.ERROR_CODE)) {
-                return StatusDto.buildFailure(SAVEFAILURE);
+                throw new CommonException("",SAVEFAILURE);
             }
             return StatusDto.buildSuccessStatusDto(SAVESUCCESS);
         } catch (Exception e) {
             logger.error(SAVEFAILURE, e);
-            return StatusDto.buildFailure(SAVEFAILURE);
+            throw new CommonException("",e.getMessage());
         }
     }
 
@@ -209,8 +206,9 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
      * @date 2018-07-05 13:49:42
      */
     @Override
-    public StatusDtoThriftBean<ServiceCenterWorkplaceDTO> getWorkplaceByCode(String serviceCenterCode) {
-        return workplaceService.getWorkplaceByCode(serviceCenterCode);
+    public StatusDto<ServiceCenterWorkplaceDTO> getWorkplaceByCode(String serviceCenterCode) {
+        StatusDtoThriftBean<ServiceCenterWorkplaceDTO> workplaceByCode = workplaceService.getWorkplaceByCode(serviceCenterCode);
+        return StatusDtoThriftUtils.resolve(workplaceByCode, ServiceCenterWorkplaceDTO.class);
     }
 
     /**
@@ -235,7 +233,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
      * @date 2018-07-03 14:27:11
      */
     @Override
-    public StatusDtoThriftPage<QueryServiceCenterDTO> queryList(SearchListDTO searchListDTO) {
+    public StatusDto<Page<QueryServiceCenterDTO>> queryList(SearchListDTO searchListDTO) {
         StatusDtoThriftPage<QueryServiceCenterDTO> serviceCenterList = orgService.queryServiceCenterList(searchListDTO.getProvince(),
                                                                          searchListDTO.getCity() ,
                                                                          searchListDTO.getArea() ,
@@ -249,7 +247,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
         List<Long> ids = rows.stream().map(a -> a.getId()).collect(Collectors.toList());
 
         if (ids.size() == 0) {
-            return StatusDtoThriftUtils.build(null);
+            return StatusDto.buildFailure("没有相关数据！");
         }
         // 统计门店下用户的数量
         StatusDtoThriftList<QueryCountUserNumberDTO> storeUserNumber = userService.queryCountUserNumberByOrgId(ids);
@@ -259,7 +257,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
         for (QueryServiceCenterDTO serviceCenterDTO : rows) {
             serviceCenterDTO.setServiceCenterUserNumber(collect.get(serviceCenterDTO.getId()));
         }
-        return StatusDtoThriftUtils.buildSuccess(data);
+        return resolve;
     }
 
     /**
