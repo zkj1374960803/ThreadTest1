@@ -82,15 +82,5 @@ upload:
 ccbuluo:
   thrift:
     service:
-      name: aftersaleService
-      port: 15501
-      ip: 192.168.0.237
-      basePackages: com
-      #loadbalance: precise
-      #precise: 192.168.0.12:15666
     zookeeper:
       server: 192.168.0.237:2181
-    provider:
-        usercore: "UserCoreSerService"
-        usermanage: "UserManagerService"
-        wechat: "WechatCoreService"
