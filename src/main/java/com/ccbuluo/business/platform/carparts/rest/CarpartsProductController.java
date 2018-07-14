@@ -77,7 +77,7 @@ public class CarpartsProductController extends BaseController {
      */
     @ApiOperation(value = "编辑零配件",notes = "【魏俊标】")
     @PostMapping("/editCarpartsProduct")
-    public StatusDto<String> editCarpartsProduct(@ApiParam(name = "saveBasicCarpartsProductDTO", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO) {
+    public StatusDto<String> editCarpartsProduct(@ApiParam(name = "saveBasicCarpartsProductDTO", value = "传入json格式", required = true) SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO) {
         saveBasicCarpartsProductDTO.setOperator(userHolder.getLoggedUserId());
         return carpartsProductService.editCarpartsProduct(saveBasicCarpartsProductDTO);
     }

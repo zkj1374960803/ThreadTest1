@@ -1,7 +1,7 @@
 package com.ccbuluo.business.platform.carconfiguration.utils;
 
 import com.ccbuluo.business.constants.Constants;
-import com.ccbuluo.business.platform.carconfiguration.carmanage.dao.BasicCarcoreInfoDao;
+import com.ccbuluo.business.platform.carmanage.dao.BasicCarcoreInfoDao;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
