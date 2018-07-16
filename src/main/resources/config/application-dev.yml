@@ -39,12 +39,11 @@ oauth:
 #本系统相关配置
 base:
   #本系统域名
-#  url: http://192.168.0.216:15999
-  url: http://localhost:15999
+  url: http://localhost:15201
   #本系统的appid
-  appid: 681fe3bf2bcf4a0f8fc4bc1497d9a4f6
+  appid: c873890d60ad4e8c92705d4872ccac90
   #本系统的secret
-  secret: 6c28edbc36214242858fbea49fe58098
+  secret: 883c12f76921465aa5bfb74e9d9ac9cc
   #顶级服务中心code
   topservicecenter: "SC000001"
 
