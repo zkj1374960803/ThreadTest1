@@ -96,16 +96,12 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
                 return StatusDto.buildFailure("仓库名字已存在，请核对！");
             } else if (status == Constants.FAILURESTATUS) {
                 return StatusDto.buildFailure(SAVEFAILURE);
-            } else if (status == Constants.SUCCESSSTATUS) {
-                return StatusDto.buildSuccessStatusDto(SAVESUCCESS);
             }
 
             // 保存服务中心
             StatusDtoThriftLong<Long> serviceCenterId = createServiceCenter(saveServiceCenterDTO, serviceCenterCode);
             if (serviceCenterId.getCode().equals(Constants.ERROR_CODE)) {
                 return StatusDto.buildFailure(serviceCenterId.getMessage());
-            } else if (serviceCenterId.getCode().equals(Constants.SUCCESS_CODE)) {
-                return StatusDto.buildSuccessStatusDto(SAVESUCCESS);
             }
 
             // 保存职场
