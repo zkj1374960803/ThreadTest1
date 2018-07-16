@@ -24,6 +24,7 @@ import org.weakref.jmx.internal.guava.base.Preconditions;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * 供应商实现类
@@ -61,6 +62,10 @@ public class SupplierServiceImpl implements SupplierService{
         Assert.notEmpty(bizServiceSupplier.getAreaCode());
         Assert.notEmpty(bizServiceSupplier.getSupplierAddress());
         Assert.notEmpty(bizServiceSupplier.getMajorProduct());
+        // 手机号校验
+        String regex = "^1[34578][0-9]{9}$";
+        boolean matches = Pattern.matches(regex, bizServiceSupplier.getSupplierPhone());
+        Assert.isTrue(matches, "手机号校验失败！");
 
         String loggedUserId = userHolder.getLoggedUserId();
         bizServiceSupplier.setOperator(loggedUserId);
@@ -135,6 +140,10 @@ public class SupplierServiceImpl implements SupplierService{
         Assert.notEmpty(editSupplierDTO.getAreaCode());
         Assert.notEmpty(editSupplierDTO.getSupplierAddress());
         Assert.notEmpty(editSupplierDTO.getMajorProduct());
+        // 手机号校验
+        String regex = "^1[34578][0-9]{9}$";
+        boolean matches = Pattern.matches(regex, editSupplierDTO.getSupplierPhone());
+        Assert.isTrue(matches, "手机号校验失败！");
 
         String loggedUserId = userHolder.getLoggedUserId();
         editSupplierDTO.setOperator(loggedUserId);
