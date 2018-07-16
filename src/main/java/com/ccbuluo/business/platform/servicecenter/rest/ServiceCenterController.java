@@ -6,8 +6,10 @@ import com.ccbuluo.business.platform.servicecenter.dto.SearchListDTO;
 import com.ccbuluo.business.platform.servicecenter.service.ServiceCenterService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
+import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftPage;
+import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.usercoreintf.dto.QueryServiceCenterDTO;
 import com.ccbuluo.usercoreintf.dto.ServiceCenterWorkplaceDTO;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
@@ -126,8 +128,9 @@ public class ServiceCenterController extends BaseController {
      */
     @ApiOperation(value = "服务中心列表", notes = "【刘铎】")
     @PostMapping("/list")
-    public StatusDtoThriftPage<QueryServiceCenterDTO> queryList(@ApiParam(name = "服务中心查询对象", value = "传入json格式", required = true)SearchListDTO searchListDTO) {
-        return serviceCenterService.queryList(searchListDTO);
+    public StatusDto<Page<QueryServiceCenterDTO>> queryList(@ApiParam(name = "服务中心查询对象", value = "传入json格式", required = true)SearchListDTO searchListDTO) {
+        StatusDtoThriftPage<QueryServiceCenterDTO> queryServiceCenterDTOStatusDtoThriftPage = serviceCenterService.queryList(searchListDTO);
+        return StatusDtoThriftUtils.resolve(queryServiceCenterDTOStatusDtoThriftPage, QueryServiceCenterDTO.class);
     }
 
     /**
