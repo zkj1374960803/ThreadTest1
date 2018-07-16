@@ -6,9 +6,13 @@ import com.ccbuluo.business.platform.servicecenter.dto.SearchListDTO;
 import com.ccbuluo.business.platform.servicecenter.service.ServiceCenterService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
+import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftList;
 import com.ccbuluo.http.StatusDtoThriftPage;
+import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.usercoreintf.dto.QueryServiceCenterDTO;
+import com.ccbuluo.usercoreintf.dto.QueryServiceCenterListDTO;
 import com.ccbuluo.usercoreintf.dto.ServiceCenterWorkplaceDTO;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import io.swagger.annotations.*;
@@ -16,6 +20,7 @@ import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -126,8 +131,9 @@ public class ServiceCenterController extends BaseController {
      */
     @ApiOperation(value = "服务中心列表", notes = "【刘铎】")
     @PostMapping("/list")
-    public StatusDtoThriftPage<QueryServiceCenterDTO> queryList(@ApiParam(name = "服务中心查询对象", value = "传入json格式", required = true)SearchListDTO searchListDTO) {
-        return serviceCenterService.queryList(searchListDTO);
+    public StatusDto<Page<QueryServiceCenterDTO>> queryList(@ApiParam(name = "服务中心查询对象", value = "传入json格式", required = true)SearchListDTO searchListDTO) {
+        StatusDtoThriftPage<QueryServiceCenterDTO> queryServiceCenterDTOStatusDtoThriftPage = serviceCenterService.queryList(searchListDTO);
+        return StatusDtoThriftUtils.resolve(queryServiceCenterDTOStatusDtoThriftPage, QueryServiceCenterDTO.class);
     }
 
     /**
@@ -146,11 +152,12 @@ public class ServiceCenterController extends BaseController {
         @ApiImplicitParam(name = "area", value = "区",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "name", value = "服务中心名字",  required = false, paramType = "query")})
     @GetMapping("/findusableservicecenter")
-    public StatusDto findUsableServiceCenter(@RequestParam(required = false) String province,
-                                             @RequestParam(required = false) String city,
-                                             @RequestParam(required = false) String area,
-                                             @RequestParam(required = false) String name) throws TException {
-        return StatusDto.buildDataSuccessStatusDto(orgService.queryServiceCenter(province, city, area, name));
+    public StatusDto<List<QueryServiceCenterListDTO>> findUsableServiceCenter(@RequestParam(required = false) String province,
+                                                   @RequestParam(required = false) String city,
+                                                   @RequestParam(required = false) String area,
+                                                   @RequestParam(required = false) String name) {
+        StatusDtoThriftList<QueryServiceCenterListDTO> queryServiceCenterListDTOStatusDtoThriftList = orgService.queryServiceCenter(province, city, area, name);
+        return StatusDtoThriftUtils.resolve(queryServiceCenterListDTOStatusDtoThriftList, QueryServiceCenterListDTO.class);
     }
 
 
