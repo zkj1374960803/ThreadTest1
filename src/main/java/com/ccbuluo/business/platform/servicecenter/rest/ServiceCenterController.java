@@ -117,9 +117,9 @@ public class ServiceCenterController extends BaseController {
         StatusDto<String> stringStatusDto = serviceCenterService.editWorkplace(serviceCenterWorkplaceDTO);
         String code = stringStatusDto.getCode();
         if (code.equals(Constants.ERROR_CODE)) {
-            return StatusDto.buildSuccessStatusDto("编辑失败！");
+            return StatusDto.buildFailureStatusDto("编辑失败！");
         }
-        return StatusDto.buildFailureStatusDto("编辑成功！");
+        return StatusDto.buildSuccessStatusDto("编辑成功！");
     }
 
     /**
