@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.supplier.service;
 
+import com.ccbuluo.business.constants.Assert;
 import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceSupplier;
@@ -15,9 +16,11 @@ import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.thrift.exception.ThriftRpcException;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.weakref.jmx.internal.guava.base.Preconditions;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -45,6 +48,20 @@ public class SupplierServiceImpl implements SupplierService{
      */
     @Override
     public StatusDto<String> createSupplier(BizServiceSupplier bizServiceSupplier) throws TException {
+        // 参数校验
+        Assert.notNull(bizServiceSupplier);
+        Assert.notEmpty(bizServiceSupplier.getSupplierName());
+        Assert.notEmpty(bizServiceSupplier.getLinkman());
+        Assert.notEmpty(bizServiceSupplier.getSupplierPhone());
+        Assert.notEmpty(bizServiceSupplier.getProvinceName());
+        Assert.notEmpty(bizServiceSupplier.getProvinceCode());
+        Assert.notEmpty(bizServiceSupplier.getCityName());
+        Assert.notEmpty(bizServiceSupplier.getCityCode());
+        Assert.notEmpty(bizServiceSupplier.getAreaName());
+        Assert.notEmpty(bizServiceSupplier.getAreaCode());
+        Assert.notEmpty(bizServiceSupplier.getSupplierAddress());
+        Assert.notEmpty(bizServiceSupplier.getMajorProduct());
+
         String loggedUserId = userHolder.getLoggedUserId();
         bizServiceSupplier.setOperator(loggedUserId);
         bizServiceSupplier.setCreator(loggedUserId);
@@ -58,6 +75,27 @@ public class SupplierServiceImpl implements SupplierService{
         checkSupplierInfo(bizServiceSupplier.getId(), bizServiceSupplier.getSupplierPhone(), bizServiceSupplier.getSupplierName());
         bizServiceSupplierDao.saveEntity(bizServiceSupplier);
         return StatusDto.buildSuccessStatusDto();
+    }
+
+    /**
+     * 供应商参数校验
+     * @param bizServiceSupplier 供应商信息
+     * @author zhangkangjian
+     * @date 2018-07-12 17:34:49
+     */
+    private void supplierParameterChecking(BizServiceSupplier bizServiceSupplier) {
+        Assert.notNull(bizServiceSupplier);
+        Assert.notEmpty(bizServiceSupplier.getSupplierName());
+        Assert.notEmpty(bizServiceSupplier.getLinkman());
+        Assert.notEmpty(bizServiceSupplier.getSupplierPhone());
+        Assert.notEmpty(bizServiceSupplier.getProvinceName());
+        Assert.notEmpty(bizServiceSupplier.getProvinceCode());
+        Assert.notEmpty(bizServiceSupplier.getCityName());
+        Assert.notEmpty(bizServiceSupplier.getCityCode());
+        Assert.notEmpty(bizServiceSupplier.getAreaName());
+        Assert.notEmpty(bizServiceSupplier.getAreaCode());
+        Assert.notEmpty(bizServiceSupplier.getSupplierAddress());
+        Assert.notEmpty(bizServiceSupplier.getMajorProduct());
     }
 
     /**
@@ -84,6 +122,20 @@ public class SupplierServiceImpl implements SupplierService{
      */
     @Override
     public void editsupplier(EditSupplierDTO editSupplierDTO) {
+        // 参数校验
+        Assert.notNull(editSupplierDTO);
+        Assert.notEmpty(editSupplierDTO.getSupplierName());
+        Assert.notEmpty(editSupplierDTO.getLinkman());
+        Assert.notEmpty(editSupplierDTO.getSupplierPhone());
+        Assert.notEmpty(editSupplierDTO.getProvinceName());
+        Assert.notEmpty(editSupplierDTO.getProvinceCode());
+        Assert.notEmpty(editSupplierDTO.getCityName());
+        Assert.notEmpty(editSupplierDTO.getCityCode());
+        Assert.notEmpty(editSupplierDTO.getAreaName());
+        Assert.notEmpty(editSupplierDTO.getAreaCode());
+        Assert.notEmpty(editSupplierDTO.getSupplierAddress());
+        Assert.notEmpty(editSupplierDTO.getMajorProduct());
+
         String loggedUserId = userHolder.getLoggedUserId();
         editSupplierDTO.setOperator(loggedUserId);
         checkSupplierInfo(editSupplierDTO.getId(), editSupplierDTO.getSupplierPhone(), editSupplierDTO.getSupplierName());

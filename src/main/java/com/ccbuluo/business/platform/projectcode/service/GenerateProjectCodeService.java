@@ -63,7 +63,7 @@ public class GenerateProjectCodeService {
                 resultDto = getCode(prefix.toString(), 6, 0,"#A##B#");
                 break;
             case FK:    // 零配件分类
-                resultDto = getCode(prefix.toString(), 6, 0,"#A##B#");
+                resultDto = getCode(prefix.toString(), 4, 0,"#A##B#");
                 break;
             case FM:    // 零配件模板
                 resultDto = getCode(prefix.toString(), 5, 0,"#A##B#");

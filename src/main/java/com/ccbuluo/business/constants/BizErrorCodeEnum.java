@@ -7,7 +7,8 @@ package com.ccbuluo.business.constants;
 public enum BizErrorCodeEnum {
     CODE_EXCEPTION("2000", "生成编码时发生异常"),
     CODE_UNKONEPREFIX("2001", "前缀未知"),
-    CODE_OVERRANGE("2002", "自增段超出长度限制");
+    CODE_OVERRANGE("2002", "自增段超出长度限制"),
+    PARAMETER_ERROR_CODE("3000", "必填参数不能为空");
 
     BizErrorCodeEnum(String errCode, String msg) {
         this.errorCode = errCode;
