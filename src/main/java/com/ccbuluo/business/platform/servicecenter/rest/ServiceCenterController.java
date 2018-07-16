@@ -7,10 +7,7 @@ import com.ccbuluo.business.platform.servicecenter.service.ServiceCenterService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
-import com.ccbuluo.http.StatusDto;
-import com.ccbuluo.http.StatusDtoThriftList;
-import com.ccbuluo.http.StatusDtoThriftPage;
-import com.ccbuluo.http.StatusDtoThriftUtils;
+import com.ccbuluo.http.*;
 import com.ccbuluo.usercoreintf.dto.QueryServiceCenterDTO;
 import com.ccbuluo.usercoreintf.dto.QueryServiceCenterListDTO;
 import com.ccbuluo.usercoreintf.dto.ServiceCenterWorkplaceDTO;
@@ -99,8 +96,9 @@ public class ServiceCenterController extends BaseController {
     @ApiOperation(value = "根据服务中心code查询职场", notes = "【刘铎】")
     @ApiImplicitParam(name = "serviceCenterCode", value = "服务中心code",  required = true, paramType = "query")
     @GetMapping("/getworkplacebycode")
-    public StatusDto getWorkplaceByCode(@RequestParam String serviceCenterCode)  throws TException  {
-        return StatusDto.buildDataSuccessStatusDto(serviceCenterService.getWorkplaceByCode(serviceCenterCode));
+    public StatusDto<ServiceCenterWorkplaceDTO> getWorkplaceByCode(@RequestParam String serviceCenterCode)  throws TException  {
+        StatusDtoThriftBean<ServiceCenterWorkplaceDTO> workplaceByCode = serviceCenterService.getWorkplaceByCode(serviceCenterCode);
+        return StatusDtoThriftUtils.resolve(workplaceByCode, ServiceCenterWorkplaceDTO.class);
     }
 
 
