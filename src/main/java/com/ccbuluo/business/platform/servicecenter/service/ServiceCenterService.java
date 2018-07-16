@@ -3,7 +3,6 @@ package com.ccbuluo.business.platform.servicecenter.service;
 import com.ccbuluo.business.platform.servicecenter.dto.SaveServiceCenterDTO;
 import com.ccbuluo.business.platform.servicecenter.dto.SearchListDTO;
 import com.ccbuluo.business.platform.servicecenter.dto.SearchServiceCenterDTO;
-import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftBean;
 import com.ccbuluo.http.StatusDtoThriftPage;
@@ -56,7 +55,7 @@ public interface ServiceCenterService {
     * @author liuduo
     * @date 2018-07-05 13:49:42
     */
-    StatusDto<ServiceCenterWorkplaceDTO> getWorkplaceByCode(String serviceCenterCode)  throws TException ;
+    StatusDtoThriftBean<ServiceCenterWorkplaceDTO> getWorkplaceByCode(String serviceCenterCode)  throws TException ;
 
     /**
      * 编辑职场
@@ -74,7 +73,7 @@ public interface ServiceCenterService {
      * @author liuduo
      * @date 2018-07-03 14:27:11
      */
-    StatusDto<Page<QueryServiceCenterDTO>> queryList(SearchListDTO searchListDTO) ;
+    StatusDtoThriftPage<QueryServiceCenterDTO> queryList(SearchListDTO searchListDTO) ;
 
     /**
      * 服务中心启停

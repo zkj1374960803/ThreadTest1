@@ -13,6 +13,7 @@ public class Constants {
 
     // 删除标识
     public static final int DELETE_FLAG_NORMAL = 0;
+    public static final int DELETE_FLAG_DELETE = 1;
     // 编码最后的值
     public static final Integer FLAG_ONE = 1;
 
@@ -28,6 +29,10 @@ public class Constants {
     public static final String ERROR_CODE = "0";
     public static final String SUCCESS_CODE = "1";
 
+    /**
+     * 冒号
+     */
+    public static final String CAR_COLON = ":";
     public static final String COMMA = ",";
 
     public static final Long LONG_FLAG_ONE = 1L;
@@ -38,6 +43,52 @@ public class Constants {
 
     public static final long LONG_FLAG_DEFAULT = -1;
     public static final long LONG_ORG_ERROR = -3;
+
+    /**
+     * 数字格式化格式
+     */
+    public static final String FORMAT_NUMBER = "%04d";
+
+    /**
+     * 车型配置模块
+     */
+    public static final String CAR_CONFIGURATION = "car_configuration";
+    /**
+     * 品牌编号首字母
+     */
+    public static final String CAR_BRAND_CODING = "P";
+    /**
+     * 品牌编码长度
+     */
+    public static final Integer CAR_BRAND_LENGTH = 3;
+    /**
+     * 车系编号首字母
+     */
+    public static final String CAR_SERIES_CODING = "CX";
+    /**
+     * 车型配置编码长度
+     */
+    public static final Integer CAR_CONFIGURATION_CODING_LENGTH = 6;
+    /**
+     * 车系编码长度
+     */
+    public static final Integer CAR_SERIES_LENGTH = 5;
+    /**
+     * 车型配置编码首字母
+     */
+    public static final String CAR_CONFIGURATION_CODING = "C";
+    /**
+     * 车辆管理模块
+     */
+    public static final String CAR_MANAGE = "car_manage";
+    /**
+     * 车辆编号首字母
+     */
+    public static final String CAR_CODING = "CL";
+    /**
+     * 车辆编码长度
+     */
+    public static final Integer CAR_CODING_LENGTH = 3;
 
 
 }

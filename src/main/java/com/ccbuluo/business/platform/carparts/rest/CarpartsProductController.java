@@ -56,7 +56,7 @@ public class CarpartsProductController extends BaseController {
      */
     @ApiOperation(value = "添加零配件",notes = "【魏俊标】")
     @PostMapping("/saveCarpartsProduct")
-    public StatusDto<String> saveCarpartsProduct(@ApiParam(name = "basicCarpartsProduct对象", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO){
+    public StatusDto<String> saveCarpartsProduct(@ApiParam(name = "saveBasicCarpartsProductDTO对象", value = "传入json格式", required = true) SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO){
         // 生成编码
         StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FP);
         //获取code失败
@@ -77,7 +77,7 @@ public class CarpartsProductController extends BaseController {
      */
     @ApiOperation(value = "编辑零配件",notes = "【魏俊标】")
     @PostMapping("/editCarpartsProduct")
-    public StatusDto<String> editCarpartsProduct(@ApiParam(name = "saveBasicCarpartsProductDTO", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO) {
+    public StatusDto<String> editCarpartsProduct(@ApiParam(name = "saveBasicCarpartsProductDTO", value = "传入json格式", required = true) SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO) {
         saveBasicCarpartsProductDTO.setOperator(userHolder.getLoggedUserId());
         return carpartsProductService.editCarpartsProduct(saveBasicCarpartsProductDTO);
     }

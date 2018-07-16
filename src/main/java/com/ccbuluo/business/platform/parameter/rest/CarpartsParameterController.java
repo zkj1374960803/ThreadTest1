@@ -47,7 +47,7 @@ public class CarpartsParameterController extends BaseController {
      */
     @ApiOperation(value = "添加参数",notes = "【魏俊标】")
     @PostMapping("/saveCarpartsParameter")
-    public StatusDto saveCarpartsParameter(@ApiParam(name = "saveBasicCarpartsParameterDTO对象", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsParameterDTO saveBasicCarpartsParameterDTO)  throws TException {
+    public StatusDto saveCarpartsParameter(@ApiParam(name = "saveBasicCarpartsParameterDTO对象", value = "传入json格式", required = true) SaveBasicCarpartsParameterDTO saveBasicCarpartsParameterDTO)  throws TException {
         // 生成编码
         StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FM);
         //获取code失败
@@ -68,7 +68,7 @@ public class CarpartsParameterController extends BaseController {
      */
     @ApiOperation(value = "编辑零配件参数",notes = "【魏俊标】")
     @PostMapping("/editCarpartsParameter")
-    public StatusDto editCarpartsParameter(@ApiParam(name = "saveBasicCarpartsParameterDTO", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsParameterDTO saveBasicCarpartsParameterDTO) {
+    public StatusDto editCarpartsParameter(@ApiParam(name = "saveBasicCarpartsParameterDTO", value = "传入json格式", required = true) SaveBasicCarpartsParameterDTO saveBasicCarpartsParameterDTO) {
         saveBasicCarpartsParameterDTO.setOperator(userHolder.getLoggedUserId());
         return StatusDtoThriftUtils.resolve(carpartsParameterService.editCarpartsParameter(saveBasicCarpartsParameterDTO), String.class);
     }

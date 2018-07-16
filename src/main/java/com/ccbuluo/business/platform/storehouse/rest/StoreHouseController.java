@@ -54,8 +54,8 @@ public class StoreHouseController extends BaseController {
      * @date 2018-07-03 10:37:55
      */
     @ApiOperation(value = "仓库启停", notes = "【刘铎】")
-    @ApiImplicitParams({@ApiImplicitParam(name = "id", value = "仓库id", required = true, paramType = "query",dataType = "integer"),
-        @ApiImplicitParam(name = "storeHouseStatus", value = "仓库状态", required = true, paramType = "query",dataType = "integer")})
+    @ApiImplicitParams({@ApiImplicitParam(name = "id", value = "仓库id", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "storeHouseStatus", value = "仓库状态", required = true, paramType = "query")})
     @GetMapping("/editstorehousestatus")
     public StatusDto editStoreHouseStatus(@RequestParam Long id,
                                           @RequestParam Integer storeHouseStatus) {
