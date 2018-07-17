@@ -34,9 +34,9 @@ public class BizServiceEquiptypeDao extends BaseDao<BizServiceEquiptype> {
      */
     public int saveEntity(BizServiceEquiptype entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO biz_service_equiptype ( type_code,type_neme,remark,")
+        sql.append("INSERT INTO biz_service_equiptype ( type_neme,remark,")
             .append("creator,create_time,operator,operate_time,delete_flag ) VALUES ( ")
-            .append(" :typeCode, :typeNeme, :remark, :creator, :createTime, :operator,")
+            .append(" :typeNeme, :remark, :creator, :createTime, :operator,")
             .append(" :operateTime, :deleteFlag )");
         return super.save(sql.toString(), entity);
     }
@@ -85,5 +85,21 @@ public class BizServiceEquiptypeDao extends BaseDao<BizServiceEquiptype> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
         return super.updateForMap(sql.toString(), params);
+    }
+
+    /**
+     * 检查物料类型是否重复
+     * @param typeNeme 名字
+     * @return 名字的是否重复
+     * @author liuduo
+     * @date 2018-07-17 14:40:42
+     */
+    public Boolean checkName(String typeNeme) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("typeNeme", typeNeme);
+
+        String sql = "SELECT COUNT(id) > 0 FROM biz_service_equiptype WHERE type_neme = :typeNeme";
+
+        return findForObject(sql, params, Boolean.class);
     }
 }

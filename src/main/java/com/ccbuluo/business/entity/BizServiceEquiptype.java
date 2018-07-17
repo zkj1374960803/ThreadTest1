@@ -14,28 +14,15 @@ import java.util.Date;
 @ApiModel(value = "物料的类型实体", description = "物料的类型")
 public class BizServiceEquiptype extends AftersaleCommonEntity{
     /**
-     * 类型的编号
-     */
-    @ApiModelProperty(name = "typeCode", value = "类型的编号")
-    private String typeCode;
-    /**
      * 类型的名称
      */
-    @ApiModelProperty(name = "typeNeme", value = "类型的名称")
+    @ApiModelProperty(name = "typeNeme", value = "类型的名称", required = true)
     private String typeNeme;
     /**
      * 备注
      */
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
-
-    public void setTypeCode(String typeCode) {
-        this.typeCode = typeCode;
-    }
-
-    public String getTypeCode() {
-        return this.typeCode;
-    }
 
     public void setTypeNeme(String typeNeme) {
         this.typeNeme = typeNeme;
