@@ -75,7 +75,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public StatusDto<String> saveServiceCenter(SaveServiceCenterDTO saveServiceCenterDTO){
+    public StatusDto<String> saveServiceCenter(SaveServiceCenterDTO saveServiceCenterDTO) throws Exception{
         try {
             // 生成服务中心code
             String serviceCenterCode = null;
@@ -101,18 +101,18 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
             // 保存服务中心
             StatusDtoThriftLong<Long> serviceCenterId = createServiceCenter(saveServiceCenterDTO, serviceCenterCode);
             if (serviceCenterId.getCode().equals(Constants.ERROR_CODE)) {
-                return StatusDto.buildFailure(serviceCenterId.getMessage());
+                throw new IllegalAccessException(serviceCenterId.getMessage());
             }
 
             // 保存职场
             StatusDto<String> workplaceStatus = crteateWorkplace(saveServiceCenterDTO, serviceCenterCode);
             if (workplaceStatus.getCode().equals(Constants.ERROR_CODE)) {
-                return StatusDto.buildFailure(SAVEFAILURE);
+                throw new IllegalAccessException(SAVEFAILURE);
             }
             return StatusDto.buildSuccessStatusDto(SAVESUCCESS);
         } catch (Exception e) {
             logger.error(SAVEFAILURE, e);
-            return StatusDto.buildFailure(SAVEFAILURE);
+            throw new IllegalAccessException(SAVEFAILURE);
         }
     }
 
@@ -267,7 +267,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
      * @date 2018-07-06 10:11:00
      */
     @Override
-    public StatusDto<String> editOrgStatus(String serviceCenterCode, Integer serviceCenterStatus) throws TException {
+    public StatusDto<String> editOrgStatus(String serviceCenterCode, Integer serviceCenterStatus) {
         return orgService.editOrgStatus(serviceCenterCode, serviceCenterStatus, userHolder.getLoggedUserId());
     }
 

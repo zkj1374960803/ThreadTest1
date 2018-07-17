@@ -26,7 +26,7 @@ public interface ServiceCenterService {
      * @author liuduo
      * @date 2018-07-04 09:40:53
      */
-    StatusDto<String> saveServiceCenter(SaveServiceCenterDTO saveServiceCenterDTO)  throws TException;
+    StatusDto<String> saveServiceCenter(SaveServiceCenterDTO saveServiceCenterDTO)  throws Exception;
 
     /**
      * 服务中心详情
@@ -35,7 +35,7 @@ public interface ServiceCenterService {
      * @author liuduo
      * @date 2018-07-05 09:15:47
      */
-    SearchServiceCenterDTO getByCode(String serviceCenterCode) throws TException;
+    SearchServiceCenterDTO getByCode(String serviceCenterCode);
 
     /**
      * 编辑服务中心
@@ -46,7 +46,7 @@ public interface ServiceCenterService {
      * @author liuduo
      * @date 2018-07-05 11:10:30
      */
-    StatusDto<String> editServiceCenter(String serviceCenterCode, String serviceCenterName, String labelIds) throws TException;
+    StatusDto<String> editServiceCenter(String serviceCenterCode, String serviceCenterName, String labelIds);
 
     /**
     * 根据服务中心code查询职场
@@ -55,7 +55,7 @@ public interface ServiceCenterService {
     * @author liuduo
     * @date 2018-07-05 13:49:42
     */
-    StatusDtoThriftBean<ServiceCenterWorkplaceDTO> getWorkplaceByCode(String serviceCenterCode)  throws TException ;
+    StatusDtoThriftBean<ServiceCenterWorkplaceDTO> getWorkplaceByCode(String serviceCenterCode) ;
 
     /**
      * 编辑职场
@@ -83,5 +83,5 @@ public interface ServiceCenterService {
      * @author liuduo
      * @date 2018-07-06 10:11:00
      */
-    StatusDto<String> editOrgStatus(String serviceCenterCode, Integer serviceCenterStatus) throws TException;
+    StatusDto<String> editOrgStatus(String serviceCenterCode, Integer serviceCenterStatus);
 }

@@ -45,7 +45,7 @@ public class ServiceCenterController extends BaseController {
      */
     @ApiOperation(value = "服务中心保存", notes = "【刘铎】")
     @PostMapping("/save")
-    public StatusDto saveServiceCenter(@ApiParam(name = "服务中心对象", value = "传入json格式", required = true)SaveServiceCenterDTO saveServiceCenterDTO)  throws TException {
+    public StatusDto saveServiceCenter(@ApiParam(name = "服务中心对象", value = "传入json格式", required = true)SaveServiceCenterDTO saveServiceCenterDTO) throws Exception {
         return serviceCenterService.saveServiceCenter(saveServiceCenterDTO);
     }
 
@@ -59,7 +59,7 @@ public class ServiceCenterController extends BaseController {
     @ApiOperation(value = "服务中心详情", notes = "【刘铎】")
     @ApiImplicitParam(name = "serviceCenterCode", value = "服务中心code",  required = true, paramType = "query")
     @GetMapping("/getbycode")
-    public StatusDto getByCode(@RequestParam String serviceCenterCode) throws TException {
+    public StatusDto getByCode(@RequestParam String serviceCenterCode) {
         return StatusDto.buildDataSuccessStatusDto(serviceCenterService.getByCode(serviceCenterCode));
     }
 
@@ -80,7 +80,7 @@ public class ServiceCenterController extends BaseController {
     @GetMapping("/edit")
     public StatusDto<String> editServiceCenter(@RequestParam String serviceCenterCode,
                                        @RequestParam String serviceCenterName,
-                                       @RequestParam String labelIds) throws TException {
+                                       @RequestParam String labelIds) {
 
         return serviceCenterService.editServiceCenter(serviceCenterCode, serviceCenterName, labelIds);
     }
@@ -96,7 +96,7 @@ public class ServiceCenterController extends BaseController {
     @ApiOperation(value = "根据服务中心code查询职场", notes = "【刘铎】")
     @ApiImplicitParam(name = "serviceCenterCode", value = "服务中心code",  required = true, paramType = "query")
     @GetMapping("/getworkplacebycode")
-    public StatusDto<ServiceCenterWorkplaceDTO> getWorkplaceByCode(@RequestParam String serviceCenterCode)  throws TException  {
+    public StatusDto<ServiceCenterWorkplaceDTO> getWorkplaceByCode(@RequestParam String serviceCenterCode) {
         StatusDtoThriftBean<ServiceCenterWorkplaceDTO> workplaceByCode = serviceCenterService.getWorkplaceByCode(serviceCenterCode);
         return StatusDtoThriftUtils.resolve(workplaceByCode, ServiceCenterWorkplaceDTO.class);
     }
@@ -111,7 +111,7 @@ public class ServiceCenterController extends BaseController {
      */
     @ApiOperation(value = "编辑服务中心职场", notes = "【刘铎】")
     @PostMapping("/editworkplace")
-    public StatusDto editWorkplace(@ApiParam(name = "服务中心职场对象", value = "传入json格式", required = true)ServiceCenterWorkplaceDTO serviceCenterWorkplaceDTO) throws TException {
+    public StatusDto editWorkplace(@ApiParam(name = "服务中心职场对象", value = "传入json格式", required = true)ServiceCenterWorkplaceDTO serviceCenterWorkplaceDTO) {
         StatusDto<String> stringStatusDto = serviceCenterService.editWorkplace(serviceCenterWorkplaceDTO);
         String code = stringStatusDto.getCode();
         if (code.equals(Constants.ERROR_CODE)) {
@@ -172,7 +172,7 @@ public class ServiceCenterController extends BaseController {
         @ApiImplicitParam(name = "serviceCenterStatus", value = "状态",  required = true, paramType = "query", dataType = "integer")})
     @GetMapping("/editstatus")
     public StatusDto editOrgStatus(@RequestParam String serviceCenterCode,
-                                          @RequestParam Integer serviceCenterStatus) throws TException {
+                                          @RequestParam Integer serviceCenterStatus) {
         StatusDto<String> stringStatusDto = serviceCenterService.editOrgStatus(serviceCenterCode, serviceCenterStatus);
         if (stringStatusDto.equals(Constants.ERROR_CODE)) {
             return StatusDto.buildSuccessStatusDto("编辑失败！");
