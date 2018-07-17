@@ -27,7 +27,7 @@ public class BasicCarmodelParameterDao extends BaseDao<CarmodelParameter> {
         return namedParameterJdbcTemplate;
     }
 
-    private String SQL_BUILD = " id, parameter_name, value_type, optional_list, manual_add_flag, required_flag, sort_number, create_time, creator, operate_time, operator, delete_flag ";
+    private String SQL_BUILD = " id, parameter_name, value_type, optional_list, manual_add_flag, required_flag, sort_number, car_label_id, create_time, creator, operate_time, operator, delete_flag ";
     /**
      * 分页查询所有配置参数
      * @param parameterName 配置参数名称
@@ -114,8 +114,8 @@ public class BasicCarmodelParameterDao extends BaseDao<CarmodelParameter> {
     public long createParameter(CarmodelParameter carmodelParameter){
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO basic_carmodel_parameter ")
-            .append("( parameter_name, value_type, optional_list, manual_add_flag, required_flag, sort_number, create_time, creator, operate_time, operator, delete_flag) ")
-            .append(" VALUES ( :parameterName, :valueType, :optionalList, :manualAddFlag, :requiredFlag, :sortNumber, :createTime, :creator, :operateTime, :operator, :deleteFlag)");
+            .append("( parameter_name, value_type, optional_list, manual_add_flag, required_flag, sort_number, car_label_id, create_time, creator, operate_time, operator, delete_flag) ")
+            .append(" VALUES ( :parameterName, :valueType, :optionalList, :manualAddFlag, :requiredFlag, :sortNumber, :carLabelId, :createTime, :creator, :operateTime, :operator, :deleteFlag)");
         long i = super.saveRid(sql.toString(), carmodelParameter);
         return i;
     }
@@ -131,7 +131,7 @@ public class BasicCarmodelParameterDao extends BaseDao<CarmodelParameter> {
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE basic_carmodel_parameter SET parameter_name= :parameterName, ")
             .append(" value_type= :valueType, optional_list= :optionalList, manual_add_flag= :manualAddFlag, required_flag= :requiredFlag,")
-            .append(" sort_number= :sortNumber, operate_time= :operateTime, operator= :operator WHERE id = :id");
+            .append(" sort_number= :sortNumber, car_label_id= :carLabelId, operate_time= :operateTime, operator= :operator WHERE id = :id");
         int i = super.updateForBean(sql.toString(), carmodelParameter);
         return i;
     }
