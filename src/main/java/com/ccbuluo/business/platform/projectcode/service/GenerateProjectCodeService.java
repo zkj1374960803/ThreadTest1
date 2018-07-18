@@ -39,8 +39,6 @@ public class GenerateProjectCodeService {
     private JedisCluster jedisCluster;
     @Autowired
     private BizServiceProjectcodeDao bizServiceProjectcodeDao;
-    @ThriftRPCClient("UserCoreSerService")
-    private BasicUserOrganizationService orgService;
 
     /**
      * 根据前缀生成相应的编码
@@ -70,6 +68,12 @@ public class GenerateProjectCodeService {
                 break;
             case FP:    // 零配件
                 resultDto = getCode(prefix.toString(), 6, 1,"#A##B##C#");
+                break;
+            case FA:    // 物料
+                resultDto = getCode(prefix.toString(), 4, 0,"#A##B#");
+                break;
+            case FL:    // 工时
+                resultDto = getCode(prefix.toString(), 4, 0,"#A##B#");
                 break;
             default:
                 resultDto = StatusDto.buildStatusDtoWithCode(BizErrorCodeEnum.CODE_UNKONEPREFIX.getErrorCode(),
