@@ -185,6 +185,7 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
             param.put("Keyword", Keyword);
             sql.append(" AND bci.vin_number LIKE CONCAT('%',:Keyword,'%') ");
         }
+        sql.append("  ORDER BY bci.operate_time DESC");
         Page<SearchBizServiceMaintaincarDTO> DTOS = super.queryPageForBean(SearchBizServiceMaintaincarDTO.class, sql.toString(), param,offset,pageSize);
         return DTOS;
     }
