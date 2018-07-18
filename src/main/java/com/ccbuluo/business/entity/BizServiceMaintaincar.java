@@ -21,7 +21,7 @@ public class BizServiceMaintaincar extends AftersaleCommonEntity{
     /**
      * 车架号
      */
-    @ApiModelProperty(name = "vinNumber", value = "车架号")
+    @ApiModelProperty(name = "vinNumber", value = "车架号",required = true)
     private String vinNumber;
     /**
      * 维修车的分配状态(1：已分配，0：未分配)
@@ -31,23 +31,23 @@ public class BizServiceMaintaincar extends AftersaleCommonEntity{
     /**
      * 车辆品牌的id
      */
-    @ApiModelProperty(name = "carbrandId", value = "车辆品牌的id")
+    @ApiModelProperty(name = "carbrandId", value = "车辆品牌的id",required = true)
     private Long carbrandId;
     /**
      * 车系的id
      */
-    @ApiModelProperty(name = "carseriesId", value = "车系的id")
+    @ApiModelProperty(name = "carseriesId", value = "车系的id",required = true)
     private Long carseriesId;
     /**
      * 车型的id
      */
-    @ApiModelProperty(name = "carmodelId", value = "车型的id")
+    @ApiModelProperty(name = "carmodelId", value = "车型的id",required = true)
     private Long carmodelId;
     /**
      * 客户经理的id
      */
-    @ApiModelProperty(name = "cusmanagerId", value = "客户经理的id")
-    private String cusmanagerId;
+    @ApiModelProperty(name = "cusmanagerUuid", value = "客户经理的id")
+    private String cusmanagerUuid;
     /**
      * 客户经理名称
      */
@@ -56,7 +56,7 @@ public class BizServiceMaintaincar extends AftersaleCommonEntity{
     /**
      * 北斗设备编号
      */
-    @ApiModelProperty(name = "beidouNumber", value = "北斗设备编号")
+    @ApiModelProperty(name = "beidouNumber", value = "北斗设备编号",required = true)
     private String beidouNumber;
     /**
      * 备注
@@ -112,12 +112,12 @@ public class BizServiceMaintaincar extends AftersaleCommonEntity{
         return this.carmodelId;
     }
 
-    public void setCusmanagerId(String cusmanagerId) {
-        this.cusmanagerId = cusmanagerId;
+    public String getCusmanagerUuid() {
+        return cusmanagerUuid;
     }
 
-    public String getCusmanagerId() {
-        return this.cusmanagerId;
+    public void setCusmanagerUuid(String cusmanagerUuid) {
+        this.cusmanagerUuid = cusmanagerUuid;
     }
 
     public void setCusmanagerName(String cusmanagerName) {

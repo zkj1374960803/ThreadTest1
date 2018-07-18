@@ -1,8 +1,12 @@
 package com.ccbuluo.business.platform.maintaincar.dao;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceMaintaincar;
+import com.ccbuluo.business.platform.maintaincar.dto.SearchBizServiceMaintaincarDTO;
 import com.ccbuluo.dao.BaseDao;
+import com.ccbuluo.db.Page;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -32,13 +36,13 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
      * @author liuduo
      * @date 2018-07-17 13:57:53
      */
-    public int saveEntity(BizServiceMaintaincar entity) {
+    public int saveServiceMaintaincar(BizServiceMaintaincar entity) {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO biz_service_maintaincar ( mend_code,vin_number,")
-            .append("car_status,carbrand_id,carseries_id,carmodel_id,cusmanager_id,")
+            .append("car_status,carbrand_id,carseries_id,carmodel_id,cusmanager_uuid,")
             .append("cusmanager_name,beidou_number,remark,creator,create_time,operator,")
             .append("operate_time,delete_flag ) VALUES (  :mendCode, :vinNumber,")
-            .append(" :carStatus, :carbrandId, :carseriesId, :carmodelId, :cusmanagerId,")
+            .append(" :carStatus, :carbrandId, :carseriesId, :carmodelId, :cusmanagerUuid,")
             .append(" :cusmanagerName, :beidouNumber, :remark, :creator, :createTime,")
             .append(" :operator, :operateTime, :deleteFlag )");
         return super.save(sql.toString(), entity);
@@ -51,12 +55,12 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
      * @author liuduo
      * @date 2018-07-17 13:57:53
      */
-    public int update(BizServiceMaintaincar entity) {
+    public int updateServiceMaintaincar(BizServiceMaintaincar entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_service_maintaincar SET mend_code = :mendCode,")
+        sql.append("UPDATE biz_service_maintaincar SET ")
             .append("vin_number = :vinNumber,car_status = :carStatus,")
             .append("carbrand_id = :carbrandId,carseries_id = :carseriesId,")
-            .append("carmodel_id = :carmodelId,cusmanager_id = :cusmanagerId,")
+            .append("carmodel_id = :carmodelId,cusmanager_uuid = :cusmanagerUuid,")
             .append("cusmanager_name = :cusmanagerName,beidou_number = :beidouNumber,")
             .append("remark = :remark,creator = :creator,create_time = :createTime,")
             .append("operator = :operator,operate_time = :operateTime,")
@@ -70,10 +74,10 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
      * @author liuduo
      * @date 2018-07-17 13:57:53
      */
-    public BizServiceMaintaincar getById(long id) {
+    public BizServiceMaintaincar queryServiceMaintaincarByCarId(long id) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,mend_code,vin_number,car_status,carbrand_id,carseries_id,")
-            .append("carmodel_id,cusmanager_id,cusmanager_name,beidou_number,remark,")
+            .append("carmodel_id,cusmanager_uuid,cusmanager_name,beidou_number,remark,")
             .append("creator,create_time,operator,operate_time,delete_flag")
             .append(" FROM biz_service_maintaincar WHERE id= :id");
         Map<String, Object> params = Maps.newHashMap();
@@ -88,11 +92,100 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
      * @author liuduo
      * @date 2018-07-17 13:57:53
      */
-    public int deleteById(long id) {
+    public int deleteCarcoreInfoByCarId(long id) {
         StringBuilder sql = new StringBuilder();
-        sql.append("DELETE  FROM biz_service_maintaincar WHERE id= :id ");
+        sql.append("UPDATE biz_service_maintaincar SET delete_flag = :deleteFlag  WHERE id= :id ");
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
+        params.put("deleteFlag", com.ccbuluo.merchandiseintf.carparts.Constants.Constants.DELETE_FLAG_DELETE);
         return super.updateForMap(sql.toString(), params);
+    }
+    /**
+     * 车辆基本信息 车架号(VIN) 是否存在
+     * @param bizServiceMaintaincar 车辆基本信息
+     * @return int
+     * @exception
+     * @author wuyibo
+     * @date 2018-05-09 18:41:36
+     */
+    public int countVinNumber(BizServiceMaintaincar bizServiceMaintaincar) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT COUNT(*) FROM biz_service_maintaincar ")
+                .append("   WHERE vin_number = :vinNumber AND delete_flag = :deleteFlag");
+        if (null != bizServiceMaintaincar.getId()) {
+            sql.append(" AND id != :id");
+        }
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("vinNumber", bizServiceMaintaincar.getVinNumber());
+        params.put("deleteFlag", bizServiceMaintaincar.getDeleteFlag());
+        params.put("id", bizServiceMaintaincar.getId());
+        return namedParameterJdbcTemplate.queryForObject(sql.toString(), params, Integer.class);
+    }
+
+    /**
+     * 车辆基本信息 北斗设备编号 是否存在
+     * @param bizServiceMaintaincar 车辆基本信息
+     * @return int
+     * @exception
+     * @author wuyibo
+     * @date 2018-05-09 18:41:36
+     */
+    public int countBeidouNumber(BizServiceMaintaincar bizServiceMaintaincar) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT COUNT(*) FROM biz_service_maintaincar ")
+                .append("   WHERE beidou_number = :beidouNumber AND delete_flag = :deleteFlag");
+        if (null != bizServiceMaintaincar.getId()) {
+            sql.append(" AND id != :id");
+        }
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("beidouNumber", bizServiceMaintaincar.getBeidouNumber());
+        params.put("deleteFlag", bizServiceMaintaincar.getDeleteFlag());
+        params.put("id", bizServiceMaintaincar.getId());
+        return namedParameterJdbcTemplate.queryForObject(sql.toString(), params, Integer.class);
+    }
+
+    /**
+     * 车辆列表分页查询
+     * @param carbrandId 品牌id
+     * @param carseriesId 车系id
+     * @param
+     * @param Keyword (车辆编号或是车架号)
+     * @param offset 起始数
+     * @param pageSize 每页数量
+     * @author weijb
+     * @date 2018-07-13 19:52:44
+     */
+    public Page<SearchBizServiceMaintaincarDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer carStatus, String Keyword, Integer offset, Integer pageSize){
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT bci.id,bci.mend_code,bci.vin_number,bci.car_status,")
+                .append("bcm.carbrand_name,bcmm.carseries_name,bcmmm.carmodel_name")
+                .append(" FROM biz_service_maintaincar bci LEFT JOIN basic_carbrand_manage bcm on bci.carbrand_id=bcm.id ")
+                .append(" LEFT JOIN basic_carseries_manage bcmm on bci.carseries_id=bcmm.id ")
+                .append(" LEFT JOIN basic_carmodel_manage bcmmm ON bci.carmodel_id=bcmmm.id ")
+                .append(" WHERE bci.delete_flag = :deleteFlag ");
+        // 品牌
+        if (null != carbrandId) {
+            param.put("carbrandId", carbrandId);
+            sql.append(" AND bci.carbrand_id = :carbrandId ");
+        }
+        // 车系
+        if (null != carseriesId) {
+            param.put("carseriesId", carseriesId);
+            sql.append(" AND bci.carseries_id = :carseriesId ");
+        }
+        // 车型
+        if (null != carStatus) {
+            param.put("carStatus", carStatus);
+            sql.append(" AND bci.car_status = :carStatus ");
+        }
+        // 车架号
+        if (StringUtils.isNotBlank(Keyword)) {
+            param.put("Keyword", Keyword);
+            sql.append(" AND bci.vin_number LIKE CONCAT('%',:Keyword,'%') ");
+        }
+        Page<SearchBizServiceMaintaincarDTO> DTOS = super.queryPageForBean(SearchBizServiceMaintaincarDTO.class, sql.toString(), param,offset,pageSize);
+        return DTOS;
     }
 }
