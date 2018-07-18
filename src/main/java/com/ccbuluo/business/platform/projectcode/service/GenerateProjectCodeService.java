@@ -39,8 +39,6 @@ public class GenerateProjectCodeService {
     private JedisCluster jedisCluster;
     @Autowired
     private BizServiceProjectcodeDao bizServiceProjectcodeDao;
-    @ThriftRPCClient("UserCoreSerService")
-    private BasicUserOrganizationService orgService;
 
     /**
      * 根据前缀生成相应的编码
@@ -151,7 +149,7 @@ public class GenerateProjectCodeService {
      * @date 2018-07-03 17:08:07
      */
     @Transactional(rollbackFor = Exception.class)
-    public String produceCode(String prefix, int autoIncreasedcodeSize, String code, int randomlength, String order) {
+    String produceCode(String prefix, int autoIncreasedcodeSize, String code, int randomlength, String order) {
         try {
             String redisKey = buildRedisKey(prefix);
             // 需要自增的字符串
@@ -180,7 +178,7 @@ public class GenerateProjectCodeService {
                 bizServiceProjectcode.setCodePrefix(prefix);
                 bizServiceProjectcode.setCurrentCount(parkNum);
                 bizServiceProjectcode.setUpdateTime(new Date());
-                bizServiceProjectcodeDao.update(bizServiceProjectcode);
+                bizServiceProjectcodeDao.updateByPrifix(bizServiceProjectcode);
             }
             // 数据库更新成功之后再更新重新放入redis，
             jedisCluster.set(redisKey, String.valueOf(parkNum));

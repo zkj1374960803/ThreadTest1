@@ -56,6 +56,18 @@ public class BizServiceProjectcodeDao extends BaseDao<BizServiceProjectcode> {
     }
 
     /**
+     * 根据前缀更新业务主体编号记录
+     * @param entity
+     * @return
+     */
+    public int updateByPrifix(BizServiceProjectcode entity) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_service_projectcode SET current_count = :currentCount,")
+                .append("update_time = :updateTime WHERE code_prefix= :codePrefix");
+        return super.updateForBean(sql.toString(), entity);
+    }
+
+    /**
      * 获取详情
      * @param codePrefix  前缀
      * @author liuduo
@@ -66,7 +78,7 @@ public class BizServiceProjectcodeDao extends BaseDao<BizServiceProjectcode> {
         params.put("count", Constants.FLAG_ONE);
         params.put("codePrefix", codePrefix);
 
-        String sql = "SELECT id,code_prefix,current_count + :count as current_count FROM biz_service_projectcode WHERE code_prefix= :codePrefix";
+        String sql = "SELECT id,code_prefix,current_count + :count as current_count FROM biz_service_projectcode WHERE code_prefix= :codePrefix LIMIT 1 ";
 
         return super.findForBean(BizServiceProjectcode.class, sql, params);
     }
