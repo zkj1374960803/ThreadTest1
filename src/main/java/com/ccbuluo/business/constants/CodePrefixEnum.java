@@ -12,6 +12,8 @@ public enum CodePrefixEnum {
     FK("零配件分类"),
     FM("零配件模板"),
     FS("员工"),
+    FA("物料"),
+    FL("工时"),
     FG("供应商");
 
 

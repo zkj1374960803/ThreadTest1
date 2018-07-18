@@ -1,9 +1,9 @@
-package com.ccbuluo.business.entity;
+package com.ccbuluo.business.platform.equipment.dto;
 
+import com.ccbuluo.business.entity.AftersaleCommonEntity;
+import com.ccbuluo.business.entity.IdEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import java.util.Date;
 
 /**
  * 物料实体
@@ -11,36 +11,23 @@ import java.util.Date;
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "物料实体", description = "物料")
-public class BizServiceEquipment extends AftersaleCommonEntity{
-    /**
-     * 物料编号
-     */
-    @ApiModelProperty(name = "equipCode", value = "物料编号")
-    private String equipCode;
+@ApiModel(value = "物料保存实体", description = "物料保存实体")
+public class SaveBizServiceEquipmentDTO extends IdEntity {
     /**
      * 物料名称
      */
-    @ApiModelProperty(name = "equipName", value = "物料名称")
+    @ApiModelProperty(name = "equipName", value = "物料名称", required = true)
     private String equipName;
     /**
      * 物料类型的id
      */
-    @ApiModelProperty(name = "equiptypeId", value = "物料类型的id")
+    @ApiModelProperty(name = "equiptypeId", value = "物料类型的id", required = true)
     private Long equiptypeId;
     /**
      * 备注
      */
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
-
-    public void setEquipCode(String equipCode) {
-        this.equipCode = equipCode;
-    }
-
-    public String getEquipCode() {
-        return this.equipCode;
-    }
 
     public void setEquipName(String equipName) {
         this.equipName = equipName;

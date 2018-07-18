@@ -1,10 +1,11 @@
-package com.ccbuluo.business.entity;
+package com.ccbuluo.business.platform.maintainitem.dto;
 
+import com.ccbuluo.business.entity.AftersaleCommonEntity;
+import com.ccbuluo.business.entity.IdEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * 维修服务项实体
@@ -12,8 +13,8 @@ import java.util.Date;
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "维修服务项实体", description = "维修服务项")
-public class BizServiceMaintainitem extends AftersaleCommonEntity{
+@ApiModel(value = "维修服务项实体详情dto", description = "维修服务项实体详情dto")
+public class DetailBizServiceMaintainitemDTO extends IdEntity {
     /**
      * 服务项目的编码
      */
@@ -30,10 +31,10 @@ public class BizServiceMaintainitem extends AftersaleCommonEntity{
     @ApiModelProperty(name = "unitPrice", value = "单价")
     private BigDecimal unitPrice;
     /**
-     * 备注
+     * 地区倍数数量
      */
-    @ApiModelProperty(name = "remark", value = "备注")
-    private String remark;
+    @ApiModelProperty(name = "multipleNum", value = "地区倍数数量")
+    private Integer multipleNum;
 
 
     public void setMaintainitemCode(String maintainitemCode) {
@@ -60,12 +61,11 @@ public class BizServiceMaintainitem extends AftersaleCommonEntity{
         return this.unitPrice;
     }
 
-    public void setRemark(String remark) {
-        this.remark = remark;
+    public Integer getMultipleNum() {
+        return multipleNum;
     }
 
-    public String getRemark() {
-        return this.remark;
+    public void setMultipleNum(Integer multipleNum) {
+        this.multipleNum = multipleNum;
     }
-
 }

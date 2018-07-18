@@ -1,9 +1,9 @@
-package com.ccbuluo.business.entity;
+package com.ccbuluo.business.platform.equipment.dto;
 
+import com.ccbuluo.business.entity.AftersaleCommonEntity;
+import com.ccbuluo.business.entity.IdEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import java.util.Date;
 
 /**
  * 物料实体
@@ -11,8 +11,8 @@ import java.util.Date;
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "物料实体", description = "物料")
-public class BizServiceEquipment extends AftersaleCommonEntity{
+@ApiModel(value = "物料详情实体", description = "物料详情实体")
+public class DetailBizServiceEquipmentDTO extends IdEntity {
     /**
      * 物料编号
      */
@@ -28,6 +28,11 @@ public class BizServiceEquipment extends AftersaleCommonEntity{
      */
     @ApiModelProperty(name = "equiptypeId", value = "物料类型的id")
     private Long equiptypeId;
+    /**
+     * 物料类型的名字
+     */
+    @ApiModelProperty(name = "equiptypeName", value = "物料类型的名字")
+    private String equiptypeName;
     /**
      * 备注
      */
@@ -66,4 +71,11 @@ public class BizServiceEquipment extends AftersaleCommonEntity{
         return this.remark;
     }
 
+    public String getEquiptypeName() {
+        return equiptypeName;
+    }
+
+    public void setEquiptypeName(String equiptypeName) {
+        this.equiptypeName = equiptypeName;
+    }
 }

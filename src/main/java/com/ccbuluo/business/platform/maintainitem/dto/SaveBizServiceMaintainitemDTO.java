@@ -1,10 +1,11 @@
-package com.ccbuluo.business.entity;
+package com.ccbuluo.business.platform.maintainitem.dto;
 
+import com.ccbuluo.business.entity.AftersaleCommonEntity;
+import com.ccbuluo.business.entity.IdEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * 维修服务项实体
@@ -12,13 +13,8 @@ import java.util.Date;
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "维修服务项实体", description = "维修服务项")
-public class BizServiceMaintainitem extends AftersaleCommonEntity{
-    /**
-     * 服务项目的编码
-     */
-    @ApiModelProperty(name = "maintainitemCode", value = "服务项目的编码")
-    private String maintainitemCode;
+@ApiModel(value = "维修服务项实体保存dto", description = "维修服务项实体保存dto")
+public class SaveBizServiceMaintainitemDTO extends IdEntity {
     /**
      * 服务项目名称
      */
@@ -29,20 +25,6 @@ public class BizServiceMaintainitem extends AftersaleCommonEntity{
      */
     @ApiModelProperty(name = "unitPrice", value = "单价")
     private BigDecimal unitPrice;
-    /**
-     * 备注
-     */
-    @ApiModelProperty(name = "remark", value = "备注")
-    private String remark;
-
-
-    public void setMaintainitemCode(String maintainitemCode) {
-        this.maintainitemCode = maintainitemCode;
-    }
-
-    public String getMaintainitemCode() {
-        return this.maintainitemCode;
-    }
 
     public String getMaintainitemName() {
         return maintainitemName;
@@ -58,14 +40,6 @@ public class BizServiceMaintainitem extends AftersaleCommonEntity{
 
     public BigDecimal getUnitPrice() {
         return this.unitPrice;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-
-    public String getRemark() {
-        return this.remark;
     }
 
 }

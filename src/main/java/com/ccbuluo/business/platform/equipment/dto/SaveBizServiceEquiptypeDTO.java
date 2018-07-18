@@ -1,9 +1,9 @@
-package com.ccbuluo.business.entity;
+package com.ccbuluo.business.platform.equipment.dto;
 
+import com.ccbuluo.business.entity.AftersaleCommonEntity;
+import com.ccbuluo.business.entity.IdEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import java.util.Date;
 
 /**
  * 物料的类型实体
@@ -11,8 +11,8 @@ import java.util.Date;
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "物料的类型实体", description = "物料的类型")
-public class BizServiceEquiptype extends AftersaleCommonEntity{
+@ApiModel(value = "物料类型保存实体", description = "物料类型保存实体")
+public class SaveBizServiceEquiptypeDTO extends IdEntity {
     /**
      * 类型的名称
      */

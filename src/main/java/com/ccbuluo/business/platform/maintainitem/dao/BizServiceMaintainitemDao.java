@@ -1,8 +1,13 @@
 package com.ccbuluo.business.platform.maintainitem.dao;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceMaintainitem;
+import com.ccbuluo.business.platform.maintainitem.dto.DetailBizServiceMaintainitemDTO;
+import com.ccbuluo.business.platform.maintainitem.dto.SaveBizServiceMaintainitemDTO;
 import com.ccbuluo.dao.BaseDao;
+import com.ccbuluo.db.Page;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -35,9 +40,9 @@ public class BizServiceMaintainitemDao extends BaseDao<BizServiceMaintainitem> {
     public int saveEntity(BizServiceMaintainitem entity) {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO biz_service_maintainitem ( maintainitem_code,")
-            .append("maintainitem_neme,unit_price,remark,creator,create_time,operator,")
+            .append("maintainitem_name,unit_price,remark,creator,create_time,operator,")
             .append("operate_time,delete_flag ) VALUES (  :maintainitemCode,")
-            .append(" :maintainitemNeme, :unitPrice, :remark, :creator, :createTime,")
+            .append(" :maintainitemName, :unitPrice, :remark, :creator, :createTime,")
             .append(" :operator, :operateTime, :deleteFlag )");
         return super.save(sql.toString(), entity);
     }
@@ -52,11 +57,9 @@ public class BizServiceMaintainitemDao extends BaseDao<BizServiceMaintainitem> {
     public int update(BizServiceMaintainitem entity) {
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE biz_service_maintainitem SET ")
-            .append("maintainitem_code = :maintainitemCode,")
-            .append("maintainitem_neme = :maintainitemNeme,unit_price = :unitPrice,")
-            .append("remark = :remark,creator = :creator,create_time = :createTime,")
-            .append("operator = :operator,operate_time = :operateTime,")
-            .append("delete_flag = :deleteFlag WHERE id= :id");
+            .append("maintainitem_name = :maintainitemName,unit_price = :unitPrice,")
+            .append("operator = :operator,operate_time = :operateTime WHERE id= :id");
+
         return super.updateForBean(sql.toString(), entity);
     }
 
@@ -66,14 +69,15 @@ public class BizServiceMaintainitemDao extends BaseDao<BizServiceMaintainitem> {
      * @author liuduo
      * @date 2018-07-17 13:57:53
      */
-    public BizServiceMaintainitem getById(long id) {
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,maintainitem_code,maintainitem_neme,unit_price,remark,")
-            .append("creator,create_time,operator,operate_time,delete_flag")
-            .append(" FROM biz_service_maintainitem WHERE id= :id");
+    public DetailBizServiceMaintainitemDTO getById(long id) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
-        return super.findForBean(BizServiceMaintainitem.class, sql.toString(), params);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,maintainitem_code,maintainitem_name,unit_price")
+            .append(" FROM biz_service_maintainitem WHERE id= :id");
+
+        return super.findForBean(DetailBizServiceMaintainitemDTO.class, sql.toString(), params);
     }
 
     /**
@@ -89,5 +93,65 @@ public class BizServiceMaintainitemDao extends BaseDao<BizServiceMaintainitem> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
         return super.updateForMap(sql.toString(), params);
+    }
+
+    /**
+     * 服务名字检验（新增用）
+     * @param maintainitemName 服务名字
+     * @return 是否重复
+     * @author liuduo
+     * @date 2018-07-18 10:32:12
+     */
+    public Boolean checkName(String maintainitemName) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("maintainitemName", maintainitemName);
+
+        String sql = "SELECT COUNT(id) > 0 FROM biz_service_maintainitem WHERE maintainitem_name = :maintainitemName";
+
+        return findForObject(sql, params, Boolean.class);
+    }
+
+
+    /**
+     * 检查服务是否重复（编辑用）
+     * @param saveBizServiceMaintainitemDTO 工时实体
+     * @return 名字的是否重复
+     * @author liuduo
+     * @date 2018-07-18 10:29:20
+     */
+    public Boolean editCheckName(SaveBizServiceMaintainitemDTO saveBizServiceMaintainitemDTO) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("maintainitemName", saveBizServiceMaintainitemDTO.getMaintainitemName());
+        params.put("id", saveBizServiceMaintainitemDTO.getId());
+
+        String sql = "SELECT COUNT(id) > 0 FROM biz_service_maintainitem WHERE id <> :id AND maintainitem_name = :maintainitemName";
+
+        return findForObject(sql, params, Boolean.class);
+    }
+
+    /**
+     * 查询工时列表
+     * @param keyword 关键字
+     * @param offset 起始数
+     * @param pagesize 每页数
+     * @return 物料列表
+     * @author liuduo
+     * @date 2018-07-17 20:10:35
+     */
+    public Page<DetailBizServiceMaintainitemDTO> queryList(String keyword, Integer offset, Integer pagesize) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT bsm.id, bsm.maintainitem_code,bsm.maintainitem_neme,bsm.unit_price FROM biz_service_maintainitem AS bsm ")
+            .append(" LEFT JOIN biz_service_multipleprice AS bsmm ON bsmm.maintainitem_code = bsm.maintainitem_code")
+            .append(" WHERE 1=1");
+        if (StringUtils.isNotBlank(keyword)) {
+            params.put("keyword", keyword);
+            sql.append(" AND bsm.maintainitem_neme LIKE CONCAT('%',:keyword,'%')");
+        }
+        sql.append("  AND bsm.delete_flag = :deleteFlag ORDER BY operate_time DESC");
+
+        return queryPageForBean(DetailBizServiceMaintainitemDTO.class, sql.toString(), params, offset, pagesize);
     }
 }
