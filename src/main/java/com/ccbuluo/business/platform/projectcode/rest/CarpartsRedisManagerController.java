@@ -31,7 +31,7 @@ public class CarpartsRedisManagerController {
      * @date 2018-07-11 15:52:33
      */
     @ApiOperation(value = "缓存列表",notes = "【魏俊标】")
-    @PostMapping("/redisList")
+    @GetMapping("/redisList")
     public StatusDto<List<String>> redisList() throws TException {
         List<String> list = new ArrayList<String>();
         list.add("服务中心key=servicedev:projectcode:FW,value="+jedisCluster.get("servicedev:projectcode:FW"));

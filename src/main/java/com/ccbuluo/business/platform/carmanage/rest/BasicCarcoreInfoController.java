@@ -39,7 +39,7 @@ public class BasicCarcoreInfoController extends BaseController {
      */
     @ApiOperation(value = "新增车辆", notes = "【weijb】")
     @PostMapping("/create")
-    public StatusDto create(@ApiParam(name = "saveCarcoreInfoDTO对象", value = "传入json格式", required = true) CarcoreInfo carcoreInfo) {
+    public StatusDto create(@ApiParam(name = "carcoreInfo对象", value = "传入json格式", required = true) CarcoreInfo carcoreInfo) {
         return basicCarcoreInfoService.saveCarcoreInfo(carcoreInfo);
     }
 
@@ -103,15 +103,17 @@ public class BasicCarcoreInfoController extends BaseController {
     @GetMapping("/list")
     @ApiImplicitParams({@ApiImplicitParam(name = "carbrandId", value = "品牌id", required = false, paramType = "query"),
             @ApiImplicitParam(name = "carseriesId", value = "车系id", required = false, paramType = "query"),
+            @ApiImplicitParam(name = "carStatus", value = "车辆状态", required = false, paramType = "query",dataType = "int"),
             @ApiImplicitParam(name = "Keyword", value = "关键字", required = false, paramType = "query"),
             @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
             @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
     public StatusDto<Page<SearchCarcoreInfoDTO>> queryCarcoreInfoList(@RequestParam(required = false) Long carbrandId,
                                                                           @RequestParam(required = false) Long carseriesId,
+                                                                          @RequestParam(required = false) Integer carStatus,
                                                                           @RequestParam(required = false) String Keyword,
                                                                           @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                           @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
-        return StatusDto.buildDataSuccessStatusDto(basicCarcoreInfoService.queryCarcoreInfoList(carbrandId, carseriesId, Keyword, offset, pageSize));
+        return StatusDto.buildDataSuccessStatusDto(basicCarcoreInfoService.queryCarcoreInfoList(carbrandId, carseriesId, carStatus, Keyword, offset, pageSize));
     }
 
 }

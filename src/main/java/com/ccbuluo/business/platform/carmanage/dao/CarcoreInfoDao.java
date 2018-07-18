@@ -34,10 +34,10 @@ public class CarcoreInfoDao extends BaseDao<CarcoreInfo> {
      */
     public int saveEntity(CarcoreInfo entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO carcore_info ( carcore_code,vin_number,engine_number,")
+        sql.append("INSERT INTO carcore_info ( car_number,vin_number,engine_number,")
             .append("beidou_number,carbrand_id,carseries_id,carmodel_id,produce_time,")
             .append("remark,creator,create_time,operator,operate_time,delete_flag")
-            .append(" ) VALUES (  :carcoreCode, :vinNumber, :engineNumber, :beidouNumber,")
+            .append(" ) VALUES (  :carNumber, :vinNumber, :engineNumber, :beidouNumber,")
             .append(" :carbrandId, :carseriesId, :carmodelId, :produceTime, :remark,")
             .append(" :creator, :createTime, :operator, :operateTime, :deleteFlag )");
         return super.save(sql.toString(), entity);
@@ -52,7 +52,7 @@ public class CarcoreInfoDao extends BaseDao<CarcoreInfo> {
      */
     public int update(CarcoreInfo entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE carcore_info SET carcore_code = :carcoreCode,")
+        sql.append("UPDATE carcore_info SET car_number = :carNumber,")
             .append("vin_number = :vinNumber,engine_number = :engineNumber,")
             .append("beidou_number = :beidouNumber,carbrand_id = :carbrandId,")
             .append("carseries_id = :carseriesId,carmodel_id = :carmodelId,")
@@ -70,7 +70,7 @@ public class CarcoreInfoDao extends BaseDao<CarcoreInfo> {
      */
     public CarcoreInfo getById(long id) {
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,carcore_code,vin_number,engine_number,beidou_number,")
+        sql.append("SELECT id,car_number,vin_number,engine_number,beidou_number,")
             .append("carbrand_id,carseries_id,carmodel_id,produce_time,remark,creator,")
             .append("create_time,operator,operate_time,delete_flag FROM carcore_info")
             .append(" WHERE id= :id");
