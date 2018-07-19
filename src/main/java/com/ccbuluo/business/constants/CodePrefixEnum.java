@@ -15,7 +15,8 @@ public enum CodePrefixEnum {
     FA("物料"),
     FL("工时"),
     FG("供应商"),
-    FR("维修车");
+    FR("维修车"),
+    FD("车型标签");
 
 
     CodePrefixEnum(String label){

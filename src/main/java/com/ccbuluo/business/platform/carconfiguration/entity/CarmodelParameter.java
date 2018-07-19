@@ -47,8 +47,8 @@ public class CarmodelParameter extends CarCommonEntity {
     /**
      * 标签id
      */
-    @ApiModelProperty(name = "carLabelId", value = "标签id")
-    private Integer carLabelId;
+    @ApiModelProperty(name = "carmodelLabelId", value = "标签id")
+    private Integer carmodelLabelId;
 
 
     public String getParameterName() {
@@ -99,11 +99,11 @@ public class CarmodelParameter extends CarCommonEntity {
         this.sortNumber = sortNumber;
     }
 
-    public Integer getCarLabelId() {
-        return carLabelId;
+    public Integer getCarmodelLabelId() {
+        return carmodelLabelId;
     }
 
-    public void setCarLabelId(Integer carLabelId) {
-        this.carLabelId = carLabelId;
+    public void setCarmodelLabelId(Integer carmodelLabelId) {
+        this.carmodelLabelId = carmodelLabelId;
     }
 }
