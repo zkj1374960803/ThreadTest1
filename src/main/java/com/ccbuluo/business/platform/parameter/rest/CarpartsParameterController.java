@@ -56,8 +56,7 @@ public class CarpartsParameterController extends BaseController {
         }
         saveBasicCarpartsParameterDTO.setParameterCode(stringStatusDto.getData());
         saveBasicCarpartsParameterDTO.setCreator(userHolder.getLoggedUserId());
-        carpartsParameterService.saveCarpartsParameter(saveBasicCarpartsParameterDTO);
-        return StatusDto.buildSuccessStatusDto();
+        return StatusDtoThriftUtils.resolve(carpartsParameterService.saveCarpartsParameter(saveBasicCarpartsParameterDTO), String.class);
     }
 
     /**
