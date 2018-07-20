@@ -307,7 +307,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
         String labelIds = saveServiceCenterDTO.getLabelIds();
         List<LabelServiceCenterDTO> lableList = new ArrayList<>();
         if (StringUtils.isBlank(labelIds)) {
-            return labelServiceCenterService.save(lableList);
+            return new int[1];
         }
         String[] split = labelIds.split(Constants.COMMA);
         for (String lable : split) {
