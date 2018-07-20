@@ -131,6 +131,17 @@ public class CarpartsParameterController extends BaseController {
     }
 
     /**
+     * 查询通过参数列表
+     * @author weijb
+     * @date 2018-07-05 14:52:44
+     */
+    @ApiOperation(value = "查询通过参数列表",notes = "【魏俊标】")
+    @GetMapping("/getCommonParameterList")
+    protected StatusDto<List<RelCarpartsCateparamDTO>> getCommonParameterList() {
+        return StatusDtoThriftUtils.resolve(carpartsParameterService.getCommonParameterList(),RelCarpartsCateparamDTO.class);
+    }
+
+    /**
      *零配件参数列表分页查询
      * @param parameterType 类型
      * @param parameterStatus 状态
