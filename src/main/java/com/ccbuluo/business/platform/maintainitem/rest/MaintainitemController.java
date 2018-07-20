@@ -90,8 +90,8 @@ public class MaintainitemController extends BaseController {
      * @author liuduo
      * @date 2018-07-17 20:10:35
      */
-    @ApiOperation(value = "物料列表", notes = "【刘铎】")
-    @ApiImplicitParams({@ApiImplicitParam(name = "keywork", value = "关键字", paramType = "query"),
+    @ApiOperation(value = "工时列表", notes = "【刘铎】")
+    @ApiImplicitParams({@ApiImplicitParam(name = "keyword", value = "关键字", paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "起始数", paramType = "query", dataType = "int",required = true),
         @ApiImplicitParam(name = "pagesize", value = "每页数", paramType = "query", dataType = "int",required = true)})
     @GetMapping("/list")

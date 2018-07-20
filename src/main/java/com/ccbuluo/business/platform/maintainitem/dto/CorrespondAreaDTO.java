@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.maintainitem.dto;
 
 import com.ccbuluo.business.entity.AftersaleCommonEntity;
+import com.ccbuluo.business.entity.IdEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 

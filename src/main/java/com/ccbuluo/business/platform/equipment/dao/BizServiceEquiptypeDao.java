@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.equipment.dao;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceEquiptype;
 import com.ccbuluo.business.platform.equipment.dto.SaveBizServiceEquiptypeDTO;
 import com.ccbuluo.dao.BaseDao;
@@ -81,10 +82,13 @@ public class BizServiceEquiptypeDao extends BaseDao<BizServiceEquiptype> {
      * @date 2018-07-17 15:03:48
      */
     public int deleteById(long id) {
-        StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE  biz_service_equiptype SET delete_flag = :deleteFlag WHERE id= :id ");
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
+        params.put("deleteFlag", Constants.DELETE_FLAG_DELETE);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE  biz_service_equiptype SET delete_flag = :deleteFlag WHERE id= :id ");
+
         return super.updateForMap(sql.toString(), params);
     }
 
