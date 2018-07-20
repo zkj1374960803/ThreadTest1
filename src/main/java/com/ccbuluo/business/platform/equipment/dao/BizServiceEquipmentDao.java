@@ -80,21 +80,6 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
     }
 
     /**
-     * 删除物料
-     * @param id  id
-     * @return 影响条数
-     * @author liuduo
-     * @date 2018-07-17 13:57:53
-     */
-    public int deleteById(long id) {
-        StringBuilder sql = new StringBuilder();
-        sql.append("DELETE  FROM biz_service_equipment WHERE id= :id ");
-        Map<String, Object> params = Maps.newHashMap();
-        params.put("id", id);
-        return super.updateForMap(sql.toString(), params);
-    }
-
-    /**
      * 检查物料类型下是否有物料
      * @param id 物料类型id
      * @return 是否有数据

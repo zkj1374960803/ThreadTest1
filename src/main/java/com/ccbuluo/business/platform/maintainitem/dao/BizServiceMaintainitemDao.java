@@ -134,7 +134,7 @@ public class BizServiceMaintainitemDao extends BaseDao<BizServiceMaintainitem> {
      * @param keyword 关键字
      * @param offset 起始数
      * @param pagesize 每页数
-     * @return 物料列表
+     * @return 工时列表
      * @author liuduo
      * @date 2018-07-17 20:10:35
      */
@@ -143,14 +143,15 @@ public class BizServiceMaintainitemDao extends BaseDao<BizServiceMaintainitem> {
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT bsm.id, bsm.maintainitem_code,bsm.maintainitem_neme,bsm.unit_price FROM biz_service_maintainitem AS bsm ")
-            .append(" LEFT JOIN biz_service_multipleprice AS bsmm ON bsmm.maintainitem_code = bsm.maintainitem_code")
-            .append(" WHERE 1=1");
+        sql.append("SELECT bsmm.id,bsmm.maintainitem_code,bsmm.maintainitem_name,bsmm.unit_price, ")
+            .append("  (SELECT COUNT(bsm.id) FROM biz_service_multipleprice AS bsm ")
+            .append("  WHERE bsm.maintainitem_code = bsmm.maintainitem_code) AS multipleNum")
+            .append("  FROM biz_service_maintainitem AS bsmm WHERE 1 = 1 ");
         if (StringUtils.isNotBlank(keyword)) {
             params.put("keyword", keyword);
-            sql.append(" AND bsm.maintainitem_neme LIKE CONCAT('%',:keyword,'%')");
+            sql.append(" AND bsmm.maintainitem_name LIKE CONCAT('%',:keyword,'%')");
         }
-        sql.append("  AND bsm.delete_flag = :deleteFlag ORDER BY operate_time DESC");
+        sql.append("  AND bsmm.delete_flag = :deleteFlag ORDER BY bsmm.operate_time DESC");
 
         return queryPageForBean(DetailBizServiceMaintainitemDTO.class, sql.toString(), params, offset, pagesize);
     }
