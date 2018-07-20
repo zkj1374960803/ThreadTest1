@@ -78,16 +78,10 @@ public class LabelServiceCenterServiceImpl implements LabelServiceCenterService 
     public int editLabelServiceCenter(String serviceCenterCode, String labels) {
         try {
             // 删除之前关联的
-            int affected = labelServiceCenterDao.delLabelServiceCenter(serviceCenterCode);
-            if (affected == Constants.FAILURESTATUS) {
-                return Constants.FAILURESTATUS;
-            }
+            labelServiceCenterDao.delLabelServiceCenter(serviceCenterCode);
             SaveServiceCenterDTO saveServiceCenterDTO = new SaveServiceCenterDTO();
             saveServiceCenterDTO.setLabelIds(labels);
-            int[] ints = serviceCenterService.saveLableServiceCenter(saveServiceCenterDTO, serviceCenterCode);
-            if (ints.length == 0) {
-                return Constants.FAILURESTATUS;
-            }
+            serviceCenterService.saveLableServiceCenter(saveServiceCenterDTO, serviceCenterCode);
             return Constants.SUCCESSSTATUS;
         } catch (Exception e) {
             logger.error("关联失败！", e);

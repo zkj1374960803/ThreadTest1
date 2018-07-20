@@ -76,11 +76,11 @@ public class ServiceCenterController extends BaseController {
     @ApiOperation(value = "编辑服务中心", notes = "【刘铎】")
     @ApiImplicitParams({@ApiImplicitParam(name = "serviceCenterCode", value = "服务中心code",  required = true, paramType = "query"),
         @ApiImplicitParam(name = "serviceCenterName", value = "服务中心名字",  required = true, paramType = "query"),
-        @ApiImplicitParam(name = "labelIds", value = "标签ids",  required = true, paramType = "query"),})
+        @ApiImplicitParam(name = "labelIds", value = "标签ids", paramType = "query"),})
     @GetMapping("/edit")
     public StatusDto<String> editServiceCenter(@RequestParam String serviceCenterCode,
                                        @RequestParam String serviceCenterName,
-                                       @RequestParam String labelIds) {
+                                       @RequestParam(required = false) String labelIds) {
 
         return serviceCenterService.editServiceCenter(serviceCenterCode, serviceCenterName, labelIds);
     }

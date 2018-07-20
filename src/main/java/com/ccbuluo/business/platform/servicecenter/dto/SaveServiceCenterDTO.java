@@ -80,7 +80,7 @@ public class SaveServiceCenterDTO{
     /**
      * 标签ids
      */
-    @ApiModelProperty(name = "labelIds", value = "标签ids", required = true)
+    @ApiModelProperty(name = "labelIds", value = "标签ids")
     private String labelIds;
 
     public String getServiceCenterName() {

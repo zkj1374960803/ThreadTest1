@@ -305,14 +305,14 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
     public int[] saveLableServiceCenter(SaveServiceCenterDTO saveServiceCenterDTO, String serviceCenterCode) {
         List<Long> lables = new ArrayList<>();
         String labelIds = saveServiceCenterDTO.getLabelIds();
+        List<LabelServiceCenterDTO> lableList = new ArrayList<>();
         if (StringUtils.isBlank(labelIds)) {
-            return new int[0];
+            return labelServiceCenterService.save(lableList);
         }
         String[] split = labelIds.split(Constants.COMMA);
         for (String lable : split) {
             lables.add(Long.valueOf(lable));
         }
-        List<LabelServiceCenterDTO> lableList = new ArrayList<>();
         for (Long lableId : lables) {
             LabelServiceCenterDTO labelServiceCenterDTO = new LabelServiceCenterDTO();
             labelServiceCenterDTO.setLabelId(lableId);
