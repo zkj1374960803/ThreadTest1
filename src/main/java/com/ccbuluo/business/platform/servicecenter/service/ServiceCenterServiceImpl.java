@@ -87,7 +87,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
             }
             // 保存标签
             int[] ids = saveLableServiceCenter(saveServiceCenterDTO, serviceCenterCode);
-            if (ids.length == 0) {
+            if (ids.length == Constants.FAILURESTATUS) {
                 return StatusDto.buildFailure(SAVEFAILURE);
             }
             // 保存仓库

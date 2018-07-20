@@ -81,7 +81,10 @@ public class LabelServiceCenterServiceImpl implements LabelServiceCenterService 
             labelServiceCenterDao.delLabelServiceCenter(serviceCenterCode);
             SaveServiceCenterDTO saveServiceCenterDTO = new SaveServiceCenterDTO();
             saveServiceCenterDTO.setLabelIds(labels);
-            serviceCenterService.saveLableServiceCenter(saveServiceCenterDTO, serviceCenterCode);
+            int[] ints = serviceCenterService.saveLableServiceCenter(saveServiceCenterDTO, serviceCenterCode);
+            if (ints.length == Constants.FAILURESTATUS) {
+                return Constants.FAILURESTATUS;
+            }
             return Constants.SUCCESSSTATUS;
         } catch (Exception e) {
             logger.error("关联失败！", e);
