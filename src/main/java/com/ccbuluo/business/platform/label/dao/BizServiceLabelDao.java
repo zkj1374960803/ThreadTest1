@@ -112,4 +112,17 @@ public class BizServiceLabelDao extends BaseDao<BizServiceLabel> {
             .append("operator = :operator,operate_time = :operateTime WHERE id = :id ");
         super.updateForBean(sql.toString(), label);
     }
+    /**
+     * 查询标签的关联关系
+     * @param id 标签的id
+     * @return
+     * @author zhangkangjian
+     * @date 2018-07-20 09:41:59
+     */
+    public Long countRelLabel(Long id) {
+        String sql = "SELECT COUNT(*) FROM rel_center_label WHERE label_id = :labelId";
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("labelId", id);
+        return namedParameterJdbcTemplate.queryForObject(sql, map, Long.class);
+    }
 }

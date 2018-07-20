@@ -6,6 +6,7 @@ import com.ccbuluo.business.platform.label.dto.ListLabelDTO;
 import com.ccbuluo.business.platform.supplier.service.SupplierService;
 import com.ccbuluo.business.platform.supplier.service.SupplierServiceImpl;
 import com.ccbuluo.core.common.UserHolder;
+import com.ccbuluo.core.exception.CommonException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,6 +59,11 @@ public class LabelServiceImpl implements LabelService {
      */
     @Override
     public void deleteLabel(Long id) {
+        // 判断是否可以删除标签
+        Long countRelLabel = bizServiceLabelDao.countRelLabel(id);
+        if(countRelLabel > 0L){
+            throw new CommonException("0", "此标签已和服务中心建立关联关系，无法删除！");
+        }
         bizServiceLabelDao.deleteById(id);
     }
 
