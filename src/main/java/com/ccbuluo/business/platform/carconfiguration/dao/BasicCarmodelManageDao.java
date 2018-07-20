@@ -28,7 +28,7 @@ public class BasicCarmodelManageDao extends BaseDao<CarmodelManage> {
         return namedParameterJdbcTemplate;
     }
 
-    private String SQL_BUILD = "id, carbrand_id, carseries_id,carmodel_number, carmodel_name, model_title, model_master_image, model_image, carmodel_status, create_time, creator, operate_time, operator, delete_flag";
+    private String SQL_BUILD = "id, carbrand_id, carseries_id,carmodel_number, carmodel_name, car_type, model_title, model_master_image, model_image, carmodel_status, create_time, creator, operate_time, operator, delete_flag";
 
     /**
      * 分页查询车型列表
@@ -44,7 +44,7 @@ public class BasicCarmodelManageDao extends BaseDao<CarmodelManage> {
     public Page<CarmodelManageDTO> queryPageForCarModelManage(Long carbrandId, Long carseriesId, Integer status, String carmodelName, int offset, int limit){
         Map<String ,Object> param = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT bcmm.carbrand_id,bcmm.carseries_id,bcmm.id,bcmm.carmodel_name,bcmm.carmodel_number ,bcmm.model_image, ")
+        sql.append(" SELECT bcmm.carbrand_id,bcmm.carseries_id,bcmm.id,bcmm.carmodel_name,bcmm.carmodel_number, bcmm.car_type ,bcmm.model_image, ")
             .append(" bcmm.model_master_image,bcmm.`carmodel_status`,bcmm.model_title,a.car_count ")
             .append(" FROM basic_carmodel_manage bcmm ")
             .append(" LEFT JOIN (SELECT bcci.carmodel_id, count(*) AS car_count FROM basic_carcore_info bcci WHERE bcci.delete_flag = 0 GROUP BY bcci.carmodel_id) a  ")
@@ -133,7 +133,7 @@ public class BasicCarmodelManageDao extends BaseDao<CarmodelManage> {
         Map<String ,Object> param = Maps.newHashMap();
         param.put("id",id);
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT bcmm.id, bcmm.carbrand_id,bcmm.carmodel_number, bcmm.carseries_id,bcmm.carmodel_name, ")
+        sql.append(" SELECT bcmm.id, bcmm.carbrand_id,bcmm.carmodel_number, bcmm.carseries_id,bcmm.carmodel_name, bcmm.car_type, ")
            .append(" bcmm.model_title, bcmm.model_master_image, bcmm.model_image, bcmm.carmodel_status,bcbm.carbrand_logo ")
            .append(" FROM basic_carmodel_manage bcmm  ")
            .append(" LEFT JOIN basic_carbrand_manage bcbm ON bcmm.carbrand_id = bcbm.id WHERE bcmm.id = :id");
@@ -151,8 +151,8 @@ public class BasicCarmodelManageDao extends BaseDao<CarmodelManage> {
     public long create(CarmodelManage carmodelManage){
         StringBuilder sql = new StringBuilder();
         sql.append(" INSERT INTO basic_carmodel_manage ")
-            .append(" (carbrand_id, carseries_id, carmodel_name, model_title, model_master_image, model_image,carmodel_number, create_time, creator,operate_time,operator) ")
-            .append(" VALUES ( :carbrandId, :carseriesId, :carmodelName, :modelTitle, :modelMasterImage, :modelImage, :carmodelNumber, :createTime, :creator, :operateTime, :operator) ");
+            .append(" (carbrand_id, carseries_id, car_type, carmodel_name, model_title, model_master_image, model_image,carmodel_number, create_time, creator,operate_time,operator) ")
+            .append(" VALUES ( :carbrandId, :carseriesId, :carType, :carmodelName, :modelTitle, :modelMasterImage, :modelImage, :carmodelNumber, :createTime, :creator, :operateTime, :operator) ");
         Long rid = super.saveRid(sql.toString(), carmodelManage);
         return rid;
     }
@@ -166,7 +166,7 @@ public class BasicCarmodelManageDao extends BaseDao<CarmodelManage> {
      */
     public int edit(CarmodelManage carmodelManage){
         StringBuilder sql = new StringBuilder();
-        sql.append(" UPDATE basic_carmodel_manage SET carbrand_id= :carbrandId, carseries_id= :carseriesId,carmodel_name= :carmodelName, model_title= :modelTitle, ")
+        sql.append(" UPDATE basic_carmodel_manage SET carbrand_id= :carbrandId, carseries_id= :carseriesId,carmodel_name= :carmodelName,car_type= :carType, model_title= :modelTitle, ")
            .append(" model_master_image= :modelMasterImage, model_image= :modelImage, operate_time= :operateTime, operator= :operator WHERE id= :id ");
         int i = super.updateForBean(sql.toString(), carmodelManage);
         return i;

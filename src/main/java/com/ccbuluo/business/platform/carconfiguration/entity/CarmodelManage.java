@@ -53,6 +53,11 @@ public class CarmodelManage extends CarCommonEntity {
      */
     @ApiModelProperty(name = "carmodelStatus", value = "车型状态，0为未启用，1为启用，默认为1")
     private Integer carmodelStatus;
+    /**
+     * 车辆类型： 81:微型车 83:商务车 84:越野车 89:面包车 90:微型客车 96:小型车 98:中型车 99:中大型车 100:豪华车 103:电动车(常用) 112:电动单车 113:单车
+     */
+    @ApiModelProperty(name = "carType", value = "车辆类型： 81:微型车 83:商务车 84:越野车 89:面包车 90:微型客车 96:小型车 98:中型车 99:中大型车 100:豪华车 103:电动车(常用) 112:电动单车 113:单车")
+    private Integer carType;
 
     public String getCarmodelNumber() {
         return carmodelNumber;
@@ -118,4 +123,11 @@ public class CarmodelManage extends CarCommonEntity {
         this.carmodelStatus = carmodelStatus;
     }
 
+    public Integer getCarType() {
+        return carType;
+    }
+
+    public void setCarType(Integer carType) {
+        this.carType = carType;
+    }
 }

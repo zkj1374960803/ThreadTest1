@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.carmodellabel.service;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizCarmodelLabel;
 import com.ccbuluo.business.platform.carmodellabel.dao.BizCarmodelLabelDao;
+import com.ccbuluo.business.platform.carmodellabel.dto.BizCarmodelLabelDTO;
 import com.ccbuluo.business.platform.carmodellabel.dto.SearchBizCarmodelLabelDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.db.Page;
@@ -12,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 /**
@@ -164,6 +167,15 @@ public class BizCarmodelLabelServiceImpl implements BizCarmodelLabelService {
     @Override
     public Page<SearchBizCarmodelLabelDTO> queryCarmodelLabelList(String Keyword, Integer offset, Integer pageSize){
         return bizCarmodelLabelDao.queryCarmodelLabelList(Keyword, offset, pageSize);
+    }
+    /**
+     * 车型标签列表查询
+     * @author weijb
+     * @date 2018-07-18 14:59:51
+     */
+    @Override
+    public List<BizCarmodelLabelDTO> getAllCarmodelLabelList(){
+        return bizCarmodelLabelDao.getAllCarmodelLabelList();
     }
 
 

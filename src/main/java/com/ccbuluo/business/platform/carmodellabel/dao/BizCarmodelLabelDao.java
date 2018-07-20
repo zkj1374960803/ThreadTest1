@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.carmodellabel.dao;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizCarmodelLabel;
 import com.ccbuluo.business.entity.BizServiceMaintaincar;
+import com.ccbuluo.business.platform.carmodellabel.dto.BizCarmodelLabelDTO;
 import com.ccbuluo.business.platform.carmodellabel.dto.SearchBizCarmodelLabelDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
@@ -12,6 +13,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -139,5 +141,20 @@ public class BizCarmodelLabelDao extends BaseDao<BizServiceMaintaincar> {
         sql.append("  ORDER BY bci.sort");
         Page<SearchBizCarmodelLabelDTO> DTOS = super.queryPageForBean(SearchBizCarmodelLabelDTO.class, sql.toString(), param,offset,pageSize);
         return DTOS;
+    }
+
+    /**
+     * 车型标签列表查询
+     * @author weijb
+     * @date 2018-07-18 14:59:51
+     */
+    public List<BizCarmodelLabelDTO> getAllCarmodelLabelList(){
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,label_code,label_name,sort,")
+                .append("creator,create_time,operator,operate_time,delete_flag")
+                .append(" FROM basic_carmodel_label WHERE delete_flag = :deleteFlag ORDER BY sort");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        return super.queryListBean(BizCarmodelLabelDTO.class, sql.toString(), params);
     }
 }

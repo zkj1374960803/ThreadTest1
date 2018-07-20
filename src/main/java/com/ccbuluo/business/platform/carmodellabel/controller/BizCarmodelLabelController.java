@@ -3,17 +3,20 @@ package com.ccbuluo.business.platform.carmodellabel.controller;
 import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizCarmodelLabel;
+import com.ccbuluo.business.platform.carmodellabel.dto.BizCarmodelLabelDTO;
 import com.ccbuluo.business.platform.carmodellabel.dto.SearchBizCarmodelLabelDTO;
 import com.ccbuluo.business.platform.carmodellabel.service.BizCarmodelLabelService;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftUtils;
 import io.swagger.annotations.*;
 import org.apache.thrift.TException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 维修车辆基本信息controller
@@ -115,6 +118,17 @@ public class BizCarmodelLabelController extends BaseController {
                                                                            @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                            @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
         return StatusDto.buildDataSuccessStatusDto(bizCarmodelLabelService.queryCarmodelLabelList(Keyword, offset, pageSize));
+    }
+
+    /**
+     * 车型标签列表查询
+     * @author weijb
+     * @date 2018-07-18 14:59:51
+     */
+    @ApiOperation(value = "车型标签列表（全查询用于下拉框）",notes = "【魏俊标】")
+    @GetMapping("/alllist")
+    protected StatusDto<List<BizCarmodelLabelDTO>> getAllCarmodelLabelList() {
+        return StatusDto.buildDataSuccessStatusDto(bizCarmodelLabelService.getAllCarmodelLabelList());
     }
 
 }

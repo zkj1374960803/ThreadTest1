@@ -15,6 +15,7 @@ public class CarmodelManageDTO {
     private Long carbrandId; // 品牌id
     private Long carseriesId; // 车系id
     private String carbrandLogo; // 品牌logo
+    private Integer carType; // 车辆类型
     private String modelTitle; // 车型标题
     private String modelMasterImage; // 主图
     private String modelImage; // 图片
@@ -55,6 +56,14 @@ public class CarmodelManageDTO {
 
     public void setCarbrandLogo(String carbrandLogo) {
         this.carbrandLogo = carbrandLogo;
+    }
+
+    public Integer getCarType() {
+        return carType;
+    }
+
+    public void setCarType(Integer carType) {
+        this.carType = carType;
     }
 
     public String getModelTitle() {

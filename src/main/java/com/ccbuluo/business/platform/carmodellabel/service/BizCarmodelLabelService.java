@@ -1,9 +1,12 @@
 package com.ccbuluo.business.platform.carmodellabel.service;
 
 import com.ccbuluo.business.entity.BizCarmodelLabel;
+import com.ccbuluo.business.platform.carmodellabel.dto.BizCarmodelLabelDTO;
 import com.ccbuluo.business.platform.carmodellabel.dto.SearchBizCarmodelLabelDTO;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+
+import java.util.List;
 
 /**
  * 车型标签service
@@ -71,4 +74,10 @@ public interface BizCarmodelLabelService {
      */
     Page<SearchBizCarmodelLabelDTO> queryCarmodelLabelList(String Keyword, Integer offset, Integer pageSize);
 
+    /**
+     * 车型标签列表查询
+     * @author weijb
+     * @date 2018-07-18 14:59:51
+     */
+    List<BizCarmodelLabelDTO> getAllCarmodelLabelList();
 }
