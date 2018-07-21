@@ -10,7 +10,6 @@ import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.constants.SystemPropertyHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
-import com.ccbuluo.date.DateUtils;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.*;
 import com.ccbuluo.json.JsonUtils;
@@ -29,11 +28,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -65,30 +62,26 @@ public class CustmanagerServiceImpl implements CustmanagerService{
      * @date 2018-07-18 10:30:22
      */
     @Override
-    public StatusDto<String> createUser(UserInfoDTO userInfoDTO, BizServiceCustmanager bizServiceCustmanager) {
+    public StatusDto<String> createCustManager(UserInfoDTO userInfoDTO, BizServiceCustmanager bizServiceCustmanager) {
         // 参数校验
-        checkedParameter(userInfoDTO);
-        // 数据填充
-        userInfoDTO.setUserType(Constants.USER_TYPE_INNER);
-        userInfoDTO.setUserSource(Constants.USER_SOURCE_INNER);
+        checkedRoleCodeAndOrgCode(userInfoDTO);
+        // 保存基础用户
+        String useruuid = saveUser(userInfoDTO);
+        // 保存客户经理信息
+        saveCustManager(bizServiceCustmanager, useruuid);
+        return StatusDto.buildSuccessStatusDto();
+    }
+    /**
+     *  保存客户经理信息
+     * @param bizServiceCustmanager 客户经理信息
+     * @param useruuid 用户uuid
+     * @exception CommonException 自定义异常
+     * @author zhangkangjian
+     * @date 2018-07-21 12:01:28
+     */
+    private void saveCustManager(BizServiceCustmanager bizServiceCustmanager, String useruuid) {
+        // 保存客户经理信息
         String loggedUserId = userHolder.getLoggedUserId();
-        userInfoDTO.setUserStatus(Constants.USER_STATUS_INNER);
-        userInfoDTO.setFreezeStatus(Constants.FREEZE_STATUS_YES);
-        userInfoDTO.setOperator(loggedUserId);
-        userInfoDTO.setOperateTime(System.currentTimeMillis() / 1000);
-        userInfoDTO.setCreator(loggedUserId);
-        userInfoDTO.setUserTypeInAndOut(Constants.USER_STATUS_INNER);
-        // 保存基础用户信息
-            StatusDto<String> stringStatusDto = innerUserInfoService.saveUserAndRole(userInfoDTO);
-        if(!stringStatusDto.isSuccess()){
-            return stringStatusDto;
-        }
-        String useruuid = stringStatusDto.getData();
-        userInfoDTO.setUseruuid(useruuid);
-        StatusDto<String> stringStatusDto1 = innerUserInfoService.updateUser(userInfoDTO);
-        if(!stringStatusDto1.isSuccess()){
-            return stringStatusDto1;
-        }
         try {
             bizServiceCustmanager.setCreator(loggedUserId);
             bizServiceCustmanager.setOperator(loggedUserId);
@@ -98,9 +91,39 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             // 删除用户信息
             e.printStackTrace();
             innerUserInfoService.deleteUserInfoByUseruuid(useruuid);
-            return StatusDto.buildFailure("创建客户经理失败！");
+            throw new CommonException("2", "创建客户经理失败！");
         }
-        return StatusDto.buildSuccessStatusDto();
+    }
+    /**
+     *  保存基础用户信息,保存成功返回uuid
+     * @param userInfoDTO 用户的信息
+     * @exception CommonException 自定义异常
+     * @return StatusDto<String> 状态
+     * @author zhangkangjian
+     * @date 2018-07-21 12:02:26
+     */
+    private String saveUser(UserInfoDTO userInfoDTO) {
+        String loggedUserId = userHolder.getLoggedUserId();
+        userInfoDTO.setUserType(Constants.USER_TYPE_INNER);
+        userInfoDTO.setUserSource(Constants.USER_SOURCE_INNER);
+        userInfoDTO.setUserStatus(Constants.USER_STATUS_INNER);
+        userInfoDTO.setFreezeStatus(Constants.FREEZE_STATUS_YES);
+        userInfoDTO.setOperator(loggedUserId);
+        userInfoDTO.setOperateTime(System.currentTimeMillis() / 1000);
+        userInfoDTO.setCreator(loggedUserId);
+        userInfoDTO.setUserTypeInAndOut(Constants.USER_STATUS_INNER);
+        // 保存基础用户信息
+        StatusDto<String> userAndRole = innerUserInfoService.saveUserAndRole(userInfoDTO);
+        if(!userAndRole.isSuccess()){
+            throw new CommonException("2", userAndRole.getMessage());
+        }
+        String useruuid = userAndRole.getData();
+        userInfoDTO.setUseruuid(useruuid);
+        StatusDto<String> updateUser = innerUserInfoService.updateUser(userInfoDTO);
+        if(!updateUser.isSuccess()){
+            throw new CommonException("2", updateUser.getMessage());
+        }
+        return useruuid;
     }
 
     /**
@@ -110,7 +133,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
      * @author zhangkangjian
      * @date 2018-07-19 11:53:11
      */
-    private void checkedParameter(UserInfoDTO userInfoDTO) {
+    private void checkedRoleCodeAndOrgCode(UserInfoDTO userInfoDTO) {
         // 角色校验
         StatusDtoThriftList<Long> statusDtoRole = basicUserRoleService.queryRoleByRoleCode(Constants.CUSTMANAGER_ROLE_CODE);
         if(!statusDtoRole.isSuccess()){
@@ -144,7 +167,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         StatusDtoThriftPage<UserInfoDTO> userInfoDTOStatusDtoThriftPage = innerUserInfoService.queryUserList(userInfoDTO);
         StatusDto<Page<UserInfoDTO>> userInfoStatusDto = StatusDtoThriftUtils.resolve(userInfoDTOStatusDtoThriftPage, UserInfoDTO.class);
         // List<UserInfoDTO> 转换成 List<QueryUserListDTO>
-        StatusDto<List<QueryUserListDTO>> custManagerList = userInfoDTOConverQueryUserListDTO(userInfoStatusDto.getData().getRows());
+        StatusDto<List<QueryUserListDTO>> custManagerList = userInfoDTOConversionQueryUserListDTO(userInfoStatusDto.getData().getRows());
         if(!custManagerList.isSuccess()){
             return StatusDto.buildFailure(custManagerList.getMessage());
         }
@@ -163,7 +186,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
      */
     @Override
     public StatusDto<String> editUser(UserInfoDTO userInfoDTO, BizServiceCustmanager bizServiceCustmanager) {
-        checkedParameter(userInfoDTO);
+        checkedRoleCodeAndOrgCode(userInfoDTO);
         String loggedUserId = userHolder.getLoggedUserId();
         long timeMillis = System.currentTimeMillis();
         userInfoDTO.setOperateTime(timeMillis);
@@ -184,8 +207,56 @@ public class CustmanagerServiceImpl implements CustmanagerService{
      * @date 2018-07-19 14:47:07
      */
     @Override
-    public StatusDto<CustManagerDetailDTO> detailUser(String useruuid) throws IOException {
-        // 查询用户的基础信息
+    public StatusDto<CustManagerDetailDTO> custManagerDetail(String useruuid) throws IOException {
+        // 查询用户的基础信息和角色信息
+        StatusDto<UserInfoDTO> resolve = findUserAndRoleDetail(useruuid);
+        // 类型转换 UserInfoDTO ——> CustManagerDetailDTO
+        CustManagerDetailDTO custManagerDetailDTO = userInfoDTOConversionCustManagerDetailDTO(resolve);
+        // 填充客户经理的信息
+        findCustManagerDetail(useruuid, custManagerDetailDTO);
+        return StatusDto.buildDataSuccessStatusDto(custManagerDetailDTO);
+    }
+
+    /**
+     *  查询客户经理并填充信息
+     * @param useruuid
+     * @param custManagerDetailDTO
+     * @author zhangkangjian
+     * @date 2018-07-21 17:28:53
+     */
+    private void findCustManagerDetail(String useruuid, CustManagerDetailDTO custManagerDetailDTO) {
+        BizServiceCustmanager bizServiceCustmanager = bizServiceCustmanagerDao.queryCustManagerByUuid(useruuid);
+        if(bizServiceCustmanager != null){
+            custManagerDetailDTO.setOfficePhone(bizServiceCustmanager.getOfficePhone());
+            custManagerDetailDTO.setReceivingAddress(bizServiceCustmanager.getReceivingAddress());
+        }
+        int age = getAgeByBirth(new Date(custManagerDetailDTO.getBirthday() * 1000));
+        custManagerDetailDTO.setAge(age);
+    }
+
+    /**
+     *  类型转换 UserInfoDTO ——> CustManagerDetailDTO
+     * @param resolve 用户信息
+     * @exception IOException
+     * @return CustManagerDetailDTO 客户经理dto
+     * @author zhangkangjian
+     * @date 2018-07-21 17:26:59
+     */
+    private CustManagerDetailDTO userInfoDTOConversionCustManagerDetailDTO(StatusDto<UserInfoDTO> resolve) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String json = JsonUtils.writeValue(resolve.getData());
+        return mapper.readValue(json, CustManagerDetailDTO.class);
+    }
+
+    /**
+     * 查询用户信息和角色信息
+     * @param useruuid 用户的uuid
+     * @return StatusDto<UserInfoDTO> 用户的信息
+     * @author zhangkangjian
+     * @date 2018-07-21 17:17:20
+     */
+    private StatusDto<UserInfoDTO> findUserAndRoleDetail(String useruuid) {
         StatusDtoThriftBean<UserInfoDTO> userDetail = innerUserInfoService.findUserDetail(useruuid);
         StatusDto<UserInfoDTO> resolve = StatusDtoThriftUtils.resolve(userDetail, UserInfoDTO.class);
         List<RelUserRole> userRoles = resolve.getData().getUserRoles();
@@ -196,20 +267,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
                 resolve.getData().setRoleName(relUserRole.getRoleName());
             }
         }
-        // 类型转换 UserInfoDTO ——> CustManagerDetailDTO
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        String json = JsonUtils.writeValue(resolve.getData());
-        CustManagerDetailDTO custManagerDetailDTO = mapper.readValue(json, CustManagerDetailDTO.class);
-        // 查询客户经理的信息
-        BizServiceCustmanager bizServiceCustmanager = bizServiceCustmanagerDao.queryCustManagerByUuid(useruuid);
-        if(bizServiceCustmanager != null){
-            custManagerDetailDTO.setOfficePhone(bizServiceCustmanager.getOfficePhone());
-            custManagerDetailDTO.setReceivingAddress(bizServiceCustmanager.getReceivingAddress());
-        }
-        int age = getAgeByBirth(new Date(custManagerDetailDTO.getBirthday() * 1000));
-        custManagerDetailDTO.setAge(age);
-        return StatusDto.buildDataSuccessStatusDto(custManagerDetailDTO);
+        return resolve;
     }
 
     /**
@@ -239,8 +297,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
                 }
             );
         }
-
-        Page<QueryUserListDTO> page = new Page();
+        Page<QueryUserListDTO> page = new Page<QueryUserListDTO>();
         Page<UserInfoDTO> pageUser = resolve.getData();
         page.setRows(data);
         page.setLimit(pageUser.getLimit());
@@ -257,7 +314,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
      * @author zhangkangjian
      * @date 2018-07-18 19:45:07
      */
-    private StatusDto<List<QueryUserListDTO>> userInfoDTOConverQueryUserListDTO(List<UserInfoDTO> rows) {
+    private StatusDto<List<QueryUserListDTO>> userInfoDTOConversionQueryUserListDTO(List<UserInfoDTO> rows) {
         List<QueryUserListDTO> userList = null;
         if(rows != null && rows.size() > 0){
             String s = JsonUtils.writeValue(rows);

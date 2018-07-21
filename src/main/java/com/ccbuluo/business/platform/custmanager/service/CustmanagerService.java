@@ -24,7 +24,7 @@ public interface CustmanagerService {
      * @author zhangkangjian
      * @date 2018-07-18 10:30:22
      */
-    StatusDto<String> createUser(UserInfoDTO userInfoDTO, BizServiceCustmanager bizServiceCustmanager);
+    StatusDto<String> createCustManager(UserInfoDTO userInfoDTO, BizServiceCustmanager bizServiceCustmanager);
     /**
      * 查询用户列表
      * @param userInfoDTO 查询条件
@@ -49,5 +49,5 @@ public interface CustmanagerService {
      * @author zhangkangjian
      * @date 2018-07-19 14:47:07
      */
-    StatusDto detailUser(String useruuid) throws IOException;
+    StatusDto custManagerDetail(String useruuid) throws IOException;
 }

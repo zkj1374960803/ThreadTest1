@@ -10,7 +10,6 @@ import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
-import com.ccbuluo.http.StatusDtoThriftList;
 import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import io.swagger.annotations.Api;
@@ -66,7 +65,7 @@ public class CustmanagerController extends BaseController {
     })
     @PostMapping("/createuser")
     public StatusDto<String> createUser(@ApiIgnore UserInfoDTO userInfoDTO, @ApiIgnore BizServiceCustmanager bizServiceCustmanager) {
-        return custmanagerServiceImpl.createUser(userInfoDTO, bizServiceCustmanager);
+        return custmanagerServiceImpl.createCustManager(userInfoDTO, bizServiceCustmanager);
     }
     /**
      * 查询客户经理列表
@@ -126,7 +125,7 @@ public class CustmanagerController extends BaseController {
     @ApiImplicitParam(name = "useruuid", value = "用户uuid", required = true, paramType = "path")
     @PostMapping("/detail/{useruuid}")
     public StatusDto<CustManagerDetailDTO> detailUser(@PathVariable String useruuid) throws IOException {
-        return custmanagerServiceImpl.detailUser(useruuid);
+        return custmanagerServiceImpl.custManagerDetail(useruuid);
     }
 
 
