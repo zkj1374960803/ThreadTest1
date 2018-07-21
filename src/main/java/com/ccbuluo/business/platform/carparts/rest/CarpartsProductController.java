@@ -115,7 +115,7 @@ public class CarpartsProductController extends BaseController {
     /**
      *零配件列表分页查询
      * @param categoryCode 零部件分类code
-     * @param carpartsName 零部件名称
+     * @param keyword 零部件名称
      * @param offset 起始数
      * @param pageSize 每页数量
      * @author weijb
@@ -124,14 +124,14 @@ public class CarpartsProductController extends BaseController {
     @ApiOperation(value = "零部件记录列表",notes = "【魏俊标】")
     @GetMapping("/list")
     @ApiImplicitParams({@ApiImplicitParam(name = "categoryCode", value = "零部件分类code", required = false, paramType = "query"),
-            @ApiImplicitParam(name = "carpartsName", value = "零部件名称", required = false, paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "零部件编号或名称", required = false, paramType = "query"),
             @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
             @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
     public StatusDto<Page<BasicCarpartsProductDTO>> queryCarpartsProductList(@RequestParam(required = false) String categoryCode,
-                                                                             @RequestParam(required = false) String carpartsName,
+                                                                             @RequestParam(required = false) String keyword,
                                                                              @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                              @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
-        return StatusDtoThriftUtils.resolve(carpartsProductService.queryCarpartsProductList(categoryCode, carpartsName, offset, pageSize),BasicCarpartsProductDTO.class);
+        return StatusDtoThriftUtils.resolve(carpartsProductService.queryCarpartsProductList(categoryCode, keyword, offset, pageSize),BasicCarpartsProductDTO.class);
     }
 
 }
