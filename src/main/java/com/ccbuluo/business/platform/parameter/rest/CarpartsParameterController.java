@@ -135,7 +135,7 @@ public class CarpartsParameterController extends BaseController {
      * @author weijb
      * @date 2018-07-05 14:52:44
      */
-    @ApiOperation(value = "查询通过参数列表",notes = "【魏俊标】")
+    @ApiOperation(value = "查询通用参数列表",notes = "【魏俊标】")
     @GetMapping("/getCommonParameterList")
     protected StatusDto<List<RelCarpartsCateparamDTO>> getCommonParameterList() {
         return StatusDtoThriftUtils.resolve(carpartsParameterService.getCommonParameterList(),RelCarpartsCateparamDTO.class);
@@ -145,7 +145,7 @@ public class CarpartsParameterController extends BaseController {
      *零配件参数列表分页查询
      * @param parameterType 类型
      * @param parameterStatus 状态
-     * @param parameterName 参数名称
+     * @param keyword 参数名称
      * @param parameterProperty 属性
      * @param categoryCode 末级分类
      * @param offset 起始数
@@ -157,18 +157,18 @@ public class CarpartsParameterController extends BaseController {
     @GetMapping("/list")
     @ApiImplicitParams({@ApiImplicitParam(name = "parameterType", value = "参数类型", required = false, paramType = "query"),
             @ApiImplicitParam(name = "parameterStatus", value = "参数状态", required = false, paramType = "query"),
-            @ApiImplicitParam(name = "parameterName", value = "参数名称", required = false, paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "参数编号或名称", required = false, paramType = "query"),
             @ApiImplicitParam(name = "parameterProperty", value = "参数属性", required = false, paramType = "query"),
             @ApiImplicitParam(name = "categoryCode", value = "末级分类code", required = false, paramType = "query"),
             @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
             @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
     public StatusDto<Page<BasicCarpartsParameterDTO>> queryCarpartsParameterList(@RequestParam(required = false) String parameterType,
                                                                                  @RequestParam(required = false) String parameterStatus,
-                                                                                 @RequestParam(required = false) String parameterName,
+                                                                                 @RequestParam(required = false) String keyword,
                                                                                  @RequestParam(required = false) String parameterProperty,
                                                                                  @RequestParam(required = false) String categoryCode,
                                                                                  @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                                  @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
-        return StatusDtoThriftUtils.resolve(carpartsParameterService.queryCarpartsParameterList(parameterType, parameterStatus,parameterName, parameterProperty,categoryCode, offset, pageSize),BasicCarpartsParameterDTO.class);
+        return StatusDtoThriftUtils.resolve(carpartsParameterService.queryCarpartsParameterList(parameterType, parameterStatus,keyword, parameterProperty,categoryCode, offset, pageSize),BasicCarpartsParameterDTO.class);
     }
 }
