@@ -133,7 +133,12 @@ public class BizServiceStorehouseDao extends BaseDao<BizServiceStorehouse> {
         params.put("areaName", areaName);
         params.put("storeHouseStatus", storeHouseStatus);
         params.put("keyword", keyword);
-        params.put("serviceCenterCode", Arrays.asList(serviceCenterCode));
+        if (serviceCenterCode.size() == 0) {
+            params.put("serviceCenterCode", Arrays.asList());
+        } else {
+            params.put("serviceCenterCode", serviceCenterCode);
+        }
+
 
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,storehouse_code,storehouse_name,storehouse_acreage,servicecenter_code,storehouse_status FROM biz_service_storehouse")
