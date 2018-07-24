@@ -175,8 +175,8 @@ public class ServiceCenterController extends BaseController {
                                           @RequestParam Integer serviceCenterStatus) {
         StatusDto<String> stringStatusDto = serviceCenterService.editOrgStatus(serviceCenterCode, serviceCenterStatus);
         if (stringStatusDto.equals(Constants.ERROR_CODE)) {
-            return StatusDto.buildSuccessStatusDto("编辑失败！");
+            return StatusDto.buildFailure("编辑失败！");
         }
-        return StatusDto.buildFailureStatusDto("编辑成功！");
+        return StatusDto.buildSuccessStatusDto("编辑成功！");
     }
 }

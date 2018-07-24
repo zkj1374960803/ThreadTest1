@@ -33,14 +33,13 @@ redis:
 oauth:
   center:
     #认证中心路径
-    url: http://192.168.0.12:8081
+    url: http://192.168.0.48:8081
 
 
 #本系统相关配置
 base:
   #本系统域名
-#  url: http://192.168.0.216:15999
-  url: http://localhost:15999
+  url: http://localhost:15201
   #本系统的appid
   appid: c873890d60ad4e8c92705d4872ccac90
   #本系统的secret
@@ -84,7 +83,6 @@ ccbuluo:
   thrift:
     service:
       basePackages: com
-
     zookeeper:
       server: 192.168.0.78:2181
 
