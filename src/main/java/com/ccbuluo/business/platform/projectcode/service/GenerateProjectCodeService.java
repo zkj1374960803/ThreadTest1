@@ -69,6 +69,18 @@ public class GenerateProjectCodeService {
             case FP:    // 零配件
                 resultDto = getCode(prefix.toString(), 6, 1,"#A##B##C#");
                 break;
+            case FA:    // 物料
+                resultDto = getCode(prefix.toString(), 4, 0,"#A##B#");
+                break;
+            case FL:    // 工时
+                resultDto = getCode(prefix.toString(), 4, 0,"#A##B#");
+                break;
+            case FR:    // 维修车
+                resultDto = getCode(prefix.toString(), 4, 0,"#A##B#");
+                break;
+            case FD:    // 车型标签
+                resultDto = getCode(prefix.toString(), 4, 0,"#A##B#");
+                break;
             default:
                 resultDto = StatusDto.buildStatusDtoWithCode(BizErrorCodeEnum.CODE_UNKONEPREFIX.getErrorCode(),
                         BizErrorCodeEnum.CODE_UNKONEPREFIX.getMessage());

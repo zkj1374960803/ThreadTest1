@@ -1,7 +1,7 @@
-package com.ccbuluo.business.platform.carmanage.service;
+package com.ccbuluo.business.platform.maintaincar.service;
 
-import com.ccbuluo.business.platform.carconfiguration.entity.CarcoreInfo;
-import com.ccbuluo.business.platform.carmanage.dto.SearchCarcoreInfoDTO;
+import com.ccbuluo.business.entity.BizServiceMaintaincar;
+import com.ccbuluo.business.platform.maintaincar.dto.SearchBizServiceMaintaincarDTO;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 
@@ -10,36 +10,36 @@ import com.ccbuluo.http.StatusDto;
  * @author chaoshuai
  * @date 2018-05-08 10:55:54
  */
-public interface BasicCarcoreInfoService {
+public interface BizServiceMaintaincarService {
 
     /**
      * 新增车辆
-     * @param carcoreInfo 车辆信息dto
+     * @param bizServiceMaintaincar 车辆信息dto
      * @return com.ccbuluo.http.StatusDto
      * @exception
      * @author weijb
      * @date 2018-05-09 14:02:30
      */
-    StatusDto saveCarcoreInfo(CarcoreInfo carcoreInfo);
+    StatusDto saveServiceMaintaincar(BizServiceMaintaincar bizServiceMaintaincar);
     /**
      * 编辑车辆
-     * @param carcoreInfo 车辆信息dto
+     * @param bizServiceMaintaincar 车辆信息dto
      * @return com.ccbuluo.http.StatusDto
      * @exception
      * @author weijb
      * @date 2018-05-09 14:02:30
      */
-    StatusDto editCarcoreInfo(CarcoreInfo carcoreInfo);
+    StatusDto editServiceMaintaincar(BizServiceMaintaincar bizServiceMaintaincar);
 
     /**
      * 车辆基本信息验证唯一性
-     * @param carcoreInfo 车辆基本信息
+     * @param bizServiceMaintaincar 车辆基本信息
      * @return com.ccbuluo.http.StatusDto
      * @exception
      * @author wuyibo
      * @date 2018-05-09 14:02:30
      */
-    StatusDto findCarcoreInfoVerification(CarcoreInfo carcoreInfo);
+    StatusDto findServiceMaintaincarVerification(BizServiceMaintaincar bizServiceMaintaincar);
 
 
     /**
@@ -50,7 +50,7 @@ public interface BasicCarcoreInfoService {
      * @author weijb
      * @date 2018-06-08 13:55:14
      */
-    CarcoreInfo queryCarDetailByCarId(Long carId);
+    BizServiceMaintaincar queryServiceMaintaincarByCarId(Long carId);
 
     /**
      * 根据车辆id删除车辆
@@ -60,7 +60,7 @@ public interface BasicCarcoreInfoService {
      * @author weijb
      * @date 2018-06-08 13:55:14
      */
-    int deleteCarcoreInfoByCarId(Long carId);
+    int deleteServiceMaintaincarByCarId(Long carId);
     /**
      * 车辆列表分页查询
      * @param carbrandId 品牌id
@@ -71,6 +71,6 @@ public interface BasicCarcoreInfoService {
      * @author weijb
      * @date 2018-07-13 19:52:44
      */
-    Page<SearchCarcoreInfoDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer carStatus, String Keyword, Integer offset, Integer pageSize);
+    Page<SearchBizServiceMaintaincarDTO> queryServiceMaintaincarList(Long carbrandId, Long carseriesId, Integer carStatus, String Keyword, Integer offset, Integer pageSize);
 
 }

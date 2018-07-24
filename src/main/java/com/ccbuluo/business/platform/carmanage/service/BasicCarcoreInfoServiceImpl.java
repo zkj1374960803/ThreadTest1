@@ -149,10 +149,11 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
 
         // 1.车辆编码(新增）
         if (null == carcoreInfo.getId()) {
-            carcoreInfo.setCarcoreCode(findCarNumber());
+            carcoreInfo.setCarNumber(findCarNumber());
         }
+        carcoreInfo.setCarStatus(Constants.DELETE_FLAG_NORMAL);
         // 3.通用字段
-        carcoreInfo.setCreator(userHolder.getLoggedUserId());
+        carcoreInfo.preInsert(userHolder.getLoggedUserId());
     }
 
     /**
@@ -236,8 +237,8 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
      * @date 2018-07-13 19:52:44
      */
     @Override
-    public Page<SearchCarcoreInfoDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, String Keyword, Integer offset, Integer pageSize){
-        return basicCarcoreInfoDao.queryCarcoreInfoList(carbrandId, carseriesId, Keyword, offset, pageSize);
+    public Page<SearchCarcoreInfoDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer carStatus, String Keyword, Integer offset, Integer pageSize){
+        return basicCarcoreInfoDao.queryCarcoreInfoList(carbrandId, carseriesId, carStatus, Keyword, offset, pageSize);
     }
 
 

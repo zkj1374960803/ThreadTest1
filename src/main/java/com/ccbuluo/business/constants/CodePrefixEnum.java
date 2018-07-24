@@ -12,7 +12,11 @@ public enum CodePrefixEnum {
     FK("零配件分类"),
     FM("零配件模板"),
     FS("员工"),
-    FG("供应商");
+    FA("物料"),
+    FL("工时"),
+    FG("供应商"),
+    FR("维修车"),
+    FD("车型标签");
 
 
     CodePrefixEnum(String label){
