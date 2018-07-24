@@ -55,8 +55,8 @@ public class CarpartsProductController extends BaseController {
      * @date 2018-07-2 08:59:35
      */
     @ApiOperation(value = "添加零配件",notes = "【魏俊标】")
-    @PostMapping("/savecarpartsproduct")
-    public StatusDto<String> saveCarpartsProduct(@ApiParam(name = "saveBasicCarpartsProductDTO对象", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO){
+    @PostMapping("/saveCarpartsProduct")
+    public StatusDto<String> saveCarpartsProduct(@ApiParam(name = "saveBasicCarpartsProductDTO对象", value = "传入json格式", required = true) SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO){
         // 生成编码
         StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FP);
         //获取code失败
@@ -76,8 +76,8 @@ public class CarpartsProductController extends BaseController {
      * @date 2018-07-02 18:52:40
      */
     @ApiOperation(value = "编辑零配件",notes = "【魏俊标】")
-    @PostMapping("/editcarpartsproduct")
-    public StatusDto<String> editCarpartsProduct(@ApiParam(name = "saveBasicCarpartsProductDTO", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO) {
+    @PostMapping("/editCarpartsProduct")
+    public StatusDto<String> editCarpartsProduct(@ApiParam(name = "saveBasicCarpartsProductDTO", value = "传入json格式", required = true) SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO) {
         saveBasicCarpartsProductDTO.setOperator(userHolder.getLoggedUserId());
         return carpartsProductService.editCarpartsProduct(saveBasicCarpartsProductDTO);
     }
@@ -90,7 +90,7 @@ public class CarpartsProductController extends BaseController {
      * @date 2018-07-02 18:52:40
      */
     @ApiOperation(value = "删除零配件",notes = "【魏俊标】")
-    @GetMapping("/deletecarpartsproduct/{carpartsCode}")
+    @GetMapping("/deleteCarpartsProduct/{carpartsCode}")
     @ApiImplicitParam(name = "carpartsCode", value = "零部件Code", required = true, dataType = "String", paramType = "path")
     public StatusDto deleteCarpartsProduct(@PathVariable String carpartsCode) {
         carpartsProductService.deleteCarpartsProduct(carpartsCode);
@@ -107,7 +107,7 @@ public class CarpartsProductController extends BaseController {
      */
     @ApiOperation(value = "查询零配件详情",notes = "【魏俊标】")
     @ApiImplicitParam(name = "carpartsCode", value = "零部件Code", required = true, dataType = "String", paramType = "path")
-    @GetMapping("/findcarpartsproductdetail/{carpartsCode}")
+    @GetMapping("/findCarpartsProductdetail/{carpartsCode}")
     public StatusDto<EditBasicCarpartsProductDTO> findCarpartsProductdetail(@PathVariable String carpartsCode){
         return StatusDtoThriftUtils.resolve(carpartsProductService.findCarpartsProductdetail(carpartsCode),EditBasicCarpartsProductDTO.class);
     }
