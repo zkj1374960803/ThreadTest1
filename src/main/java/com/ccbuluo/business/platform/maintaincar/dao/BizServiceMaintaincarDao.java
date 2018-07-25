@@ -62,9 +62,7 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
             .append("carbrand_id = :carbrandId,carseries_id = :carseriesId,")
             .append("carmodel_id = :carmodelId,cusmanager_uuid = :cusmanagerUuid,")
             .append("cusmanager_name = :cusmanagerName,beidou_number = :beidouNumber,")
-            .append("remark = :remark,creator = :creator,create_time = :createTime,")
-            .append("operator = :operator,operate_time = :operateTime,")
-            .append("delete_flag = :deleteFlag WHERE id= :id");
+            .append("remark = :remark,operator = :operator,operate_time = :operateTime WHERE id= :id");
         return super.updateForBean(sql.toString(), entity);
     }
 
@@ -117,7 +115,7 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
         }
         Map<String, Object> params = Maps.newHashMap();
         params.put("vinNumber", bizServiceMaintaincar.getVinNumber());
-        params.put("deleteFlag", bizServiceMaintaincar.getDeleteFlag());
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         params.put("id", bizServiceMaintaincar.getId());
         return namedParameterJdbcTemplate.queryForObject(sql.toString(), params, Integer.class);
     }
@@ -139,7 +137,7 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
         }
         Map<String, Object> params = Maps.newHashMap();
         params.put("beidouNumber", bizServiceMaintaincar.getBeidouNumber());
-        params.put("deleteFlag", bizServiceMaintaincar.getDeleteFlag());
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         params.put("id", bizServiceMaintaincar.getId());
         return namedParameterJdbcTemplate.queryForObject(sql.toString(), params, Integer.class);
     }
@@ -175,7 +173,7 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
             param.put("carseriesId", carseriesId);
             sql.append(" AND bci.carseries_id = :carseriesId ");
         }
-        // 车型
+        // 维修车状态
         if (null != carStatus) {
             param.put("carStatus", carStatus);
             sql.append(" AND bci.car_status = :carStatus ");
@@ -183,6 +181,7 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
         // 车架号
         if (StringUtils.isNotBlank(Keyword)) {
             param.put("Keyword", Keyword);
+            //目前只根据车架号查询
             sql.append(" AND bci.vin_number LIKE CONCAT('%',:Keyword,'%') ");
         }
         sql.append("  ORDER BY bci.operate_time DESC");

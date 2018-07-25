@@ -41,7 +41,7 @@ public class BizServiceMaintaincarController extends BaseController {
      */
     @ApiOperation(value = "新增维修车辆", notes = "【weijb】")
     @PostMapping("/create")
-    public StatusDto create(@ApiParam(name = "carcoreInfo对象", value = "传入json格式", required = true) BizServiceMaintaincar bizServiceMaintaincar) {
+    public StatusDto create(@ApiParam(name = "bizServiceMaintaincar对象", value = "传入json格式", required = true)@RequestBody BizServiceMaintaincar bizServiceMaintaincar) {
         // 生成编码
         StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FR);
         //获取code失败
@@ -62,7 +62,7 @@ public class BizServiceMaintaincarController extends BaseController {
      */
     @ApiOperation(value = "编辑维修车辆", notes = "【weijb】")
     @PostMapping("/edit")
-    public StatusDto edit(@ApiParam(name = "bizServiceMaintaincar对象", value = "传入json格式", required = true) BizServiceMaintaincar bizServiceMaintaincar) {
+    public StatusDto edit(@ApiParam(name = "bizServiceMaintaincar对象", value = "传入json格式", required = true)@RequestBody BizServiceMaintaincar bizServiceMaintaincar) {
         return bizServiceMaintaincarService.editServiceMaintaincar(bizServiceMaintaincar);
     }
 
@@ -77,7 +77,7 @@ public class BizServiceMaintaincarController extends BaseController {
      */
     @ApiOperation(value = "根据维修车辆id查询维修车辆信息", notes = "根据维修车辆id查询维修车辆信息")
     @ApiImplicitParam(name = "carId", value = "车辆id", required = true, paramType = "query")
-    @GetMapping("/queryServiceMaintaincarByCarId")
+    @GetMapping("/queryservicemaintaincarbycarid")
     public StatusDto queryServiceMaintaincarByCarId(Long carId) throws TException {
         return StatusDto.buildDataSuccessStatusDto(bizServiceMaintaincarService.queryServiceMaintaincarByCarId(carId));
     }

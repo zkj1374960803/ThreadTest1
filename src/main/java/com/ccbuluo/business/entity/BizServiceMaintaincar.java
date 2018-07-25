@@ -11,7 +11,7 @@ import java.util.Date;
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "客服经理 上门维修 使用的维修车 实体表实体", description = "客服经理 上门维修 使用的维修车 实体表")
+@ApiModel(value = "BizServiceMaintaincar", description = "客服经理 上门维修 使用的维修车 实体表")
 public class BizServiceMaintaincar extends AftersaleCommonEntity{
     /**
      * 维修车辆编号

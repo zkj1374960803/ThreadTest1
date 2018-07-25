@@ -56,20 +56,16 @@ public class BizServiceMaintaincarServiceImpl implements BizServiceMaintaincarSe
      */
     @Override
     public StatusDto saveServiceMaintaincar(BizServiceMaintaincar bizServiceMaintaincar) {
-        // 1.1 车辆基本信息验证唯一性
-        StatusDto statusDto = findServiceMaintaincarVerification(bizServiceMaintaincar);
-        if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
-            return statusDto;
-        }
-
         try {
-
+            // 1.1 车辆基本信息验证唯一性
+            StatusDto statusDto = findServiceMaintaincarVerification(bizServiceMaintaincar);
+            if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
+                return statusDto;
+            }
             // 1.保存车辆基本信息
             buildServiceMaintaincar(bizServiceMaintaincar);
             long carcoreInfoId = bizServiceMaintaincarDao.saveServiceMaintaincar(bizServiceMaintaincar);
-
             return StatusDto.buildSuccessStatusDto();
-
         } catch (Exception e) {
             logger.error("维修车辆新增失败！", e);
             throw e;
@@ -85,20 +81,16 @@ public class BizServiceMaintaincarServiceImpl implements BizServiceMaintaincarSe
      */
     @Override
     public StatusDto editServiceMaintaincar(BizServiceMaintaincar bizServiceMaintaincar){
-        // 1.1 车辆基本信息验证唯一性
-        StatusDto statusDto = findServiceMaintaincarVerification(bizServiceMaintaincar);
-        if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
-            return statusDto;
-        }
-
         try {
-
+            // 1.1 车辆基本信息验证唯一性
+            StatusDto statusDto = findServiceMaintaincarVerification(bizServiceMaintaincar);
+            if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
+                return statusDto;
+            }
             // 1.保存车辆基本信息
             buildServiceMaintaincar(bizServiceMaintaincar);
             long carcoreInfoId = bizServiceMaintaincarDao.updateServiceMaintaincar(bizServiceMaintaincar);
-
             return StatusDto.buildSuccessStatusDto();
-
         } catch (Exception e) {
             logger.error("车辆更新失败！", e);
             throw e;
@@ -114,7 +106,8 @@ public class BizServiceMaintaincarServiceImpl implements BizServiceMaintaincarSe
      * @date 2018-05-10 18:38:06
      */
     private void buildServiceMaintaincar(BizServiceMaintaincar bizServiceMaintaincar) {
-        bizServiceMaintaincar.setCarStatus((long)Constants.DELETE_FLAG_NORMAL);
+        bizServiceMaintaincar.setCarStatus((long)Constants.STATUS_FLAG_ZERO);
+        bizServiceMaintaincar.setDeleteFlag(Constants.DELETE_FLAG_NORMAL);
         // 3.通用字段
         bizServiceMaintaincar.preInsert(userHolder.getLoggedUserId());
     }
@@ -129,7 +122,6 @@ public class BizServiceMaintaincarServiceImpl implements BizServiceMaintaincarSe
      */
     @Override
     public StatusDto findServiceMaintaincarVerification(BizServiceMaintaincar bizServiceMaintaincar) {
-        bizServiceMaintaincar.setDeleteFlag(Constants.DELETE_FLAG_NORMAL);
         int vinNumberCount = bizServiceMaintaincarDao.countVinNumber(bizServiceMaintaincar);
         int beidouNumberCount = bizServiceMaintaincarDao.countBeidouNumber(bizServiceMaintaincar);
         StringBuilder result = new StringBuilder();
