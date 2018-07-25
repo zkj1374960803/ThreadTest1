@@ -250,7 +250,7 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
         // 车架号
         if (StringUtils.isNotBlank(Keyword)) {
             param.put("Keyword", Keyword);
-            sql.append(" AND bci.vin_number LIKE CONCAT('%',:Keyword,'%') ");
+            sql.append(" AND (bci.vin_number LIKE CONCAT('%',:Keyword,'%') OR bci.car_number LIKE CONCAT('%',:Keyword,'%'))");
         }
         sql.append("  ORDER BY bci.operate_time DESC");
         Page<SearchCarcoreInfoDTO> DTOS = super.queryPageForBean(SearchCarcoreInfoDTO.class, sql.toString(), param,offset,pageSize);

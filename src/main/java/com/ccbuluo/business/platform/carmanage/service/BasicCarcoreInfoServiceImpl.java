@@ -88,20 +88,16 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
      */
     @Override
     public StatusDto saveCarcoreInfo(CarcoreInfo carcoreInfo) {
-        // 1.1 车辆基本信息验证唯一性
-        StatusDto statusDto = findCarcoreInfoVerification(carcoreInfo);
-        if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
-            return statusDto;
-        }
-
         try {
-
+            // 1.1 车辆基本信息验证唯一性
+            StatusDto statusDto = findCarcoreInfoVerification(carcoreInfo);
+            if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
+                return statusDto;
+            }
             // 1.保存车辆基本信息
             buildCarcoreInfo(carcoreInfo);
             long carcoreInfoId = basicCarcoreInfoDao.saveCarcoreInfo(carcoreInfo);
-
             return StatusDto.buildSuccessStatusDto();
-
         } catch (Exception e) {
             logger.error("车辆新增失败！", e);
             throw e;
@@ -117,20 +113,16 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
      */
     @Override
     public StatusDto editCarcoreInfo(CarcoreInfo carcoreInfo){
-        // 1.1 车辆基本信息验证唯一性
-        StatusDto statusDto = findCarcoreInfoVerification(carcoreInfo);
-        if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
-            return statusDto;
-        }
-
         try {
-
+            // 1.1 车辆基本信息验证唯一性
+            StatusDto statusDto = findCarcoreInfoVerification(carcoreInfo);
+            if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
+                return statusDto;
+            }
             // 1.保存车辆基本信息
             buildCarcoreInfo(carcoreInfo);
             long carcoreInfoId = basicCarcoreInfoDao.updateCarcoreInfo(carcoreInfo);
-
             return StatusDto.buildSuccessStatusDto();
-
         } catch (Exception e) {
             logger.error("车辆更新失败！", e);
             throw e;
@@ -146,7 +138,6 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
      * @date 2018-05-10 18:38:06
      */
     private void buildCarcoreInfo(CarcoreInfo carcoreInfo) {
-
         // 1.车辆编码(新增）
         if (null == carcoreInfo.getId()) {
             carcoreInfo.setCarNumber(findCarNumber());
