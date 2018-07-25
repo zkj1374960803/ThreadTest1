@@ -112,7 +112,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
             return StatusDto.buildSuccessStatusDto(SAVESUCCESS);
         } catch (Exception e) {
             logger.error(SAVEFAILURE, e);
-            throw new IllegalAccessException(SAVEFAILURE);
+            throw e;
         }
     }
 
