@@ -6,24 +6,24 @@ server:
 #tomcatJdbc 配置信息
 spring:
   datasource:
-    url: jdbc:mysql://192.168.0.13:3306/aftersale_repairing_platform?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&allowMultiQueries=true&useSSL=false
+    url: jdbc:mysql://192.168.0.92:3306/aftersale_repairing_platform?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&allowMultiQueries=true&useSSL=false
     driver-class-name: com.mysql.jdbc.Driver
-    username: arpuser
-    password: arpuser123456
+    username: dev_app
+    password: dev123456
 
 
 #jedis配置
 redis:
   database: 0
-  host:  192.168.0.13
+  host:  192.168.0.78
   port: 6379
-  password: zhtqc$123456
+  password: zhtdev$123456
 
   #集群配置
   cluster:
     #多个节点以逗号分隔
-    clusterNodes: 192.168.0.54:6379,192.168.0.54:6380,192.168.0.54:6381,192.168.0.54:6382,192.168.0.54:6383,192.168.0.54:6384
-    password: zhtqc$123456
+    clusterNodes: 192.168.0.78:6379,192.168.0.78:6380,192.168.0.78:6381,192.168.0.78:6382,192.168.0.78:6383,192.168.0.78:6384
+    password: zhtdev$123456
 
   perfix:
     projectcode: servicedev:projectcode
