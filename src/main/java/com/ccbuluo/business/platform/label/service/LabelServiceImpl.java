@@ -35,14 +35,12 @@ public class LabelServiceImpl implements LabelService {
      */
     @Override
     public ListLabelDTO createLabel(BizServiceLabel bizServiceLabel) {
+        // 标签验重
+        supplierServiceImpl.compareRepeat(bizServiceLabel.getId(), bizServiceLabel.getLabelName(),"label_name", "biz_service_label", "标签名称重复！");
+        // 保存标签
         String loggedUserId = userHolder.getLoggedUserId();
         bizServiceLabel.setCreator(loggedUserId);
         bizServiceLabel.setOperator(loggedUserId);
-        // 标签验重
-        Long id = bizServiceLabel.getId();
-        String strId = id == null ? null : id.toString();
-        supplierServiceImpl.compareRepeat(strId, bizServiceLabel.getLabelName(),"label_name", "biz_service_label", "标签名称重复！");
-        // 保存标签
         Long aLong = bizServiceLabelDao.saveEntity(bizServiceLabel);
         ListLabelDTO lld = new ListLabelDTO();
         lld.setId(aLong);
@@ -81,7 +79,7 @@ public class LabelServiceImpl implements LabelService {
      */
     @Override
     public void editlabel(Long id, String labelName) {
-        supplierServiceImpl.compareRepeat(String.valueOf(id), labelName,"label_name", "biz_service_label", "标签名称重复！");
+        supplierServiceImpl.compareRepeat(id, labelName,"label_name", "biz_service_label", "标签名称重复！");
         BizServiceLabel label = new BizServiceLabel();
         label.setId(id);
         label.setLabelName(labelName);

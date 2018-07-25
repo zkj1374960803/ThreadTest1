@@ -149,11 +149,11 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
      * @author zhangkangjian
      * @date 2018-07-03 16:04:08
      */
-    public List<String> queryIds(String value, String fields, String tableName) {
+    public List<Long> queryIds(String value, String fields, String tableName) {
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("value", value);
         String sql = "SELECT id FROM " + tableName+ "  WHERE " + fields + " = :value ";
-        return querySingColum(String.class, sql, map);
+        return querySingColum(Long.class, sql, map);
     }
 
     /**

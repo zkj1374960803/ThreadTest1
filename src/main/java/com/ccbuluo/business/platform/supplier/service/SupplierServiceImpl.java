@@ -4,6 +4,7 @@ import com.ccbuluo.business.constants.Assert;
 import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceSupplier;
+import com.ccbuluo.business.platform.custmanager.dto.CustManagerDetailDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
 import com.ccbuluo.business.platform.supplier.dto.EditSupplierDTO;
@@ -16,6 +17,9 @@ import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.thrift.exception.ThriftRpcException;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.json.JsonUtils;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.weakref.jmx.internal.guava.base.Preconditions;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -48,7 +53,45 @@ public class SupplierServiceImpl implements SupplierService{
      * @date 2018-07-03 14:32:57
      */
     @Override
-    public StatusDto<String> createSupplier(BizServiceSupplier bizServiceSupplier) throws TException {
+    public StatusDto<String> createSupplier(BizServiceSupplier bizServiceSupplier) throws IOException {
+        // 校验参数和参数合法性
+        checkParamAndSupplierInfo(bizServiceSupplier);
+        // 保存供应商信息
+        saveSupplier(bizServiceSupplier);
+        return StatusDto.buildSuccessStatusDto();
+    }
+
+    /**
+     * 保存供应商信息
+     * @param bizServiceSupplier 供应商信息
+     * @author zhangkangjian
+     * @date 2018-07-25 10:18:44
+     */
+    private void saveSupplier(BizServiceSupplier bizServiceSupplier) {
+        String loggedUserId = userHolder.getLoggedUserId();
+        bizServiceSupplier.setOperator(loggedUserId);
+        bizServiceSupplier.setCreator(loggedUserId);
+        // 生成供应商编号
+        StatusDto<String> supplierCode = generateProjectCodeService.grantCode(CodePrefixEnum.FG);
+        if(!supplierCode.isSuccess()){
+            throw new CommonException(supplierCode.getCode(), "生成供应商编号失败！");
+        }
+        bizServiceSupplier.setSupplierCode(supplierCode.getData());
+        bizServiceSupplierDao.saveEntity(bizServiceSupplier);
+    }
+
+    /**
+     *  校验参数和参数合法性
+     * @param object 供应商信息
+     * @author zhangkangjian
+     * @date 2018-07-25 10:20:24
+     */
+    private void checkParamAndSupplierInfo(Object object) throws IOException {
+        // 类型转换
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String json = JsonUtils.writeValue(object);
+        BizServiceSupplier bizServiceSupplier = mapper.readValue(json, BizServiceSupplier.class);
         // 参数校验
         Assert.notNull(bizServiceSupplier);
         Assert.notEmpty(bizServiceSupplier.getSupplierName());
@@ -63,45 +106,11 @@ public class SupplierServiceImpl implements SupplierService{
         Assert.notEmpty(bizServiceSupplier.getSupplierAddress());
         Assert.notEmpty(bizServiceSupplier.getMajorProduct());
         // 手机号校验
-        String regex = "^1[34578][0-9]{9}$";
-        boolean matches = Pattern.matches(regex, bizServiceSupplier.getSupplierPhone());
-        Assert.isTrue(matches, "手机号校验失败！");
-
-        String loggedUserId = userHolder.getLoggedUserId();
-        bizServiceSupplier.setOperator(loggedUserId);
-        bizServiceSupplier.setCreator(loggedUserId);
-        // 生成供应商编号
-        StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FG);
-        if(!stringStatusDto.isSuccess()){
-            return StatusDto.buildFailure("生成供应商编号失败！");
-        }
-        bizServiceSupplier.setSupplierCode(stringStatusDto.getData());
+        checkPhone(bizServiceSupplier.getSupplierPhone());
         // 信息校验
         checkSupplierInfo(bizServiceSupplier.getId(), bizServiceSupplier.getSupplierPhone(), bizServiceSupplier.getSupplierName());
-        bizServiceSupplierDao.saveEntity(bizServiceSupplier);
-        return StatusDto.buildSuccessStatusDto();
     }
 
-    /**
-     * 供应商参数校验
-     * @param bizServiceSupplier 供应商信息
-     * @author zhangkangjian
-     * @date 2018-07-12 17:34:49
-     */
-    private void supplierParameterChecking(BizServiceSupplier bizServiceSupplier) {
-        Assert.notNull(bizServiceSupplier);
-        Assert.notEmpty(bizServiceSupplier.getSupplierName());
-        Assert.notEmpty(bizServiceSupplier.getLinkman());
-        Assert.notEmpty(bizServiceSupplier.getSupplierPhone());
-        Assert.notEmpty(bizServiceSupplier.getProvinceName());
-        Assert.notEmpty(bizServiceSupplier.getProvinceCode());
-        Assert.notEmpty(bizServiceSupplier.getCityName());
-        Assert.notEmpty(bizServiceSupplier.getCityCode());
-        Assert.notEmpty(bizServiceSupplier.getAreaName());
-        Assert.notEmpty(bizServiceSupplier.getAreaCode());
-        Assert.notEmpty(bizServiceSupplier.getSupplierAddress());
-        Assert.notEmpty(bizServiceSupplier.getMajorProduct());
-    }
 
     /**
      * 供应商信息校验
@@ -113,10 +122,9 @@ public class SupplierServiceImpl implements SupplierService{
      */
     private void checkSupplierInfo(Long id, String phone, String name) {
         // 手机号校验
-        String str = id == null ? null : id.toString();
-        compareRepeat(str , phone, "supplier_phone", "biz_service_supplier", "手机号重复！");
+        compareRepeat(id , phone, "supplier_phone", "biz_service_supplier", "手机号重复！");
         // 名字验重
-        compareRepeat(str , name, "supplier_name", "biz_service_supplier", "供应商名称重复！");
+        compareRepeat(id , name, "supplier_name", "biz_service_supplier", "供应商名称重复！");
     }
 
     /**
@@ -126,29 +134,24 @@ public class SupplierServiceImpl implements SupplierService{
      * @date 2018-07-03 14:32:57
      */
     @Override
-    public void editsupplier(EditSupplierDTO editSupplierDTO) {
-        // 参数校验
-        Assert.notNull(editSupplierDTO);
-        Assert.notEmpty(editSupplierDTO.getSupplierName());
-        Assert.notEmpty(editSupplierDTO.getLinkman());
-        Assert.notEmpty(editSupplierDTO.getSupplierPhone());
-        Assert.notEmpty(editSupplierDTO.getProvinceName());
-        Assert.notEmpty(editSupplierDTO.getProvinceCode());
-        Assert.notEmpty(editSupplierDTO.getCityName());
-        Assert.notEmpty(editSupplierDTO.getCityCode());
-        Assert.notEmpty(editSupplierDTO.getAreaName());
-        Assert.notEmpty(editSupplierDTO.getAreaCode());
-        Assert.notEmpty(editSupplierDTO.getSupplierAddress());
-        Assert.notEmpty(editSupplierDTO.getMajorProduct());
-        // 手机号校验
-        String regex = "^1[34578][0-9]{9}$";
-        boolean matches = Pattern.matches(regex, editSupplierDTO.getSupplierPhone());
-        Assert.isTrue(matches, "手机号校验失败！");
-
-        String loggedUserId = userHolder.getLoggedUserId();
-        editSupplierDTO.setOperator(loggedUserId);
-        checkSupplierInfo(editSupplierDTO.getId(), editSupplierDTO.getSupplierPhone(), editSupplierDTO.getSupplierName());
+    public void editsupplier(EditSupplierDTO editSupplierDTO) throws IOException {
+        // 校验参数和参数合法性
+        checkParamAndSupplierInfo(editSupplierDTO);
+        // 更新供应商信息
+        editSupplierDTO.setOperator(userHolder.getLoggedUserId());
         bizServiceSupplierDao.update(editSupplierDTO);
+    }
+
+    /**
+     *  手机号格式校验
+     * @param supplierPhone 供应商手机号
+     * @author zhangkangjian
+     * @date 2018-07-25 10:01:13
+     */
+    private void checkPhone(String supplierPhone) {
+        String regex = "^1[34578][0-9]{9}$";
+        boolean matches = Pattern.matches(regex, supplierPhone);
+        Assert.isTrue(matches, "手机号校验失败！");
     }
 
     /**
@@ -196,7 +199,7 @@ public class SupplierServiceImpl implements SupplierService{
      * @date 2018-05-23 16:05:19
      * @version v1.0.0
      */
-    private void compareRepeat(String id, List<String> ids, String tip){
+    private void compareRepeat(Long id, List<Long> ids, String tip){
         if(id != null){
             if(ids.size() == 1){
                 if(!id.equals(ids.get(0))){
@@ -219,14 +222,14 @@ public class SupplierServiceImpl implements SupplierService{
      * 例子：compareRepeat("2" , "18761326500", "supplier_phone", "biz_service_supplier", "手机号重复！");
      * @param id
      * @param value 验重的值
-     * @param fields 验重的字段
-     * @param tableName 表名
+     * @param fields 数据库字段，验重的字段
+     * @param tableName 数据库表名
      * @param tip 失败提示语 成功不提示语
      * @author zhangkangjian
      * @date 2018-07-03 16:06:48
      */
-    public void compareRepeat(String id, String value, String fields, String tableName, String tip){
-        List<String> ids = bizServiceSupplierDao.queryIds(value, fields, tableName);
+    public void compareRepeat(Long id, String value, String fields, String tableName, String tip){
+        List<Long> ids = bizServiceSupplierDao.queryIds(value, fields, tableName);
         compareRepeat(id, ids ,tip);
     }
 

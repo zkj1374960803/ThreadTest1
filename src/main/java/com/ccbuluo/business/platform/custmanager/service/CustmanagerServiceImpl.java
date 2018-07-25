@@ -191,7 +191,10 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         long timeMillis = System.currentTimeMillis();
         userInfoDTO.setOperateTime(timeMillis);
         userInfoDTO.setOperator(loggedUserId);
-        innerUserInfoService.updateUser(userInfoDTO);
+        StatusDto<String> updateUser = innerUserInfoService.updateUser(userInfoDTO);
+        if(!updateUser.isSuccess()){
+            return StatusDto.buildFailure("更新失败！");
+        }
         bizServiceCustmanager.setOperator(loggedUserId);
         bizServiceCustmanager.setOperateTime(new Date());
         bizServiceCustmanager.setUserUuid(userInfoDTO.getUseruuid());
@@ -212,7 +215,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         StatusDto<UserInfoDTO> resolve = findUserAndRoleDetail(useruuid);
         // 类型转换 UserInfoDTO ——> CustManagerDetailDTO
         CustManagerDetailDTO custManagerDetailDTO = userInfoDTOConversionCustManagerDetailDTO(resolve);
-        // 填充客户经理的信息
+        // 查询客户经理的信息
         findCustManagerDetail(useruuid, custManagerDetailDTO);
         return StatusDto.buildDataSuccessStatusDto(custManagerDetailDTO);
     }

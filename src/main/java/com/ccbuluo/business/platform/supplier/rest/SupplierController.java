@@ -18,6 +18,7 @@ import org.apache.thrift.TException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -42,7 +43,7 @@ public class SupplierController extends BaseController {
      */
     @PostMapping("/createsupplier")
     @ApiOperation(value = "添加供应商",notes = "【张康健】")
-    public StatusDto createSupplier(BizServiceSupplier bizServiceSupplier) throws TException {
+    public StatusDto createSupplier(BizServiceSupplier bizServiceSupplier) throws IOException {
         return supplierServiceImpl.createSupplier(bizServiceSupplier);
     }
     
@@ -55,7 +56,7 @@ public class SupplierController extends BaseController {
      */
     @PostMapping("/editsupplier")
     @ApiOperation(value = "编辑供应商",notes = "【张康健】")
-    public StatusDto editsupplier(EditSupplierDTO editSupplierDTO){
+    public StatusDto editsupplier(EditSupplierDTO editSupplierDTO) throws IOException {
         supplierServiceImpl.editsupplier(editSupplierDTO);
         return StatusDto.buildSuccessStatusDto();
     }
