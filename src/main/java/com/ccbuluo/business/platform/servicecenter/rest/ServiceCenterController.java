@@ -14,6 +14,8 @@ import com.ccbuluo.usercoreintf.dto.ServiceCenterWorkplaceDTO;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import io.swagger.annotations.*;
 import org.apache.thrift.TException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
@@ -31,6 +33,7 @@ import java.util.Map;
 @RequestMapping("/platform/servicecenter")
 public class ServiceCenterController extends BaseController {
 
+    Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private ServiceCenterService serviceCenterService;
     @ThriftRPCClient("UserCoreSerService")
@@ -46,7 +49,12 @@ public class ServiceCenterController extends BaseController {
     @ApiOperation(value = "服务中心保存", notes = "【刘铎】")
     @PostMapping("/save")
     public StatusDto saveServiceCenter(@ApiParam(name = "服务中心对象", value = "传入json格式", required = true)SaveServiceCenterDTO saveServiceCenterDTO) throws Exception {
-        return serviceCenterService.saveServiceCenter(saveServiceCenterDTO);
+        try {
+            return serviceCenterService.saveServiceCenter(saveServiceCenterDTO);
+        } catch (Exception e) {
+            logger.error("保存失败！", e);
+            return StatusDto.buildFailure(e.getMessage());
+        }
     }
 
     /**
