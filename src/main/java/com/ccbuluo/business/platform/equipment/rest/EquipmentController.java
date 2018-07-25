@@ -36,7 +36,7 @@ public class EquipmentController extends BaseController {
      */
     @ApiOperation(value = "物料保存", notes = "【刘铎】")
     @PostMapping("/save")
-    public StatusDto saveEquiptype(@ApiParam(name = "物料对象", value = "传入json格式", required = true)SaveBizServiceEquipmentDTO saveBizServiceEquipmentDTO) {
+    public StatusDto saveEquiptype(@ApiParam(name = "物料对象", value = "传入json格式", required = true)@RequestBody SaveBizServiceEquipmentDTO saveBizServiceEquipmentDTO) {
         int status = equipmentService.save(saveBizServiceEquipmentDTO);
         if (status == Constants.FAILURE_ONE) {
             return StatusDto.buildFailure("该物料已存在，请核对！");
@@ -72,7 +72,7 @@ public class EquipmentController extends BaseController {
      */
     @ApiOperation(value = "物料保存", notes = "【刘铎】")
     @PostMapping("/edit")
-    public StatusDto editEquiptype(@ApiParam(name = "物料对象", value = "传入json格式", required = true)SaveBizServiceEquipmentDTO saveBizServiceEquipmentDTO) {
+    public StatusDto editEquiptype(@ApiParam(name = "物料对象", value = "传入json格式", required = true)@RequestBody SaveBizServiceEquipmentDTO saveBizServiceEquipmentDTO) {
         int status = equipmentService.editEquiptype(saveBizServiceEquipmentDTO);
         if (status == Constants.FAILURE_ONE) {
             return StatusDto.buildFailure("该物料已存在，请核对！");

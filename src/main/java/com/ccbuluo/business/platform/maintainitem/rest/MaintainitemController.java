@@ -36,7 +36,7 @@ public class MaintainitemController extends BaseController {
      */
     @ApiOperation(value = "工时保存", notes = "【刘铎】")
     @PostMapping("/save")
-    public StatusDto saveMaintainitem(@ApiParam(name = "工时对象", value = "传入json格式", required = true)SaveBizServiceMaintainitemDTO saveBizServiceMaintainitemDTO) {
+    public StatusDto saveMaintainitem(@ApiParam(name = "工时对象", value = "传入json格式", required = true)@RequestBody SaveBizServiceMaintainitemDTO saveBizServiceMaintainitemDTO) {
         int status = maintainitemService.save(saveBizServiceMaintainitemDTO);
         if (status == Constants.FAILURE_ONE) {
             return StatusDto.buildFailure("该服务已存在，请核对！");
@@ -71,7 +71,7 @@ public class MaintainitemController extends BaseController {
      */
     @ApiOperation(value = "工时编辑", notes = "【刘铎】")
     @PostMapping("/edit")
-    public StatusDto editMaintainitem(@ApiParam(name = "工时对象", value = "传入json格式", required = true)SaveBizServiceMaintainitemDTO saveBizServiceMaintainitemDTO) {
+    public StatusDto editMaintainitem(@ApiParam(name = "工时对象", value = "传入json格式", required = true)@RequestBody SaveBizServiceMaintainitemDTO saveBizServiceMaintainitemDTO) {
         int status = maintainitemService.edit(saveBizServiceMaintainitemDTO);
         if (status == Constants.FAILURE_ONE) {
             return StatusDto.buildFailure("该服务已存在，请核对！");
