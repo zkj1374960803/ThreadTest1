@@ -38,7 +38,7 @@ public class EquiptypeController extends BaseController {
      */
     @ApiOperation(value = "物料类型保存", notes = "【刘铎】")
     @PostMapping("/save")
-    public StatusDto saveEquiptype(@ApiParam(name = "物料类型对象", value = "传入json格式", required = true)SaveBizServiceEquiptypeDTO saveBizServiceEquiptypeDTO) {
+    public StatusDto saveEquiptype(@ApiParam(name = "物料类型对象", value = "传入json格式", required = true)@RequestBody SaveBizServiceEquiptypeDTO saveBizServiceEquiptypeDTO) {
         int status = equiptypeService.save(saveBizServiceEquiptypeDTO);
         if (status == Constants.FAILURE_ONE) {
             return StatusDto.buildFailure("该物料类型已存在，请核对！");
@@ -69,7 +69,7 @@ public class EquiptypeController extends BaseController {
      */
     @ApiOperation(value = "物料类型编辑", notes = "【刘铎】")
     @PostMapping("/edit")
-    public StatusDto editEquiptype(@ApiParam(name = "物料类型对象", value = "传入json格式", required = true)SaveBizServiceEquiptypeDTO saveBizServiceEquiptypeDTO) {
+    public StatusDto editEquiptype(@ApiParam(name = "物料类型对象", value = "传入json格式", required = true)@RequestBody SaveBizServiceEquiptypeDTO saveBizServiceEquiptypeDTO) {
         int status = equiptypeService.edit(saveBizServiceEquiptypeDTO);
         if (status == Constants.FAILURE_ONE) {
             return StatusDto.buildFailure("该物料类型已存在，请核对！");
