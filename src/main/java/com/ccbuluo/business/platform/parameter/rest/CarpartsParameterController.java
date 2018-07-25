@@ -28,7 +28,7 @@ import java.util.List;
  */
 @Api(tags = "零配件参数管理(平台端)")
 @RestController
-@RequestMapping("/afterSales/carpartsparameter")
+@RequestMapping("/aftersales/carpartsparameter")
 public class CarpartsParameterController extends BaseController {
 
     @ThriftRPCClient("BasicMerchandiseSer")
@@ -46,8 +46,8 @@ public class CarpartsParameterController extends BaseController {
      * @date 2018-07-04 19:52:44
      */
     @ApiOperation(value = "添加参数",notes = "【魏俊标】")
-    @PostMapping("/saveCarpartsParameter")
-    public StatusDto saveCarpartsParameter(@ApiParam(name = "saveBasicCarpartsParameterDTO对象", value = "传入json格式", required = true) @RequestBody SaveBasicCarpartsParameterDTO saveBasicCarpartsParameterDTO)  throws TException {
+    @PostMapping("/savecarpartsparameter")
+    public StatusDto saveCarpartsParameter(@ApiParam(name = "saveBasicCarpartsParameterDTO对象", value = "传入json格式", required = true) SaveBasicCarpartsParameterDTO saveBasicCarpartsParameterDTO)  throws TException {
         // 生成编码
         StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FM);
         //获取code失败
@@ -66,8 +66,8 @@ public class CarpartsParameterController extends BaseController {
      * @date 2018-07-05 10:10:43
      */
     @ApiOperation(value = "编辑零配件参数",notes = "【魏俊标】")
-    @PostMapping("/editCarpartsParameter")
-    public StatusDto editCarpartsParameter(@ApiParam(name = "saveBasicCarpartsParameterDTO", value = "传入json格式", required = true) SaveBasicCarpartsParameterDTO saveBasicCarpartsParameterDTO) {
+    @PostMapping("/editcarpartsparameter")
+    public StatusDto editCarpartsParameter(@ApiParam(name = "saveBasicCarpartsParameterDTO", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsParameterDTO saveBasicCarpartsParameterDTO) {
         saveBasicCarpartsParameterDTO.setOperator(userHolder.getLoggedUserId());
         return StatusDtoThriftUtils.resolve(carpartsParameterService.editCarpartsParameter(saveBasicCarpartsParameterDTO), String.class);
     }
@@ -83,7 +83,7 @@ public class CarpartsParameterController extends BaseController {
     @ApiOperation(value = "零配件参数启停", notes = "【魏俊标】")
     @ApiImplicitParams({@ApiImplicitParam(name = "parameterCode", value = "参数code", required = true, paramType = "query"),
             @ApiImplicitParam(name = "parameterStatus", value = "参数状态", required = true, paramType = "query")})
-    @GetMapping("/editParameterStatus")
+    @GetMapping("/editparameterstatus")
     public StatusDto editParameterStatus(@RequestParam String parameterCode,
                                          @RequestParam Integer parameterStatus) {
         return StatusDtoThriftUtils.resolve(carpartsParameterService.editParameterStatus(parameterCode, parameterStatus),String.class);
@@ -97,7 +97,7 @@ public class CarpartsParameterController extends BaseController {
      */
     @ApiOperation(value = "删除零配件参数", notes = "【魏俊标】")
     @ApiImplicitParam(name = "parameterCode", value = "参数Code", required = true, dataType = "String", paramType = "path")
-    @GetMapping("/deleteCarpartsParameter/{parameterCode}")
+    @GetMapping("/deletecarpartsparameter/{parameterCode}")
     public StatusDto deleteCarpartsParameter(@PathVariable String parameterCode) {
         return StatusDtoThriftUtils.resolve(carpartsParameterService.deleteCarpartsParameter(parameterCode),String.class);
     }
@@ -112,7 +112,7 @@ public class CarpartsParameterController extends BaseController {
      */
     @ApiOperation(value = "查询零配件参数详情",notes = "【魏俊标】")
     @ApiImplicitParam(name = "parameterCode", value = "零部件参数Code", required = true, dataType = "String", paramType = "path")
-    @GetMapping("/findCarpartsParameterdetail/{parameterCode}")
+    @GetMapping("/findcarpartsparameterdetail/{parameterCode}")
     public StatusDto<EditBasicCarpartsParameterDTO> findCarpartsParameterdetail(@PathVariable String parameterCode){
         return StatusDtoThriftUtils.resolve(carpartsParameterService.findCarpartsParameterdetail(parameterCode),EditBasicCarpartsParameterDTO.class);
     }
@@ -125,7 +125,7 @@ public class CarpartsParameterController extends BaseController {
      */
     @ApiOperation(value = "根据零部件分类code（末级）查询参数列表",notes = "【魏俊标】")
     @ApiImplicitParam(name = "categoryCode", value = "分类Code", required = true, dataType = "String", paramType = "path")
-    @GetMapping("/getParameterListByCategoryCode/{categoryCode}")
+    @GetMapping("/getparameterlistbycategorycode/{categoryCode}")
     protected StatusDto<List<RelCarpartsCateparamDTO>> getParameterListByCategoryCode(@PathVariable String categoryCode) {
         return StatusDtoThriftUtils.resolve(carpartsParameterService.getParameterListByCategoryCode(categoryCode),RelCarpartsCateparamDTO.class);
     }
@@ -136,7 +136,7 @@ public class CarpartsParameterController extends BaseController {
      * @date 2018-07-05 14:52:44
      */
     @ApiOperation(value = "查询通用参数列表",notes = "【魏俊标】")
-    @GetMapping("/getCommonParameterList")
+    @GetMapping("/getcommonparameterlist")
     protected StatusDto<List<RelCarpartsCateparamDTO>> getCommonParameterList() {
         return StatusDtoThriftUtils.resolve(carpartsParameterService.getCommonParameterList(),RelCarpartsCateparamDTO.class);
     }
