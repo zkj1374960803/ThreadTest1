@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -195,11 +196,22 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         if(!updateUser.isSuccess()){
             return StatusDto.buildFailure("更新失败！");
         }
+        bizServiceCustmanager.setUserUuid(userInfoDTO.getUseruuid());
+        updateCustManager(bizServiceCustmanager);
+        return StatusDto.buildSuccessStatusDto();
+    }
+
+    /**
+     * 更新客户经理信息
+     * @param bizServiceCustmanager  客户经理信息
+     * @author zhangkangjian
+     * @date 2018-07-25 14:32:04
+     */
+    private void updateCustManagerDetail(BizServiceCustmanager bizServiceCustmanager) {
+        String loggedUserId = userHolder.getLoggedUserId();
         bizServiceCustmanager.setOperator(loggedUserId);
         bizServiceCustmanager.setOperateTime(new Date());
-        bizServiceCustmanager.setUserUuid(userInfoDTO.getUseruuid());
         bizServiceCustmanagerDao.updateBizServiceCustmanager(bizServiceCustmanager);
-        return StatusDto.buildSuccessStatusDto();
     }
 
     /**
@@ -218,6 +230,19 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         // 查询客户经理的信息
         findCustManagerDetail(useruuid, custManagerDetailDTO);
         return StatusDto.buildDataSuccessStatusDto(custManagerDetailDTO);
+    }
+
+    /**
+     * 更新客户经理信息
+     * @param bizServiceCustmanager  客户经理信息
+     * @return StatusDto
+     * @author zhangkangjian
+     * @date 2018-07-25 14:14:11
+     */
+    @Override
+    public StatusDto<String> updateCustManager(BizServiceCustmanager bizServiceCustmanager) {
+        updateCustManagerDetail(bizServiceCustmanager);
+        return StatusDto.buildSuccessStatusDto();
     }
 
     /**

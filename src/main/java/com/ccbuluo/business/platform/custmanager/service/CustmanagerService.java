@@ -50,4 +50,12 @@ public interface CustmanagerService {
      * @date 2018-07-19 14:47:07
      */
     StatusDto custManagerDetail(String useruuid) throws IOException;
+    /**
+     * 更新客户经理信息
+     * @param bizServiceCustmanager 客户经理信息
+     * @return StatusDto
+     * @author zhangkangjian
+     * @date 2018-07-25 14:14:11
+     */
+    StatusDto<String> updateCustManager(BizServiceCustmanager bizServiceCustmanager);
 }

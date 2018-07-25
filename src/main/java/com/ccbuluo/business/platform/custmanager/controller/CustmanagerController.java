@@ -128,5 +128,23 @@ public class CustmanagerController extends BaseController {
         return custmanagerServiceImpl.custManagerDetail(useruuid);
     }
 
+    /**
+     * 更新客户经理信息
+     * @param bizServiceCustmanager 客户经理信息
+     * @return StatusDto
+     * @author zhangkangjian
+     * @date 2018-07-25 14:14:11
+     */
+    @ApiOperation(value = "更新客户经理信息", notes = "【张康健】")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "userUuid", value = "用户uuid", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "officePhone", value = "办公手机号", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "receivingAddress", value = "收货地址", required = true, paramType = "query")
+    })
+    @PostMapping("/updatecustmanager")
+    public StatusDto<String> updateCustManager(@ApiIgnore BizServiceCustmanager bizServiceCustmanager) {
+        return custmanagerServiceImpl.updateCustManager(bizServiceCustmanager);
+    }
+
 
 }
