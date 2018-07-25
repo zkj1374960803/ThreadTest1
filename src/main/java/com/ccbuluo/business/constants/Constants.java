@@ -29,6 +29,10 @@ public class Constants {
     public static final String ERROR_CODE = "0";
     public static final String SUCCESS_CODE = "1";
 
+    // 状态标识
+    public static final int STATUS_FLAG_ZERO = 0;
+    public static final int STATUS_FLAG_ONE = 1;
+
     /**
      * 冒号
      */

@@ -50,12 +50,12 @@ public class BizCarmodelLabelServiceImpl implements BizCarmodelLabelService {
      */
     @Override
     public StatusDto saveCarmodelLabel(BizCarmodelLabel bizCarmodelLabel) {
-        // 1.1 车型标签验证唯一性
-        StatusDto statusDto = findServiceMaintaincarVerification(bizCarmodelLabel);
-        if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
-            return statusDto;
-        }
         try {
+            // 1.1 车型标签验证唯一性
+            StatusDto statusDto = findServiceMaintaincarVerification(bizCarmodelLabel);
+            if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
+                return statusDto;
+            }
             // 1.保存车型标签基本信息
             buildServiceMaintaincar(bizCarmodelLabel);
             long carcoreInfoId = bizCarmodelLabelDao.saveCarmodelLabel(bizCarmodelLabel);
@@ -77,14 +77,12 @@ public class BizCarmodelLabelServiceImpl implements BizCarmodelLabelService {
      */
     @Override
     public StatusDto editCarmodelLabel(BizCarmodelLabel bizCarmodelLabel){
-        // 1.1 车型标签基本信息验证唯一性
-        StatusDto statusDto = findServiceMaintaincarVerification(bizCarmodelLabel);
-        if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
-            return statusDto;
-        }
-
         try {
-
+            // 1.1 车型标签基本信息验证唯一性
+            StatusDto statusDto = findServiceMaintaincarVerification(bizCarmodelLabel);
+            if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
+                return statusDto;
+            }
             // 1.保存车型标签基本信息
             buildServiceMaintaincar(bizCarmodelLabel);
             long carcoreInfoId = bizCarmodelLabelDao.updateCarmodelLabel(bizCarmodelLabel);
@@ -106,6 +104,7 @@ public class BizCarmodelLabelServiceImpl implements BizCarmodelLabelService {
      * @date 2018-05-10 18:38:06
      */
     private void buildServiceMaintaincar(BizCarmodelLabel bizCarmodelLabel) {
+        bizCarmodelLabel.setDeleteFlag(Constants.DELETE_FLAG_NORMAL);
         // 3.通用字段
         bizCarmodelLabel.preInsert(userHolder.getLoggedUserId());
     }
@@ -120,7 +119,6 @@ public class BizCarmodelLabelServiceImpl implements BizCarmodelLabelService {
      */
     @Override
     public StatusDto findServiceMaintaincarVerification(BizCarmodelLabel bizCarmodelLabel) {
-        bizCarmodelLabel.setDeleteFlag(Constants.DELETE_FLAG_NORMAL);
         int vinNumberCount = bizCarmodelLabelDao.findCarmodelLabelExist(bizCarmodelLabel);
         StringBuilder result = new StringBuilder();
         if (vinNumberCount > 0) {

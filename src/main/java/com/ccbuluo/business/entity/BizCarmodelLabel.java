@@ -4,12 +4,12 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
- * 客服经理 上门维修 使用的维修车 实体表实体
+ * 车型标签 实体表实体
  * @author weijb
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "客服经理 上门维修 使用的维修车 实体表实体", description = "客服经理 上门维修 使用的维修车 实体表")
+@ApiModel(value = "BizCarmodelLabel", description = "车型标签 实体表实体")
 public class BizCarmodelLabel extends AftersaleCommonEntity{
     /**
      * 标签编号

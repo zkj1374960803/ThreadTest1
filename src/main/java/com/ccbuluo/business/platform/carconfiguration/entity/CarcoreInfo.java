@@ -10,7 +10,7 @@ import java.util.Date;
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "实体", description = "")
+@ApiModel(value = "CarcoreInfo", description = "车辆管理 实体表")
 public class CarcoreInfo extends CarCommonEntity {
     /**
      * 主键，自增
@@ -54,6 +54,7 @@ public class CarcoreInfo extends CarCommonEntity {
     /**
      * 出厂时间
      */
+    @ApiModelProperty(name = "produceTime", value = "出厂日期")
     private Date produceTime;
     /**
      * 备注

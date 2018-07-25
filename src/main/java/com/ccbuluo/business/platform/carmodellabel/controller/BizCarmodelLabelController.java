@@ -10,11 +10,9 @@ import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeServ
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
-import com.ccbuluo.http.StatusDtoThriftUtils;
 import io.swagger.annotations.*;
 import org.apache.thrift.TException;
 import org.springframework.web.bind.annotation.*;
-
 import javax.annotation.Resource;
 import java.util.List;
 
@@ -25,7 +23,7 @@ import java.util.List;
  * @version v 1.0.0
  */
 @RestController
-@RequestMapping("/afterSales/carmodellabel")
+@RequestMapping("/aftersales/carmodellabel")
 @Api(tags = "车型标签管理")
 public class BizCarmodelLabelController extends BaseController {
 
@@ -44,7 +42,7 @@ public class BizCarmodelLabelController extends BaseController {
      */
     @ApiOperation(value = "新增车型标签", notes = "【weijb】")
     @PostMapping("/create")
-    public StatusDto create(@ApiParam(name = "bizCarmodelLabel对象", value = "传入json格式", required = true) BizCarmodelLabel bizCarmodelLabel) {
+    public StatusDto create(@ApiParam(name = "bizCarmodelLabel对象", value = "传入json格式", required = true)@RequestBody BizCarmodelLabel bizCarmodelLabel) {
         // 生成编码
         StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FD);
         //获取code失败
@@ -65,7 +63,7 @@ public class BizCarmodelLabelController extends BaseController {
      */
     @ApiOperation(value = "编辑车型标签", notes = "【weijb】")
     @PostMapping("/edit")
-    public StatusDto edit(@ApiParam(name = "bizServiceMaintaincar对象", value = "传入json格式", required = true) BizCarmodelLabel bizCarmodelLabel) {
+    public StatusDto edit(@ApiParam(name = "bizCarmodelLabel对象", value = "传入json格式", required = true)@RequestBody BizCarmodelLabel bizCarmodelLabel) {
         return bizCarmodelLabelService.editCarmodelLabel(bizCarmodelLabel);
     }
 
@@ -80,7 +78,7 @@ public class BizCarmodelLabelController extends BaseController {
      */
     @ApiOperation(value = "根据标签id查询车型标签详情", notes = "根据标签id查询车型标签详情")
     @ApiImplicitParam(name = "labelCode", value = "车型标签labelCode", required = true, paramType = "query")
-    @GetMapping("/queryCarmodelLabelBylabelCode")
+    @GetMapping("/querycarmodellabelbylabelcode")
     public StatusDto queryCarmodelLabelBylabelId(String labelCode) throws TException {
         return StatusDto.buildDataSuccessStatusDto(bizCarmodelLabelService.queryCarmodelLabelBylabelCode(labelCode));
     }

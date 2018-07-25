@@ -60,7 +60,7 @@ public interface BasicCarcoreInfoService {
      * @author weijb
      * @date 2018-06-08 13:55:14
      */
-    int deleteCarcoreInfoByCarId(Long carId);
+    StatusDto deleteCarcoreInfoByCarId(Long carId);
     /**
      * 车辆列表分页查询
      * @param carbrandId 品牌id

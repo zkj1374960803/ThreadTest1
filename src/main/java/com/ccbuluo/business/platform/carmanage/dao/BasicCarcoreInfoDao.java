@@ -67,9 +67,8 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
                 .append("SET vin_number = :vinNumber,engine_number = :engineNumber,")
                 .append("beidou_number = :beidouNumber,carbrand_id = :carbrandId,")
                 .append("carseries_id = :carseriesId,carmodel_id = :carmodelId,")
-                .append("produce_time = :produceTime,remark = :remark,car_status = :carStatus,creator = :creator,")
-                .append("create_time = :createTime,operator = :operator,")
-                .append("operate_time = :operateTime,delete_flag = :deleteFlag WHERE id= :id");
+                .append("produce_time = :produceTime,remark = :remark,operator = :operator,")
+                .append("operate_time = :operateTime WHERE id= :id");
         return super.updateForBean(sql.toString(), entity);
     }
 

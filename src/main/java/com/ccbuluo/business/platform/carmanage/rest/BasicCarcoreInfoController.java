@@ -39,7 +39,7 @@ public class BasicCarcoreInfoController extends BaseController {
      */
     @ApiOperation(value = "新增车辆", notes = "【weijb】")
     @PostMapping("/create")
-    public StatusDto create(@ApiParam(name = "carcoreInfo对象", value = "传入json格式", required = true) CarcoreInfo carcoreInfo) {
+    public StatusDto create(@ApiParam(name = "carcoreInfo对象", value = "传入json格式", required = true)@RequestBody CarcoreInfo carcoreInfo) {
         return basicCarcoreInfoService.saveCarcoreInfo(carcoreInfo);
     }
 
@@ -53,7 +53,7 @@ public class BasicCarcoreInfoController extends BaseController {
      */
     @ApiOperation(value = "编辑车辆", notes = "【weijb】")
     @PostMapping("/edit")
-    public StatusDto edit(@ApiParam(name = "saveCarcoreInfoDTO对象", value = "传入json格式", required = true) CarcoreInfo carcoreInfo) {
+    public StatusDto edit(@ApiParam(name = "saveCarcoreInfoDTO对象", value = "传入json格式", required = true)@RequestBody CarcoreInfo carcoreInfo) {
         return basicCarcoreInfoService.editCarcoreInfo(carcoreInfo);
     }
 
@@ -85,8 +85,7 @@ public class BasicCarcoreInfoController extends BaseController {
     @GetMapping("/delete/{carId}")
     @ApiImplicitParam(name = "carId", value = "车辆id", required = true, paramType = "path")
     public StatusDto delete(@PathVariable Long carId) {
-        basicCarcoreInfoService.deleteCarcoreInfoByCarId(carId);
-        return StatusDto.buildSuccessStatusDto();
+        return basicCarcoreInfoService.deleteCarcoreInfoByCarId(carId);
     }
 
     /**

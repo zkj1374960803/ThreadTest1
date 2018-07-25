@@ -10,7 +10,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "客服经理 上门维修 使用的维修车 实体表实体", description = "客服经理 上门维修 使用的维修车 实体表")
+@ApiModel(value = "SearchBizServiceMaintaincarDTO", description = "客服经理 上门维修 使用的维修车 实体表")
 public class SearchBizServiceMaintaincarDTO {
     /**
      * 维修车辆编号

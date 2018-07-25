@@ -58,10 +58,9 @@ public class BizCarmodelLabelDao extends BaseDao<BizServiceMaintaincar> {
     public int updateCarmodelLabel(BizCarmodelLabel entity) {
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE basic_carmodel_label SET ")
-            .append("label_code = :labelCode,label_name = :labelName,sort = :sort,")
-            .append("creator = :creator,create_time = :createTime,")
+            .append(" label_name = :labelName,sort = :sort,")
             .append("operator = :operator,operate_time = :operateTime,")
-            .append("delete_flag = :deleteFlag WHERE label_code= :labelCode");
+            .append(" WHERE label_code= :labelCode");
         return super.updateForBean(sql.toString(), entity);
     }
 
@@ -138,7 +137,7 @@ public class BizCarmodelLabelDao extends BaseDao<BizServiceMaintaincar> {
             param.put("Keyword", Keyword);
             sql.append(" AND bci.label_name LIKE CONCAT('%',:Keyword,'%') ");
         }
-        sql.append("  ORDER BY bci.sort");
+        sql.append("  ORDER BY bci.sort,bci.id");
         Page<SearchBizCarmodelLabelDTO> DTOS = super.queryPageForBean(SearchBizCarmodelLabelDTO.class, sql.toString(), param,offset,pageSize);
         return DTOS;
     }
@@ -152,7 +151,7 @@ public class BizCarmodelLabelDao extends BaseDao<BizServiceMaintaincar> {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,label_code,label_name,sort,")
                 .append("creator,create_time,operator,operate_time,delete_flag")
-                .append(" FROM basic_carmodel_label WHERE delete_flag = :deleteFlag ORDER BY sort");
+                .append(" FROM basic_carmodel_label WHERE delete_flag = :deleteFlag ORDER BY sort,id");
         Map<String, Object> params = Maps.newHashMap();
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         return super.queryListBean(BizCarmodelLabelDTO.class, sql.toString(), params);

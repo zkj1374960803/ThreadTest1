@@ -55,6 +55,10 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
      * 该北斗设备编号已经存在！
      */
     private static final String CAR_BEIDOU_NUMBER_VERIFY = "该北斗设备编号已经存在！";
+    /**
+     * 该车架号(VIN)已经存在！
+     */
+    private static final String CAR_STATUS_VERIFY = "此车辆已被分配无法删除！";
 
 
     /**
@@ -142,7 +146,8 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
         if (null == carcoreInfo.getId()) {
             carcoreInfo.setCarNumber(findCarNumber());
         }
-        carcoreInfo.setCarStatus(Constants.DELETE_FLAG_NORMAL);
+        //新增默认未分配：0
+        carcoreInfo.setCarStatus(Constants.STATUS_FLAG_ZERO);
         // 3.通用字段
         carcoreInfo.preInsert(userHolder.getLoggedUserId());
     }
@@ -214,8 +219,18 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
      * @date 2018-06-08 13:55:14
      */
     @Override
-    public int deleteCarcoreInfoByCarId(Long carId){
-        return basicCarcoreInfoDao.deleteCarcoreInfoByCarId(carId);
+    public StatusDto deleteCarcoreInfoByCarId(Long carId){
+        try {
+            StatusDto statusDto = checkCarcoreInfoDelete(carId);
+            if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
+                return statusDto;
+            }
+            basicCarcoreInfoDao.deleteCarcoreInfoByCarId(carId);
+            return StatusDto.buildSuccessStatusDto();
+        } catch (Exception e) {
+            logger.error("删除车辆失败！",e);
+            throw e;
+        }
     }
     /**
      * 车辆列表分页查询
@@ -231,6 +246,22 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
     public Page<SearchCarcoreInfoDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer carStatus, String Keyword, Integer offset, Integer pageSize){
         return basicCarcoreInfoDao.queryCarcoreInfoList(carbrandId, carseriesId, carStatus, Keyword, offset, pageSize);
     }
-
+    /**
+     * 车辆删除验证
+     * @param carId 车辆id
+     * @author weijb
+     * @date 2018-05-09 14:02:30
+     */
+    public StatusDto checkCarcoreInfoDelete(Long carId) {
+        CarcoreInfo carcoreInfo = basicCarcoreInfoDao.queryCarDetailByCarId(carId);
+        StringBuilder result = new StringBuilder();
+        if (null != carcoreInfo && carcoreInfo.getCarStatus() != 0) {
+            result.append(CAR_STATUS_VERIFY);
+        }
+        if (StringUtils.isNotBlank(result.toString())) {
+            return StatusDto.buildFailureStatusDto(result.toString());
+        }
+        return StatusDto.buildSuccessStatusDto();
+    }
 
 }
