@@ -91,7 +91,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             // 删除用户信息
             e.printStackTrace();
             innerUserInfoService.deleteUserInfoByUseruuid(useruuid);
-            throw new CommonException("2", "创建客户经理失败！");
+            throw new CommonException(Constants.ERROR_CODE, "创建客户经理失败！");
         }
     }
     /**
@@ -115,13 +115,13 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         // 保存基础用户信息
         StatusDto<String> userAndRole = innerUserInfoService.saveUserAndRole(userInfoDTO);
         if(!userAndRole.isSuccess()){
-            throw new CommonException("2", userAndRole.getMessage());
+            throw new CommonException(userAndRole.getCode(), userAndRole.getMessage());
         }
         String useruuid = userAndRole.getData();
         userInfoDTO.setUseruuid(useruuid);
         StatusDto<String> updateUser = innerUserInfoService.updateUser(userInfoDTO);
         if(!updateUser.isSuccess()){
-            throw new CommonException("2", updateUser.getMessage());
+            throw new CommonException(userAndRole.getCode(), updateUser.getMessage());
         }
         return useruuid;
     }
@@ -137,13 +137,13 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         // 角色校验
         StatusDtoThriftList<Long> statusDtoRole = basicUserRoleService.queryRoleByRoleCode(Constants.CUSTMANAGER_ROLE_CODE);
         if(!statusDtoRole.isSuccess()){
-            throw new CommonException("2", "客户经理角色不存在！");
+            throw new CommonException(statusDtoRole.getCode(), "客户经理角色不存在！");
         }
         // 组织架构校验
         userInfoDTO.setOrgCode(BusinessPropertyHolder.TOP_SERVICECENTER);
         StatusDtoThriftBean<BasicUserOrganization> orgByCode = basicUserOrganizationService.findOrgByCode(userInfoDTO.getOrgCode());
         if(!orgByCode.isSuccess()){
-            throw new CommonException("2", "组织架构不存在！");
+            throw new CommonException(statusDtoRole.getCode(), "组织架构不存在！");
         }
         StatusDto<List<Long>> resolve = StatusDtoThriftUtils.resolve(statusDtoRole, Long.class);
         userInfoDTO.setRoles(resolve.getData());
