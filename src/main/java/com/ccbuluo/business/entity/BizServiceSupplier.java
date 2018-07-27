@@ -43,7 +43,7 @@ public class BizServiceSupplier {
     /**
      * 详细地址
      */
-    @ApiModelProperty(name = "supplierAddress", value = "详细地址")
+    @ApiModelProperty(name = "supplierAddress", value = "详细地址", required = true)
     private String supplierAddress;
     /**
      * 供应商的使用状态：1启用/0停用

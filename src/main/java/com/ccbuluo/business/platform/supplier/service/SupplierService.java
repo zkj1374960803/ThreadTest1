@@ -10,6 +10,7 @@ import com.ccbuluo.http.StatusDto;
 import org.apache.thrift.TException;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -24,14 +25,14 @@ public interface SupplierService {
      * @author zhangkangjian
      * @date 2018-07-03 14:32:57
      */
-    StatusDto<String> createSupplier(BizServiceSupplier bizServiceSupplier) throws TException;
+    StatusDto<String> createSupplier(BizServiceSupplier bizServiceSupplier) throws IOException;
     /**
      * 编辑供应商
      * @param editSupplierDTO 供应商信息
      * @author zhangkangjian
      * @date 2018-07-03 14:32:57
      */
-    void editsupplier(EditSupplierDTO editSupplierDTO);
+    void editsupplier(EditSupplierDTO editSupplierDTO) throws IOException;
     /**
      *  供应商启用/停用接口
      * @param id 供应商id

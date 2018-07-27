@@ -94,5 +94,32 @@ public class Constants {
      */
     public static final Integer CAR_CODING_LENGTH = 3;
 
+    /**
+     * 内部用户添加
+     */
+    public static final String USER_SOURCE_INNER = "2001";
 
+    /**
+     * 用户状态 1在职 0离职
+     */
+    public static final String USER_STATUS_INNER = "1";
+    public static final String USER_STATUS_OUTER = "0";
+
+    /**
+     * 1 激活 0冻结
+     */
+    public static final int FREEZE_STATUS_YES = 1;
+    public static final int FREEZE_STATUS_NO = 0;
+    /**
+     * 客户经理角色code
+     */
+    public static final String CUSTMANAGER_ROLE_CODE = "JS024";
+    /**
+     * 排序字段
+     */
+    public static final String SORT_FIELD_ID = "id";
+    /**
+     * 用户是对内用户、还是对外用户
+     */
+    public static final String USER_TYPE_INNER = "inner";
 }
