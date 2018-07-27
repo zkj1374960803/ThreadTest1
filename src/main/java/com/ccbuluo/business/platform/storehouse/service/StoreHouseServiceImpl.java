@@ -149,10 +149,11 @@ public class StoreHouseServiceImpl implements StoreHouseService{
         List<String> serviceCenterCode = new ArrayList<>();
         Map<String, String>  serviceCenterByCodes = Maps.newHashMap();
         serviceCenterByCodes = orgService.getServiceCenterByCodes(keyword);
-        if (serviceCenterByCodes.size() == 0) {
+        if (serviceCenterByCodes.size() > 0) {
             serviceCenterByCodes = orgService.getServiceCenterByCodes(null);
+            serviceCenterByCodes.forEach((key, value) ->serviceCenterCode.add(key));
         }
-        serviceCenterByCodes.forEach((key, value) ->serviceCenterCode.add(key));
+
         Page<SearchStorehouseListDTO> storehouseList =  bizServiceStorehouseDao.queryList(provinceName, cityName, areaName, storeHouseStatus, keyword, serviceCenterCode, offset, pagesize);
         List<SearchStorehouseListDTO> rows = storehouseList.getRows();
         if (serviceCenterByCodes != null) {
