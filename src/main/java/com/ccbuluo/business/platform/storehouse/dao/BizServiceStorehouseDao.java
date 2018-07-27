@@ -152,7 +152,11 @@ public class BizServiceStorehouseDao extends BaseDao<BizServiceStorehouse> {
             sql.append(" AND area_name = :areaName");
         }
         if (StringUtils.isNotBlank(keyword)) {
-            sql.append(" AND (storehouse_code LIKE CONCAT('%',:keyword,'%') OR storehouse_name LIKE CONCAT('%',:keyword,'%') OR servicecenter_code IN (:serviceCenterCode))");
+            sql.append(" AND (storehouse_code LIKE CONCAT('%',:keyword,'%') OR storehouse_name LIKE CONCAT('%',:keyword,'%')");
+            if(!serviceCenterCode.isEmpty()){
+                sql.append("  OR servicecenter_code IN (:serviceCenterCode)");
+            }
+            sql.append(" )");
         }
         sql.append(" ORDER BY operate_time DESC");
 
