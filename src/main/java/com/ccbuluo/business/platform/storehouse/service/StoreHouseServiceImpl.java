@@ -150,7 +150,6 @@ public class StoreHouseServiceImpl implements StoreHouseService{
         Map<String, String>  serviceCenterByCodes = Maps.newHashMap();
         serviceCenterByCodes = orgService.getServiceCenterByCodes(keyword);
         if (serviceCenterByCodes.size() > 0) {
-            serviceCenterByCodes = orgService.getServiceCenterByCodes(null);
             serviceCenterByCodes.forEach((key, value) ->serviceCenterCode.add(key));
         }
 
