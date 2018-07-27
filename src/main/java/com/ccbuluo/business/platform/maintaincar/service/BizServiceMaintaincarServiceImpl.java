@@ -165,15 +165,15 @@ public class BizServiceMaintaincarServiceImpl implements BizServiceMaintaincarSe
      * 车辆列表分页查询
      * @param carbrandId 品牌id
      * @param carseriesId 车系id
-     * @param Keyword (车辆编号或是车架号)
+     * @param keyword (车辆编号或是车架号)
      * @param offset 起始数
      * @param pageSize 每页数量
      * @author weijb
      * @date 2018-07-13 19:52:44
      */
     @Override
-    public Page<SearchBizServiceMaintaincarDTO> queryServiceMaintaincarList(Long carbrandId, Long carseriesId, Integer carStatus, String Keyword, Integer offset, Integer pageSize){
-        return bizServiceMaintaincarDao.queryCarcoreInfoList(carbrandId, carseriesId, carStatus, Keyword, offset, pageSize);
+    public Page<SearchBizServiceMaintaincarDTO> queryServiceMaintaincarList(Long carbrandId, Long carseriesId, Integer carStatus, String keyword, Integer offset, Integer pageSize){
+        return bizServiceMaintaincarDao.queryCarcoreInfoList(carbrandId, carseriesId, carStatus, keyword, offset, pageSize);
     }
 
 

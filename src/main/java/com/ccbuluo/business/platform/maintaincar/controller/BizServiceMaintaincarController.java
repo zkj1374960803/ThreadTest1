@@ -102,7 +102,7 @@ public class BizServiceMaintaincarController extends BaseController {
      * 车辆列表分页查询
      * @param carbrandId 品牌id
      * @param carseriesId 车系id
-     * @param Keyword (车辆编号或是车架号)
+     * @param keyword (车辆编号或是车架号)
      * @param offset 起始数
      * @param pageSize 每页数量
      * @author weijb
@@ -113,16 +113,16 @@ public class BizServiceMaintaincarController extends BaseController {
     @ApiImplicitParams({@ApiImplicitParam(name = "carbrandId", value = "品牌id", required = false, paramType = "query"),
             @ApiImplicitParam(name = "carseriesId", value = "车系id", required = false, paramType = "query"),
             @ApiImplicitParam(name = "carStatus", value = "维修车辆状态", required = false, paramType = "query",dataType = "int"),
-            @ApiImplicitParam(name = "Keyword", value = "关键字", required = false, paramType = "query"),
+            @ApiImplicitParam(name = "keyword", value = "关键字", required = false, paramType = "query"),
             @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
             @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
     public StatusDto<Page<SearchBizServiceMaintaincarDTO>> queryCarcoreInfoList(@RequestParam(required = false) Long carbrandId,
                                                                                 @RequestParam(required = false) Long carseriesId,
                                                                                 @RequestParam(required = false) Integer carStatus,
-                                                                                @RequestParam(required = false) String Keyword,
+                                                                                @RequestParam(required = false) String keyword,
                                                                                 @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                                 @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
-        return StatusDto.buildDataSuccessStatusDto(bizServiceMaintaincarService.queryServiceMaintaincarList(carbrandId, carseriesId, carStatus, Keyword, offset, pageSize));
+        return StatusDto.buildDataSuccessStatusDto(bizServiceMaintaincarService.queryServiceMaintaincarList(carbrandId, carseriesId, carStatus, keyword, offset, pageSize));
     }
 
 }

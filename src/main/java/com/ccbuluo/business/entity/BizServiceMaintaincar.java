@@ -64,6 +64,22 @@ public class BizServiceMaintaincar extends AftersaleCommonEntity{
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
 
+    /**
+     * 所属品牌name
+     */
+    @ApiModelProperty(name = "carbrandName", value = "所属品牌名字")
+    private String carbrandName;
+    /**
+     * 所属车系name
+     */
+    @ApiModelProperty(name = "carseriesName", value = "所属车系名字")
+    private String carseriesName;
+    /**
+     * 所属车型name
+     */
+    @ApiModelProperty(name = "carmodelName", value = "所属车型名字")
+    private String carmodelName;
+
     public void setMendCode(String mendCode) {
         this.mendCode = mendCode;
     }
@@ -144,4 +160,27 @@ public class BizServiceMaintaincar extends AftersaleCommonEntity{
         return this.remark;
     }
 
+    public String getCarbrandName() {
+        return carbrandName;
+    }
+
+    public void setCarbrandName(String carbrandName) {
+        this.carbrandName = carbrandName;
+    }
+
+    public String getCarseriesName() {
+        return carseriesName;
+    }
+
+    public void setCarseriesName(String carseriesName) {
+        this.carseriesName = carseriesName;
+    }
+
+    public String getCarmodelName() {
+        return carmodelName;
+    }
+
+    public void setCarmodelName(String carmodelName) {
+        this.carmodelName = carmodelName;
+    }
 }

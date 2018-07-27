@@ -74,10 +74,13 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
      */
     public BizServiceMaintaincar queryServiceMaintaincarByCarId(long id) {
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,mend_code,vin_number,car_status,carbrand_id,carseries_id,")
-            .append("carmodel_id,cusmanager_uuid,cusmanager_name,beidou_number,remark,")
-            .append("creator,create_time,operator,operate_time,delete_flag")
-            .append(" FROM biz_service_maintaincar WHERE id= :id");
+        sql.append("SELECT bci.id,bci.mend_code,bci.vin_number,bci.car_status,bci.carbrand_id,bci.carseries_id,")
+            .append("bci.carmodel_id,bci.cusmanager_uuid,bci.cusmanager_name,bci.beidou_number,bci.remark,bcm.carbrand_name,bcmm.carseries_name,bcmmm.carmodel_name, ")
+            .append("bci.creator,bci.create_time,bci.operator,bci.operate_time,bci.delete_flag")
+            .append(" FROM biz_service_maintaincar bci LEFT JOIN basic_carbrand_manage bcm on bci.carbrand_id=bcm.id ")
+            .append(" LEFT JOIN basic_carseries_manage bcmm on bci.carseries_id=bcmm.id ")
+            .append(" LEFT JOIN basic_carmodel_manage bcmmm ON bci.carmodel_id=bcmmm.id ")
+            .append("WHERE bci.id= :id");
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
         return super.findForBean(BizServiceMaintaincar.class, sql.toString(), params);
@@ -147,13 +150,13 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
      * @param carbrandId 品牌id
      * @param carseriesId 车系id
      * @param
-     * @param Keyword (车辆编号或是车架号)
+     * @param keyword (车辆编号或是车架号)
      * @param offset 起始数
      * @param pageSize 每页数量
      * @author weijb
      * @date 2018-07-13 19:52:44
      */
-    public Page<SearchBizServiceMaintaincarDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer carStatus, String Keyword, Integer offset, Integer pageSize){
+    public Page<SearchBizServiceMaintaincarDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer carStatus, String keyword, Integer offset, Integer pageSize){
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
@@ -179,8 +182,8 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
             sql.append(" AND bci.car_status = :carStatus ");
         }
         // 车架号
-        if (StringUtils.isNotBlank(Keyword)) {
-            param.put("Keyword", Keyword);
+        if (StringUtils.isNotBlank(keyword)) {
+            param.put("Keyword", keyword);
             //目前只根据车架号查询
             sql.append(" AND bci.vin_number LIKE CONCAT('%',:Keyword,'%') ");
         }

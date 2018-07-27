@@ -155,7 +155,7 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
             params.put("keywork", keyword);
             sql.append(" AND bse.equip_name LIKE CONCAT('%',:keywork,'%')");
         }
-        sql.append(" AND bse.delete_flag = :deleteFlag ORDER BY operate_time DESC");
+        sql.append(" AND bse.delete_flag = :deleteFlag ORDER BY bse.operate_time DESC");
 
         return queryPageForBean(DetailBizServiceEquipmentDTO.class, sql.toString(), params, offset, pagesize);
     }

@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.maintaincar.dto;
 
 import com.ccbuluo.business.entity.AftersaleCommonEntity;
+import com.ccbuluo.business.entity.IdEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -11,7 +12,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @version V1.0.0
  */
 @ApiModel(value = "SearchBizServiceMaintaincarDTO", description = "客服经理 上门维修 使用的维修车 实体表")
-public class SearchBizServiceMaintaincarDTO {
+public class SearchBizServiceMaintaincarDTO extends IdEntity {
     /**
      * 维修车辆编号
      */
