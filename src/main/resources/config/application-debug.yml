@@ -1,6 +1,6 @@
 #开发环境 配置文件
 server:
-  port: 15999
+  port: 8093
   maxPostSize: 20971520
 
 #tomcatJdbc 配置信息
