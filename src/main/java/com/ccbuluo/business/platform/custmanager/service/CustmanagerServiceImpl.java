@@ -384,6 +384,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             return age;
         } catch (Exception e) {
             //异常后返回数据
+            e.printStackTrace();
             return 0;
         }
     }
