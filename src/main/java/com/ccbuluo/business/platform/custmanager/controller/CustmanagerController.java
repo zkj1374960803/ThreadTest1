@@ -77,7 +77,7 @@ public class CustmanagerController extends BaseController {
     @PostMapping("/list")
     @ApiOperation(value = "查询客户经理列表", notes = "【张康健】")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "userStatus", value = "用户状态 -1:全部1:在职0:离职", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "userStatus", value = "用户状态 null:全部1:在职0:离职", required = false, paramType = "query"),
         @ApiImplicitParam(name = "name", value = "用户姓名", required = false, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "起始值", required = true, paramType = "query"),
         @ApiImplicitParam(name = "pageSize", value = "显示的数量", required = true, paramType = "query")
