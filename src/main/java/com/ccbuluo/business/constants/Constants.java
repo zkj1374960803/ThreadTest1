@@ -115,6 +115,14 @@ public class Constants {
      */
     public static final String CUSTMANAGER_ROLE_CODE = "JS024";
     /**
+     * 客户经理组织架构code
+     */
+    public static final String CUSTMANAGER_ORG_CODE = "SC000003";
+    /**
+     * 组织架构的类型
+     */
+    public static final String ORG_TYPE = "CUSTMANAGER";
+    /**
      * 排序字段
      */
     public static final String SORT_FIELD_ID = "id";
