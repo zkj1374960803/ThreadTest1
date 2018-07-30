@@ -26,6 +26,12 @@ public class SaveBizServiceMaintainitemDTO extends IdEntity {
     @ApiModelProperty(name = "unitPrice", value = "单价")
     private BigDecimal unitPrice;
 
+    /**
+     * 地区倍数
+     */
+    @ApiModelProperty(name = "saveBizServiceMultiplepriceDTO", value = "地区倍数")
+    private SaveBizServiceMultiplepriceDTO saveBizServiceMultiplepriceDTO;
+
     public String getMaintainitemName() {
         return maintainitemName;
     }
@@ -42,4 +48,11 @@ public class SaveBizServiceMaintainitemDTO extends IdEntity {
         return this.unitPrice;
     }
 
+    public SaveBizServiceMultiplepriceDTO getSaveBizServiceMultiplepriceDTO() {
+        return saveBizServiceMultiplepriceDTO;
+    }
+
+    public void setSaveBizServiceMultiplepriceDTO(SaveBizServiceMultiplepriceDTO saveBizServiceMultiplepriceDTO) {
+        this.saveBizServiceMultiplepriceDTO = saveBizServiceMultiplepriceDTO;
+    }
 }

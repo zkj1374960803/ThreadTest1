@@ -30,6 +30,8 @@ public class MaintainitemServiceImpl implements MaintainitemService{
     @Autowired
     private GenerateProjectCodeService generateProjectCodeService;
     @Autowired
+    private MultiplepriceServiceImpl multiplepriceService;
+    @Autowired
     private UserHolder userHolder;
 
     /**
@@ -94,6 +96,8 @@ public class MaintainitemServiceImpl implements MaintainitemService{
         bizServiceMaintainitem.setUnitPrice(saveBizServiceMaintainitemDTO.getUnitPrice());
         bizServiceMaintainitem.preUpdate(userHolder.getLoggedUserId());
         bizServiceMaintainitem.setId(saveBizServiceMaintainitemDTO.getId());
+        // 保存地区倍数
+        multiplepriceService.save(saveBizServiceMaintainitemDTO.getSaveBizServiceMultiplepriceDTO());
         return bizServiceMaintainitemDao.update(bizServiceMaintainitem);
     }
 
