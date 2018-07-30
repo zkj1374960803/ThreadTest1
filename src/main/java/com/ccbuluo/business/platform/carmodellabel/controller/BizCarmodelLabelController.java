@@ -85,23 +85,23 @@ public class BizCarmodelLabelController extends BaseController {
 
     /**
      * 删除车型标签
-     * @param labelCode 车型标签id
+     * @param id 车型标签id
      * @return
      * @exception
      * @author weijb
      * @date 2018-07-18 14:59:51
      */
     @ApiOperation(value = "删除车型标签",notes = "【魏俊标】")
-    @GetMapping("/delete/{labelCode}")
-    @ApiImplicitParam(name = "labelCode", value = "车型标签labelCode", required = true, paramType = "path")
-    public StatusDto delete(@PathVariable String labelCode) {
-        bizCarmodelLabelService.deleteCarcoreInfoBylabelCode(labelCode);
-        return StatusDto.buildSuccessStatusDto();
+    @GetMapping("/delete/{id}")
+    @ApiImplicitParam(name = "id", value = "车型标签id", required = true, paramType = "path")
+    public StatusDto delete(@PathVariable Long id) {
+        return bizCarmodelLabelService.deleteCarcoreInfoBylabelCode(id);
+//        return StatusDto.buildSuccessStatusDto();
     }
 
     /**
      * 车型标签列表分页查询
-     * @param Keyword (车车型标签名称)
+     * @param keyword (车车型标签名称)
      * @param offset 起始数
      * @param pageSize 每页数量
      * @author weijb
@@ -109,13 +109,13 @@ public class BizCarmodelLabelController extends BaseController {
      */
     @ApiOperation(value = "车型标签列表",notes = "【魏俊标】")
     @GetMapping("/list")
-    @ApiImplicitParams({@ApiImplicitParam(name = "Keyword", value = "关键字", required = false, paramType = "query"),
+    @ApiImplicitParams({@ApiImplicitParam(name = "keyword", value = "关键字", required = false, paramType = "query"),
             @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
             @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
-    public StatusDto<Page<SearchBizCarmodelLabelDTO>> queryCarmodelLabelList(@RequestParam(required = false) String Keyword,
+    public StatusDto<Page<SearchBizCarmodelLabelDTO>> queryCarmodelLabelList(@RequestParam(required = false) String keyword,
                                                                            @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                            @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
-        return StatusDto.buildDataSuccessStatusDto(bizCarmodelLabelService.queryCarmodelLabelList(Keyword, offset, pageSize));
+        return StatusDto.buildDataSuccessStatusDto(bizCarmodelLabelService.queryCarmodelLabelList(keyword, offset, pageSize));
     }
 
     /**
