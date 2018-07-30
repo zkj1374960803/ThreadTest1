@@ -39,13 +39,7 @@ public class EquiptypeController extends BaseController {
     @ApiOperation(value = "物料类型保存", notes = "【刘铎】")
     @PostMapping("/save")
     public StatusDto saveEquiptype(@ApiParam(name = "物料类型对象", value = "传入json格式", required = true)@RequestBody SaveBizServiceEquiptypeDTO saveBizServiceEquiptypeDTO) {
-        int status = equiptypeService.save(saveBizServiceEquiptypeDTO);
-        if (status == Constants.FAILURE_ONE) {
-            return StatusDto.buildFailure("该物料类型已存在，请核对！");
-        } else if (status == Constants.FAILURESTATUS) {
-            return StatusDto.buildFailure("保存失败！");
-        }
-        return StatusDto.buildSuccessStatusDto("保存成功！");
+        return equiptypeService.save(saveBizServiceEquiptypeDTO);
     }
 
     /**

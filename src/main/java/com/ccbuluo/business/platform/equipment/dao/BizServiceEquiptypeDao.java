@@ -35,13 +35,13 @@ public class BizServiceEquiptypeDao extends BaseDao<BizServiceEquiptype> {
      * @author liuduo
      * @date 2018-07-17 13:57:53
      */
-    public int saveEntity(BizServiceEquiptype entity) {
+    public Long saveEntity(BizServiceEquiptype entity) {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO biz_service_equiptype ( type_name,remark,")
             .append("creator,create_time,operator,operate_time,delete_flag ) VALUES ( ")
             .append(" :typeName, :remark, :creator, :createTime, :operator,")
             .append(" :operateTime, :deleteFlag )");
-        return super.save(sql.toString(), entity);
+        return super.saveRid(sql.toString(), entity);
     }
 
     /**
