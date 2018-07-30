@@ -31,7 +31,7 @@ public class CustManagerDetailDTO {
     private String ethnic;
     @ApiModelProperty(name = "birthday", value = "出生日期")
     private long birthday;
-    @ApiModelProperty(name = "certificateType", value = "证件类型")
+    @ApiModelProperty(name = "certificateType", value = "证件类型1:身份证2:护照3:港澳4:台湾")
     private String certificateType;
     @ApiModelProperty(name = "certificateNo", value = "证件号码")
     private String certificateNo;
