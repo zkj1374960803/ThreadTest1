@@ -37,17 +37,21 @@ public class EquiptypeServiceImpl implements EquiptypeService{
      * @date 2018-07-17 14:31:15
      */
     @Override
-    public int save(SaveBizServiceEquiptypeDTO saveBizServiceEquiptypeDTO) {
+    public StatusDto save(SaveBizServiceEquiptypeDTO saveBizServiceEquiptypeDTO) {
         // 名字校验
         Boolean aboolean =  bizServiceEquiptypeDao.checkName(saveBizServiceEquiptypeDTO.getTypeName());
         if (aboolean) {
-            return Constants.FAILURE_ONE;
+            return StatusDto.buildFailure("该物料类型已存在，请核对！");
         }
         BizServiceEquiptype bizServiceEquiptype = new BizServiceEquiptype();
         bizServiceEquiptype.setTypeName(saveBizServiceEquiptypeDTO.getTypeName());
         bizServiceEquiptype.setRemark(saveBizServiceEquiptypeDTO.getRemark());
         bizServiceEquiptype.preInsert(userHolder.getLoggedUserId());
-        return bizServiceEquiptypeDao.saveEntity(bizServiceEquiptype);
+        Long aLong = bizServiceEquiptypeDao.saveEntity(bizServiceEquiptype);
+        SaveBizServiceEquiptypeDTO successData = new SaveBizServiceEquiptypeDTO();
+        successData.setId(aLong);
+        successData.setTypeName(saveBizServiceEquiptypeDTO.getTypeName());
+        return StatusDto.buildDataSuccessStatusDto(successData);
     }
 
     /**

@@ -145,7 +145,7 @@ public class BizServiceMaintainitemDao extends BaseDao<BizServiceMaintainitem> {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT bsmm.id,bsmm.maintainitem_code,bsmm.maintainitem_name,bsmm.unit_price, ")
             .append("  (SELECT COUNT(bsm.id) FROM biz_service_multipleprice AS bsm ")
-            .append("  WHERE bsm.maintainitem_code = bsmm.maintainitem_code) AS multipleNum")
+            .append("  WHERE bsm.maintainitem_code = bsmm.maintainitem_code AND bsm.delete_flag = :deleteFlag) AS multipleNum")
             .append("  FROM biz_service_maintainitem AS bsmm WHERE 1 = 1 ");
         if (StringUtils.isNotBlank(keyword)) {
             params.put("keyword", keyword);

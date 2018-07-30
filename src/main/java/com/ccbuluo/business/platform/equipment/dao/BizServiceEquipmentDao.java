@@ -149,7 +149,7 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
             .append("  FROM biz_service_equipment AS bse LEFT JOIN biz_service_equiptype AS bsee ON bsee.id = bse.id WHERE 1=1");
         if (equiptypeId != null) {
             params.put("equiptypeId", equiptypeId);
-            sql.append(" AND bse.equiptype_id = equiptypeId");
+            sql.append(" AND bse.equiptype_id = :equiptypeId");
         }
         if (StringUtils.isNotBlank(keyword)) {
             params.put("keywork", keyword);

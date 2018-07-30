@@ -16,6 +16,7 @@ public enum CodePrefixEnum {
     FL("工时"),
     FG("供应商"),
     FR("维修车"),
+    FO("客户经理组织架构"),
     FD("车型标签");
 
 

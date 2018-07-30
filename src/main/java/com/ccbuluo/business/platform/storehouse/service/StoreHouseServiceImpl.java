@@ -149,15 +149,17 @@ public class StoreHouseServiceImpl implements StoreHouseService{
         List<String> serviceCenterCode = new ArrayList<>();
         Map<String, String>  serviceCenterByCodes = Maps.newHashMap();
         serviceCenterByCodes = orgService.getServiceCenterByCodes(keyword);
-        if (serviceCenterByCodes.size() == 0) {
-            serviceCenterByCodes = orgService.getServiceCenterByCodes(null);
+        if (serviceCenterByCodes.size() > 0) {
+            serviceCenterByCodes.forEach((key, value) ->serviceCenterCode.add(key));
         }
-        serviceCenterByCodes.forEach((key, value) ->serviceCenterCode.add(key));
+
         Page<SearchStorehouseListDTO> storehouseList =  bizServiceStorehouseDao.queryList(provinceName, cityName, areaName, storeHouseStatus, keyword, serviceCenterCode, offset, pagesize);
         List<SearchStorehouseListDTO> rows = storehouseList.getRows();
-        if (serviceCenterByCodes != null) {
+        if (!rows.isEmpty()) {
+            // 查到所有的服务中心名称map，用来拼接服务中心的名字
+            Map<String, String> allServiceCenters = orgService.getServiceCenterByCodes(null);
             for (SearchStorehouseListDTO storeHouse : rows) {
-                storeHouse.setServiceCenterName(serviceCenterByCodes.get(storeHouse.getServicecenterCode()));
+                storeHouse.setServiceCenterName(allServiceCenters.get(storeHouse.getServicecenterCode()));
             }
         }
         return storehouseList;
