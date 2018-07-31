@@ -41,69 +41,26 @@ public class MultiplepriceServiceImpl implements MultiplepriceService{
 
     /**
      * 保存地区倍数
-     * @param saveBizServiceMultiplepriceDTO 地区倍数dto
+     * @param saveBizServiceMaintainitemDTO 工时dto
+     * @param maintainitemCode 工时code
      * @return 保存是否成功
      * @author liuduo
      * @date 2018-07-18 13:59:55
      */
     @Override
-    public int save(SaveBizServiceMultiplepriceDTO saveBizServiceMultiplepriceDTO) {
+    public int save(String maintainitemCode, SaveBizServiceMaintainitemDTO saveBizServiceMaintainitemDTO) {
         List<BizServiceMultipleprice> bizServiceMultiplepriceList = new ArrayList<>();
-        // 根据服务项code查询已有的地区
-        List<String> cityCodeList = bizServiceMultiplepriceDao.queryAreaByCode(saveBizServiceMultiplepriceDTO.getMaintainitemCode());
-        if (cityCodeList.size() > 0
-            && saveBizServiceMultiplepriceDTO != null
-            && saveBizServiceMultiplepriceDTO.getMultiplepriceDTOList().size() > 0) {
-            List<CorrespondAreaDTO> multiplepriceDTOList = saveBizServiceMultiplepriceDTO.getMultiplepriceDTOList();
-            // 获取新的地区
-            List<String> newCityCodeList = multiplepriceDTOList.stream().map(a -> a.getCityCode()).collect(Collectors.toList());
-            // 获取交集（需要修改的）
-            List<String> needUpdate = cityCodeList.stream().filter(item -> newCityCodeList.contains(item)).collect(Collectors.toList());
-            // 获取差集（需要新增的）
-            List<String> needInsert = newCityCodeList.stream().filter(item -> !cityCodeList.contains(item)).collect(Collectors.toList());
-            // 更新
-            for (String cityCode : needUpdate) {
-                for (CorrespondAreaDTO correspondAreaDTO : multiplepriceDTOList) {
-                    if (cityCode.equals(correspondAreaDTO.getCityCode())) {
-                        BizServiceMultipleprice bizServiceMultipleprice = new BizServiceMultipleprice();
-                        bizServiceMultipleprice.setMultiple(saveBizServiceMultiplepriceDTO.getMultiple());
-                        bizServiceMultipleprice.setCityCode(correspondAreaDTO.getCityCode());
-                        bizServiceMultipleprice.setMaintainitemCode(saveBizServiceMultiplepriceDTO.getMaintainitemCode());
-                        bizServiceMultiplepriceDao.update(bizServiceMultipleprice);
-                    }
-                }
-            }
-            // 新增
-            for (String cityCode : needInsert) {
-                for (CorrespondAreaDTO correspondAreaDTO : multiplepriceDTOList) {
-                    if (cityCode.equals(correspondAreaDTO.getCityCode())) {
-                        BizServiceMultipleprice bizServiceMultipleprice = new BizServiceMultipleprice();
-                        bizServiceMultipleprice.setMaintainitemCode(saveBizServiceMultiplepriceDTO.getMaintainitemCode());
-                        bizServiceMultipleprice.setMultiple(saveBizServiceMultiplepriceDTO.getMultiple());
-                        bizServiceMultipleprice.setProvinceCode(correspondAreaDTO.getProvinceCode());
-                        bizServiceMultipleprice.setProvinceName(correspondAreaDTO.getProvinceName());
-                        bizServiceMultipleprice.setCityCode(correspondAreaDTO.getCityCode());
-                        bizServiceMultipleprice.setCityName(correspondAreaDTO.getCityName());
-                        bizServiceMultipleprice.preInsert(userHolder.getLoggedUserId());
-                        bizServiceMultiplepriceList.add(bizServiceMultipleprice);
-                    }
-                }
-            }
-            int[] ints = bizServiceMultiplepriceDao.saveMultipleprice(bizServiceMultiplepriceList);
-            if (ints.length > 0) {
-                return Constants.SUCCESSSTATUS;
-            }
-            return Constants.FAILURESTATUS;
-        }
-        // 没有查询到已有地区，直接新增
-        for (int i = 0; i < saveBizServiceMultiplepriceDTO.getMultiplepriceDTOList().size(); i++) {
+       // 删除原来的地区
+        bizServiceMultiplepriceDao.deleteOld(maintainitemCode);
+        // 新增
+        for (int i = 0; i < saveBizServiceMaintainitemDTO.getCorrespondAreaDTOList().size(); i++) {
             BizServiceMultipleprice bizServiceMultipleprice = new BizServiceMultipleprice();
-            bizServiceMultipleprice.setMaintainitemCode(saveBizServiceMultiplepriceDTO.getMaintainitemCode());
-            bizServiceMultipleprice.setMultiple(saveBizServiceMultiplepriceDTO.getMultiple());
-            bizServiceMultipleprice.setProvinceCode(saveBizServiceMultiplepriceDTO.getMultiplepriceDTOList().get(i).getProvinceCode());
-            bizServiceMultipleprice.setProvinceName(saveBizServiceMultiplepriceDTO.getMultiplepriceDTOList().get(i).getProvinceName());
-            bizServiceMultipleprice.setCityCode(saveBizServiceMultiplepriceDTO.getMultiplepriceDTOList().get(i).getCityCode());
-            bizServiceMultipleprice.setCityName(saveBizServiceMultiplepriceDTO.getMultiplepriceDTOList().get(i).getCityName());
+            bizServiceMultipleprice.setMaintainitemCode(maintainitemCode);
+            bizServiceMultipleprice.setMultiple(saveBizServiceMaintainitemDTO.getCorrespondAreaDTOList().get(i).getMultiple());
+            bizServiceMultipleprice.setProvinceCode(saveBizServiceMaintainitemDTO.getCorrespondAreaDTOList().get(i).getProvinceCode());
+            bizServiceMultipleprice.setProvinceName(saveBizServiceMaintainitemDTO.getCorrespondAreaDTOList().get(i).getProvinceName());
+            bizServiceMultipleprice.setCityCode(saveBizServiceMaintainitemDTO.getCorrespondAreaDTOList().get(i).getCityCode());
+            bizServiceMultipleprice.setCityName(saveBizServiceMaintainitemDTO.getCorrespondAreaDTOList().get(i).getCityName());
             bizServiceMultipleprice.preInsert(userHolder.getLoggedUserId());
             bizServiceMultiplepriceList.add(bizServiceMultipleprice);
         }

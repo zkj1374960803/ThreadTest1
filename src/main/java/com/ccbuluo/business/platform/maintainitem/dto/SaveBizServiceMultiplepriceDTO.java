@@ -13,38 +13,13 @@ import java.util.List;
  * @version V1.0.0
  */
 @ApiModel(value = "SaveBizServiceMultiplepriceDTO", description = "服务项目 各地区对基本定价的倍数")
-public class SaveBizServiceMultiplepriceDTO extends IdEntity {
-    /**
-     * 服务项目的编码
-     */
-    @ApiModelProperty(name = "maintainitemCode", value = "服务项目的编码")
-    private String maintainitemCode;
-    /**
-     * 倍数
-     */
-    @ApiModelProperty(name = "multiple", value = "倍数")
-    private Double multiple;
+public class SaveBizServiceMultiplepriceDTO {
+
     /**
      * 城市
      */
     @ApiModelProperty(name = "remark", value = "城市")
     private List<CorrespondAreaDTO> multiplepriceDTOList;
-
-    public void setMaintainitemCode(String maintainitemCode) {
-        this.maintainitemCode = maintainitemCode;
-    }
-
-    public String getMaintainitemCode() {
-        return this.maintainitemCode;
-    }
-
-    public void setMultiple(Double multiple) {
-        this.multiple = multiple;
-    }
-
-    public Double getMultiple() {
-        return this.multiple;
-    }
 
     public List<CorrespondAreaDTO> getMultiplepriceDTOList() {
         return multiplepriceDTOList;

@@ -2,7 +2,6 @@ package com.ccbuluo.business.platform.maintainitem.rest;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceMultipleprice;
-import com.ccbuluo.business.platform.maintainitem.dto.SaveBizServiceMultiplepriceDTO;
 import com.ccbuluo.business.platform.maintainitem.service.MultiplepriceService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
@@ -10,13 +9,6 @@ import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.Set;
 
 /**
  * 地区倍数controller
@@ -31,24 +23,6 @@ public class MultiplepriceController extends BaseController {
 
     @Autowired
     private MultiplepriceService multiplepriceService;
-
-    /**
-     * 保存地区倍数
-     * @param saveBizServiceMultiplepriceDTO 地区倍数dto
-     * @return 保存是否成功
-     * @author liuduo
-     * @date 2018-07-18 13:59:55
-     */
-    @ApiOperation(value = "地区倍数保存", notes = "【刘铎】")
-    @PostMapping("/save")
-    public StatusDto saveMultipleprice(@ApiParam(name = "工时对象", value = "传入json格式", required = true)@RequestBody SaveBizServiceMultiplepriceDTO saveBizServiceMultiplepriceDTO) {
-        int status = multiplepriceService.save(saveBizServiceMultiplepriceDTO);
-        if (status == Constants.FAILURESTATUS) {
-            return StatusDto.buildFailure("保存失败！");
-        }
-        return StatusDto.buildSuccessStatusDto("保存成功！");
-    }
-
 
     /**
      * 查询地区倍数列表

@@ -14,6 +14,11 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(value = "服务项目 各地区对基本定价的倍数实体(详情)", description = "服务项目 各地区对基本定价的倍数(详情)")
 public class CorrespondAreaDTO {
     /**
+     * 地区倍数
+     */
+    @ApiModelProperty(name = "multiple", value = "地区倍数")
+    private Double multiple;
+    /**
      * 省code
      */
     @ApiModelProperty(name = "provinceCode", value = "省code")
@@ -33,6 +38,14 @@ public class CorrespondAreaDTO {
      */
     @ApiModelProperty(name = "cityName", value = "市名字")
     private String cityName;
+
+    public Double getMultiple() {
+        return multiple;
+    }
+
+    public void setMultiple(Double multiple) {
+        this.multiple = multiple;
+    }
 
     public void setProvinceCode(String provinceCode) {
         this.provinceCode = provinceCode;
