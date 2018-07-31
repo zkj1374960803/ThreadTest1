@@ -1,7 +1,7 @@
 package com.ccbuluo.business.platform.equipment.rest;
 
 import com.ccbuluo.business.constants.Constants;
-import com.ccbuluo.business.constants.UnitEnum;
+import com.ccbuluo.business.constants.EquipUnitEnum;
 import com.ccbuluo.business.platform.equipment.dto.DetailBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.equipment.dto.SaveBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.equipment.service.EquipmentService;
@@ -116,9 +116,9 @@ public class EquipmentController extends BaseController {
      * @date 2018-07-31 19:10:23
      */
     @ApiOperation(value = "计量单位", notes = "【刘铎】")
-    @GetMapping("/unitlist")
-    public StatusDto<List<UnitEnum>> getUnitList() {
-        return StatusDto.buildDataSuccessStatusDto(Arrays.asList(UnitEnum.values()));
+    @GetMapping("/equipunitlist")
+    public StatusDto<List<EquipUnitEnum>> getEquipUnitList() {
+        return StatusDto.buildDataSuccessStatusDto(Arrays.asList(EquipUnitEnum.values()));
     }
 
 }

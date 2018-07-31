@@ -41,9 +41,9 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
      */
     public int saveEntity(BizServiceEquipment entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO biz_service_equipment ( equip_code,equip_name,equiptype_id,unit,")
+        sql.append("INSERT INTO biz_service_equipment ( equip_code,equip_name,equiptype_id,equip_unit,")
             .append("remark,creator,create_time,operator,operate_time,delete_flag")
-            .append(" ) VALUES (  :equipCode, :equipName, :equiptypeId, :unit, :remark, :creator,")
+            .append(" ) VALUES (  :equipCode, :equipName, :equiptypeId, :equipUnit, :remark, :creator,")
             .append(" :createTime, :operator, :operateTime, :deleteFlag )");
         return super.save(sql.toString(), entity);
     }
@@ -58,7 +58,7 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
     public int update(BizServiceEquipment entity) {
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE biz_service_equipment SET ")
-            .append("equip_name = :equipName,equiptype_id = :equiptypeId,unit = :unit,remark = :remark,operator = :operator,")
+            .append("equip_name = :equipName,equiptype_id = :equiptypeId,equip_unit = :equipUnit,remark = :remark,operator = :operator,")
             .append(" operate_time = :operateTime WHERE id= :id");
         return super.updateForBean(sql.toString(), entity);
     }
@@ -71,7 +71,7 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
      */
     public DetailBizServiceEquipmentDTO getById(long id) {
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT bse.id,bse.equip_name,bse.unit,bse.equip_code,bse.equiptype_id,bsee.type_name AS equiptypeName ")
+        sql.append("SELECT bse.id,bse.equip_name,bse.equip_unit,bse.equip_code,bse.equiptype_id,bsee.type_name AS equiptypeName ")
             .append(" FROM biz_service_equipment AS bse LEFT JOIN biz_service_equiptype AS bsee ON bsee.id = bse.equiptype_id")
             .append(" WHERE bse.id = :id");
         Map<String, Object> params = Maps.newHashMap();
@@ -145,7 +145,7 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT bse.id,bse.equip_code,bse.unit,bse.equip_name,bsee.type_name,bse.equiptype_id,bsee.type_name AS equiptypeName ")
+        sql.append("SELECT bse.id,bse.equip_code,bse.equip_unit,bse.equip_name,bsee.type_name,bse.equiptype_id,bsee.type_name AS equiptypeName ")
             .append("  FROM biz_service_equipment AS bse LEFT JOIN biz_service_equiptype AS bsee ON bsee.id = bse.id WHERE 1=1");
         if (equiptypeId != null) {
             params.put("equiptypeId", equiptypeId);
