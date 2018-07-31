@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.maintaincar.dao;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceMaintaincar;
+import com.ccbuluo.business.platform.maintaincar.dto.ListServiceMaintaincarDTO;
 import com.ccbuluo.business.platform.maintaincar.dto.SearchBizServiceMaintaincarDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
@@ -11,6 +12,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -190,5 +192,13 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
         sql.append("  ORDER BY bci.operate_time DESC");
         Page<SearchBizServiceMaintaincarDTO> DTOS = super.queryPageForBean(SearchBizServiceMaintaincarDTO.class, sql.toString(), param,offset,pageSize);
         return DTOS;
+    }
+    //查询未分配的维修车列表
+    public List<ListServiceMaintaincarDTO> queryundistributedlist(){
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT mend_code,vin_number ")
+                .append(" FROM biz_service_maintaincar WHERE WHERE car_status=0 ");
+        Map<String, Object> params = Maps.newHashMap();
+        return super.queryListBean(ListServiceMaintaincarDTO.class, sql.toString(), params);
     }
 }

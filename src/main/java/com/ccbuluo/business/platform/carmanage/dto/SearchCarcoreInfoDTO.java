@@ -43,6 +43,10 @@ public class SearchCarcoreInfoDTO {
      */
     @ApiModelProperty(name = "carmodelName", value = "所属车型名字")
     private String carmodelName;
+    /**
+     * 车辆状态
+     */
+    private Integer carStatus;
 
     public void setId(Long id) {
         this.id = id;
@@ -92,4 +96,11 @@ public class SearchCarcoreInfoDTO {
         this.carmodelName = carmodelName;
     }
 
+    public Integer getCarStatus() {
+        return carStatus;
+    }
+
+    public void setCarStatus(Integer carStatus) {
+        this.carStatus = carStatus;
+    }
 }

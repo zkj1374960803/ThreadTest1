@@ -1,16 +1,19 @@
 package com.ccbuluo.business.platform.carmodellabel.dto;
 
+import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelParameter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.List;
+
 /**
- * 客服经理 上门维修 使用的维修车 实体表实体
+ * 车型标签（获取全部车型标签用） 实体表实体
  * @author weijb
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "客服经理 上门维修 使用的维修车 实体表实体", description = "客服经理 上门维修 使用的维修车 实体表")
-public class SearchBizCarmodelLabelDTO {
+@ApiModel(value = "车型标签（获取全部车型标签用） 实体表实体", description = "车型标签（获取全部车型标签用） 实体表实体")
+public class ViewCarmodelLabelDTO {
     /**
      * 标签id
      */
@@ -26,17 +29,12 @@ public class SearchBizCarmodelLabelDTO {
      */
     @ApiModelProperty(name = "labelName", value = "标签名称",required = true)
     private String labelName;
-    /**
-     * 排序号
-     */
-    @ApiModelProperty(name = "carStatus", value = "排序号")
-    private Integer sort;
 
     /**
-     * 参数量
+     * 标签
      */
-    @ApiModelProperty(name = "parameterTotal", value = "参数量")
-    private Integer parameterTotal;
+    @ApiModelProperty(name = "labels", value = "标签")
+    private List<CarmodelParameter> parameterList;
 
     public Long getId() {
         return id;
@@ -62,19 +60,11 @@ public class SearchBizCarmodelLabelDTO {
         this.labelName = labelName;
     }
 
-    public Integer getSort() {
-        return sort;
+    public List<CarmodelParameter> getParameterList() {
+        return parameterList;
     }
 
-    public void setSort(Integer sort) {
-        this.sort = sort;
-    }
-
-    public Integer getParameterTotal() {
-        return parameterTotal;
-    }
-
-    public void setParameterTotal(Integer parameterTotal) {
-        this.parameterTotal = parameterTotal;
+    public void setParameterList(List<CarmodelParameter> parameterList) {
+        this.parameterList = parameterList;
     }
 }

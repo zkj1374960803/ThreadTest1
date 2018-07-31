@@ -95,8 +95,8 @@ public class BasicCarmodelParameterController extends BaseController {
     @ApiOperation(value = "新增车型配置参数", notes = "【chaoshuai】")
     @PostMapping("/create")
     public StatusDto create(CarmodelParameter carmodelParameter){
-        StatusDto statusDto = this.basicCarmodelParameterService.createParameter(carmodelParameter);
-        return StatusDto.buildSuccessStatusDto(statusDto.getMessage());
+        return this.basicCarmodelParameterService.createParameter(carmodelParameter);
+//        return StatusDto.buildSuccessStatusDto(statusDto.getMessage());
     }
 
     /**
@@ -109,8 +109,8 @@ public class BasicCarmodelParameterController extends BaseController {
     @ApiOperation(value = "编辑车型配置参数", notes = "【chaoshuai】")
     @PostMapping("/edit")
     public StatusDto edit(CarmodelParameter carmodelParameter){
-        StatusDto statusDto = this.basicCarmodelParameterService.editParameter(carmodelParameter);
-        return StatusDto.buildSuccessStatusDto(statusDto.getMessage());
+        return this.basicCarmodelParameterService.editParameter(carmodelParameter);
+//        return StatusDto.buildSuccessStatusDto(statusDto.getMessage());
     }
 
     /**

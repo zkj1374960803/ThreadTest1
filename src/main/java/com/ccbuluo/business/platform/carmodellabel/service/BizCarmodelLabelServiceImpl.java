@@ -2,9 +2,12 @@ package com.ccbuluo.business.platform.carmodellabel.service;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizCarmodelLabel;
+import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarmodelParameterDao;
+import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelParameter;
 import com.ccbuluo.business.platform.carmodellabel.dao.BizCarmodelLabelDao;
 import com.ccbuluo.business.platform.carmodellabel.dto.BizCarmodelLabelDTO;
 import com.ccbuluo.business.platform.carmodellabel.dto.SearchBizCarmodelLabelDTO;
+import com.ccbuluo.business.platform.carmodellabel.dto.ViewCarmodelLabelDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -14,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -33,6 +37,7 @@ public class BizCarmodelLabelServiceImpl implements BizCarmodelLabelService {
     @Autowired
     private UserHolder userHolder;
     @Autowired
+    private BasicCarmodelParameterDao basicCarmodelParameterDao;
 
     /**
      * 该标签已经存在！
@@ -204,6 +209,38 @@ public class BizCarmodelLabelServiceImpl implements BizCarmodelLabelService {
     public List<BizCarmodelLabelDTO> getAllCarmodelLabelList(){
         return bizCarmodelLabelDao.getAllCarmodelLabelList();
     }
-
+    /**
+     * 获取车型标签以及标签所关联的车型参数
+     * @author weijb
+     * @date 2018-07-18 14:59:51
+     */
+    @Override
+    public List<ViewCarmodelLabelDTO> getAllCarmodelLabelAndParameterList(){
+        //查询所有的标签
+        List<BizCarmodelLabelDTO> labelList = bizCarmodelLabelDao.getAllCarmodelLabelList();
+        //查询所有的车型参数
+        List<CarmodelParameter> parametersList = this.basicCarmodelParameterDao.queryAllParameter();
+        return buildViewCarmodelLabelDTO(labelList,parametersList);
+    }
+    //组装标签数据
+    private List<ViewCarmodelLabelDTO> buildViewCarmodelLabelDTO(List<BizCarmodelLabelDTO> labelList, List<CarmodelParameter> parametersList){
+        List<ViewCarmodelLabelDTO> list = new ArrayList<ViewCarmodelLabelDTO>();
+        for(BizCarmodelLabelDTO label : labelList){
+            ViewCarmodelLabelDTO vl = new ViewCarmodelLabelDTO();
+            vl.setId(label.getId());
+            vl.setLabelCode(label.getLabelCode());
+            vl.setLabelName(label.getLabelName());
+            List<CarmodelParameter> pList = new ArrayList<CarmodelParameter>();
+            for(CarmodelParameter parameter : parametersList){
+                //如果参数所关联的标签id等于标签id
+                if(label.getId().intValue() == parameter.getCarmodelLabelId()){
+                    pList.add(parameter);
+                }
+            }
+            vl.setParameterList(pList);
+            list.add(vl);
+        }
+        return list;
+    }
 
 }

@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.carmodellabel.service;
 import com.ccbuluo.business.entity.BizCarmodelLabel;
 import com.ccbuluo.business.platform.carmodellabel.dto.BizCarmodelLabelDTO;
 import com.ccbuluo.business.platform.carmodellabel.dto.SearchBizCarmodelLabelDTO;
+import com.ccbuluo.business.platform.carmodellabel.dto.ViewCarmodelLabelDTO;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 
@@ -80,4 +81,10 @@ public interface BizCarmodelLabelService {
      * @date 2018-07-18 14:59:51
      */
     List<BizCarmodelLabelDTO> getAllCarmodelLabelList();
+    /**
+     * 获取车型标签以及标签所关联的车型参数
+     * @author weijb
+     * @date 2018-07-18 14:59:51
+     */
+    List<ViewCarmodelLabelDTO> getAllCarmodelLabelAndParameterList();
 }

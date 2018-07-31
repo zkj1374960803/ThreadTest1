@@ -136,7 +136,7 @@ public class BizCarmodelLabelDao extends BaseDao<BizServiceMaintaincar> {
         // 标签名称
         if (StringUtils.isNotBlank(keyword)) {
             param.put("keyword", keyword);
-            sql.append(" AND bci.label_name LIKE CONCAT('%',:keyword,'%') ");
+            sql.append(" AND (bci.label_name LIKE CONCAT('%',:keyword,'%') OR bci.label_code LIKE CONCAT('%',:keyword,'%'))");
         }
         sql.append("  ORDER BY bci.operate_time DESC");
         Page<SearchBizCarmodelLabelDTO> DTOS = super.queryPageForBean(SearchBizCarmodelLabelDTO.class, sql.toString(), param,offset,pageSize);
@@ -153,7 +153,7 @@ public class BizCarmodelLabelDao extends BaseDao<BizServiceMaintaincar> {
     public int findCarmodelParameterByLabelCode(long labelid) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT COUNT(*) FROM basic_carmodel_parameter ")
-                .append(" WHERE carmodel_label_id != :labelid AND delete_flag = :deleteFlag");
+                .append(" WHERE carmodel_label_id = :labelid AND delete_flag = :deleteFlag");
         Map<String, Object> params = Maps.newHashMap();
         params.put("labelid", labelid);
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);

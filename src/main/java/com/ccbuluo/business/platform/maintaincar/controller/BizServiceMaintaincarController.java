@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.maintaincar.controller;
 import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceMaintaincar;
+import com.ccbuluo.business.platform.maintaincar.dto.ListServiceMaintaincarDTO;
 import com.ccbuluo.business.platform.maintaincar.dto.SearchBizServiceMaintaincarDTO;
 import com.ccbuluo.business.platform.maintaincar.service.BizServiceMaintaincarService;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
@@ -14,6 +15,7 @@ import org.apache.thrift.TException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 维修车辆基本信息controller
@@ -123,6 +125,16 @@ public class BizServiceMaintaincarController extends BaseController {
                                                                                 @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                                 @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
         return StatusDto.buildDataSuccessStatusDto(bizServiceMaintaincarService.queryServiceMaintaincarList(carbrandId, carseriesId, carStatus, keyword, offset, pageSize));
+    }
+    /**
+     * 查询未分配的维修车列表
+     * @author weijb
+     * @date 2018-07-31 15:59:51
+     */
+    @ApiOperation(value = "查询未分配的维修车列表",notes = "【魏俊标】")
+    @GetMapping("/queryundistributedlist")
+    public StatusDto<List<ListServiceMaintaincarDTO>> queryundistributedlist() {
+        return StatusDto.buildDataSuccessStatusDto(bizServiceMaintaincarService.queryundistributedlist());
     }
 
 }

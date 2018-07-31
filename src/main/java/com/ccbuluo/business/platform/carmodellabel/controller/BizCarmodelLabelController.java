@@ -5,6 +5,7 @@ import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizCarmodelLabel;
 import com.ccbuluo.business.platform.carmodellabel.dto.BizCarmodelLabelDTO;
 import com.ccbuluo.business.platform.carmodellabel.dto.SearchBizCarmodelLabelDTO;
+import com.ccbuluo.business.platform.carmodellabel.dto.ViewCarmodelLabelDTO;
 import com.ccbuluo.business.platform.carmodellabel.service.BizCarmodelLabelService;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.controller.BaseController;
@@ -14,6 +15,7 @@ import io.swagger.annotations.*;
 import org.apache.thrift.TException;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
+import javax.swing.text.View;
 import java.util.List;
 
 /**
@@ -96,7 +98,6 @@ public class BizCarmodelLabelController extends BaseController {
     @ApiImplicitParam(name = "id", value = "车型标签id", required = true, paramType = "path")
     public StatusDto delete(@PathVariable Long id) {
         return bizCarmodelLabelService.deleteCarcoreInfoBylabelCode(id);
-//        return StatusDto.buildSuccessStatusDto();
     }
 
     /**
@@ -127,6 +128,16 @@ public class BizCarmodelLabelController extends BaseController {
     @GetMapping("/alllist")
     protected StatusDto<List<BizCarmodelLabelDTO>> getAllCarmodelLabelList() {
         return StatusDto.buildDataSuccessStatusDto(bizCarmodelLabelService.getAllCarmodelLabelList());
+    }
+    /**
+     * 获取车型标签以及标签所关联的车型参数
+     * @author weijb
+     * @date 2018-07-31 14:59:51
+     */
+    @ApiOperation(value = "获取车型标签以及标签所关联的车型参数",notes = "【魏俊标】")
+    @GetMapping("/alllistandparameter")
+    protected StatusDto<List<ViewCarmodelLabelDTO>> getAllCarmodelLabelAndParameterList() {
+        return StatusDto.buildDataSuccessStatusDto(bizCarmodelLabelService.getAllCarmodelLabelAndParameterList());
     }
 
 }
