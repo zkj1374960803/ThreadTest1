@@ -97,7 +97,7 @@ public class MaintainitemServiceImpl implements MaintainitemService{
         bizServiceMaintainitem.preUpdate(userHolder.getLoggedUserId());
         bizServiceMaintainitem.setId(saveBizServiceMaintainitemDTO.getId());
         // 保存地区倍数
-        multiplepriceService.save(saveBizServiceMaintainitemDTO.getSaveBizServiceMultiplepriceDTO());
+        multiplepriceService.save(saveBizServiceMaintainitemDTO.getMaintainitemCode(), saveBizServiceMaintainitemDTO);
         return bizServiceMaintainitemDao.update(bizServiceMaintainitem);
     }
 

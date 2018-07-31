@@ -41,25 +41,26 @@ public class MultiplepriceServiceImpl implements MultiplepriceService{
 
     /**
      * 保存地区倍数
-     * @param saveBizServiceMultiplepriceDTO 地区倍数dto
+     * @param saveBizServiceMaintainitemDTO 工时dto
+     * @param maintainitemCode 工时code
      * @return 保存是否成功
      * @author liuduo
      * @date 2018-07-18 13:59:55
      */
     @Override
-    public int save(SaveBizServiceMultiplepriceDTO saveBizServiceMultiplepriceDTO) {
+    public int save(String maintainitemCode, SaveBizServiceMaintainitemDTO saveBizServiceMaintainitemDTO) {
         List<BizServiceMultipleprice> bizServiceMultiplepriceList = new ArrayList<>();
        // 删除原来的地区
-        bizServiceMultiplepriceDao.deleteOld(saveBizServiceMultiplepriceDTO.getMaintainitemCode());
+        bizServiceMultiplepriceDao.deleteOld(maintainitemCode);
         // 新增
-        for (int i = 0; i < saveBizServiceMultiplepriceDTO.getMultiplepriceDTOList().size(); i++) {
+        for (int i = 0; i < saveBizServiceMaintainitemDTO.getCorrespondAreaDTOList().size(); i++) {
             BizServiceMultipleprice bizServiceMultipleprice = new BizServiceMultipleprice();
-            bizServiceMultipleprice.setMaintainitemCode(saveBizServiceMultiplepriceDTO.getMaintainitemCode());
-            bizServiceMultipleprice.setMultiple(saveBizServiceMultiplepriceDTO.getMultiple());
-            bizServiceMultipleprice.setProvinceCode(saveBizServiceMultiplepriceDTO.getMultiplepriceDTOList().get(i).getProvinceCode());
-            bizServiceMultipleprice.setProvinceName(saveBizServiceMultiplepriceDTO.getMultiplepriceDTOList().get(i).getProvinceName());
-            bizServiceMultipleprice.setCityCode(saveBizServiceMultiplepriceDTO.getMultiplepriceDTOList().get(i).getCityCode());
-            bizServiceMultipleprice.setCityName(saveBizServiceMultiplepriceDTO.getMultiplepriceDTOList().get(i).getCityName());
+            bizServiceMultipleprice.setMaintainitemCode(maintainitemCode);
+            bizServiceMultipleprice.setMultiple(saveBizServiceMaintainitemDTO.getCorrespondAreaDTOList().get(i).getMultiple());
+            bizServiceMultipleprice.setProvinceCode(saveBizServiceMaintainitemDTO.getCorrespondAreaDTOList().get(i).getProvinceCode());
+            bizServiceMultipleprice.setProvinceName(saveBizServiceMaintainitemDTO.getCorrespondAreaDTOList().get(i).getProvinceName());
+            bizServiceMultipleprice.setCityCode(saveBizServiceMaintainitemDTO.getCorrespondAreaDTOList().get(i).getCityCode());
+            bizServiceMultipleprice.setCityName(saveBizServiceMaintainitemDTO.getCorrespondAreaDTOList().get(i).getCityName());
             bizServiceMultipleprice.preInsert(userHolder.getLoggedUserId());
             bizServiceMultiplepriceList.add(bizServiceMultipleprice);
         }

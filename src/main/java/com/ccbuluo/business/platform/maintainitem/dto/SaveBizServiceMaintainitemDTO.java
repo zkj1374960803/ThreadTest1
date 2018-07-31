@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 维修服务项实体
@@ -21,19 +22,31 @@ public class SaveBizServiceMaintainitemDTO extends IdEntity {
     @ApiModelProperty(name = "maintainitemName", value = "服务项目名称")
     private String maintainitemName;
     /**
+     * 服务项目的编码
+     */
+    @ApiModelProperty(name = "maintainitemCode", value = "服务项目的编码")
+    private String maintainitemCode;
+    /**
      * 单价
      */
     @ApiModelProperty(name = "unitPrice", value = "单价")
     private BigDecimal unitPrice;
-
     /**
-     * 地区倍数
+     * 对应的城市
      */
-    @ApiModelProperty(name = "saveBizServiceMultiplepriceDTO", value = "地区倍数")
-    private SaveBizServiceMultiplepriceDTO saveBizServiceMultiplepriceDTO;
+    @ApiModelProperty(name = "correspondAreaDTOList", value = "对应的城市")
+    private List<CorrespondAreaDTO> correspondAreaDTOList;
 
     public String getMaintainitemName() {
         return maintainitemName;
+    }
+
+    public String getMaintainitemCode() {
+        return maintainitemCode;
+    }
+
+    public void setMaintainitemCode(String maintainitemCode) {
+        this.maintainitemCode = maintainitemCode;
     }
 
     public void setMaintainitemName(String maintainitemName) {
@@ -48,11 +61,11 @@ public class SaveBizServiceMaintainitemDTO extends IdEntity {
         return this.unitPrice;
     }
 
-    public SaveBizServiceMultiplepriceDTO getSaveBizServiceMultiplepriceDTO() {
-        return saveBizServiceMultiplepriceDTO;
+    public List<CorrespondAreaDTO> getCorrespondAreaDTOList() {
+        return correspondAreaDTOList;
     }
 
-    public void setSaveBizServiceMultiplepriceDTO(SaveBizServiceMultiplepriceDTO saveBizServiceMultiplepriceDTO) {
-        this.saveBizServiceMultiplepriceDTO = saveBizServiceMultiplepriceDTO;
+    public void setCorrespondAreaDTOList(List<CorrespondAreaDTO> correspondAreaDTOList) {
+        this.correspondAreaDTOList = correspondAreaDTOList;
     }
 }
