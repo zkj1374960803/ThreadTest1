@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.equipment.rest;
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.constants.UnitEnum;
 import com.ccbuluo.business.platform.equipment.dto.DetailBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.equipment.dto.SaveBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.equipment.service.EquipmentService;
@@ -11,6 +12,7 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -104,6 +106,19 @@ public class EquipmentController extends BaseController {
                                                                    @RequestParam(defaultValue = "0") Integer offset,
                                                                    @RequestParam(defaultValue = "10") Integer pagesize) {
         return StatusDto.buildDataSuccessStatusDto(equipmentService.queryList(equiptypeId, keyword, offset, pagesize));
+    }
+
+
+    /**
+     * 查询计量单位
+     * @return 计量单位
+     * @author liuduo
+     * @date 2018-07-31 19:10:23
+     */
+    @ApiOperation(value = "计量单位", notes = "【刘铎】")
+    @GetMapping("/unitlist")
+    public StatusDto<List<UnitEnum>> getUnitList() {
+        return StatusDto.buildDataSuccessStatusDto(Arrays.asList(UnitEnum.values()));
     }
 
 }
