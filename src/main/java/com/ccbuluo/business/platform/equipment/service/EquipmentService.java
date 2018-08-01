@@ -5,6 +5,7 @@ import com.ccbuluo.business.platform.equipment.dto.SaveBizServiceEquipmentDTO;
 import com.ccbuluo.db.Page;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 物料service
@@ -51,4 +52,6 @@ public interface EquipmentService {
      * @date 2018-07-17 20:10:35
      */
     Page<DetailBizServiceEquipmentDTO> queryList(Long equiptypeId, String keyword, Integer offset, Integer pagesize);
+
+    List<Map<String,String>> getUnit();
 }

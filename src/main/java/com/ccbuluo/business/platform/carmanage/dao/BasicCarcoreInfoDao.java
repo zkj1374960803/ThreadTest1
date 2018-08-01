@@ -222,14 +222,15 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT bci.id,bci.car_number,bci.vin_number,bci.car_status,")
-                .append("bcm.carbrand_name,bci.carseries_id,bcmmm.carmodel_name")
+                .append("bcm.carbrand_name,bci.carseries_id,bci.custmanagerName,bcmmm.carmodel_name")
                 .append(" FROM basic_carcore_info bci LEFT JOIN basic_carbrand_manage bcm on bci.carbrand_id=bcm.id ")
                 .append(" LEFT JOIN basic_carmodel_manage bcmmm ON bci.carmodel_id=bcmmm.id ")
                 .append(" WHERE bci.delete_flag = :deleteFlag ");
         // 客户经理uuid
         if (StringUtils.isNotBlank(custmanagerUuid)) {
             param.put("custmanagerUuid", custmanagerUuid);
-            sql.append(" AND bci.cusmanager_uuid = :custmanagerUuid");
+            param.put("carStatus", Constants.YES);
+            sql.append(" AND bci.cusmanager_uuid = :custmanagerUuid AND bci.car_status = :carStatus");
         }
         // 品牌
         if (null != carbrandId) {
@@ -333,7 +334,8 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("carNumber", carNumber);
         params.put("cusmanagerUuid", null);
-        String sql = "UPDATE basic_carcore_info SET cusmanager_uuid = :cusmanagerUuid WHERE car_number = :carNumber";
+        params.put("carStatus", Constants.NO);
+        String sql = "UPDATE basic_carcore_info SET cusmanager_uuid = :cusmanagerUuid,car_status = :carStatus WHERE car_number = :carNumber";
 
         return updateForMap(sql, params);
     }
