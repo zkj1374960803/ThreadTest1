@@ -10,6 +10,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -128,5 +129,12 @@ public class BizServiceCustmanagerDao extends BaseDao<BizServiceCustmanager> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("useruuid", useruuid);
         return super.findForBean(BizServiceCustmanager.class, sql.toString(), params);
+    }
+
+    public List<String> queryIds(String value, String fields, String tableName) {
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("value", value);
+        String sql = "SELECT user_uuid FROM " + tableName + "  WHERE " + fields + " = :value ";
+        return querySingColum(String.class, sql, map);
     }
 }

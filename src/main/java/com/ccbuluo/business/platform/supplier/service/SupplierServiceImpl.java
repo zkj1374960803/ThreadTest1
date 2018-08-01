@@ -7,10 +7,7 @@ import com.ccbuluo.business.entity.BizServiceSupplier;
 import com.ccbuluo.business.platform.custmanager.dto.CustManagerDetailDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
-import com.ccbuluo.business.platform.supplier.dto.EditSupplierDTO;
-import com.ccbuluo.business.platform.supplier.dto.QuerySupplierListDTO;
-import com.ccbuluo.business.platform.supplier.dto.ResultFindSupplierDetailDTO;
-import com.ccbuluo.business.platform.supplier.dto.ResultSupplierListDTO;
+import com.ccbuluo.business.platform.supplier.dto.*;
 
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
@@ -30,6 +27,7 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * 供应商实现类
@@ -188,6 +186,51 @@ public class SupplierServiceImpl implements SupplierService{
     @Override
     public ResultFindSupplierDetailDTO findSupplierDetail(Long id) {
         return bizServiceSupplierDao.getById(id);
+    }
+
+    /**
+     * 添加关联商品
+     *
+     * @param saveRelSupplierProductDTO 关联商品DTO
+     * @return StatusDto
+     * @author zhangkangjian
+     * @date 2018-08-01 10:06:19
+     */
+    @Override
+    public StatusDto<String> createRelSupplierProduct(SaveRelSupplierProductDTO saveRelSupplierProductDTO) {
+        String loggedUserId = userHolder.getLoggedUserId();
+        // 过滤垃圾数据和填充数据
+        List<RelSupplierProduct> supplierProductList = null;
+        if(saveRelSupplierProductDTO != null){
+            supplierProductList = saveRelSupplierProductDTO.getSupplierProductList();
+            List<RelSupplierProduct> collect = supplierProductList.stream().filter(a -> StringUtils.isNoneBlank(a.getProductCode(), a.getSupplierCode(), a.getProductType())).collect(Collectors.toList());
+            collect.stream().forEach(a -> {
+                a.setCreator(loggedUserId);
+                a.setOperator(loggedUserId);
+            });
+            // 批量插入
+            bizServiceSupplierDao.batchSave(collect);
+        }
+        return StatusDto.buildSuccessStatusDto();
+    }
+
+    /**
+     * 查询供应商的商品（零配件，物料）
+     *
+     * @param relSupplierProduct 查询条件
+     * @return StatusDto<Page < RelSupplierProduct>> 分页信息
+     * @author zhangkangjian
+     * @date 2018-08-01 11:46:53
+     */
+    @Override
+    public Page<RelSupplierProduct> findSupplierProduct(RelSupplierProduct relSupplierProduct) {
+        String value = RelSupplierProduct.ProductTypeEnum.EQUIPMENT.getValue();
+
+
+
+
+
+        return null;
     }
 
     /**

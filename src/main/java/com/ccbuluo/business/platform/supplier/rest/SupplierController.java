@@ -1,21 +1,16 @@
 package com.ccbuluo.business.platform.supplier.rest;
 
 import com.ccbuluo.business.entity.BizServiceSupplier;
-import com.ccbuluo.business.platform.supplier.dto.EditSupplierDTO;
-import com.ccbuluo.business.platform.supplier.dto.QuerySupplierListDTO;
-import com.ccbuluo.business.platform.supplier.dto.ResultFindSupplierDetailDTO;
-import com.ccbuluo.business.platform.supplier.dto.ResultSupplierListDTO;
+import com.ccbuluo.business.platform.supplier.dto.*;
 import com.ccbuluo.business.platform.supplier.service.SupplierService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCServer;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import org.apache.thrift.TException;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -107,6 +102,36 @@ public class SupplierController extends BaseController {
         return StatusDto.buildDataSuccessStatusDto(supplierServiceImpl.findSupplierDetail(id));
     }
 
+    /**
+     * 添加关联商品
+     * @param saveRelSupplierProductDTO 关联商品DTO
+     * @return StatusDto
+     * @author zhangkangjian
+     * @date 2018-08-01 10:06:19
+     */
+    @ApiOperation(value = "添加关联商品",notes = "【张康健】")
+    @PostMapping("/createrelsupplierproduct")
+    public StatusDto<String> createRelSupplierProduct(@ApiParam(name = "saveRelSupplierProductDTO", value = "保存供应商关联商品关系json", required = true)@RequestBody SaveRelSupplierProductDTO saveRelSupplierProductDTO){
+        return supplierServiceImpl.createRelSupplierProduct(saveRelSupplierProductDTO);
+    }
+
+    /**
+     * 查询供应商的商品（零配件，物料）
+     * @param relSupplierProduct 查询条件
+     * @return StatusDto<Page<RelSupplierProduct>> 分页信息
+     * @author zhangkangjian
+     * @date 2018-08-01 11:46:53
+     */
+    @ApiOperation(value = "查询供应商的商品",notes = "【张康健】")
+    @GetMapping("/findsupplierproduct")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "supplierCode", value = "供应商code", required = true, paramType = "query",dataType = "String"),
+        @ApiImplicitParam(name = "productType", value = "商品类型(注：PRODUCT零配件，EQUIPMENT物料)", required = true, paramType = "query", dataType = "String"),
+    })
+    public StatusDto<Page<RelSupplierProduct>> findSupplierProduct(@ApiIgnore RelSupplierProduct relSupplierProduct){
+        Page<RelSupplierProduct> page = supplierServiceImpl.findSupplierProduct(relSupplierProduct);
+
+    }
 
 
 

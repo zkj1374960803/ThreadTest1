@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.supplier.dto;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 /**
@@ -7,6 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @author zhangkangjian
  * @date 2018-07-04 09:43:48
  */
+@ApiModel(value = "QuerySupplierListDTO", description = "查询供应商DTO")
 public class QuerySupplierListDTO {
     @ApiModelProperty(name = "provinceName", value = "省")
    private String provinceName;
