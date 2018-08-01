@@ -77,14 +77,14 @@ public interface BasicCarcoreInfoService {
      * @author weijb
      * @date 2018-07-13 19:52:44
      */
-    Page<SearchCarcoreInfoDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer carStatus, String Keyword, Integer offset, Integer pageSize);
+    Page<SearchCarcoreInfoDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer carStatus, String custmanagerUuid, String Keyword, Integer offset, Integer pageSize);
 
     /**
      * 查询未分配的车辆列表
      * @author weijb
      * @date 2018-07-31 15:59:51
      */
-    List<ListCarcoreInfoDTO> queryundistributedlist();
+    List<ListCarcoreInfoDTO> queryundistributedlist(String vinNumber);
     /**
      * 根据车辆code更新车辆状态
      * @param list
@@ -93,7 +93,7 @@ public interface BasicCarcoreInfoService {
      * @author weijb
      * @date 2018-07-31 15:59:51
      */
-    List<Long> updatestatusbycode(List<UpdateCarcoreInfoDTO> list);
+    int updatestatusbycode(List<UpdateCarcoreInfoDTO> list);
 
     /**
      * 根据车架号查询车辆信息
@@ -103,6 +103,16 @@ public interface BasicCarcoreInfoService {
      * @date 2018-06-08 13:55:14
      */
     VinCarcoreInfoDTO getCarInfoByVin(String vinNumber);
+
+    /**
+     * 解除车辆与客户经理的关联关系
+     * @param carNumber 车辆编号
+     * @return 操作是否成功
+     * @author liuduo
+     * @date 2018-08-01 14:23:04
+     */
+    int release(String carNumber);
+
     /**
      * 根据车辆vin更新车辆的门店信息
      * @param vinNumber 车架号

@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.equipment.service;
 
 import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.constants.EquipUnitEnum;
 import com.ccbuluo.business.entity.BizServiceEquipment;
 import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
 import com.ccbuluo.business.platform.equipment.dto.DetailBizServiceEquipmentDTO;
@@ -12,8 +13,9 @@ import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * 物料service实现
@@ -111,4 +113,24 @@ public class EquipmentServiceImpl implements EquipmentService{
     public Page<DetailBizServiceEquipmentDTO> queryList(Long equiptypeId, String keyword, Integer offset, Integer pagesize) {
         return bizServiceEquipmentDao.queryList(equiptypeId, keyword, offset, pagesize);
     }
+
+    /**
+     * 返回计量单位
+     * @return 枚举
+     * @author liuduo
+     * @date 2018-08-01 17:56:07
+     */
+    @Override
+    public List<Map<String, String>> getUnit() {
+        List<Map<String,String>> list = new ArrayList<>();
+        List<EquipUnitEnum> equipUnitEnums = Arrays.asList(EquipUnitEnum.values());
+        equipUnitEnums.forEach(item -> {
+            Map<String, String> map = new HashMap<>();
+            map.put("unitKey", item.name());
+            map.put("unitValue", item.getLabel());
+            list.add(map);
+        });
+        return list;
+    }
+
 }
