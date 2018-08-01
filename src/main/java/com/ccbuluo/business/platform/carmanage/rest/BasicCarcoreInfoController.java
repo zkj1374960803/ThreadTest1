@@ -155,5 +155,27 @@ public class BasicCarcoreInfoController extends BaseController {
     public StatusDto getCarInfoByVin(String vinNumber) throws TException {
         return StatusDto.buildDataSuccessStatusDto(basicCarcoreInfoService.getCarInfoByVin(vinNumber));
     }
+    /**
+     * 根据车辆vin更新车辆的门店信息
+     * @param vinNumber 车架号
+     * @param storeCode 门店code
+     * @param storeName 门店名称
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author weijb
+     * @date 2018-08-01 15:55:14
+     */
+    @ApiOperation(value = "根据车辆vin更新车辆的门店信息", notes = "【魏俊标】")
+    @ApiImplicitParams({@ApiImplicitParam(name = "vinNumber", value = "车架号", required = false, paramType = "query"),
+            @ApiImplicitParam(name = "storeCode", value = "门店code", required = false, paramType = "query"),
+            @ApiImplicitParam(name = "storeName", value = "门店名称", required = false, paramType = "query")})
+    @GetMapping("/updatecarcoreinfobyvin")
+    public StatusDto updatecarcoreinfobyvin(@RequestParam String vinNumber,@RequestParam Integer storeCode,@RequestParam Integer storeName) {
+        int flag = basicCarcoreInfoService.updatecarcoreinfobyvin(vinNumber,storeCode,storeName);
+        if (flag != Constants.STATUS_FLAG_ZERO) {
+            return StatusDto.buildSuccessStatusDto("操作成功！");
+        }
+        return StatusDto.buildFailureStatusDto("操作失败！");
+    }
 
 }

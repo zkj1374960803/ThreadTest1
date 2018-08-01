@@ -48,7 +48,9 @@ public class BasicCarmodelManageDao extends BaseDao<CarmodelManage> {
             .append(" bcmm.model_master_image,bcmm.`carmodel_status`,bcmm.model_title,a.car_count,bcm.carbrand_name ")
             .append(" FROM basic_carmodel_manage bcmm  LEFT JOIN basic_carbrand_manage bcm on bcmm.carbrand_id=bcm.id ")
             .append(" LEFT JOIN (SELECT bcci.carmodel_id, count(*) AS car_count FROM basic_carcore_info bcci WHERE bcci.delete_flag = 0 GROUP BY bcci.carmodel_id) a  ")
-            .append(" ON a.carmodel_id = bcmm.id WHERE 1=1 ");
+            .append(" ON a.carmodel_id = bcmm.id WHERE bcmm.delete_flag = :deleteFlag ");
+
+        param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         if (null != carbrandId){
             sql.append(" AND bcmm.carbrand_id = :carbrandId ");
             param.put("carbrandId",carbrandId);
@@ -63,9 +65,9 @@ public class BasicCarmodelManageDao extends BaseDao<CarmodelManage> {
         }
         if(null != carmodelName && !"".equals(carmodelName)){
             param.put("carmodelName",carmodelName);
-            sql.append(" AND bcmm.carmodel_name LIKE CONCAT( :carmodelName,'%') ");
+            sql.append(" AND bcmm.carmodel_name LIKE CONCAT('%',:carmodelName,'%') ");
         }
-        sql.append(" ORDER BY bcmm.id DESC");
+        sql.append(" ORDER BY bcmm.operate_time DESC");
         Page<CarmodelManageDTO> carmodelManageDTOPage = super.queryPageForBean(CarmodelManageDTO.class, sql.toString(), param, offset, limit);
         return carmodelManageDTOPage;
     }

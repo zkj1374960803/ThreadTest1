@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Map;
@@ -318,6 +319,20 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
     @Override
     public VinCarcoreInfoDTO getCarInfoByVin(String vinNumber){
         return basicCarcoreInfoDao.getCarInfoByVin(vinNumber);
+    }
+    /**
+     * 根据车辆vin更新车辆的门店信息
+     * @param vinNumber 车架号
+     * @param storeCode 门店code
+     * @param storeName 门店名称
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author weijb
+     * @date 2018-08-01 15:55:14
+     */
+    @Override
+    public int updatecarcoreinfobyvin(String vinNumber, Integer storeCode, Integer storeName){
+        return basicCarcoreInfoDao.updatecarcoreinfobyvin(vinNumber,storeCode,storeName);
     }
 
 }
