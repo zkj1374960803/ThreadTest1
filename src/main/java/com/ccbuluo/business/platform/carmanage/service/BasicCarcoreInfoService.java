@@ -7,6 +7,7 @@ import com.ccbuluo.business.platform.carmanage.dto.UpdateCarcoreInfoDTO;
 import com.ccbuluo.business.platform.carmanage.dto.VinCarcoreInfoDTO;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -102,4 +103,15 @@ public interface BasicCarcoreInfoService {
      * @date 2018-06-08 13:55:14
      */
     VinCarcoreInfoDTO getCarInfoByVin(String vinNumber);
+    /**
+     * 根据车辆vin更新车辆的门店信息
+     * @param vinNumber 车架号
+     * @param storeCode 门店code
+     * @param storeName 门店名称
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author weijb
+     * @date 2018-08-01 15:55:14
+     */
+    int updatecarcoreinfobyvin(String vinNumber, Integer storeCode, Integer storeName);
 }

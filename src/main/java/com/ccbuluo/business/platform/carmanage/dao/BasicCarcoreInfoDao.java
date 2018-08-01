@@ -287,4 +287,22 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
         params.put("vinNumber", vinNumber);
         return super.findForBean(VinCarcoreInfoDTO.class, sql.toString(), params);
     }
+    /**
+     * 根据车辆vin更新车辆的门店信息
+     * @param vinNumber 车架号
+     * @param storeCode 门店code
+     * @param storeName 门店名称
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author weijb
+     * @date 2018-08-01 15:55:14
+     */
+    public int updatecarcoreinfobyvin(String vinNumber, Integer storeCode, Integer storeName){
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("storeCode", storeCode);
+        params.put("storeName", storeName);
+        params.put("vinNumber", vinNumber);
+        String sql = "update basic_carcore_info set store_code=:storeCode, store_name=:storeName, car_status=1  where vin_number=:vinNumber";
+        return updateForMap(sql, params);
+    }
 }
