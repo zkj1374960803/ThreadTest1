@@ -320,6 +320,7 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
     public VinCarcoreInfoDTO getCarInfoByVin(String vinNumber){
         return basicCarcoreInfoDao.getCarInfoByVin(vinNumber);
     }
+
     /**
      * 根据车辆vin更新车辆的门店信息
      * @param vinNumber 车架号
