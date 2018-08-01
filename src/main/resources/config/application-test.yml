@@ -64,8 +64,8 @@ dev-default:
   username: "ZHT0007"
   password: "123456"
 #文件上传目录
-upload:
-  dir: uploads/
+oss:
+  bucket-name: zht-test-nosec
 
 
 #swagger相关配置
