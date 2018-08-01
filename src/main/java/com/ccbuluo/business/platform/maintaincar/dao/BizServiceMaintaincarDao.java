@@ -197,8 +197,24 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
     public List<ListServiceMaintaincarDTO> queryundistributedlist(){
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT mend_code,vin_number ")
-                .append(" FROM biz_service_maintaincar WHERE WHERE car_status=0 ");
+                .append(" FROM biz_service_maintaincar WHERE car_status=0 ");
         Map<String, Object> params = Maps.newHashMap();
         return super.queryListBean(ListServiceMaintaincarDTO.class, sql.toString(), params);
+    }
+    /**
+     * 根据维修车code更新维修车状态
+     * @param mendCode code
+     * @param status
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author weijb
+     * @date 2018-07-31 15:59:51
+     */
+    public int updatestatusbycode(String mendCode, Integer status){
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("mendCode", mendCode);
+        params.put("status", status);
+        String sql = "UPDATE biz_service_maintaincar SET car_status = :status WHERE mend_code = :mendCode";
+        return updateForMap(sql, params);
     }
 }

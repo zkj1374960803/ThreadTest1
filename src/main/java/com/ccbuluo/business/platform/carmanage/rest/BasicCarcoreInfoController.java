@@ -1,19 +1,19 @@
 package com.ccbuluo.business.platform.carmanage.rest;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarcoreInfo;
+import com.ccbuluo.business.platform.carmanage.dto.ListCarcoreInfoDTO;
 import com.ccbuluo.business.platform.carmanage.dto.SearchCarcoreInfoDTO;
+import com.ccbuluo.business.platform.carmanage.dto.UpdateCarcoreInfoDTO;
 import com.ccbuluo.business.platform.carmanage.service.BasicCarcoreInfoService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
-import com.ccbuluo.http.StatusDtoThriftUtils;
-import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import io.swagger.annotations.*;
 import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
+import java.util.List;
 
 /**
  * 车辆基本信息controller
@@ -113,6 +113,47 @@ public class BasicCarcoreInfoController extends BaseController {
                                                                           @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                           @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
         return StatusDto.buildDataSuccessStatusDto(basicCarcoreInfoService.queryCarcoreInfoList(carbrandId, carseriesId, carStatus, Keyword, offset, pageSize));
+    }
+    /**
+     * 查询未分配的车辆列表
+     * @author weijb
+     * @date 2018-07-31 15:59:51
+     */
+    @ApiOperation(value = "查询未分配的车辆列表",notes = "【魏俊标】")
+    @GetMapping("/queryundistributedlist")
+    public StatusDto<List<ListCarcoreInfoDTO>> queryundistributedlist() {
+        return StatusDto.buildDataSuccessStatusDto(basicCarcoreInfoService.queryundistributedlist());
+    }
+
+    /**
+     * 批量更新维修车状态（根据车辆code）
+     * @param carcoreInfoList
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author weijb
+     * @date 2018-07-31 15:59:51
+     */
+    @ApiOperation(value = "批量更新维修车状态（根据车辆code）", notes = "【魏俊标】")
+    @PostMapping("/updatestatusbycode")
+    public StatusDto updatestatusbycode(@ApiParam(name = "updateCarcoreInfoDTO集合", value = "传入updateCarcoreInfoDTO数组", required = true)@RequestBody List<UpdateCarcoreInfoDTO> carcoreInfoList) {
+        List<Long> flag = basicCarcoreInfoService.updatestatusbycode(carcoreInfoList);
+        if (flag.size() != Constants.STATUS_FLAG_ZERO) {
+            return StatusDto.buildSuccessStatusDto("操作成功！");
+        }
+        return StatusDto.buildFailureStatusDto("操作失败！");
+    }
+    /**
+     * 根据车架号查询车辆信息
+     * @param vinNumber 车辆vin
+     * @exception
+     * @author weijb
+     * @date 2018-06-08 13:55:14
+     */
+    @ApiOperation(value = "根据车架号查询车辆信息", notes = "【魏俊标】")
+    @ApiImplicitParam(name = "vinNumber", value = "车辆vin", required = true, paramType = "query")
+    @GetMapping("/getcarinfobyvin")
+    public StatusDto getCarInfoByVin(String vinNumber) throws TException {
+        return StatusDto.buildDataSuccessStatusDto(basicCarcoreInfoService.getCarInfoByVin(vinNumber));
     }
 
 }

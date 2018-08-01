@@ -137,4 +137,25 @@ public class BizServiceMaintaincarController extends BaseController {
         return StatusDto.buildDataSuccessStatusDto(bizServiceMaintaincarService.queryundistributedlist());
     }
 
+    /**
+     * 根据维修车code更新维修车状态
+     * @param mendCode code
+     * @param carStatus
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author weijb
+     * @date 2018-07-31 15:59:51
+     */
+    @ApiOperation(value = "根据维修车code更新维修车状态", notes = "【魏俊标】")
+    @ApiImplicitParams({@ApiImplicitParam(name = "mendCode", value = "维修车code", required = false, paramType = "query"),
+            @ApiImplicitParam(name = "carStatus", value = "状态", required = false, paramType = "query")})
+    @GetMapping("/updatestatusbycode")
+    public StatusDto updatestatusbycode(@RequestParam String mendCode,@RequestParam Integer carStatus) {
+        int flag = bizServiceMaintaincarService.updatestatusbycode(mendCode, carStatus);
+        if (flag == Constants.SUCCESSSTATUS) {
+            return StatusDto.buildSuccessStatusDto("操作成功！");
+        }
+        return StatusDto.buildFailureStatusDto("操作失败！");
+    }
+
 }

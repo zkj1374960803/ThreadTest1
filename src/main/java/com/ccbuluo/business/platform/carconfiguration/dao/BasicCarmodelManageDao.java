@@ -258,5 +258,42 @@ public class BasicCarmodelManageDao extends BaseDao<CarmodelManage> {
         params.put("carmodelId", carmodelId);
         return super.queryListBean(CarmodelManage.class, sql.toString(), params);
     }
+    /**
+     * 数据验证唯一性
+     * @param carmodelManageDTO 车型基本信息
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author wuyibo
+     * @date 2018-08-01 09:37:13
+     */
+    public int countEntity(CarmodelManageDTO carmodelManageDTO) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT COUNT(*) FROM basic_carmodel_manage ")
+                .append("   WHERE carmodel_name = :carmodelName AND delete_flag = :deleteFlag");
+        if (null != carmodelManageDTO.getId()) {
+            sql.append(" AND id != :id");
+        }
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("carmodelName", carmodelManageDTO.getCarmodelName());
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        params.put("id", carmodelManageDTO.getId());
+        return namedParameterJdbcTemplate.queryForObject(sql.toString(), params, Integer.class);
+    }
+    /**
+     * 删除车型
+     * @param id 车型id
+     * @return
+     * @exception
+     * @author weijb
+     * @date 2018-08-01 09:37:13
+     */
+    public int deleteCarmodelManageById(Long id){
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE basic_carmodel_manage SET delete_flag = :deleteFlag  WHERE id= :id ");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("id", id);
+        params.put("deleteFlag", Constants.DELETE_FLAG_DELETE);
+        return super.updateForMap(sql.toString(), params);
+    }
 
 }

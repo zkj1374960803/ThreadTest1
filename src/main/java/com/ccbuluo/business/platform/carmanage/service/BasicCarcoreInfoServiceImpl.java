@@ -4,7 +4,11 @@ import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarcoreInfo;
 import com.ccbuluo.business.platform.carconfiguration.utils.RegularCodeProductor;
 import com.ccbuluo.business.platform.carmanage.dao.BasicCarcoreInfoDao;
+import com.ccbuluo.business.platform.carmanage.dto.ListCarcoreInfoDTO;
 import com.ccbuluo.business.platform.carmanage.dto.SearchCarcoreInfoDTO;
+import com.ccbuluo.business.platform.carmanage.dto.UpdateCarcoreInfoDTO;
+import com.ccbuluo.business.platform.carmanage.dto.VinCarcoreInfoDTO;
+import com.ccbuluo.business.platform.maintaincar.dto.ListServiceMaintaincarDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.constants.SystemPropertyHolder;
 import com.ccbuluo.db.Page;
@@ -17,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -262,6 +267,40 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
             return StatusDto.buildFailureStatusDto(result.toString());
         }
         return StatusDto.buildSuccessStatusDto();
+    }
+
+    /**
+     * 查询未分配的车辆列表
+     * @author weijb
+     * @date 2018-07-31 15:59:51
+     */
+    @Override
+    public List<ListCarcoreInfoDTO> queryundistributedlist(){
+        return basicCarcoreInfoDao.queryundistributedlist();
+    }
+
+    /**
+     * 根据车辆code更新车辆状态
+     * @param list
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author weijb
+     * @date 2018-07-31 15:59:51
+     */
+    @Override
+    public List<Long> updatestatusbycode(List<UpdateCarcoreInfoDTO> list){
+        return basicCarcoreInfoDao.updatestatusbycode(list);
+    }
+    /**
+     * 根据车架号查询车辆信息
+     * @param vinNumber 车辆vin
+     * @exception
+     * @author weijb
+     * @date 2018-06-08 13:55:14
+     */
+    @Override
+    public VinCarcoreInfoDTO getCarInfoByVin(String vinNumber){
+        return basicCarcoreInfoDao.getCarInfoByVin(vinNumber);
     }
 
 }

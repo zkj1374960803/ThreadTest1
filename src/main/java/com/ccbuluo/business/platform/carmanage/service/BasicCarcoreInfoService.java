@@ -1,9 +1,14 @@
 package com.ccbuluo.business.platform.carmanage.service;
 
 import com.ccbuluo.business.platform.carconfiguration.entity.CarcoreInfo;
+import com.ccbuluo.business.platform.carmanage.dto.ListCarcoreInfoDTO;
 import com.ccbuluo.business.platform.carmanage.dto.SearchCarcoreInfoDTO;
+import com.ccbuluo.business.platform.carmanage.dto.UpdateCarcoreInfoDTO;
+import com.ccbuluo.business.platform.carmanage.dto.VinCarcoreInfoDTO;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+
+import java.util.List;
 
 /**
  * 车辆基本信息service
@@ -73,4 +78,28 @@ public interface BasicCarcoreInfoService {
      */
     Page<SearchCarcoreInfoDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer carStatus, String Keyword, Integer offset, Integer pageSize);
 
+    /**
+     * 查询未分配的车辆列表
+     * @author weijb
+     * @date 2018-07-31 15:59:51
+     */
+    List<ListCarcoreInfoDTO> queryundistributedlist();
+    /**
+     * 根据车辆code更新车辆状态
+     * @param list
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author weijb
+     * @date 2018-07-31 15:59:51
+     */
+    List<Long> updatestatusbycode(List<UpdateCarcoreInfoDTO> list);
+
+    /**
+     * 根据车架号查询车辆信息
+     * @param vinNumber 车辆vin
+     * @exception
+     * @author weijb
+     * @date 2018-06-08 13:55:14
+     */
+    VinCarcoreInfoDTO getCarInfoByVin(String vinNumber);
 }

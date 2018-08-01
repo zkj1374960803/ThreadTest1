@@ -84,5 +84,15 @@ public interface BizServiceMaintaincarService {
      * @date 2018-07-31 15:59:51
      */
     List<ListServiceMaintaincarDTO> queryundistributedlist();
+    /**
+     * 根据维修车code更新维修车状态
+     * @param mendCode code
+     * @param status
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author weijb
+     * @date 2018-07-31 15:59:51
+     */
+    int updatestatusbycode(String mendCode, Integer status);
 
 }

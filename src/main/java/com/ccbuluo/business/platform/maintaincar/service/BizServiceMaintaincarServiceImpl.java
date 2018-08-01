@@ -189,4 +189,17 @@ public class BizServiceMaintaincarServiceImpl implements BizServiceMaintaincarSe
         return bizServiceMaintaincarDao.queryundistributedlist();
     }
 
+    /**
+     * 根据维修车code更新维修车状态
+     * @param mendCode code
+     * @param status
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author weijb
+     * @date 2018-07-31 15:59:51
+     */
+    @Override
+    public int updatestatusbycode(String mendCode, Integer status){
+        return bizServiceMaintaincarDao.updatestatusbycode(mendCode, status);
+    }
 }

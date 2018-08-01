@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.carconfiguration.rest;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.carconfiguration.dao.CarmodelManageDTO;
 import com.ccbuluo.business.platform.carconfiguration.service.BasicCarmodelManageService;
 import com.ccbuluo.core.controller.BaseController;
@@ -156,4 +157,24 @@ public class BasicCarmodelManageController extends BaseController {
     public StatusDto<List<Map<String, Object>>> queryall() {
         return StatusDto.buildDataSuccessStatusDto( this.basicCarmodelManageService.queryAll());
     }
+
+    /**
+     * 删除车型
+     * @param id 车型id
+     * @return
+     * @exception
+     * @author weijb
+     * @date 2018-08-01 09:37:13
+     */
+    @ApiOperation(value = "删除车型",notes = "【魏俊标】")
+    @GetMapping("/delete")
+    @ApiImplicitParam(name = "id", value = "车型id", required = true, paramType = "query")
+    public StatusDto delete(@RequestParam Long id) {
+        int flag = basicCarmodelManageService.deleteCarmodelManageById(id);
+        if (flag == Constants.SUCCESSSTATUS) {
+            return StatusDto.buildSuccessStatusDto("删除成功！");
+        }
+        return StatusDto.buildFailureStatusDto("删除失败！");
+    }
+
 }

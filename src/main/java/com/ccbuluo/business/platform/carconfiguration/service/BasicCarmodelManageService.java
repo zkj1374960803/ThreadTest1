@@ -90,4 +90,13 @@ public interface BasicCarmodelManageService {
      * @date 2018-06-12 15:31:17
      */
     List<Map<String,Object>> queryAll();
+    /**
+     * 删除车型
+     * @param id 车型id
+     * @return
+     * @exception
+     * @author weijb
+     * @date 2018-08-01 09:37:13
+     */
+    int deleteCarmodelManageById(Long id);
 }

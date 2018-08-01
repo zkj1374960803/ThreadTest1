@@ -2,17 +2,13 @@ package com.ccbuluo.business.platform.carmanage.dao;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarcoreInfo;
-import com.ccbuluo.business.platform.carmanage.dto.CarDTO;
-import com.ccbuluo.business.platform.carmanage.dto.SearchCarcoreInfoDTO;
+import com.ccbuluo.business.platform.carmanage.dto.*;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
-import com.ccbuluo.http.StatusDto;
-import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
-
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
@@ -256,4 +252,40 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
         return DTOS;
     }
 
+    //查询未分配的车辆列表
+    public List<ListCarcoreInfoDTO> queryundistributedlist(){
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT car_number,vin_number ")
+                .append(" FROM basic_carcore_info WHERE car_status=0 ");
+        Map<String, Object> params = Maps.newHashMap();
+        return super.queryListBean(ListCarcoreInfoDTO.class, sql.toString(), params);
+    }
+    /**
+     * 根据车辆code更新车辆状态
+     * @param list
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author weijb
+     * @date 2018-07-31 15:59:51
+     */
+    public List<Long> updatestatusbycode(List<UpdateCarcoreInfoDTO> list){
+        String sql = "update basic_carcore_info set cusmanager_uuid=:cusmanagerUuid, cusmanager_name=:cusmanagerName, car_status=:carStatus  where car_number=:carNumber";
+        return batchInsertForListBean(sql, list);
+    }
+
+    /**
+     * 根据车架号查询车辆信息
+     * @param vinNumber 车辆vin
+     * @exception
+     * @author weijb
+     * @date 2018-06-08 13:55:14
+     */
+    public VinCarcoreInfoDTO getCarInfoByVin(String vinNumber){
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT car_number,vin_number,engine_number,beidou_number ")
+                .append(" FROM basic_carcore_info WHERE vin_number= :vinNumber");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("vinNumber", vinNumber);
+        return super.findForBean(VinCarcoreInfoDTO.class, sql.toString(), params);
+    }
 }
