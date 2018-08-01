@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.label.rest;
+package com.ccbuluo.business.platform.label.controller;
 
 import com.ccbuluo.business.entity.BizServiceLabel;
 import com.ccbuluo.business.platform.label.dto.ListLabelDTO;

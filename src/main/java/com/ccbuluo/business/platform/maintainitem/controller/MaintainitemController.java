@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.maintainitem.rest;
+package com.ccbuluo.business.platform.maintainitem.controller;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.maintainitem.dto.DetailBizServiceMaintainitemDTO;
@@ -10,8 +10,6 @@ import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * 工时controller

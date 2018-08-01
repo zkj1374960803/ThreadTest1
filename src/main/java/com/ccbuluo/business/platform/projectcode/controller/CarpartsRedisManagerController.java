@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.projectcode.rest;
+package com.ccbuluo.business.platform.projectcode.controller;
 
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftUtils;

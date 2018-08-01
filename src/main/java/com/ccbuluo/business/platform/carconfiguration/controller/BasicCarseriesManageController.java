@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.carconfiguration.rest;
+package com.ccbuluo.business.platform.carconfiguration.controller;
 
 import com.ccbuluo.business.platform.carconfiguration.entity.CarseriesManage;
 import com.ccbuluo.business.platform.carconfiguration.service.BasicCarseriesManageService;

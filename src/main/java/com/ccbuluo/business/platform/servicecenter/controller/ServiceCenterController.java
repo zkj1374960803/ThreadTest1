@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.servicecenter.rest;
+package com.ccbuluo.business.platform.servicecenter.controller;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.servicecenter.dto.SaveServiceCenterDTO;
@@ -13,14 +13,12 @@ import com.ccbuluo.usercoreintf.dto.QueryServiceCenterListDTO;
 import com.ccbuluo.usercoreintf.dto.ServiceCenterWorkplaceDTO;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import io.swagger.annotations.*;
-import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import java.io.IOException;
+
 import java.util.List;
-import java.util.Map;
 
 /**
  * 服务中心controller

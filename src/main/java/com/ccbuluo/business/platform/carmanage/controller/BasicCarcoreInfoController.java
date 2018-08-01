@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.carmanage.rest;
+package com.ccbuluo.business.platform.carmanage.controller;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarcoreInfo;
