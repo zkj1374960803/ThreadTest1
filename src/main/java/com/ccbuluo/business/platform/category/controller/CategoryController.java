@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.category.rest;
+package com.ccbuluo.business.platform.category.controller;
 
 import com.ccbuluo.business.platform.category.service.CategoryServiceImpl;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
@@ -11,7 +11,6 @@ import com.ccbuluo.merchandiseintf.carparts.category.dto.QueryCategoryListDTO;
 import com.ccbuluo.merchandiseintf.carparts.category.service.CarpartsCategoryService;
 import com.ccbuluo.merchandiseintf.carparts.entity.BasicCarpartsCategory;
 import io.swagger.annotations.*;
-import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

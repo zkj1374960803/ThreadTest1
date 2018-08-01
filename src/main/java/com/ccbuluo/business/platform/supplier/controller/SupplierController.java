@@ -1,14 +1,20 @@
-package com.ccbuluo.business.platform.supplier.rest;
+package com.ccbuluo.business.platform.supplier.controller;
 
 import com.ccbuluo.business.entity.BizServiceSupplier;
-import com.ccbuluo.business.platform.supplier.dto.*;
+import com.ccbuluo.business.platform.supplier.dto.EditSupplierDTO;
+import com.ccbuluo.business.platform.supplier.dto.QuerySupplierListDTO;
+import com.ccbuluo.business.platform.supplier.dto.ResultFindSupplierDetailDTO;
+import com.ccbuluo.business.platform.supplier.dto.ResultSupplierListDTO;
 import com.ccbuluo.business.platform.supplier.service.SupplierService;
 import com.ccbuluo.core.controller.BaseController;
-import com.ccbuluo.core.thrift.annotation.ThriftRPCServer;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.*;
 import org.apache.thrift.TException;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 

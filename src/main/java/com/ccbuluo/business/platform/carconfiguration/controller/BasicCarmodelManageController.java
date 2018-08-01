@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.carconfiguration.rest;
+package com.ccbuluo.business.platform.carconfiguration.controller;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.carconfiguration.dao.CarmodelManageDTO;

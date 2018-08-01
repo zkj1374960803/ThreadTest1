@@ -74,8 +74,8 @@ swagger:
   description: 售后服务平台PC端api
 
 #文件上传目录
-upload:
-  dir: uploads/
+oss:
+  bucket-name: zht-dev-nosec
 
 #thrift微服务配置
 ccbuluo:

@@ -222,9 +222,8 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT bci.id,bci.car_number,bci.vin_number,bci.car_status,")
-                .append("bcm.carbrand_name,bcmm.carseries_name,bcmmm.carmodel_name")
+                .append("bcm.carbrand_name,bci.carseries_id,bcmmm.carmodel_name")
                 .append(" FROM basic_carcore_info bci LEFT JOIN basic_carbrand_manage bcm on bci.carbrand_id=bcm.id ")
-                .append(" LEFT JOIN basic_carseries_manage bcmm on bci.carseries_id=bcmm.id ")
                 .append(" LEFT JOIN basic_carmodel_manage bcmmm ON bci.carmodel_id=bcmmm.id ")
                 .append(" WHERE bci.delete_flag = :deleteFlag ");
         // 品牌
@@ -287,5 +286,23 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("vinNumber", vinNumber);
         return super.findForBean(VinCarcoreInfoDTO.class, sql.toString(), params);
+    }
+    /**
+     * 根据车辆vin更新车辆的门店信息
+     * @param vinNumber 车架号
+     * @param storeCode 门店code
+     * @param storeName 门店名称
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author weijb
+     * @date 2018-08-01 15:55:14
+     */
+    public int updatecarcoreinfobyvin(String vinNumber, Integer storeCode, Integer storeName){
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("storeCode", storeCode);
+        params.put("storeName", storeName);
+        params.put("vinNumber", vinNumber);
+        String sql = "update basic_carcore_info set store_code=:storeCode, store_name=:storeName, car_status=1  where vin_number=:vinNumber";
+        return updateForMap(sql, params);
     }
 }

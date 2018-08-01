@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.parameter.rest;
+package com.ccbuluo.business.platform.parameter.controller;
 
 import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;

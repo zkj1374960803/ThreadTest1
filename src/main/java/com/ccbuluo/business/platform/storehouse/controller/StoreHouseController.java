@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.storehouse.rest;
+package com.ccbuluo.business.platform.storehouse.controller;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.storehouse.dto.SaveBizServiceStorehouseDTO;

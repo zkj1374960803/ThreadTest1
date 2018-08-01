@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.maintainitem.rest;
+package com.ccbuluo.business.platform.maintainitem.controller;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceMultipleprice;

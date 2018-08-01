@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.equipment.rest;
+package com.ccbuluo.business.platform.equipment.controller;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceEquiptype;

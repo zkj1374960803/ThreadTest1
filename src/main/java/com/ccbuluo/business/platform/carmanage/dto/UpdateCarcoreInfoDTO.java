@@ -34,7 +34,6 @@ public class UpdateCarcoreInfoDTO {
      */
     private Integer carStatus;
 
-    List<UpdateCarcoreInfoDTO> selfList;
 
     public String getCarNumber() {
         return carNumber;
@@ -66,13 +65,5 @@ public class UpdateCarcoreInfoDTO {
 
     public void setCarStatus(Integer carStatus) {
         this.carStatus = carStatus;
-    }
-
-    public List<UpdateCarcoreInfoDTO> getSelfList() {
-        return selfList;
-    }
-
-    public void setSelfList(List<UpdateCarcoreInfoDTO> selfList) {
-        this.selfList = selfList;
     }
 }
