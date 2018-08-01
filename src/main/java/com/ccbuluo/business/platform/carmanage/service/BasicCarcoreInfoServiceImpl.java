@@ -1,7 +1,9 @@
 package com.ccbuluo.business.platform.carmanage.service;
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarseriesManageDao;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarcoreInfo;
+import com.ccbuluo.business.platform.carconfiguration.entity.CarseriesManage;
 import com.ccbuluo.business.platform.carconfiguration.utils.RegularCodeProductor;
 import com.ccbuluo.business.platform.carmanage.dao.BasicCarcoreInfoDao;
 import com.ccbuluo.business.platform.carmanage.dto.ListCarcoreInfoDTO;
@@ -43,6 +45,7 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
     @Autowired
     private UserHolder userHolder;
     @Autowired
+    BasicCarseriesManageDao basicCarseriesManageDao;
 
     /**
      * 存储redis时当前模块的名字
@@ -249,7 +252,21 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
      */
     @Override
     public Page<SearchCarcoreInfoDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer carStatus, String Keyword, Integer offset, Integer pageSize){
-        return basicCarcoreInfoDao.queryCarcoreInfoList(carbrandId, carseriesId, carStatus, Keyword, offset, pageSize);
+        Page<SearchCarcoreInfoDTO> searchCarcoreInfoDTOPage =  basicCarcoreInfoDao.queryCarcoreInfoList(carbrandId, carseriesId, carStatus, Keyword, offset, pageSize);
+        //拼装车系
+        buildCarseriesManage(searchCarcoreInfoDTOPage);
+        return searchCarcoreInfoDTOPage;
+    }
+    // 组装车系的名称
+    private void buildCarseriesManage(Page<SearchCarcoreInfoDTO> searchCarcoreInfoDTOPage){
+        List<CarseriesManage> list = basicCarseriesManageDao.queryAllCarseriesManageList();
+        for(SearchCarcoreInfoDTO sd : searchCarcoreInfoDTOPage.getRows()){
+            for(CarseriesManage cm : list){//获取车系的名称
+                if(sd.getCarseriesId().intValue() == cm.getId().intValue()){
+                    sd.setCarseriesName(cm.getCarseriesName());
+                }
+            }
+        }
     }
     /**
      * 车辆删除验证

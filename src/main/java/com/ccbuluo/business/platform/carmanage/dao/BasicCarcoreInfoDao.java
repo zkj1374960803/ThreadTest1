@@ -222,9 +222,8 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT bci.id,bci.car_number,bci.vin_number,bci.car_status,")
-                .append("bcm.carbrand_name,bcmm.carseries_name,bcmmm.carmodel_name")
+                .append("bcm.carbrand_name,bci.carseries_id,bcmmm.carmodel_name")
                 .append(" FROM basic_carcore_info bci LEFT JOIN basic_carbrand_manage bcm on bci.carbrand_id=bcm.id ")
-                .append(" LEFT JOIN basic_carseries_manage bcmm on bci.carseries_id=bcmm.id ")
                 .append(" LEFT JOIN basic_carmodel_manage bcmmm ON bci.carmodel_id=bcmmm.id ")
                 .append(" WHERE bci.delete_flag = :deleteFlag ");
         // 品牌

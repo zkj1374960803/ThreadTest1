@@ -36,6 +36,11 @@ public class SearchCarcoreInfoDTO {
     /**
      * 所属车系id
      */
+    @ApiModelProperty(name = "carseriesId", value = "所属车系id",required = true)
+    private Long carseriesId;
+    /**
+     * 所属车系id
+     */
     @ApiModelProperty(name = "carseriesName", value = "所属车系名字")
     private String carseriesName;
     /**
@@ -78,6 +83,14 @@ public class SearchCarcoreInfoDTO {
 
     public void setCarbrandName(String carbrandName) {
         this.carbrandName = carbrandName;
+    }
+
+    public Long getCarseriesId() {
+        return carseriesId;
+    }
+
+    public void setCarseriesId(Long carseriesId) {
+        this.carseriesId = carseriesId;
     }
 
     public String getCarseriesName() {

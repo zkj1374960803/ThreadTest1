@@ -67,7 +67,20 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
     @Override
     public Page<CarmodelManageDTO> queryPageForCarModelManage(Long carbrandId, Long carseriesId, Integer status, String carmodelName, int offset, int limit) {
         Page<CarmodelManageDTO> carmodelManageDTOPage = this.basicCarmodelManageDao.queryPageForCarModelManage(carbrandId, carseriesId, status,carmodelName, offset, limit);
+        //拼装车系
+        buildCarseriesManage(carmodelManageDTOPage);
         return carmodelManageDTOPage;
+    }
+    // 组装车系的名称
+    private void buildCarseriesManage(Page<CarmodelManageDTO> carmodelManageDTOPage){
+        List<CarseriesManage> list = basicCarseriesManageDao.queryAllCarseriesManageList();
+        for(CarmodelManageDTO cd : carmodelManageDTOPage.getRows()){
+            for(CarseriesManage cm : list){//获取车系的名称
+                if(cd.getCarseriesId().intValue() == cm.getId().intValue()){
+                    cd.setCarseriesName(cm.getCarseriesName());
+                }
+            }
+        }
     }
 
     /**
