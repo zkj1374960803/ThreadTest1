@@ -103,16 +103,18 @@ public class BasicCarcoreInfoController extends BaseController {
     @ApiImplicitParams({@ApiImplicitParam(name = "carbrandId", value = "品牌id", required = false, paramType = "query"),
             @ApiImplicitParam(name = "carseriesId", value = "车系id", required = false, paramType = "query"),
             @ApiImplicitParam(name = "carStatus", value = "车辆状态", required = false, paramType = "query",dataType = "int"),
+            @ApiImplicitParam(name = "custmanagerUuid", value = "客户经理uuid【车辆管理列表不传，客户经理的管理车辆列表必传】", required = false, paramType = "query"),
             @ApiImplicitParam(name = "Keyword", value = "关键字", required = false, paramType = "query"),
             @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
             @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
     public StatusDto<Page<SearchCarcoreInfoDTO>> queryCarcoreInfoList(@RequestParam(required = false) Long carbrandId,
                                                                           @RequestParam(required = false) Long carseriesId,
-                                                                          @RequestParam(required = false) Integer carStatus,
                                                                           @RequestParam(required = false) String Keyword,
+                                                                          @RequestParam(required = false) String custmanagerUuid,
+                                                                          @RequestParam(required = false) Integer carStatus,
                                                                           @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                           @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
-        return StatusDto.buildDataSuccessStatusDto(basicCarcoreInfoService.queryCarcoreInfoList(carbrandId, carseriesId, carStatus, Keyword, offset, pageSize));
+        return StatusDto.buildDataSuccessStatusDto(basicCarcoreInfoService.queryCarcoreInfoList(carbrandId, carseriesId, carStatus, custmanagerUuid, Keyword, offset, pageSize));
     }
     /**
      * 查询未分配的车辆列表
@@ -120,9 +122,10 @@ public class BasicCarcoreInfoController extends BaseController {
      * @date 2018-07-31 15:59:51
      */
     @ApiOperation(value = "查询未分配的车辆列表",notes = "【魏俊标】")
+    @ApiImplicitParam(name = "vinNumber", value = "车辆vin", required = false, paramType = "query")
     @GetMapping("/queryundistributedlist")
-    public StatusDto<List<ListCarcoreInfoDTO>> queryundistributedlist() {
-        return StatusDto.buildDataSuccessStatusDto(basicCarcoreInfoService.queryundistributedlist());
+    public StatusDto<List<ListCarcoreInfoDTO>> queryundistributedlist(@RequestParam(required = false) String vinNumber) {
+        return StatusDto.buildDataSuccessStatusDto(basicCarcoreInfoService.queryundistributedlist(vinNumber));
     }
 
     /**
@@ -136,11 +139,11 @@ public class BasicCarcoreInfoController extends BaseController {
     @ApiOperation(value = "批量更新维修车状态（根据车辆code）", notes = "【魏俊标】")
     @PostMapping("/updatestatusbycode")
     public StatusDto updatestatusbycode(@ApiParam(name = "updateCarcoreInfoDTO集合", value = "传入updateCarcoreInfoDTO数组", required = true)@RequestBody List<UpdateCarcoreInfoDTO> carcoreInfoList) {
-        List<Long> flag = basicCarcoreInfoService.updatestatusbycode(carcoreInfoList);
-        if (flag.size() != Constants.STATUS_FLAG_ZERO) {
-            return StatusDto.buildSuccessStatusDto("操作成功！");
+        int status = basicCarcoreInfoService.updatestatusbycode(carcoreInfoList);
+        if (status == Constants.FAILURESTATUS) {
+            return StatusDto.buildFailure("操作失败！");
         }
-        return StatusDto.buildFailureStatusDto("操作失败！");
+        return StatusDto.buildSuccessStatusDto("操作成功！");
     }
     /**
      * 根据车架号查询车辆信息
@@ -176,6 +179,24 @@ public class BasicCarcoreInfoController extends BaseController {
             return StatusDto.buildSuccessStatusDto("操作成功！");
         }
         return StatusDto.buildFailureStatusDto("操作失败！");
+    }
+
+    /**
+     * 解除车辆与客户经理的关联关系
+     * @param carNumber 车辆编号
+     * @return 操作是否成功
+     * @author liuduo
+     * @date 2018-08-01 14:23:04
+     */
+    @ApiOperation(value = "移除车辆与客户经理的关联关系", notes = "【刘铎】")
+    @ApiImplicitParam(name = "carNumber", value = "车辆编码", required = true, paramType = "query")
+    @GetMapping("/release")
+    public StatusDto release(@RequestParam String carNumber) {
+        int status = basicCarcoreInfoService.release(carNumber);
+        if (status == Constants.FAILURESTATUS) {
+            return StatusDto.buildFailure("操作失败！");
+        }
+        return StatusDto.buildSuccessStatusDto("操作成功！");
     }
 
 }

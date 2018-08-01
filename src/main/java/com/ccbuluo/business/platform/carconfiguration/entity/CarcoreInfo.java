@@ -13,10 +13,6 @@ import java.util.Date;
 @ApiModel(value = "CarcoreInfo", description = "车辆管理 实体表")
 public class CarcoreInfo extends CarCommonEntity {
     /**
-     * 主键，自增
-     */
-    private Long id;
-    /**
      * 车辆编号
      */
     @ApiModelProperty(name = "carNumber", value = "车辆编号")
@@ -64,14 +60,32 @@ public class CarcoreInfo extends CarCommonEntity {
      * 车辆状态
      */
     private Integer carStatus;
+    /**
+     * 客户经理uuid
+     */
+    @ApiModelProperty(name = "cusmanagerUuid", value = "客户经理uuid")
+    private String cusmanagerUuid;
+    /**
+     * 客户经理名字
+     */
+    @ApiModelProperty(name = "cusmanagerName", value = "客户经理名字")
+    private String cusmanagerName;
+    /**
+     * 租赁系统中是否分配了门店
+     */
+    @ApiModelProperty(name = "storeAssigned", value = "租赁系统中是否分配了门店")
+    private Integer storeAssigned;
+    /**
+     * 门店的机构编码
+     */
+    @ApiModelProperty(name = "storeCode", value = "门店的机构编码")
+    private String storeCode;
+    /**
+     * 门店机构的名称
+     */
+    @ApiModelProperty(name = "storeName", value = "门店机构的名称")
+    private String storeName;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return this.id;
-    }
 
     public String getCarNumber() {
         return carNumber;
@@ -151,5 +165,45 @@ public class CarcoreInfo extends CarCommonEntity {
 
     public void setCarStatus(Integer carStatus) {
         this.carStatus = carStatus;
+    }
+
+    public String getCusmanagerUuid() {
+        return cusmanagerUuid;
+    }
+
+    public void setCusmanagerUuid(String cusmanagerUuid) {
+        this.cusmanagerUuid = cusmanagerUuid;
+    }
+
+    public String getCusmanagerName() {
+        return cusmanagerName;
+    }
+
+    public void setCusmanagerName(String cusmanagerName) {
+        this.cusmanagerName = cusmanagerName;
+    }
+
+    public Integer getStoreAssigned() {
+        return storeAssigned;
+    }
+
+    public void setStoreAssigned(Integer storeAssigned) {
+        this.storeAssigned = storeAssigned;
+    }
+
+    public String getStoreCode() {
+        return storeCode;
+    }
+
+    public void setStoreCode(String storeCode) {
+        this.storeCode = storeCode;
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
     }
 }

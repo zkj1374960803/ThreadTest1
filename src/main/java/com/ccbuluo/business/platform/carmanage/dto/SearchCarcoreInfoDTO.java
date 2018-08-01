@@ -49,6 +49,11 @@ public class SearchCarcoreInfoDTO {
     @ApiModelProperty(name = "carmodelName", value = "所属车型名字")
     private String carmodelName;
     /**
+     * 车主（在租赁系统中的门店名称）
+     */
+    @ApiModelProperty(name = "storeName", value = "车主（在租赁系统中的门店名称）")
+    private String storeName;
+    /**
      * 车辆状态
      */
     private Integer carStatus;
@@ -115,5 +120,13 @@ public class SearchCarcoreInfoDTO {
 
     public void setCarStatus(Integer carStatus) {
         this.carStatus = carStatus;
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
     }
 }
