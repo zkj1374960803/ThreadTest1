@@ -30,7 +30,7 @@ public class RelSupplierProduct {
     /**
      * 商品类型（注：PRODUCT零配件，EQUIPMENT物料）
      */
-    @ApiModelProperty(name = "productType", value = "商品类型（注：PRODUCT零配件，EQUIPMENT物料）")
+    @ApiModelProperty(name = "productType", value = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）")
     private String productType;
     @ApiModelProperty(name = "creator", value = "创建人", hidden = true)
     private String creator;
