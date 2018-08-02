@@ -49,8 +49,6 @@ public class ListCarcoreInfoDTO {
     private String carmodelName;
 
 
-
-
     public String getCarNumber() {
         return carNumber;
     }

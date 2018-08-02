@@ -119,4 +119,19 @@ public class EquipmentController extends BaseController {
     public StatusDto<List<Map<String,String>>> getEquipUnitList() {
         return StatusDto.buildDataSuccessStatusDto(equipmentService.getUnit());
     }
+
+
+    /**
+     * 根据物料类型id查询物料
+     * @param equiptypeId 物料类型id
+     * @return 物料
+     * @author liuduo
+     * @date 2018-08-02 10:41:20
+     */
+    @ApiOperation(value = "根据物料类型查物料", notes = "【刘铎】")
+    @ApiImplicitParam(name = "equiptypeId", value = "物料类型id", paramType = "query", dataType = "int")
+    @GetMapping("/queryequpmentbyequiptype")
+    public StatusDto<List<DetailBizServiceEquipmentDTO>> queryEqupmentByEquiptype(Long equiptypeId) {
+        return StatusDto.buildDataSuccessStatusDto(equipmentService.queryEqupmentByEquiptype(equiptypeId));
+    }
 }

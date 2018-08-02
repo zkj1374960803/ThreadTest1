@@ -157,6 +157,7 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
         }
         //新增默认未分配：0
         carcoreInfo.setCarStatus(Constants.STATUS_FLAG_ZERO);
+        carcoreInfo.setStoreAssigned(Constants.STATUS_FLAG_ZERO);
         // 3.通用字段
         carcoreInfo.preInsert(userHolder.getLoggedUserId());
     }
@@ -252,8 +253,8 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
      * @date 2018-07-13 19:52:44
      */
     @Override
-    public Page<SearchCarcoreInfoDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer carStatus, String custmanagerUuid, String Keyword, Integer offset, Integer pageSize){
-        Page<SearchCarcoreInfoDTO> searchCarcoreInfoDTOPage =  basicCarcoreInfoDao.queryCarcoreInfoList(carbrandId, carseriesId, carStatus, custmanagerUuid, Keyword, offset, pageSize);
+    public Page<SearchCarcoreInfoDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer storeAssigned, String custmanagerUuid, String Keyword, Integer offset, Integer pageSize){
+        Page<SearchCarcoreInfoDTO> searchCarcoreInfoDTOPage =  basicCarcoreInfoDao.queryCarcoreInfoList(carbrandId, carseriesId, storeAssigned, custmanagerUuid, Keyword, offset, pageSize);
         //拼装车系
         buildCarseriesManage(searchCarcoreInfoDTOPage);
         return searchCarcoreInfoDTOPage;

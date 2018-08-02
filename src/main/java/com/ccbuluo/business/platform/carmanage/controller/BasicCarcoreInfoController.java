@@ -107,7 +107,7 @@ public class BasicCarcoreInfoController extends BaseController {
     @GetMapping("/list")
     @ApiImplicitParams({@ApiImplicitParam(name = "carbrandId", value = "品牌id", required = false, paramType = "query"),
             @ApiImplicitParam(name = "carseriesId", value = "车系id", required = false, paramType = "query"),
-            @ApiImplicitParam(name = "carStatus", value = "车辆状态", required = false, paramType = "query",dataType = "int"),
+            @ApiImplicitParam(name = "storeAssigned", value = "车辆状态", required = false, paramType = "query",dataType = "int"),
             @ApiImplicitParam(name = "custmanagerUuid", value = "客户经理uuid【车辆管理列表不传，客户经理的管理车辆列表必传】", required = false, paramType = "query"),
             @ApiImplicitParam(name = "Keyword", value = "关键字", required = false, paramType = "query"),
             @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
@@ -116,10 +116,10 @@ public class BasicCarcoreInfoController extends BaseController {
                                                                           @RequestParam(required = false) Long carseriesId,
                                                                           @RequestParam(required = false) String Keyword,
                                                                           @RequestParam(required = false) String custmanagerUuid,
-                                                                          @RequestParam(required = false) Integer carStatus,
+                                                                          @RequestParam(required = false) Integer storeAssigned,
                                                                           @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                           @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
-        return StatusDto.buildDataSuccessStatusDto(basicCarcoreInfoService.queryCarcoreInfoList(carbrandId, carseriesId, carStatus, custmanagerUuid, Keyword, offset, pageSize));
+        return StatusDto.buildDataSuccessStatusDto(basicCarcoreInfoService.queryCarcoreInfoList(carbrandId, carseriesId, storeAssigned, custmanagerUuid, Keyword, offset, pageSize));
     }
     /**
      * 查询未分配的车辆列表

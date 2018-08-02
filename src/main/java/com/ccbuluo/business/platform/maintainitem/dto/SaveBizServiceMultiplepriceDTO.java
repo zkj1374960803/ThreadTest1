@@ -16,10 +16,36 @@ import java.util.List;
 public class SaveBizServiceMultiplepriceDTO {
 
     /**
+     * 服务项目的编码
+     */
+    @ApiModelProperty(name = "maintainitemCode", value = "服务项目的编码")
+    private String maintainitemCode;
+    /**
+     * 倍数
+     */
+    @ApiModelProperty(name = "multiple", value = "倍数")
+    private Double multiple;
+    /**
      * 城市
      */
     @ApiModelProperty(name = "remark", value = "城市")
     private List<CorrespondAreaDTO> multiplepriceDTOList;
+
+    public void setMaintainitemCode(String maintainitemCode) {
+        this.maintainitemCode = maintainitemCode;
+    }
+
+    public String getMaintainitemCode() {
+        return this.maintainitemCode;
+    }
+
+    public void setMultiple(Double multiple) {
+        this.multiple = multiple;
+    }
+
+    public Double getMultiple() {
+        return this.multiple;
+    }
 
     public List<CorrespondAreaDTO> getMultiplepriceDTOList() {
         return multiplepriceDTOList;

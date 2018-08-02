@@ -62,6 +62,11 @@ public class SearchCarcoreInfoDTO {
      * 车辆状态
      */
     private Integer carStatus;
+    /**
+     * 车辆租赁状态（是否已分配门店）
+     */
+    @ApiModelProperty(name = "storeAssigned", value = "车辆租赁状态（是否已分配门店）")
+    private Integer storeAssigned;
 
     public void setId(Long id) {
         this.id = id;
@@ -141,5 +146,13 @@ public class SearchCarcoreInfoDTO {
 
     public void setCusmanagerName(String cusmanagerName) {
         this.cusmanagerName = cusmanagerName;
+    }
+
+    public Integer getStoreAssigned() {
+        return storeAssigned;
+    }
+
+    public void setStoreAssigned(Integer storeAssigned) {
+        this.storeAssigned = storeAssigned;
     }
 }

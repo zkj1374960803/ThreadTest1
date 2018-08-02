@@ -217,11 +217,11 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
      * @author weijb
      * @date 2018-07-13 19:52:44
      */
-    public Page<SearchCarcoreInfoDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer carStatus,  String custmanagerUuid, String Keyword, Integer offset, Integer pageSize){
+    public Page<SearchCarcoreInfoDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer storeAssigned,  String custmanagerUuid, String Keyword, Integer offset, Integer pageSize){
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT bci.id,bci.car_number,bci.vin_number,bci.car_status,")
+        sql.append("SELECT bci.id,bci.car_number,bci.store_assigned,bci.vin_number,bci.car_status,")
                 .append("bcm.carbrand_name,bci.carseries_id,bci.cusmanager_name,bcmmm.carmodel_name")
                 .append(" FROM basic_carcore_info bci LEFT JOIN basic_carbrand_manage bcm on bci.carbrand_id=bcm.id ")
                 .append(" LEFT JOIN basic_carmodel_manage bcmmm ON bci.carmodel_id=bcmmm.id ")
@@ -243,9 +243,9 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
             sql.append(" AND bci.carseries_id = :carseriesId ");
         }
         // 车型
-        if (null != carStatus) {
-            param.put("carStatus", carStatus);
-            sql.append(" AND bci.car_status = :carStatus ");
+        if (null != storeAssigned) {
+            param.put("storeAssigned", storeAssigned);
+            sql.append(" AND bci.store_assigned = :storeAssigned ");
         }
         // 车架号
         if (StringUtils.isNotBlank(Keyword)) {

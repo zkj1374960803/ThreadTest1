@@ -74,7 +74,7 @@ public interface BasicCarcoreInfoService {
      * @author weijb
      * @date 2018-07-13 19:52:44
      */
-    Page<SearchCarcoreInfoDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer carStatus, String custmanagerUuid, String Keyword, Integer offset, Integer pageSize);
+    Page<SearchCarcoreInfoDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer storeAssigned, String custmanagerUuid, String Keyword, Integer offset, Integer pageSize);
 
     /**
      * 查询未分配的车辆列表
