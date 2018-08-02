@@ -133,4 +133,16 @@ public class EquipmentServiceImpl implements EquipmentService{
         return list;
     }
 
+    /**
+     * 根据物料类型id查询物料
+     * @param equiptypeId 物料类型id
+     * @return 物料
+     * @author liuduo
+     * @date 2018-08-02 10:41:20
+     */
+    @Override
+    public List<DetailBizServiceEquipmentDTO> queryEqupmentByEquiptype(Long equiptypeId) {
+        return bizServiceEquipmentDao.queryEqupmentByEquiptype(equiptypeId);
+    }
+
 }

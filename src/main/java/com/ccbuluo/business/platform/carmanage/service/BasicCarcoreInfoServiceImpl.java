@@ -21,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -355,10 +357,10 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
      */
     @Override
     public List<CusmanagerCarCountDTO> queryCarNumByCusmanagerUuid(List<String> cusmanagerUuids) {
-//        if (cusmanagerUuids) {
-//
-//        }
-        return null;
+        if (cusmanagerUuids.isEmpty()) {
+            return Collections.EMPTY_LIST;
+        }
+        return basicCarcoreInfoDao.queryCarNumByCusmanagerUuid(cusmanagerUuids);
     }
 
 

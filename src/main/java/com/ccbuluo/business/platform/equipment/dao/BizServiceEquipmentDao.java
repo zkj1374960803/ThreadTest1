@@ -159,4 +159,20 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
 
         return queryPageForBean(DetailBizServiceEquipmentDTO.class, sql.toString(), params, offset, pagesize);
     }
+
+    /**
+     * 根据物料类型id查询物料
+     * @param equiptypeId 物料类型id
+     * @return 物料
+     * @author liuduo
+     * @date 2018-08-02 10:41:20
+     */
+    public List<DetailBizServiceEquipmentDTO> queryEqupmentByEquiptype(Long equiptypeId) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("equiptypeId", equiptypeId);
+
+        String sql = "SELECT equip_code,equip_name FROM biz_service_equipment WHERE equiptype_id = :equiptypeId";
+
+        return queryListBean(DetailBizServiceEquipmentDTO.class, sql, params);
+    }
 }
