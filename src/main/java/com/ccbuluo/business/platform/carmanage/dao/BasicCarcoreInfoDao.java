@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -317,6 +318,9 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
      * @date 2018-08-01 15:59:51
      */
     public List<ListCarcoreInfoDTO> queryCarMobelNameByIds(List<Long> carModelIds) {
+        if(carModelIds.size() == 0){
+            return new ArrayList<ListCarcoreInfoDTO>();
+        }
         String sql = "SELECT id as carmodelId,carmodel_name as carmodelName FROM basic_carmodel_manage WHERE id IN (:carModelIds)";
         Map<String, Object> params = Maps.newHashMap();
         params.put("carModelIds", carModelIds);
