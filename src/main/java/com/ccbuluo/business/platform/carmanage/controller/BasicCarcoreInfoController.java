@@ -9,10 +9,13 @@ import com.ccbuluo.business.platform.carmanage.service.BasicCarcoreInfoService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import io.swagger.annotations.*;
 import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -28,6 +31,8 @@ public class BasicCarcoreInfoController extends BaseController {
 
     @Autowired
     private BasicCarcoreInfoService basicCarcoreInfoService;
+    @Resource
+    private InnerUserInfoService innerUserInfoService;
 
     /**
      * 车辆注册新增
@@ -155,7 +160,12 @@ public class BasicCarcoreInfoController extends BaseController {
     @ApiOperation(value = "根据车辆vin查询车辆信息", notes = "【魏俊标】")
     @ApiImplicitParam(name = "vinNumber", value = "车辆vin", required = true, paramType = "query")
     @GetMapping("/getcarinfobyvin")
-    public StatusDto getCarInfoByVin(@RequestParam String vinNumber,@RequestParam String SecretID,@RequestParam String AppID) throws TException {
+    public StatusDto getCarInfoByVin(@RequestParam String vinNumber,@RequestParam String appId,@RequestParam String secretId) throws TException {
+        StatusDto<String> statusDto = innerUserInfoService.checkAppIdAndSecretId( appId, secretId);
+        //权限校验
+        if(Constants.ERROR_CODE.equals(statusDto.getCode())){
+            return statusDto;
+        }
         return StatusDto.buildDataSuccessStatusDto(basicCarcoreInfoService.getCarInfoByVin(vinNumber));
     }
     /**
@@ -174,7 +184,12 @@ public class BasicCarcoreInfoController extends BaseController {
             @ApiImplicitParam(name = "storeName", value = "门店名称", required = false, paramType = "query")})
     @GetMapping("/updatecarcoreinfobyvin")
     public StatusDto updateCarcoreInfoByVin(@RequestParam String vinNumber,@RequestParam String storeCode,@RequestParam String storeName
-            ,@RequestParam String SecretID,@RequestParam String AppID) {
+            ,@RequestParam String appId,@RequestParam String secretId) {
+        StatusDto<String> statusDto = innerUserInfoService.checkAppIdAndSecretId( appId, secretId);
+        //权限校验
+        if(Constants.ERROR_CODE.equals(statusDto.getCode())){
+            return statusDto;
+        }
         int flag = basicCarcoreInfoService.updateCarcoreInfoByVin(vinNumber,storeCode,storeName);
         if (flag != Constants.STATUS_FLAG_ZERO) {
             return StatusDto.buildSuccessStatusDto("操作成功！");
