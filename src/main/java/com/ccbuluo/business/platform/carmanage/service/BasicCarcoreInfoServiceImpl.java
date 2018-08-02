@@ -294,8 +294,8 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
      * @date 2018-07-31 15:59:51
      */
     @Override
-    public List<ListCarcoreInfoDTO> queryundistributedlist(String vinNumber){
-        List<ListCarcoreInfoDTO> queryundistributedlist = basicCarcoreInfoDao.queryundistributedlist(vinNumber);
+    public List<ListCarcoreInfoDTO> queryuUndistributedList(String vinNumber){
+        List<ListCarcoreInfoDTO> queryundistributedlist = basicCarcoreInfoDao.queryuUndistributedList(vinNumber);
         List<Long> carModelIds = queryundistributedlist.stream().map(a -> a.getCarmodelId()).distinct().collect(Collectors.toList());
         List<ListCarcoreInfoDTO> listCarcoreInfoDTOS = basicCarcoreInfoDao.queryCarMobelNameByIds(carModelIds);
         Map<Long, String> collect = listCarcoreInfoDTOS.stream().collect(Collectors.toMap(a -> a.getCarmodelId(), b -> b.getCarmodelName()));
@@ -314,8 +314,8 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
      * @date 2018-07-31 15:59:51
      */
     @Override
-    public int updatestatusbycode(List<UpdateCarcoreInfoDTO> list){
-        return basicCarcoreInfoDao.updatestatusbycode(list);
+    public int updateStatusByCode(List<UpdateCarcoreInfoDTO> list){
+        return basicCarcoreInfoDao.updateStatusByCode(list);
     }
     /**
      * 根据车架号查询车辆信息
@@ -345,8 +345,8 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
      * @date 2018-08-01 15:55:14
      */
     @Override
-    public int updatecarcoreinfobyvin(String vinNumber, Integer storeCode, Integer storeName){
-        return basicCarcoreInfoDao.updatecarcoreinfobyvin(vinNumber,storeCode,storeName);
+    public int updateCarcoreInfoByVin(String vinNumber, String storeCode, String storeName){
+        return basicCarcoreInfoDao.updateCarcoreInfoByVin(vinNumber,storeCode,storeName);
     }
 
 }

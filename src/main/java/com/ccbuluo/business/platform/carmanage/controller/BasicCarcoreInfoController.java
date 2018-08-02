@@ -124,8 +124,8 @@ public class BasicCarcoreInfoController extends BaseController {
     @ApiOperation(value = "查询未分配的车辆列表",notes = "【魏俊标】")
     @ApiImplicitParam(name = "vinNumber", value = "车辆vin", required = false, paramType = "query")
     @GetMapping("/queryundistributedlist")
-    public StatusDto<List<ListCarcoreInfoDTO>> queryundistributedlist(@RequestParam(required = false) String vinNumber) {
-        return StatusDto.buildDataSuccessStatusDto(basicCarcoreInfoService.queryundistributedlist(vinNumber));
+    public StatusDto<List<ListCarcoreInfoDTO>> queryuUndistributedList(@RequestParam(required = false) String vinNumber) {
+        return StatusDto.buildDataSuccessStatusDto(basicCarcoreInfoService.queryuUndistributedList(vinNumber));
     }
 
     /**
@@ -138,8 +138,8 @@ public class BasicCarcoreInfoController extends BaseController {
      */
     @ApiOperation(value = "批量更新维修车状态（根据车辆code）", notes = "【魏俊标】")
     @PostMapping("/updatestatusbycode")
-    public StatusDto updatestatusbycode(@ApiParam(name = "updateCarcoreInfoDTO集合", value = "传入updateCarcoreInfoDTO数组", required = true)@RequestBody List<UpdateCarcoreInfoDTO> carcoreInfoList) {
-        int status = basicCarcoreInfoService.updatestatusbycode(carcoreInfoList);
+    public StatusDto updateStatusByCode(@ApiParam(name = "updateCarcoreInfoDTO集合", value = "传入updateCarcoreInfoDTO数组", required = true)@RequestBody List<UpdateCarcoreInfoDTO> carcoreInfoList) {
+        int status = basicCarcoreInfoService.updateStatusByCode(carcoreInfoList);
         if (status == Constants.FAILURESTATUS) {
             return StatusDto.buildFailure("操作失败！");
         }
@@ -152,7 +152,7 @@ public class BasicCarcoreInfoController extends BaseController {
      * @author weijb
      * @date 2018-06-08 13:55:14
      */
-    @ApiOperation(value = "根据车架号查询车辆信息", notes = "【魏俊标】")
+    @ApiOperation(value = "根据车辆vin查询车辆信息", notes = "【魏俊标】")
     @ApiImplicitParam(name = "vinNumber", value = "车辆vin", required = true, paramType = "query")
     @GetMapping("/getcarinfobyvin")
     public StatusDto getCarInfoByVin(String vinNumber) throws TException {
@@ -173,8 +173,8 @@ public class BasicCarcoreInfoController extends BaseController {
             @ApiImplicitParam(name = "storeCode", value = "门店code", required = false, paramType = "query"),
             @ApiImplicitParam(name = "storeName", value = "门店名称", required = false, paramType = "query")})
     @GetMapping("/updatecarcoreinfobyvin")
-    public StatusDto updatecarcoreinfobyvin(@RequestParam String vinNumber,@RequestParam Integer storeCode,@RequestParam Integer storeName) {
-        int flag = basicCarcoreInfoService.updatecarcoreinfobyvin(vinNumber,storeCode,storeName);
+    public StatusDto updateCarcoreInfoByVin(@RequestParam String vinNumber,@RequestParam String storeCode,@RequestParam String storeName) {
+        int flag = basicCarcoreInfoService.updateCarcoreInfoByVin(vinNumber,storeCode,storeName);
         if (flag != Constants.STATUS_FLAG_ZERO) {
             return StatusDto.buildSuccessStatusDto("操作成功！");
         }

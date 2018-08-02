@@ -263,7 +263,7 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
      * @author weijb
      * @date 2018-08-01 15:59:51
      */
-    public List<ListCarcoreInfoDTO> queryundistributedlist(String vinNumber){
+    public List<ListCarcoreInfoDTO> queryuUndistributedList(String vinNumber){
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT bci.car_number,bci.vin_number,bcmmm.carbrand_name,bcm.carseries_name,bci.carmodel_id,")
             .append(" bci.store_name FROM basic_carcore_info AS bci")
@@ -289,7 +289,7 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
      * @author weijb
      * @date 2018-07-31 15:59:51
      */
-    public int updatestatusbycode(List<UpdateCarcoreInfoDTO> list){
+    public int updateStatusByCode(List<UpdateCarcoreInfoDTO> list){
         String sql = "update basic_carcore_info set cusmanager_uuid=:cusmanagerUuid, cusmanager_name=:cusmanagerName, car_status=:carStatus  where car_number=:carNumber";
         return batchUpdateForListBean(sql, list);
     }
@@ -349,7 +349,7 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
      * @author weijb
      * @date 2018-08-01 15:55:14
      */
-    public int updatecarcoreinfobyvin(String vinNumber, Integer storeCode, Integer storeName){
+    public int updateCarcoreInfoByVin(String vinNumber, String storeCode, String storeName){
         Map<String, Object> params = Maps.newHashMap();
         params.put("storeCode", storeCode);
         params.put("storeName", storeName);

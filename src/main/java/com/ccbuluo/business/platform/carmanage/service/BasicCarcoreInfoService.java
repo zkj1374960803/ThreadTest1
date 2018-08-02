@@ -84,7 +84,7 @@ public interface BasicCarcoreInfoService {
      * @author weijb
      * @date 2018-07-31 15:59:51
      */
-    List<ListCarcoreInfoDTO> queryundistributedlist(String vinNumber);
+    List<ListCarcoreInfoDTO> queryuUndistributedList(String vinNumber);
     /**
      * 根据车辆code更新车辆状态
      * @param list
@@ -93,7 +93,7 @@ public interface BasicCarcoreInfoService {
      * @author weijb
      * @date 2018-07-31 15:59:51
      */
-    int updatestatusbycode(List<UpdateCarcoreInfoDTO> list);
+    int updateStatusByCode(List<UpdateCarcoreInfoDTO> list);
 
     /**
      * 根据车架号查询车辆信息
@@ -123,5 +123,5 @@ public interface BasicCarcoreInfoService {
      * @author weijb
      * @date 2018-08-01 15:55:14
      */
-    int updatecarcoreinfobyvin(String vinNumber, Integer storeCode, Integer storeName);
+    int updateCarcoreInfoByVin(String vinNumber, String storeCode, String storeName);
 }
