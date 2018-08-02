@@ -18,13 +18,12 @@ public interface MultiplepriceService {
 
     /**
      * 保存地区倍数
-     * @param saveBizServiceMaintainitemDTO 工时dto
-     * @param maintainitemCode 工时code
+     * @param saveBizServiceMultiplepriceDTO 地区倍数dto
      * @return 保存是否成功
      * @author liuduo
      * @date 2018-07-18 13:59:55
      */
-    int save(String maintainitemCode,  SaveBizServiceMaintainitemDTO saveBizServiceMaintainitemDTO);
+    int save(SaveBizServiceMultiplepriceDTO saveBizServiceMultiplepriceDTO);
 
     /**
      * 查询地区倍数列表
