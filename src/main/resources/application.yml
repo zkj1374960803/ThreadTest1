@@ -9,4 +9,4 @@ logging:
 
 #不需要拦截卡登录的http接口url
 auth:
-  exclution:  /asd,/drf
+  exclution:  /carmanage/getcarinfobyvin/updatecarcoreinfobyvin,/carmanage/basiccarcoreinfo/updatecarcoreinfobyvin
