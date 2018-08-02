@@ -20,39 +20,39 @@ public class QueryRelSupplierProduct {
     /**
      * 供应商code
      */
-    @ApiModelProperty(name = "供应商code", value = "supplierCode")
+    @ApiModelProperty(name = "supplierCode", value = "供应商code", hidden = true)
     private String supplierCode;
 
     /**
      * 类型名称
      */
-    @ApiModelProperty(name = "类型名称", value = "categoryName")
+    @ApiModelProperty(name = "categoryName", value = "类型名称")
     private String categoryName;
 
     /**
      * 商品的code
      */
-    @ApiModelProperty(name = "商品的code", value = "productCode")
+    @ApiModelProperty(name = "productCode", value = "商品的code", hidden = true)
     private String productCode;
     /**
      * 商品的名称
      */
-    @ApiModelProperty(name = "商品的名称", value = "productName")
+    @ApiModelProperty(name = "productName", value = "商品的名称")
     private String productName;
     /**
      * 商品类型（注：PRODUCT零配件，EQUIPMENT物料）
      */
-    @ApiModelProperty(name = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）", value = "productType")
+    @ApiModelProperty(name = "productType", value = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）")
     private String productType;
     /**
      * 偏移量
      */
-    @ApiModelProperty(name = "偏移量", value = "offset", hidden = true)
+    @ApiModelProperty(name = "offset", value = "偏移量", hidden = true)
     private Integer offset;
     /**
      * 每页显示的条数
      */
-    @ApiModelProperty(name = "每页显示的条数", value = "pageSize", hidden = true)
+    @ApiModelProperty(name = "pageSize", value = "每页显示的条数", hidden = true)
     private Integer pageSize;
 
     public Integer getOffset() {

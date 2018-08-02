@@ -227,7 +227,7 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
      * @date 2018-08-01 20:27:32
      */
     public int updateCustmanager(BizServiceCustmanager bizServiceCustmanager){
-        String sql = "UPDATE biz_service_maintaincar SET cusmanager_uuid = :userUuid, cusmanager_name = :name, car_status = 1 WHERE mend_code = :mendCode";
+        String sql = "UPDATE biz_service_maintaincar SET cusmanager_uuid = :userUuid, cusmanager_name = :name, car_status = 1 WHERE vin_number = :vinNumber";
         return updateForBean(sql, bizServiceCustmanager);
     }
     /**

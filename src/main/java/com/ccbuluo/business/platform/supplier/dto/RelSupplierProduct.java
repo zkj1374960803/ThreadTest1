@@ -20,27 +20,27 @@ public class RelSupplierProduct {
     /**
      * 供应商code
      */
-    @ApiModelProperty(name = "供应商code", value = "supplierCode")
+    @ApiModelProperty(name = "supplierCode", value = "供应商code")
     private String supplierCode;
     /**
      * 商品的code
      */
-    @ApiModelProperty(name = "商品的code", value = "productCode")
+    @ApiModelProperty(name = "productCode", value = "商品的code")
     private String productCode;
     /**
      * 商品类型（注：PRODUCT零配件，EQUIPMENT物料）
      */
-    @ApiModelProperty(name = "商品类型（注：PRODUCT零配件，EQUIPMENT物料）", value = "productType")
+    @ApiModelProperty(name = "productType", value = "商品类型（注：PRODUCT零配件，EQUIPMENT物料）")
     private String productType;
-    @ApiModelProperty(name = "创建人", value = "creator", hidden = true)
+    @ApiModelProperty(name = "creator", value = "创建人", hidden = true)
     private String creator;
-    @ApiModelProperty(name = "创建时间", value = "createTime", hidden = true)
+    @ApiModelProperty(name = "createTime", value = "创建时间", hidden = true)
     private Date createTime;
-    @ApiModelProperty(name = "操作人", value = "operator", hidden = true)
+    @ApiModelProperty(name = "operator", value = "操作人", hidden = true)
     private String operator;
-    @ApiModelProperty(name = "操作时间", value = "operateTime", hidden = true)
+    @ApiModelProperty(name = "operateTime", value = "操作时间", hidden = true)
     private Date operateTime;
-    @ApiModelProperty(name = "删除标识", value = "deleteFlag", hidden = true)
+    @ApiModelProperty(name = "deleteFlag", value = "删除标识", hidden = true)
     private Integer deleteFlag = 0;
 
 

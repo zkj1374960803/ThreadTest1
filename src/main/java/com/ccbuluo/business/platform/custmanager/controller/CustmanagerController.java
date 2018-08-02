@@ -149,7 +149,10 @@ public class CustmanagerController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "userUuid", value = "用户uuid", required = true, paramType = "query"),
         @ApiImplicitParam(name = "officePhone", value = "办公手机号", required = true, paramType = "query"),
-        @ApiImplicitParam(name = "receivingAddress", value = "收货地址", required = true, paramType = "query")
+        @ApiImplicitParam(name = "receivingAddress", value = "收货地址", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "servicecenterCode", value = "服务中心code", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "vinNumber", value = "vin", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "name", value = "客户经理姓名", required = true, paramType = "query")
     })
     @PostMapping("/updatecustmanager")
     public StatusDto<String> updateCustManager(@ApiIgnore BizServiceCustmanager bizServiceCustmanager) {

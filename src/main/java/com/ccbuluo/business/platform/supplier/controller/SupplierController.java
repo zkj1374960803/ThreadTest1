@@ -99,7 +99,7 @@ public class SupplierController extends BaseController {
      * @date 2018-07-04 10:31:57
      */
     @ApiOperation(value = "查询供应商详情接口",notes = "【张康健】")
-    @PostMapping("/findsupplierdetail/{id}")
+    @GetMapping("/findsupplierdetail/{id}")
     @ApiImplicitParam(name = "id", value = "供应商id", required = true, paramType = "path", dataType = "int")
     public StatusDto<ResultFindSupplierDetailDTO> findSupplierDetail(@PathVariable Long id){
         return StatusDto.buildDataSuccessStatusDto(supplierServiceImpl.findSupplierDetail(id));
