@@ -1,10 +1,7 @@
 package com.ccbuluo.business.platform.supplier.controller;
 
 import com.ccbuluo.business.entity.BizServiceSupplier;
-import com.ccbuluo.business.platform.supplier.dto.EditSupplierDTO;
-import com.ccbuluo.business.platform.supplier.dto.QuerySupplierListDTO;
-import com.ccbuluo.business.platform.supplier.dto.ResultFindSupplierDetailDTO;
-import com.ccbuluo.business.platform.supplier.dto.ResultSupplierListDTO;
+import com.ccbuluo.business.platform.supplier.dto.*;
 import com.ccbuluo.business.platform.supplier.service.SupplierService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
@@ -134,11 +131,25 @@ public class SupplierController extends BaseController {
         @ApiImplicitParam(name = "supplierCode", value = "供应商code", required = true, paramType = "query",dataType = "String"),
         @ApiImplicitParam(name = "productType", value = "商品类型(注：PRODUCT零配件，EQUIPMENT物料)", required = true, paramType = "query", dataType = "String"),
     })
-    public StatusDto<Page<RelSupplierProduct>> findSupplierProduct(@ApiIgnore RelSupplierProduct relSupplierProduct){
-        Page<RelSupplierProduct> page = supplierServiceImpl.findSupplierProduct(relSupplierProduct);
-
+    public StatusDto<Page<QueryRelSupplierProduct>> findSupplierProduct(@ApiIgnore QueryRelSupplierProduct relSupplierProduct){
+        Page<QueryRelSupplierProduct> page = supplierServiceImpl.findSupplierProduct(relSupplierProduct);
+        return StatusDto.buildDataSuccessStatusDto(page);
     }
 
+    /**
+     * 删除供应商关联关系
+     * @param
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-08-01 20:09:52
+     */
+    @ApiOperation(value = "删除供应商关联商品关系",notes = "【张康健】")
+    @ApiImplicitParam(name = "id", value = "供应商关联商品关系id", required = true, paramType = "query",dataType = "int")
+    public StatusDto<String> deleteSupplierProduct(@ApiIgnore Long id){
+         supplierServiceImpl.deleteSupplierProduct(id);
+        return StatusDto.buildSuccessStatusDto();
+    }
 
 
 }

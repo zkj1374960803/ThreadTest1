@@ -11,10 +11,12 @@ import com.ccbuluo.business.platform.supplier.dto.*;
 
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
+import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.core.thrift.exception.ThriftRpcException;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.json.JsonUtils;
+import com.ccbuluo.merchandiseintf.carparts.category.service.CarpartsCategoryService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +44,8 @@ public class SupplierServiceImpl implements SupplierService{
     private UserHolder userHolder;
     @Resource(name = "generateProjectCodeService")
     private GenerateProjectCodeService generateProjectCodeService;
+    @ThriftRPCClient("BasicMerchandiseSer")
+    private CarpartsCategoryService carpartsCategoryService;
 
 
     /**
@@ -213,24 +217,36 @@ public class SupplierServiceImpl implements SupplierService{
         }
         return StatusDto.buildSuccessStatusDto();
     }
-
+    @Autowired
+    FittingsProductImpl fittingsProductImpl;
     /**
      * 查询供应商的商品（零配件，物料）
      *
-     * @param relSupplierProduct 查询条件
+     * @param queryRelSupplierProduct 查询条件
      * @return StatusDto<Page < RelSupplierProduct>> 分页信息
      * @author zhangkangjian
      * @date 2018-08-01 11:46:53
      */
     @Override
-    public Page<RelSupplierProduct> findSupplierProduct(RelSupplierProduct relSupplierProduct) {
-        String value = RelSupplierProduct.ProductTypeEnum.EQUIPMENT.getValue();
+    public Page<QueryRelSupplierProduct> findSupplierProduct(QueryRelSupplierProduct queryRelSupplierProduct) {
 
+        Page<QueryRelSupplierProduct> queryRelSupplierProductPage = fittingsProductImpl.querySupplierProduct(queryRelSupplierProduct);
+        Page<QueryRelSupplierProduct> queryEquipmentProduct = fittingsProductImpl.queryEquipmentProduct(queryRelSupplierProduct);
+        return queryRelSupplierProductPage;
+    }
 
-
-
-
-        return null;
+    /**
+     * 删除供应商关系
+     *
+     * @param id
+     * @return
+     * @throws
+     * @author zhangkangjian
+     * @date 2018-08-01 20:12:26
+     */
+    @Override
+    public void deleteSupplierProduct(Long id) {
+        bizServiceSupplierDao.deleteSupplierProduct(id);
     }
 
     /**

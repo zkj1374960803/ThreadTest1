@@ -41,8 +41,8 @@ public class BizServiceCustmanagerDao extends BaseDao<BizServiceCustmanager> {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO biz_service_custmanager ( office_phone,receiving_address,")
             .append("user_uuid,remark,creator,operator,")
-            .append("delete_flag ) VALUES (  :officePhone, :receivingAddress, :userUuid,")
-            .append(" :remark, :creator,  :operator,  :deleteFlag")
+            .append("delete_flag,servicecenter_code ) VALUES (  :officePhone, :receivingAddress, :userUuid,")
+            .append(" :remark, :creator,  :operator,  :deleteFlag,servicecenterCode ")
             .append(" )");
         return super.save(sql.toString(), entity);
     }
@@ -58,7 +58,7 @@ public class BizServiceCustmanagerDao extends BaseDao<BizServiceCustmanager> {
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE biz_service_custmanager SET office_phone = :officePhone,")
             .append("receiving_address = :receivingAddress, ")
-            .append("operator = :operator,operate_time = :operateTime WHERE user_uuid = :userUuid");
+            .append("operator = :operator,operate_time = :operateTime,servicecenter_code = :,servicecenterCode WHERE user_uuid = :userUuid");
         return super.updateForBean(sql.toString(), entity);
     }
 

@@ -43,23 +43,6 @@ public class RelSupplierProduct {
     @ApiModelProperty(name = "删除标识", value = "deleteFlag", hidden = true)
     private Integer deleteFlag = 0;
 
-    public enum ProductTypeEnum {
-        PRODUCT("PRODUCT"),
-        EQUIPMENT("EQUIPMENT");
-        private String value;
-
-        public String getValue() {
-            return value;
-        }
-
-        ProductTypeEnum(String product) {
-        }
-
-        ProductTypeEnum() {
-        }
-    }
-
-
 
     public Long getId() {
         return id;

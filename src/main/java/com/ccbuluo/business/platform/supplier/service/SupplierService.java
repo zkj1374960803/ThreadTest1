@@ -71,5 +71,14 @@ public interface SupplierService {
      * @author zhangkangjian
      * @date 2018-08-01 11:46:53
      */
-    Page<RelSupplierProduct> findSupplierProduct(RelSupplierProduct relSupplierProduct);
+    Page<QueryRelSupplierProduct> findSupplierProduct(QueryRelSupplierProduct relSupplierProduct);
+    /**
+     * 删除供应商关系
+     * @param id
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-08-01 20:12:26
+     */
+    void deleteSupplierProduct(Long id);
 }

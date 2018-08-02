@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.maintaincar.dao;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceMaintaincar;
+import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
 import com.ccbuluo.business.platform.maintaincar.dto.ListServiceMaintaincarDTO;
 import com.ccbuluo.business.platform.maintaincar.dto.SearchBizServiceMaintaincarDTO;
 import com.ccbuluo.dao.BaseDao;
@@ -216,5 +217,47 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
         params.put("status", status);
         String sql = "UPDATE biz_service_maintaincar SET car_status = :status WHERE mend_code = :mendCode";
         return updateForMap(sql, params);
+    }
+    /**
+     *  根据维修车code更新维修车信息
+     * @param
+     * @exception 
+     * @return 
+     * @author zhangkangjian
+     * @date 2018-08-01 20:27:32
+     */
+    public int updateCustmanager(BizServiceCustmanager bizServiceCustmanager){
+        String sql = "UPDATE biz_service_maintaincar SET cusmanager_uuid = :userUuid, cusmanager_name = :name, car_status = 1 WHERE mend_code = :mendCode";
+        return updateForBean(sql, bizServiceCustmanager);
+    }
+    /**
+     * 根据uuid更新维修车状态
+     * @param useruuid 项目经理id
+     * @param status
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author zhangkangjian
+     * @date 2018-07-31 15:59:51
+     */
+    public int updateStatusbyUuid(String useruuid, Integer status){
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("useruuid", useruuid);
+        params.put("status", status);
+        String sql = "UPDATE biz_service_maintaincar SET car_status = :status WHERE cusmanager_uuid = :useruuid";
+        return updateForMap(sql, params);
+    }
+    /**
+     * 查询vin编码
+     * @param useruudis 用户的uuids
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-08-01 20:52:09
+     */
+    public List<BizServiceCustmanager> queryVinNumberByuuid(List<String> useruudis) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("useruudis", useruudis);
+        String sql = " SELECT a.cusmanager_uuid as 'userUuid', a.vin_number as 'mendCode' FROM biz_service_maintaincar a WHERE a.`cusmanager_uuid` IN (:useruudis)";
+        return queryListBean(BizServiceCustmanager.class, sql, params);
     }
 }

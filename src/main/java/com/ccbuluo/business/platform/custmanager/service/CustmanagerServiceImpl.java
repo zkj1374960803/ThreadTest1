@@ -7,6 +7,7 @@ import com.ccbuluo.business.platform.custmanager.dao.BizServiceCustmanagerDao;
 import com.ccbuluo.business.platform.custmanager.dto.CustManagerDetailDTO;
 import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
+import com.ccbuluo.business.platform.maintaincar.dao.BizServiceMaintaincarDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.business.platform.supplier.service.SupplierServiceImpl;
 import com.ccbuluo.core.common.UserHolder;
@@ -63,6 +64,8 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     Logger logger = LoggerFactory.getLogger(getClass());
     @ThriftRPCClient("UserCoreSerService")
     private BasicUserOrganizationService orgService;
+    @Resource
+    private BizServiceMaintaincarDao bizServiceMaintaincarDao;
 
     /**
      * 创建客户经理
@@ -265,10 +268,21 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         StatusDto<Page<UserInfoDTO>> userInfoStatusDto = StatusDtoThriftUtils.resolve(userInfoDTOStatusDtoThriftPage, UserInfoDTO.class);
         // List<UserInfoDTO> 转换成 List<QueryUserListDTO>
         StatusDto<List<QueryUserListDTO>> custManagerList = userInfoDTOConversionQueryUserListDTO(userInfoStatusDto.getData().getRows());
+        // 查询维修车
         if(!custManagerList.isSuccess()){
             return StatusDto.buildFailure(custManagerList.getMessage());
         }
+        List<QueryUserListDTO> data = custManagerList.getData();
+        List<String> useruudis = data.stream().map(QueryUserListDTO::getUseruuid).collect(Collectors.toList());
+        // 查询维修车编号
+        List<BizServiceCustmanager> list = bizServiceMaintaincarDao.queryVinNumberByuuid(useruudis);
+        Map<String, BizServiceCustmanager> appleMap = list.stream().collect(Collectors.toMap(BizServiceCustmanager::getUserUuid, a -> a,(k1,k2)->k1));
+        data.stream().forEach(a -> {
+            BizServiceCustmanager bizServiceCustmanager = appleMap.get(a.getUseruuid());
+            a.setVIN(bizServiceCustmanager.getMendCode());
+        });
         // 组装分页信息
+
         Page<QueryUserListDTO> page = buildCustManagerData(userInfoStatusDto, custManagerList);
         return StatusDto.buildDataSuccessStatusDto(page);
     }
@@ -340,6 +354,9 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     @Override
     public StatusDto<String> updateCustManager(BizServiceCustmanager bizServiceCustmanager) {
         updateCustManagerDetail(bizServiceCustmanager);
+        // 更新维修车
+        bizServiceMaintaincarDao.updateStatusbyUuid(bizServiceCustmanager.getUserUuid(), Constants.DELETE_FLAG_NORMAL);
+        bizServiceMaintaincarDao.updateCustmanager(bizServiceCustmanager);
         return StatusDto.buildSuccessStatusDto();
     }
 
