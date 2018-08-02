@@ -46,7 +46,7 @@ public class ResultFindSupplierDetailDTO {
     /**
      * 供应商的使用状态：1启用/0停用
      */
-    @ApiModelProperty(name = "supplierStatus", value = "供应商的使用状态：1启用/0停用", hidden = true)
+    @ApiModelProperty(name = "supplierStatus", value = "供应商的使用状态：1启用/0停用")
     private Long supplierStatus = 1L;
     /**
      * 供应商性质

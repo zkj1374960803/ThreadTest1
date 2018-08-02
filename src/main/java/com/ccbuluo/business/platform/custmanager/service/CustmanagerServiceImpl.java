@@ -410,6 +410,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         if(bizServiceCustmanager != null){
             custManagerDetailDTO.setOfficePhone(bizServiceCustmanager.getOfficePhone());
             custManagerDetailDTO.setReceivingAddress(bizServiceCustmanager.getReceivingAddress());
+            custManagerDetailDTO.setServicecenterCode(bizServiceCustmanager.getServicecenterCode());
         }
         int age = getAgeByBirth(new Date(custManagerDetailDTO.getBirthday() * 1000));
         custManagerDetailDTO.setAge(age);
