@@ -137,8 +137,8 @@ public class CarpartsProductController extends BaseController {
      * @author weijb
      * @date 2018-08-02 09:59:51
      */
-    @ApiOperation(value = "查询未分配的车辆列表",notes = "【魏俊标】")
-    @ApiImplicitParam(name = "vinNumber", value = "车辆vin", required = false, paramType = "query")
+    @ApiOperation(value = "根据分类code查询零配件list（不分页）",notes = "【魏俊标】")
+    @ApiImplicitParam(name = "categoryCode", value = "零部件分类code", required = false, paramType = "query")
     @GetMapping("/querycarpartsproductlistbycategorycode")
     public StatusDto<List<BasicCarpartsProductDTO>> queryCarpartsProductListByCategoryCode(@RequestParam(required = false) String categoryCode) {
         return StatusDto.buildDataSuccessStatusDto(carpartsProductService.queryCarpartsProductListByCategoryCode(categoryCode));
