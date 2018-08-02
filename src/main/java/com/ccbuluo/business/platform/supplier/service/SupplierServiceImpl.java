@@ -243,16 +243,16 @@ public class SupplierServiceImpl implements SupplierService{
 
     /**
      * 删除供应商关系
-     *
      * @param id
-     * @return
-     * @throws
      * @author zhangkangjian
      * @date 2018-08-01 20:12:26
      */
     @Override
     public void deleteSupplierProduct(Long id) {
-        bizServiceSupplierDao.deleteSupplierProduct(id);
+        RelSupplierProduct sp = bizServiceSupplierDao.findRelSupplierProduct(id);
+        if(sp != null){
+            bizServiceSupplierDao.deleteSupplierProduct(sp);
+        }
     }
 
     /**
@@ -299,7 +299,7 @@ public class SupplierServiceImpl implements SupplierService{
     }
 
     /**
-     * 查询供商物料商品
+     * 查询供商零配件商品
      * @param queryRelSupplierProduct 查询条件
      * @return Page<RelSupplierProduct> 分页的商品信息
      * @author zhangkangjian
@@ -323,7 +323,7 @@ public class SupplierServiceImpl implements SupplierService{
     }
 
     /**
-     *  查询供商零配件商品
+     *  查询供商物料商品
      * @param queryRelSupplierProduct 查询条件
      * @return Page<RelSupplierProduct> 分页的商品信息
      * @author zhangkangjian

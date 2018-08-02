@@ -72,6 +72,26 @@ public class CustManagerDetailDTO {
     private long dimissionTime;
     @ApiModelProperty(name = "dimissionReson", value = "离职原因")
     private String dimissionReson;
+    @ApiModelProperty(name = "servicecenterCode", value = "服务中心code")
+    private String servicecenterCode;
+    @ApiModelProperty(name = "vinNumber", value = "维修车vin")
+    private String vinNumber;
+
+    public String getServicecenterCode() {
+        return servicecenterCode;
+    }
+
+    public void setServicecenterCode(String servicecenterCode) {
+        this.servicecenterCode = servicecenterCode;
+    }
+
+    public String getVinNumber() {
+        return vinNumber;
+    }
+
+    public void setVinNumber(String vinNumber) {
+        this.vinNumber = vinNumber;
+    }
 
     public String getOrgCode() {
         return orgCode;

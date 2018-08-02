@@ -224,16 +224,25 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
 
     /**
      * 删除供应商关系
-     * @param id
-     * @exception
-     * @return
+     * @param supplierProduct 删除条件
      * @author zhangkangjian
      * @date 2018-08-01 20:13:18
      */
-    public void deleteSupplierProduct(Long id) {
-        String sql = "DELETE FROM rel_supplier_product WHERE id = :id";
+    public void deleteSupplierProduct(RelSupplierProduct supplierProduct) {
+        String sql = "DELETE FROM rel_supplier_product WHERE supplier_code = :supplierCode AND product_code = :productCode AND product_type = :productType ";
+        updateForBean(sql, supplierProduct);
+    }
+    /**
+     * 查询供应商关系
+     * @param id 关系id
+     * @return RelSupplierProduct
+     * @author zhangkangjian
+     * @date 2018-08-02 11:24:53
+     */
+    public RelSupplierProduct findRelSupplierProduct(Long id) {
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("id", id);
-        updateForMap(sql.toString(), map);
+        String sql = "SELECT a.supplier_code,a.product_code,a.product_type FROM rel_supplier_product a WHERE a.id = :id";
+        return findForBean(RelSupplierProduct.class, sql, map);
     }
 }

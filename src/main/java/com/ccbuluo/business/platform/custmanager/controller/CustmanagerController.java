@@ -68,7 +68,8 @@ public class CustmanagerController extends BaseController {
         @ApiImplicitParam(name = "hiredate", value = "入职时间(秒值)", required = true, paramType = "query", dataType = "Long"),
         @ApiImplicitParam(name = "officePhone", value = "办公手机号", required = true, paramType = "query"),
         @ApiImplicitParam(name = "receivingAddress", value = "收货地址", required = true, paramType = "query"),
-        @ApiImplicitParam(name = "orgCode", value = "组织架构code", required = true, paramType = "query")
+        @ApiImplicitParam(name = "orgCode", value = "组织架构code", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "servicecenterCode", value = "服务中心code", required = true, paramType = "query")
     })
     @PostMapping("/createuser")
     public StatusDto<String> createUser(@ApiIgnore UserInfoDTO userInfoDTO, @ApiIgnore BizServiceCustmanager bizServiceCustmanager) {
@@ -116,7 +117,8 @@ public class CustmanagerController extends BaseController {
         @ApiImplicitParam(name = "hiredate", value = "入职时间(秒值)", required = true, paramType = "query", dataType = "Long"),
         @ApiImplicitParam(name = "officePhone", value = "办公手机号", required = true, paramType = "query"),
         @ApiImplicitParam(name = "receivingAddress", value = "收货地址", required = true, paramType = "query"),
-        @ApiImplicitParam(name = "orgCode", value = "组织架构code", required = true, paramType = "query")
+        @ApiImplicitParam(name = "orgCode", value = "组织架构code", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "servicecenterCode", value = "服务中心code", required = true, paramType = "query")
     })
     public StatusDto editUser(@ApiIgnore UserInfoDTO userInfoDTO, @ApiIgnore BizServiceCustmanager bizServiceCustmanager) {
         return custmanagerServiceImpl.editUser(userInfoDTO, bizServiceCustmanager);

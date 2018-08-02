@@ -358,7 +358,7 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
     @Override
     public List<CusmanagerCarCountDTO> queryCarNumByCusmanagerUuid(List<String> cusmanagerUuids) {
         if (cusmanagerUuids.isEmpty()) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         return basicCarcoreInfoDao.queryCarNumByCusmanagerUuid(cusmanagerUuids);
     }
