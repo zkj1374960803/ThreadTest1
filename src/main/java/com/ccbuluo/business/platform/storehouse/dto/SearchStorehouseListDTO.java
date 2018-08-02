@@ -43,6 +43,11 @@ public class SearchStorehouseListDTO extends IdEntity {
      */
     @ApiModelProperty(name = "storehouseStatus", value = "服务中心名称")
     private String serviceCenterName;
+    /**
+     * 地址
+     */
+    @ApiModelProperty(name = "storehouseAddress", value = "地址")
+    private String storehouseAddress;
 
 
     public void setStorehouseCode(String storehouseCode) {
@@ -91,5 +96,13 @@ public class SearchStorehouseListDTO extends IdEntity {
 
     public void setServiceCenterName(String serviceCenterName) {
         this.serviceCenterName = serviceCenterName;
+    }
+
+    public String getStorehouseAddress() {
+        return storehouseAddress;
+    }
+
+    public void setStorehouseAddress(String storehouseAddress) {
+        this.storehouseAddress = storehouseAddress;
     }
 }
