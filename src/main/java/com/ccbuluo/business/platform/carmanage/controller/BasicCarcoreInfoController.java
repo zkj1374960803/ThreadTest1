@@ -155,7 +155,7 @@ public class BasicCarcoreInfoController extends BaseController {
     @ApiOperation(value = "根据车辆vin查询车辆信息", notes = "【魏俊标】")
     @ApiImplicitParam(name = "vinNumber", value = "车辆vin", required = true, paramType = "query")
     @GetMapping("/getcarinfobyvin")
-    public StatusDto getCarInfoByVin(String vinNumber) throws TException {
+    public StatusDto getCarInfoByVin(@RequestParam String vinNumber,@RequestParam String SecretID,@RequestParam String AppID) throws TException {
         return StatusDto.buildDataSuccessStatusDto(basicCarcoreInfoService.getCarInfoByVin(vinNumber));
     }
     /**
@@ -173,7 +173,8 @@ public class BasicCarcoreInfoController extends BaseController {
             @ApiImplicitParam(name = "storeCode", value = "门店code", required = false, paramType = "query"),
             @ApiImplicitParam(name = "storeName", value = "门店名称", required = false, paramType = "query")})
     @GetMapping("/updatecarcoreinfobyvin")
-    public StatusDto updateCarcoreInfoByVin(@RequestParam String vinNumber,@RequestParam String storeCode,@RequestParam String storeName) {
+    public StatusDto updateCarcoreInfoByVin(@RequestParam String vinNumber,@RequestParam String storeCode,@RequestParam String storeName
+            ,@RequestParam String SecretID,@RequestParam String AppID) {
         int flag = basicCarcoreInfoService.updateCarcoreInfoByVin(vinNumber,storeCode,storeName);
         if (flag != Constants.STATUS_FLAG_ZERO) {
             return StatusDto.buildSuccessStatusDto("操作成功！");
