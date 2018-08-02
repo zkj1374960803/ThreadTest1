@@ -3,6 +3,8 @@ package com.ccbuluo.business.platform.custmanager.service;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.platform.carmanage.dto.CusmanagerCarCountDTO;
+import com.ccbuluo.business.platform.carmanage.service.BasicCarcoreInfoService;
 import com.ccbuluo.business.platform.custmanager.dao.BizServiceCustmanagerDao;
 import com.ccbuluo.business.platform.custmanager.dto.CustManagerDetailDTO;
 import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
@@ -28,6 +30,7 @@ import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +69,8 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     private BasicUserOrganizationService orgService;
     @Resource
     private BizServiceMaintaincarDao bizServiceMaintaincarDao;
+    @Resource
+    BasicCarcoreInfoService basicCarcoreInfoService;
 
     /**
      * 创建客户经理
@@ -101,7 +106,6 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             bizServiceCustmanager.setOperator(loggedUserId);
             bizServiceCustmanager.setUserUuid(useruuid);
             // 手机号校验
-//            supplierServiceImpl.compareRepeat(bizServiceCustmanager.getId(), bizServiceCustmanager.getOfficePhone(), "office_phone", "biz_service_custmanager", "手机号重复！");
             compareRepeat(bizServiceCustmanager.getUserUuid(), bizServiceCustmanager.getOfficePhone(), "office_phone", "biz_service_custmanager", "客户经理办公SIM卡手机号重复！");
             bizServiceCustmanagerDao.saveBizServiceCustmanager(bizServiceCustmanager);
         }catch (Exception e){
@@ -130,12 +134,6 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         StatusDto<List<String>> resolve = StatusDtoThriftUtils.resolve(statusDtoThriftList, String.class);
         List<String> data = resolve.getData();
         // 过滤掉离职的用户
-//        Map<String, String> idsMap = ids.stream().collect(Collectors.toMap(String::toString, a -> a,(k1, k2)->k1));
-//        data.stream().forEach(a -> {
-//            idsMap.remove(a);
-//        });
-//        Set<String> strings = idsMap.keySet();
-//        List<String> list = new ArrayList(strings);
         ids.removeAll(data);
         compareRepeat(id, ids ,tip);
     }
@@ -275,14 +273,28 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         List<QueryUserListDTO> data = custManagerList.getData();
         List<String> useruudis = data.stream().map(QueryUserListDTO::getUseruuid).collect(Collectors.toList());
         // 查询维修车编号
-        List<BizServiceCustmanager> list = bizServiceMaintaincarDao.queryVinNumberByuuid(useruudis);
-        Map<String, BizServiceCustmanager> appleMap = list.stream().collect(Collectors.toMap(BizServiceCustmanager::getUserUuid, a -> a,(k1,k2)->k1));
-        data.stream().forEach(a -> {
-            BizServiceCustmanager bizServiceCustmanager = appleMap.get(a.getUseruuid());
-            a.setVIN(bizServiceCustmanager.getMendCode());
-        });
-        // 组装分页信息
+        List<BizServiceCustmanager> vinList = bizServiceMaintaincarDao.queryVinNumberByuuid(useruudis);
+        List<CusmanagerCarCountDTO> carList = basicCarcoreInfoService.queryCarNumByCusmanagerUuid(useruudis);
+        Map<String, CusmanagerCarCountDTO> carMap = null;
+        if(carList != null && carList.size() > 0){
+            carMap = carList.stream().collect(Collectors.toMap(CusmanagerCarCountDTO::getCusmanagerUuid, a -> a,(k1,k2)->k1));
+        }
+        if(vinList != null && vinList.size() > 0){
+            Map<String, BizServiceCustmanager> vinMap = vinList.stream().collect(Collectors.toMap(BizServiceCustmanager::getUserUuid, a -> a,(k1,k2)->k1));
+            for (int i = 0; i < data.size(); i++) {
+                QueryUserListDTO queryUserListDTO = data.get(i);
+                BizServiceCustmanager bizServiceCustmanager = vinMap.get(queryUserListDTO.getUseruuid());
+                CusmanagerCarCountDTO cusmanagerCarCountDTO = carMap.get(queryUserListDTO.getUseruuid());
+                if(bizServiceCustmanager != null){
+                    queryUserListDTO.setVIN(bizServiceCustmanager.getVinNumber());
+                }
+                if(cusmanagerCarCountDTO != null){
+                    queryUserListDTO.setCarsNumber(Long.valueOf(cusmanagerCarCountDTO.getCarNum()));
+                }
+            }
+        }
 
+        // 组装分页信息
         Page<QueryUserListDTO> page = buildCustManagerData(userInfoStatusDto, custManagerList);
         return StatusDto.buildDataSuccessStatusDto(page);
     }
@@ -389,6 +401,12 @@ public class CustmanagerServiceImpl implements CustmanagerService{
      */
     private void findCustManagerDetail(String useruuid, CustManagerDetailDTO custManagerDetailDTO) {
         BizServiceCustmanager bizServiceCustmanager = bizServiceCustmanagerDao.queryCustManagerByUuid(useruuid);
+        // 查询客户经理维修车的vin
+        List<BizServiceCustmanager> bizServiceCustmanagers = bizServiceMaintaincarDao.queryVinNumberByuuid(List.of(useruuid));
+        if(bizServiceCustmanagers != null && bizServiceCustmanagers.size() > 0){
+            String vinNumber = bizServiceCustmanagers.get(0).getVinNumber();
+            custManagerDetailDTO.setVinNumber(vinNumber);
+        }
         if(bizServiceCustmanager != null){
             custManagerDetailDTO.setOfficePhone(bizServiceCustmanager.getOfficePhone());
             custManagerDetailDTO.setReceivingAddress(bizServiceCustmanager.getReceivingAddress());

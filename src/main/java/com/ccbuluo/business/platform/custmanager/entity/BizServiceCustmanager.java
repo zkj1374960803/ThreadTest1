@@ -40,8 +40,18 @@ public class BizServiceCustmanager {
     private  Integer deleteFlag = 0;
     // 服务中心
     private String servicecenterCode;
-    // 维修车
+    // 维修车编号
     private String mendCode;
+    // 维修车vin
+    private String vinNumber;
+
+    public String getVinNumber() {
+        return vinNumber;
+    }
+
+    public void setVinNumber(String vinNumber) {
+        this.vinNumber = vinNumber;
+    }
 
     public String getMendCode() {
         return mendCode;

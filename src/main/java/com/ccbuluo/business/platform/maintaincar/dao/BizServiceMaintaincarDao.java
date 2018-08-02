@@ -243,7 +243,7 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("useruuid", useruuid);
         params.put("status", status);
-        String sql = "UPDATE biz_service_maintaincar SET car_status = :status WHERE cusmanager_uuid = :useruuid";
+        String sql = "UPDATE biz_service_maintaincar SET car_status = :status,cusmanager_uuid = null,cusmanager_name = null WHERE cusmanager_uuid = :useruuid";
         return updateForMap(sql, params);
     }
     /**
@@ -257,7 +257,7 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
     public List<BizServiceCustmanager> queryVinNumberByuuid(List<String> useruudis) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("useruudis", useruudis);
-        String sql = " SELECT a.cusmanager_uuid as 'userUuid', a.vin_number as 'mendCode' FROM biz_service_maintaincar a WHERE a.`cusmanager_uuid` IN (:useruudis)";
+        String sql = " SELECT a.cusmanager_uuid as 'userUuid', a.vin_number as 'vinNumber' FROM biz_service_maintaincar a WHERE a.`cusmanager_uuid` IN (:useruudis)";
         return queryListBean(BizServiceCustmanager.class, sql, params);
     }
 }

@@ -81,4 +81,22 @@ public interface SupplierService {
      * @date 2018-08-01 20:12:26
      */
     void deleteSupplierProduct(Long id);
+
+    /**
+     * 查询供商零配件商品
+     * @param qeryRelSupplierProduct 查询条件
+     * @return Page<QueryRelSupplierProduct> 分页零配件信息
+     * @author zhangkangjian
+     * @date 2018-08-01 14:40:39
+     */
+    Page<QueryRelSupplierProduct> queryFittingsProduct(QueryRelSupplierProduct qeryRelSupplierProduct);
+    /**
+     * 查询供商物料商品
+     * @param qeryRelSupplierProduct 查询条件
+     * @return Page<QueryRelSupplierProduct> 分页物料信息
+     * @author zhangkangjian
+     * @date 2018-08-01 14:40:39
+     */
+    Page<QueryRelSupplierProduct> queryEquipmentProduct(QueryRelSupplierProduct qeryRelSupplierProduct);
+
 }

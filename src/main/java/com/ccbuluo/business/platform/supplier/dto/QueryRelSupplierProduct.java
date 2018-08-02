@@ -44,8 +44,15 @@ public class QueryRelSupplierProduct {
      */
     @ApiModelProperty(name = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）", value = "productType")
     private String productType;
-
+    /**
+     * 偏移量
+     */
+    @ApiModelProperty(name = "偏移量", value = "offset", hidden = true)
     private Integer offset;
+    /**
+     * 每页显示的条数
+     */
+    @ApiModelProperty(name = "每页显示的条数", value = "pageSize", hidden = true)
     private Integer pageSize;
 
     public Integer getOffset() {

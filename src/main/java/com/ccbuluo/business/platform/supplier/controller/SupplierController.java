@@ -120,7 +120,7 @@ public class SupplierController extends BaseController {
 
     /**
      * 查询供应商的商品（零配件，物料）
-     * @param relSupplierProduct 查询条件
+     * @param queryRelSupplierProduct 查询条件
      * @return StatusDto<Page<RelSupplierProduct>> 分页信息
      * @author zhangkangjian
      * @date 2018-08-01 11:46:53
@@ -129,10 +129,12 @@ public class SupplierController extends BaseController {
     @GetMapping("/findsupplierproduct")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "supplierCode", value = "供应商code", required = true, paramType = "query",dataType = "String"),
-        @ApiImplicitParam(name = "productType", value = "商品类型(注：PRODUCT零配件，EQUIPMENT物料)", required = true, paramType = "query", dataType = "String"),
+        @ApiImplicitParam(name = "productType", value = "商品类型(注：FITTINGS零配件，EQUIPMENT物料)", required = true, paramType = "query", dataType = "String"),
+        @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query",dataType = "int"),
+        @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query", dataType = "int")
     })
-    public StatusDto<Page<QueryRelSupplierProduct>> findSupplierProduct(@ApiIgnore QueryRelSupplierProduct relSupplierProduct){
-        Page<QueryRelSupplierProduct> page = supplierServiceImpl.findSupplierProduct(relSupplierProduct);
+    public StatusDto<Page<QueryRelSupplierProduct>> findSupplierProduct(@ApiIgnore QueryRelSupplierProduct queryRelSupplierProduct){
+        Page<QueryRelSupplierProduct> page = supplierServiceImpl.findSupplierProduct(queryRelSupplierProduct);
         return StatusDto.buildDataSuccessStatusDto(page);
     }
 
@@ -145,8 +147,9 @@ public class SupplierController extends BaseController {
      * @date 2018-08-01 20:09:52
      */
     @ApiOperation(value = "删除供应商关联商品关系",notes = "【张康健】")
-    @ApiImplicitParam(name = "id", value = "供应商关联商品关系id", required = true, paramType = "query",dataType = "int")
-    public StatusDto<String> deleteSupplierProduct(@ApiIgnore Long id){
+    @ApiImplicitParam(name = "id", value = "供应商关联商品关系id", required = true, paramType = "path",dataType = "int")
+    @PostMapping("/deletesupplierproduct/{id}")
+    public StatusDto<String> deleteSupplierProduct(@ApiIgnore @PathVariable Long id){
          supplierServiceImpl.deleteSupplierProduct(id);
         return StatusDto.buildSuccessStatusDto();
     }
