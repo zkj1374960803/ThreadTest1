@@ -130,12 +130,6 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         StatusDto<List<String>> resolve = StatusDtoThriftUtils.resolve(statusDtoThriftList, String.class);
         List<String> data = resolve.getData();
         // 过滤掉离职的用户
-//        Map<String, String> idsMap = ids.stream().collect(Collectors.toMap(String::toString, a -> a,(k1, k2)->k1));
-//        data.stream().forEach(a -> {
-//            idsMap.remove(a);
-//        });
-//        Set<String> strings = idsMap.keySet();
-//        List<String> list = new ArrayList(strings);
         ids.removeAll(data);
         compareRepeat(id, ids ,tip);
     }

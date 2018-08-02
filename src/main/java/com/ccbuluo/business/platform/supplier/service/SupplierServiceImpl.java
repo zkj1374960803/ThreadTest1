@@ -15,7 +15,10 @@ import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.core.thrift.exception.ThriftRpcException;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftList;
+import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.json.JsonUtils;
+import com.ccbuluo.merchandiseintf.carparts.category.dto.RelSupplierProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.category.service.CarpartsCategoryService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +31,7 @@ import org.weakref.jmx.internal.guava.base.Preconditions;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -217,8 +221,7 @@ public class SupplierServiceImpl implements SupplierService{
         }
         return StatusDto.buildSuccessStatusDto();
     }
-    @Autowired
-    FittingsProductImpl fittingsProductImpl;
+
     /**
      * 查询供应商的商品（零配件，物料）
      *
@@ -229,9 +232,12 @@ public class SupplierServiceImpl implements SupplierService{
      */
     @Override
     public Page<QueryRelSupplierProduct> findSupplierProduct(QueryRelSupplierProduct queryRelSupplierProduct) {
-
-        Page<QueryRelSupplierProduct> queryRelSupplierProductPage = fittingsProductImpl.querySupplierProduct(queryRelSupplierProduct);
-        Page<QueryRelSupplierProduct> queryEquipmentProduct = fittingsProductImpl.queryEquipmentProduct(queryRelSupplierProduct);
+        Page<QueryRelSupplierProduct> queryRelSupplierProductPage = null;
+        if(Constants.PRODUCT_TYPE_FITTINGS.equals(queryRelSupplierProduct.getProductType())){
+            queryRelSupplierProductPage = queryFittingsProduct(queryRelSupplierProduct);
+        }else{
+            queryRelSupplierProductPage = queryEquipmentProduct(queryRelSupplierProduct);
+        }
         return queryRelSupplierProductPage;
     }
 
@@ -290,6 +296,41 @@ public class SupplierServiceImpl implements SupplierService{
     public void compareRepeat(Long id, String value, String fields, String tableName, String tip){
         List<Long> ids = bizServiceSupplierDao.queryIds(value, fields, tableName);
         compareRepeat(id, ids ,tip);
+    }
+
+    /**
+     * 查询供商物料商品
+     * @param queryRelSupplierProduct 查询条件
+     * @return Page<RelSupplierProduct> 分页的商品信息
+     * @author zhangkangjian
+     * @date 2018-08-01 14:40:39
+     */
+    @Override
+    public Page<QueryRelSupplierProduct> queryFittingsProduct(QueryRelSupplierProduct queryRelSupplierProduct) {
+        Page<QueryRelSupplierProduct> queryRelSupplierProductPage = bizServiceSupplierDao.querySupplierProduct(queryRelSupplierProduct);
+        List<QueryRelSupplierProduct> products = queryRelSupplierProductPage.getRows();
+        List<String> productCodes = products.stream().map(QueryRelSupplierProduct::getProductCode).collect(Collectors.toList());
+        StatusDtoThriftList<RelSupplierProductDTO> productDto = carpartsCategoryService.queryCarpartsByProductCode(productCodes);
+        StatusDto<List<RelSupplierProductDTO>> resolve = StatusDtoThriftUtils.resolve(productDto, RelSupplierProductDTO.class);
+        List<RelSupplierProductDTO> data = resolve.getData();
+        Map<String, RelSupplierProductDTO> dataMap = data.stream().collect(Collectors.toMap(RelSupplierProductDTO::getProductCode, a -> a,(k1, k2)->k1));
+        products.stream().forEach(a ->{
+            RelSupplierProductDTO relSupplierProductDTO = dataMap.get(a.getProductCode());
+            a.setCategoryName(relSupplierProductDTO.getCategoryName());
+            a.setProductName(relSupplierProductDTO.getProductName());
+        });
+        return queryRelSupplierProductPage;
+    }
+
+    /**
+     *  查询供商零配件商品
+     * @param queryRelSupplierProduct 查询条件
+     * @return Page<RelSupplierProduct> 分页的商品信息
+     * @author zhangkangjian
+     * @date 2018-08-01 20:01:27
+     */
+    public Page<QueryRelSupplierProduct> queryEquipmentProduct(QueryRelSupplierProduct queryRelSupplierProduct) {
+        return bizServiceSupplierDao.queryEquipmentProduct(queryRelSupplierProduct);
     }
 
 
