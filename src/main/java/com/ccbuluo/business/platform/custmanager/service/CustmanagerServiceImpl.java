@@ -310,7 +310,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     @Override
     public StatusDto<String> editUser(UserInfoDTO userInfoDTO, BizServiceCustmanager bizServiceCustmanager) {
         checkedRoleCodeAndOrgCode(userInfoDTO);
-        compareRepeat(bizServiceCustmanager.getUserUuid(), bizServiceCustmanager.getOfficePhone(), "office_phone", "biz_service_custmanager", "客户经理办公SIM卡手机号重复！");
+        compareRepeat(userInfoDTO.getUseruuid(), bizServiceCustmanager.getOfficePhone(), "office_phone", "biz_service_custmanager", "客户经理办公SIM卡手机号重复！");
         String loggedUserId = userHolder.getLoggedUserId();
         long timeMillis = System.currentTimeMillis();
         userInfoDTO.setOperateTime(timeMillis);
