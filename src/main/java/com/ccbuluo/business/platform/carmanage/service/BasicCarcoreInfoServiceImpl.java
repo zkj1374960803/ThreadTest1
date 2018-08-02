@@ -6,10 +6,7 @@ import com.ccbuluo.business.platform.carconfiguration.entity.CarcoreInfo;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarseriesManage;
 import com.ccbuluo.business.platform.carconfiguration.utils.RegularCodeProductor;
 import com.ccbuluo.business.platform.carmanage.dao.BasicCarcoreInfoDao;
-import com.ccbuluo.business.platform.carmanage.dto.ListCarcoreInfoDTO;
-import com.ccbuluo.business.platform.carmanage.dto.SearchCarcoreInfoDTO;
-import com.ccbuluo.business.platform.carmanage.dto.UpdateCarcoreInfoDTO;
-import com.ccbuluo.business.platform.carmanage.dto.VinCarcoreInfoDTO;
+import com.ccbuluo.business.platform.carmanage.dto.*;
 import com.ccbuluo.business.platform.maintaincar.dto.ListServiceMaintaincarDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.constants.SystemPropertyHolder;
@@ -24,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -348,5 +347,21 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
     public int updateCarcoreInfoByVin(String vinNumber, String storeCode, String storeName){
         return basicCarcoreInfoDao.updateCarcoreInfoByVin(vinNumber,storeCode,storeName);
     }
+
+    /**
+     * 根据客户经理uuids查询名下的车辆数
+     * @param cusmanagerUuids 客户经理uuids
+     * @return 客户经理名下的车辆数
+     * @author liuduo
+     * @date 2018-08-02 10:09:30
+     */
+    @Override
+    public List<CusmanagerCarCountDTO> queryCarNumByCusmanagerUuid(List<String> cusmanagerUuids) {
+        if (cusmanagerUuids.isEmpty()) {
+            return Collections.EMPTY_LIST;
+        }
+        return basicCarcoreInfoDao.queryCarNumByCusmanagerUuid(cusmanagerUuids);
+    }
+
 
 }

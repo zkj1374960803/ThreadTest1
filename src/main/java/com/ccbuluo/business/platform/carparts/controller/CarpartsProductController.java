@@ -17,6 +17,7 @@ import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 零配件
@@ -129,6 +130,18 @@ public class CarpartsProductController extends BaseController {
                                                                              @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                              @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
         return StatusDtoThriftUtils.resolve(carpartsProductService.queryCarpartsProductList(categoryCode, keyword, offset, pageSize),BasicCarpartsProductDTO.class);
+    }
+    /**
+     * 根据分类code查询零配件list（不分页）
+     * @param categoryCode 零部件分类code
+     * @author weijb
+     * @date 2018-08-02 09:59:51
+     */
+    @ApiOperation(value = "根据分类code查询零配件list（不分页）",notes = "【魏俊标】")
+    @ApiImplicitParam(name = "categoryCode", value = "零部件分类code", required = false, paramType = "query")
+    @GetMapping("/querycarpartsproductlistbycategorycode")
+    public StatusDto<List<BasicCarpartsProductDTO>> queryCarpartsProductListByCategoryCode(@RequestParam(required = false) String categoryCode) {
+        return StatusDto.buildDataSuccessStatusDto(carpartsProductService.queryCarpartsProductListByCategoryCode(categoryCode));
     }
 
 }

@@ -1,10 +1,7 @@
 package com.ccbuluo.business.platform.carmanage.service;
 
 import com.ccbuluo.business.platform.carconfiguration.entity.CarcoreInfo;
-import com.ccbuluo.business.platform.carmanage.dto.ListCarcoreInfoDTO;
-import com.ccbuluo.business.platform.carmanage.dto.SearchCarcoreInfoDTO;
-import com.ccbuluo.business.platform.carmanage.dto.UpdateCarcoreInfoDTO;
-import com.ccbuluo.business.platform.carmanage.dto.VinCarcoreInfoDTO;
+import com.ccbuluo.business.platform.carmanage.dto.*;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -124,4 +121,14 @@ public interface BasicCarcoreInfoService {
      * @date 2018-08-01 15:55:14
      */
     int updateCarcoreInfoByVin(String vinNumber, String storeCode, String storeName);
+
+
+    /**
+     * 根据客户经理uuids查询名下的车辆数
+     * @param cusmanagerUuids 客户经理uuids
+     * @return 客户经理名下的车辆数
+     * @author liuduo
+     * @date 2018-08-02 10:09:30
+     */
+    List<CusmanagerCarCountDTO> queryCarNumByCusmanagerUuid(List<String> cusmanagerUuids);
 }

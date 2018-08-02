@@ -53,5 +53,20 @@ public interface EquipmentService {
      */
     Page<DetailBizServiceEquipmentDTO> queryList(Long equiptypeId, String keyword, Integer offset, Integer pagesize);
 
+    /**
+     * 查询计量单位
+     * @return 计量单位
+     * @author liuduo
+     * @date 2018-07-31 19:10:23
+     */
     List<Map<String,String>> getUnit();
+
+    /**
+    * 根据物料类型id查询物料
+    * @param equiptypeId 物料类型id
+    * @return 物料
+    * @author liuduo
+    * @date 2018-08-02 10:41:20
+    */
+    List<DetailBizServiceEquipmentDTO> queryEqupmentByEquiptype(Long equiptypeId);
 }
