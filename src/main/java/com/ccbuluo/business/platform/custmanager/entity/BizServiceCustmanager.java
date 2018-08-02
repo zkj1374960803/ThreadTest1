@@ -18,6 +18,8 @@ public class BizServiceCustmanager {
 
     //用户的uuid
     private  String userUuid;
+    //用户名称
+    private  String name;
 
     //备注
     private  String remark;
@@ -36,6 +38,26 @@ public class BizServiceCustmanager {
 
     //删除标识
     private  Integer deleteFlag = 0;
+    // 服务中心
+    private String servicecenterCode;
+    // 维修车
+    private String mendCode;
+
+    public String getMendCode() {
+        return mendCode;
+    }
+
+    public void setMendCode(String mendCode) {
+        this.mendCode = mendCode;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public Long getId() {
         return id;
@@ -115,5 +137,13 @@ public class BizServiceCustmanager {
 
     public void setDeleteFlag(Integer deleteFlag) {
         this.deleteFlag = deleteFlag;
+    }
+
+    public String getServicecenterCode() {
+        return servicecenterCode;
+    }
+
+    public void setServicecenterCode(String servicecenterCode) {
+        this.servicecenterCode = servicecenterCode;
     }
 }

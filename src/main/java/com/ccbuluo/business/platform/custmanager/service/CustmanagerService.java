@@ -58,4 +58,13 @@ public interface CustmanagerService {
      * @date 2018-07-25 14:14:11
      */
     StatusDto<String> updateCustManager(BizServiceCustmanager bizServiceCustmanager);
+    /**
+     * 获取组织架构子节点
+     * @param parentId 组织架构父级id
+     * @param isSearchClose 是否获取关闭的组织架构
+     * @return StatusDto
+     * @author zhangkangjian
+     * @date 2018-07-31 14:58:20
+     */
+    StatusDto queryOrgList(int parentId, boolean isSearchClose);
 }

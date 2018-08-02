@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.supplier.dto;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
@@ -9,6 +10,7 @@ import java.util.Date;
  * @author zhangkangjian
  * @date 2018-07-04 10:37:29
  */
+@ApiModel(value = "ResultFindSupplierDetailDTO", description = "查询供应商详情DTO")
 public class ResultFindSupplierDetailDTO {
 
     /**

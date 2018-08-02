@@ -2,10 +2,7 @@ package com.ccbuluo.business.platform.supplier.dao;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceSupplier;
-import com.ccbuluo.business.platform.supplier.dto.EditSupplierDTO;
-import com.ccbuluo.business.platform.supplier.dto.QuerySupplierListDTO;
-import com.ccbuluo.business.platform.supplier.dto.ResultFindSupplierDetailDTO;
-import com.ccbuluo.business.platform.supplier.dto.ResultSupplierListDTO;
+import com.ccbuluo.business.platform.supplier.dto.*;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
 import com.google.common.collect.Maps;
@@ -204,5 +201,40 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
         sql.append(" order by operate_time desc ");
         SqlParameterSource param = new BeanPropertySqlParameterSource(querySupplierListDTO);
         return queryPageForBean(ResultSupplierListDTO.class, sql.toString(), param, querySupplierListDTO.getOffset(), querySupplierListDTO.getPageSize());
+    }
+
+    /**
+     * 查询供应商物料个零配件关联关系
+     * @param queryRelSupplierProduct 查询的条件
+     * @return  Page<RelSupplierProduct> 分页的信息
+     * @author zhangkangjian
+     * @date 2018-08-01 15:07:58
+     */
+    public Page<QueryRelSupplierProduct> querySupplierProduct(QueryRelSupplierProduct queryRelSupplierProduct) {
+        String sql = " SELECT a.id, a.supplier_code,a.product_code,a.product_type FROM rel_supplier_product a WHERE a.supplier_code = :supplierCode AND a.product_type = :productType group by a.supplier_code,a.product_code,a.product_type ";
+//        return queryPageForBean(QueryRelSupplierProduct.class, sql, queryRelSupplierProduct, queryRelSupplierProduct.getOffset(), queryRelSupplierProduct.getPageSize());
+        return queryPageForBean(QueryRelSupplierProduct.class, sql, queryRelSupplierProduct, 0, 10);
+    }
+
+    public Page<QueryRelSupplierProduct> queryEquipmentProduct(QueryRelSupplierProduct queryRelSupplierProduct) {
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT a.id,b.`equip_name` as 'productName',c.`type_name` as 'categoryName' FROM rel_supplier_product a LEFT JOIN biz_service_equipment b ON a.`product_code` = b.`equip_code` LEFT JOIN biz_service_equiptype c ON b.`equiptype_id` = c.`id` ")
+            .append(" WHERE a.`supplier_code` = :supplierCode ");
+        return queryPageForBean(QueryRelSupplierProduct.class, sql.toString(), queryRelSupplierProduct, 0, 10);
+    }
+
+    /**
+     * 删除供应商关系
+     * @param id
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-08-01 20:13:18
+     */
+    public void deleteSupplierProduct(Long id) {
+        String sql = "DELETE FROM rel_supplier_product WHERE id = :id";
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("id", id);
+        updateForMap(sql.toString(), map);
     }
 }

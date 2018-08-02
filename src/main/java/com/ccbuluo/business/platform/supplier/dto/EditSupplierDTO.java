@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.supplier.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -11,6 +12,7 @@ import java.util.Date;
  * @author zhangkangjian
  * @date 2018-07-03 16:32:34
  */
+@ApiModel(value = "EditSupplierDTO", description = "编辑供应商DTO")
 public class EditSupplierDTO {
     /**
      * 供应商id
