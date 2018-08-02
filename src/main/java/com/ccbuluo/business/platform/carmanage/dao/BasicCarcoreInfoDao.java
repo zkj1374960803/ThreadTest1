@@ -217,15 +217,21 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
      * @author weijb
      * @date 2018-07-13 19:52:44
      */
-    public Page<SearchCarcoreInfoDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer carStatus, String Keyword, Integer offset, Integer pageSize){
+    public Page<SearchCarcoreInfoDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer carStatus,  String custmanagerUuid, String Keyword, Integer offset, Integer pageSize){
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT bci.id,bci.car_number,bci.vin_number,bci.car_status,")
-                .append("bcm.carbrand_name,bci.carseries_id,bcmmm.carmodel_name")
+                .append("bcm.carbrand_name,bci.carseries_id,bci.custmanagerName,bcmmm.carmodel_name")
                 .append(" FROM basic_carcore_info bci LEFT JOIN basic_carbrand_manage bcm on bci.carbrand_id=bcm.id ")
                 .append(" LEFT JOIN basic_carmodel_manage bcmmm ON bci.carmodel_id=bcmmm.id ")
                 .append(" WHERE bci.delete_flag = :deleteFlag ");
+        // 客户经理uuid
+        if (StringUtils.isNotBlank(custmanagerUuid)) {
+            param.put("custmanagerUuid", custmanagerUuid);
+            param.put("carStatus", Constants.YES);
+            sql.append(" AND bci.cusmanager_uuid = :custmanagerUuid AND bci.car_status = :carStatus");
+        }
         // 品牌
         if (null != carbrandId) {
             param.put("carbrandId", carbrandId);
@@ -251,12 +257,28 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
         return DTOS;
     }
 
-    //查询未分配的车辆列表
-    public List<ListCarcoreInfoDTO> queryundistributedlist(){
+    /**
+     * 查询未分配的车辆列表
+     * @param vinNumber 车辆vin码
+     * @author weijb
+     * @date 2018-08-01 15:59:51
+     */
+    public List<ListCarcoreInfoDTO> queryuUndistributedList(String vinNumber){
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT car_number,vin_number ")
-                .append(" FROM basic_carcore_info WHERE car_status=0 ");
+        sql.append("SELECT bci.car_number,bci.vin_number,bcmmm.carbrand_name,bcm.carseries_name,bci.carmodel_id,")
+            .append(" bci.store_name FROM basic_carcore_info AS bci")
+            .append(" LEFT JOIN basic_carbrand_manage AS bcmmm ON bcmmm.id = bci.carbrand_id")
+            .append(" LEFT JOIN basic_carseries_manage AS bcm ON bcm.id = bci.carseries_id")
+            .append(" WHERE bci.delete_flag = :deleteFlag AND bci.car_status = :carStatus ")
+            .append(" AND bci.store_assigned = :storeAssigned ");
         Map<String, Object> params = Maps.newHashMap();
+        params.put("carStatus", Constants.NO);
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        params.put("storeAssigned", Constants.YES);
+        if (StringUtils.isNotBlank(vinNumber)) {
+            params.put("vinNumber", vinNumber);
+            sql.append(" AND bci.vin_number LIKE CONCAT('%',:vinNumber,'%')");
+        }
         return super.queryListBean(ListCarcoreInfoDTO.class, sql.toString(), params);
     }
     /**
@@ -267,9 +289,9 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
      * @author weijb
      * @date 2018-07-31 15:59:51
      */
-    public List<Long> updatestatusbycode(List<UpdateCarcoreInfoDTO> list){
+    public int updateStatusByCode(List<UpdateCarcoreInfoDTO> list){
         String sql = "update basic_carcore_info set cusmanager_uuid=:cusmanagerUuid, cusmanager_name=:cusmanagerName, car_status=:carStatus  where car_number=:carNumber";
-        return batchInsertForListBean(sql, list);
+        return batchUpdateForListBean(sql, list);
     }
 
     /**
@@ -287,6 +309,36 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
         params.put("vinNumber", vinNumber);
         return super.findForBean(VinCarcoreInfoDTO.class, sql.toString(), params);
     }
+
+    /**
+     * 查询未分配的车辆列表（车型）
+     * @param carModelIds 车型id
+     * @author weijb
+     * @date 2018-08-01 15:59:51
+     */
+    public List<ListCarcoreInfoDTO> queryCarMobelNameByIds(List<Long> carModelIds) {
+        String sql = "SELECT id as carmodelId,carmodel_name as carmodelName FROM basic_carmodel_manage WHERE id IN (:carModelIds)";
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("carModelIds", carModelIds);
+        return queryListBean(ListCarcoreInfoDTO.class, sql, params);
+    }
+
+    /**
+     * 解除车辆与客户经理的关联关系
+     * @param carNumber 车辆编号
+     * @return 操作是否成功
+     * @author liuduo
+     * @date 2018-08-01 14:23:04
+     */
+    public int release(String carNumber) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("carNumber", carNumber);
+        params.put("cusmanagerUuid", null);
+        params.put("carStatus", Constants.NO);
+        String sql = "UPDATE basic_carcore_info SET cusmanager_uuid = :cusmanagerUuid,car_status = :carStatus WHERE car_number = :carNumber";
+
+        return updateForMap(sql, params);
+    }
     /**
      * 根据车辆vin更新车辆的门店信息
      * @param vinNumber 车架号
@@ -297,7 +349,7 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
      * @author weijb
      * @date 2018-08-01 15:55:14
      */
-    public int updatecarcoreinfobyvin(String vinNumber, Integer storeCode, Integer storeName){
+    public int updateCarcoreInfoByVin(String vinNumber, String storeCode, String storeName){
         Map<String, Object> params = Maps.newHashMap();
         params.put("storeCode", storeCode);
         params.put("storeName", storeName);

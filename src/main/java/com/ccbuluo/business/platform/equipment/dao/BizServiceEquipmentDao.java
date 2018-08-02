@@ -146,7 +146,7 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
 
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT bse.id,bse.equip_code,bse.equip_unit,bse.equip_name,bsee.type_name,bse.equiptype_id,bsee.type_name AS equiptypeName ")
-            .append("  FROM biz_service_equipment AS bse LEFT JOIN biz_service_equiptype AS bsee ON bsee.id = bse.id WHERE 1=1");
+            .append("  FROM biz_service_equipment AS bse LEFT JOIN biz_service_equiptype AS bsee ON bsee.id = bse.equiptype_id WHERE 1=1");
         if (equiptypeId != null) {
             params.put("equiptypeId", equiptypeId);
             sql.append(" AND bse.equiptype_id = :equiptypeId");

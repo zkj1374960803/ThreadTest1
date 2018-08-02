@@ -92,8 +92,7 @@ public class BasicCarmodelManageController extends BaseController {
     @ApiOperation(value = "新增车型", notes = "【chaoshuai】")
     @PostMapping("/create")
     public StatusDto create(@RequestBody CarmodelManageDTO carmodelManageDTO){
-        StatusDto statusDto = this.basicCarmodelManageService.createCarModel(carmodelManageDTO);
-        return StatusDto.buildSuccessStatusDto(statusDto.getMessage());
+        return this.basicCarmodelManageService.createCarModel(carmodelManageDTO);
     }
 
     /**

@@ -12,8 +12,7 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * 物料controller
@@ -117,8 +116,7 @@ public class EquipmentController extends BaseController {
      */
     @ApiOperation(value = "计量单位", notes = "【刘铎】")
     @GetMapping("/equipunitlist")
-    public StatusDto<List<EquipUnitEnum>> getEquipUnitList() {
-        return StatusDto.buildDataSuccessStatusDto(Arrays.asList(EquipUnitEnum.values()));
+    public StatusDto<List<Map<String,String>>> getEquipUnitList() {
+        return StatusDto.buildDataSuccessStatusDto(equipmentService.getUnit());
     }
-
 }

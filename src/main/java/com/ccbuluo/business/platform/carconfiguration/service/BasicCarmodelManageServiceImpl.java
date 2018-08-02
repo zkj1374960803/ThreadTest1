@@ -148,7 +148,7 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
      * @return com.ccbuluo.http.StatusDto
      * @exception
      * @author wuyibo
-     * @date XXXXX
+     * @date 2018-08-01 19:43:22
      */
     public StatusDto checkUniqueVerification(CarmodelManageDTO carmodelManageDTO) {
         int entityCount = basicCarmodelManageDao.countEntity(carmodelManageDTO);
