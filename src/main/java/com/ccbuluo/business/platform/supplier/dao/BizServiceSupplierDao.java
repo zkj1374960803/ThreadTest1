@@ -218,7 +218,7 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
     public Page<QueryRelSupplierProduct> queryEquipmentProduct(QueryRelSupplierProduct queryRelSupplierProduct) {
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.id,b.`equip_name` as 'productName',c.`type_name` as 'categoryName' FROM rel_supplier_product a LEFT JOIN biz_service_equipment b ON a.`product_code` = b.`equip_code` LEFT JOIN biz_service_equiptype c ON b.`equiptype_id` = c.`id` ")
-            .append(" WHERE a.`supplier_code` = :supplierCode AND a.product_type = :productType");
+            .append(" WHERE a.`supplier_code` = :supplierCode AND a.product_type = :productType group by a.supplier_code,a.product_code,a.product_type");
         return queryPageForBean(QueryRelSupplierProduct.class, sql.toString(), queryRelSupplierProduct, queryRelSupplierProduct.getOffset(), queryRelSupplierProduct.getPageSize());
     }
 
