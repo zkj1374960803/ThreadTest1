@@ -34,7 +34,7 @@ public class MultiplepriceController extends BaseController {
      */
     @ApiOperation(value = "地区倍数保存", notes = "【刘铎】")
     @PostMapping("/save")
-    public StatusDto saveMultipleprice(@ApiParam(name = "工时对象", value = "传入json格式", required = true)SaveBizServiceMultiplepriceDTO saveBizServiceMultiplepriceDTO) {
+    public StatusDto saveMultipleprice(@ApiParam(name = "工时对象", value = "传入json格式", required = true)@RequestBody SaveBizServiceMultiplepriceDTO saveBizServiceMultiplepriceDTO) {
         int status = multiplepriceService.save(saveBizServiceMultiplepriceDTO);
         if (status == Constants.FAILURESTATUS) {
             return StatusDto.buildFailure("保存失败！");
