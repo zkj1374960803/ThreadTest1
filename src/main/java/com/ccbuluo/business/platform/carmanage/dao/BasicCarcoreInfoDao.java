@@ -358,7 +358,7 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
         params.put("storeCode", storeCode);
         params.put("storeName", storeName);
         params.put("vinNumber", vinNumber);
-        String sql = "update basic_carcore_info set store_code=:storeCode, store_name=:storeName, car_status=1  where vin_number=:vinNumber";
+        String sql = "update basic_carcore_info set store_code=:storeCode, store_name=:storeName, store_assigned=1  where vin_number=:vinNumber";
         return updateForMap(sql, params);
     }
 
