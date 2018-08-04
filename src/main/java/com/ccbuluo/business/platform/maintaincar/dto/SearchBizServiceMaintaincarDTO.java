@@ -28,6 +28,12 @@ public class SearchBizServiceMaintaincarDTO extends IdEntity {
      */
     @ApiModelProperty(name = "carStatus", value = "维修车的分配状态(1：已分配，0：未分配)")
     private Long carStatus;
+
+    /**
+     * 客户经理ID
+     */
+    @ApiModelProperty(name = "cusmanagerUuid", value = "客户经理id")
+    private String cusmanagerUuid;
     /**
      * 客户经理名称
      */
@@ -75,6 +81,14 @@ public class SearchBizServiceMaintaincarDTO extends IdEntity {
 
     public void setCusmanagerName(String cusmanagerName) {
         this.cusmanagerName = cusmanagerName;
+    }
+
+    public String getCusmanagerUuid() {
+        return cusmanagerUuid;
+    }
+
+    public void setCusmanagerUuid(String cusmanagerUuid) {
+        this.cusmanagerUuid = cusmanagerUuid;
     }
 
     public String getCusmanagerName() {

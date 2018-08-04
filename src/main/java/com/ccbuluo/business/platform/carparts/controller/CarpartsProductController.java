@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.carparts.controller;
 
 import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.platform.carconfiguration.service.BasicCarmodelManageService;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.controller.BaseController;
@@ -35,6 +36,8 @@ public class CarpartsProductController extends BaseController {
     private GenerateProjectCodeService generateProjectCodeService;
     @Resource
     UserHolder userHolder;
+    @Resource
+    BasicCarmodelManageService basicCarmodelManageService;
 
     // 编码前缀
     private static final String PREFIX = "FP";
@@ -129,7 +132,12 @@ public class CarpartsProductController extends BaseController {
                                                                              @RequestParam(required = false) String keyword,
                                                                              @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                              @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
-        return StatusDtoThriftUtils.resolve(carpartsProductService.queryCarpartsProductList(categoryCode, keyword, offset, pageSize),BasicCarpartsProductDTO.class);
+        StatusDto<Page<BasicCarpartsProductDTO>> list = StatusDtoThriftUtils.resolve(carpartsProductService.queryCarpartsProductList(categoryCode, keyword, offset, pageSize),BasicCarpartsProductDTO.class);
+        //把车型id转换成车型名字
+        if(null != list){
+            basicCarmodelManageService.buildCarModeName(list.getData().getRows());
+        }
+        return list;
     }
     /**
      * 根据分类code查询零配件list（不分页）

@@ -8,10 +8,12 @@ import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelManage;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarseriesManage;
 import com.ccbuluo.business.platform.carconfiguration.utils.RegularCodeProductor;
 import com.ccbuluo.business.platform.carmanage.dao.BasicCarcoreInfoDao;
+import com.ccbuluo.business.platform.carmanage.dto.ListCarcoreInfoDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.constants.SystemPropertyHolder;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -333,5 +335,23 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
             return StatusDto.buildFailureStatusDto(result.toString());
         }
         return StatusDto.buildSuccessStatusDto();
+    }
+    /**
+     * 把车型id转换成车型名字
+     */
+    public void buildCarModeName(List<BasicCarpartsProductDTO> list){
+        if(list.size() == 0){
+            return;
+        }
+        //获取车型列表（包括删除的）
+        List<Map<String, Object>> mList = basicCarmodelManageDao.queryAllCarMobelList();
+        for(BasicCarpartsProductDTO bd : list){
+            for(Map<String, Object> map : mList){
+                if(map.get("id").toString().equals(bd.getFitCarmodel())){
+                    bd.setCarmodelName(map.get("name").toString());
+                    continue;
+                }
+            }
+        }
     }
 }

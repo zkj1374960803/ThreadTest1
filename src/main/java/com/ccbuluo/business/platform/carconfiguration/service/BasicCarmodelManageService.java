@@ -4,6 +4,7 @@ import com.ccbuluo.business.platform.carconfiguration.dao.CarmodelManageDTO;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelManage;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -99,4 +100,8 @@ public interface BasicCarmodelManageService {
      * @date 2018-08-01 09:37:13
      */
     StatusDto deleteCarmodelManageById(Long id);
+    /**
+     * 把车型id转换成车型名字
+     */
+    void buildCarModeName(List<BasicCarpartsProductDTO> list);
 }
