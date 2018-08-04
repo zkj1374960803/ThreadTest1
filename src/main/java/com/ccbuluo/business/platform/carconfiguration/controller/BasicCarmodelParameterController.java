@@ -110,7 +110,6 @@ public class BasicCarmodelParameterController extends BaseController {
     @PostMapping("/edit")
     public StatusDto edit(CarmodelParameter carmodelParameter){
         return this.basicCarmodelParameterService.editParameter(carmodelParameter);
-//        return StatusDto.buildSuccessStatusDto(statusDto.getMessage());
     }
 
     /**
@@ -124,7 +123,6 @@ public class BasicCarmodelParameterController extends BaseController {
     @ApiImplicitParam(name = "id", value = "车型参数配置id", required = true, paramType = "path")
     @GetMapping("/delete/{id}")
     public StatusDto delete(@PathVariable("id") Long id){
-        StatusDto statusDto = this.basicCarmodelParameterService.deleteParameter(id);
-        return StatusDto.buildSuccessStatusDto(statusDto.getMessage());
+        return  this.basicCarmodelParameterService.deleteParameter(id);
     }
 }
