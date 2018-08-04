@@ -83,7 +83,7 @@ public interface BizServiceMaintaincarService {
      * @author weijb
      * @date 2018-07-31 15:59:51
      */
-    List<ListServiceMaintaincarDTO> queryundistributedlist();
+    List<ListServiceMaintaincarDTO> queryundistributedlist(String vinNumber);
     /**
      * 根据维修车code更新维修车状态
      * @param mendCode code

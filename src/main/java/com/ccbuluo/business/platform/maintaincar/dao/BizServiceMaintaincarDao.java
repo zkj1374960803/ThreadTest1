@@ -195,11 +195,15 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
         return DTOS;
     }
     //查询未分配的维修车列表
-    public List<ListServiceMaintaincarDTO> queryundistributedlist(){
+    public List<ListServiceMaintaincarDTO> queryundistributedlist(String vinNumber){
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT mend_code,vin_number ")
                 .append(" FROM biz_service_maintaincar WHERE car_status=0 ");
         Map<String, Object> params = Maps.newHashMap();
+        if (StringUtils.isNotBlank(vinNumber)) {
+            params.put("vinNumber", vinNumber);
+            sql.append(" AND vin_number LIKE CONCAT('%',:vinNumber,'%')");
+        }
         return super.queryListBean(ListServiceMaintaincarDTO.class, sql.toString(), params);
     }
     /**

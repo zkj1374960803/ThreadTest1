@@ -185,8 +185,8 @@ public class BizServiceMaintaincarServiceImpl implements BizServiceMaintaincarSe
      * @date 2018-07-31 15:59:51
      */
     @Override
-    public List<ListServiceMaintaincarDTO> queryundistributedlist(){
-        return bizServiceMaintaincarDao.queryundistributedlist();
+    public List<ListServiceMaintaincarDTO> queryundistributedlist(String vinNumber){
+        return bizServiceMaintaincarDao.queryundistributedlist(vinNumber);
     }
 
     /**
