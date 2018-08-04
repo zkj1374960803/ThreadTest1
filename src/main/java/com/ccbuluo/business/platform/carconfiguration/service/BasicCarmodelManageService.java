@@ -98,5 +98,5 @@ public interface BasicCarmodelManageService {
      * @author weijb
      * @date 2018-08-01 09:37:13
      */
-    int deleteCarmodelManageById(Long id);
+    StatusDto deleteCarmodelManageById(Long id);
 }

@@ -122,7 +122,7 @@ public class BasicCarmodelManageDao extends BaseDao<CarmodelManage> {
         sql.append("select ")
             .append(SQL_BUILD)
             .append(" FROM basic_carmodel_manage")
-            .append(" where carseries_id = :id");
+            .append(" where delete_flag=0 and carseries_id = :id");
         List<CarmodelManage> carmodelManages = super.queryListBean(CarmodelManage.class, sql.toString(), param);
         return carmodelManages;
     }

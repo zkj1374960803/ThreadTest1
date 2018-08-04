@@ -222,7 +222,7 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT bci.id,bci.car_number,bci.store_assigned,bci.vin_number,bci.car_status,")
+        sql.append("SELECT bci.id,bci.car_number,bci.store_assigned,bci.vin_number,bci.car_status,bci.cusmanager_name,")
                 .append("bcm.carbrand_name,bci.carseries_id,bci.cusmanager_name,bcmmm.carmodel_name")
                 .append(" FROM basic_carcore_info bci LEFT JOIN basic_carbrand_manage bcm on bci.carbrand_id=bcm.id ")
                 .append(" LEFT JOIN basic_carmodel_manage bcmmm ON bci.carmodel_id=bcmmm.id ")
@@ -378,5 +378,21 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
             .append(" cusmanager_uuid IN (:cusmanagerUuids) GROUP BY cusmanager_uuid");
 
         return queryListBean(CusmanagerCarCountDTO.class, sql.toString(), params);
+    }
+    /**
+     * 根据车型id查询此车型是否被车辆引用过（次数）
+     * @param carmodelId
+     * @return int
+     * @exception
+     * @author wuyibo
+     * @date 2018-08-03 12:41:36
+     */
+    public int findCarmodelParameterById(Long carmodelId) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT COUNT(*) FROM basic_carcore_info ")
+                .append("   WHERE carmodel_id = :carmodelId");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("carmodelId", carmodelId);
+        return namedParameterJdbcTemplate.queryForObject(sql.toString(), params, Integer.class);
     }
 }

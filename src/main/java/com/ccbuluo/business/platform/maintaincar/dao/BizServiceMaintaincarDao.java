@@ -163,7 +163,7 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT bci.id,bci.mend_code,bci.vin_number,bci.car_status,")
+        sql.append("SELECT bci.id,bci.mend_code,bci.vin_number,bci.car_status,bci.cusmanager_name,")
                 .append("bcm.carbrand_name,bcmm.carseries_name,bcmmm.carmodel_name")
                 .append(" FROM biz_service_maintaincar bci LEFT JOIN basic_carbrand_manage bcm on bci.carbrand_id=bcm.id ")
                 .append(" LEFT JOIN basic_carseries_manage bcmm on bci.carseries_id=bcmm.id ")
@@ -188,7 +188,7 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
         if (StringUtils.isNotBlank(keyword)) {
             param.put("Keyword", keyword);
             //目前只根据车架号查询
-            sql.append(" AND bci.vin_number LIKE CONCAT('%',:Keyword,'%') ");
+            sql.append(" AND (bci.vin_number LIKE CONCAT('%',:Keyword,'%')  OR  bci.cusmanager_name LIKE CONCAT('%',:Keyword,'%'))");
         }
         sql.append("  ORDER BY bci.operate_time DESC");
         Page<SearchBizServiceMaintaincarDTO> DTOS = super.queryPageForBean(SearchBizServiceMaintaincarDTO.class, sql.toString(), param,offset,pageSize);
