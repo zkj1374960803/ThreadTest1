@@ -1,6 +1,5 @@
 package com.ccbuluo.business.platform.custmanager.service;
 
-import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.carmanage.dto.CusmanagerCarCountDTO;
@@ -30,7 +29,6 @@ import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -286,7 +284,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
                 BizServiceCustmanager bizServiceCustmanager = vinMap.get(queryUserListDTO.getUseruuid());
                 CusmanagerCarCountDTO cusmanagerCarCountDTO = carMap.get(queryUserListDTO.getUseruuid());
                 if(bizServiceCustmanager != null){
-                    queryUserListDTO.setVIN(bizServiceCustmanager.getVinNumber());
+                    queryUserListDTO.setVinNumber(bizServiceCustmanager.getVinNumber());
                 }
                 if(cusmanagerCarCountDTO != null){
                     queryUserListDTO.setCarsNumber(Long.valueOf(cusmanagerCarCountDTO.getCarNum()));

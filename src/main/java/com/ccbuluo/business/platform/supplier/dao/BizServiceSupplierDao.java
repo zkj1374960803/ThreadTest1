@@ -204,7 +204,7 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
     }
 
     /**
-     * 查询供应商物料个零配件关联关系
+     * 查询供应商零配件关联关系
      * @param queryRelSupplierProduct 查询的条件
      * @return  Page<RelSupplierProduct> 分页的信息
      * @author zhangkangjian
@@ -214,11 +214,17 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
         String sql = " SELECT a.id, a.supplier_code,a.product_code,a.product_type FROM rel_supplier_product a WHERE a.supplier_code = :supplierCode AND a.product_type = :productType group by a.supplier_code,a.product_code,a.product_type ";
         return queryPageForBean(QueryRelSupplierProduct.class, sql, queryRelSupplierProduct, queryRelSupplierProduct.getOffset(), queryRelSupplierProduct.getPageSize());
     }
-
+    /**
+     * 查询供应商物料关联关系
+     * @param queryRelSupplierProduct 查询的条件
+     * @return  Page<RelSupplierProduct> 分页的信息
+     * @author zhangkangjian
+     * @date 2018-08-01 15:07:58
+     */
     public Page<QueryRelSupplierProduct> queryEquipmentProduct(QueryRelSupplierProduct queryRelSupplierProduct) {
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.id,b.`equip_name` as 'productName',c.`type_name` as 'categoryName' FROM rel_supplier_product a LEFT JOIN biz_service_equipment b ON a.`product_code` = b.`equip_code` LEFT JOIN biz_service_equiptype c ON b.`equiptype_id` = c.`id` ")
-            .append(" WHERE a.`supplier_code` = :supplierCode AND a.product_type = :productType");
+            .append(" WHERE a.`supplier_code` = :supplierCode AND a.product_type = :productType group by a.supplier_code,a.product_code,a.product_type");
         return queryPageForBean(QueryRelSupplierProduct.class, sql.toString(), queryRelSupplierProduct, queryRelSupplierProduct.getOffset(), queryRelSupplierProduct.getPageSize());
     }
 

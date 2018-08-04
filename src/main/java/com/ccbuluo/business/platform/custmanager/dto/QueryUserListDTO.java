@@ -13,8 +13,8 @@ public class QueryUserListDTO {
     private String name;
     @ApiModelProperty(name = "userStatus", value = "用户状态1在职0离职")
     private String userStatus;
-    @ApiModelProperty(name = "VIN", value = "绑定维修车（VIN）")
-    private String VIN;
+    @ApiModelProperty(name = "vinNumber", value = "绑定维修车（vinNumber）")
+    private String vinNumber;
     @ApiModelProperty(name = "officePhone", value = "办公电话")
     private String officePhone;
     @ApiModelProperty(name = "userUuid", value = "用户uuid")
@@ -40,12 +40,12 @@ public class QueryUserListDTO {
         this.userStatus = userStatus;
     }
 
-    public String getVIN() {
-        return VIN;
+    public String getVinNumber() {
+        return vinNumber;
     }
 
-    public void setVIN(String VIN) {
-        this.VIN = VIN;
+    public void setVinNumber(String vinNumber) {
+        this.vinNumber = vinNumber;
     }
 
     public String getOfficePhone() {
