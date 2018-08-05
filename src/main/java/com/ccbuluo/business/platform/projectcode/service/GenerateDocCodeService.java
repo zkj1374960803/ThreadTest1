@@ -88,8 +88,8 @@ public class GenerateDocCodeService {
     private String getTime(){
         LocalDateTime localDateTime = LocalDateTime.now();
         StringBuilder sb = new StringBuilder();
-        sb.append(localDateTime.getYear()).append(localDateTime.getMonthValue()).append(localDateTime.getDayOfMonth())
-                .append(localDateTime.getHour()).append(localDateTime.getMinute());
+        sb.append(localDateTime.getYear()).append(String.format("%0"+2+"d", localDateTime.getMonthValue())).append(String.format("%0"+2+"d", localDateTime.getDayOfMonth()))
+                .append(String.format("%0"+2+"d", localDateTime.getHour())).append(String.format("%0"+2+"d", localDateTime.getMinute()));
         return sb.toString();
     }
 
