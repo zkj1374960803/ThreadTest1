@@ -133,8 +133,8 @@ public class BizServiceMaintaincarController extends BaseController {
      */
     @ApiOperation(value = "查询未分配的维修车列表",notes = "【魏俊标】")
     @GetMapping("/queryundistributedlist")
-    public StatusDto<List<ListServiceMaintaincarDTO>> queryundistributedlist() {
-        return StatusDto.buildDataSuccessStatusDto(bizServiceMaintaincarService.queryundistributedlist());
+    public StatusDto<List<ListServiceMaintaincarDTO>> queryundistributedlist(@RequestParam(required = false) String vinNumber) {
+        return StatusDto.buildDataSuccessStatusDto(bizServiceMaintaincarService.queryundistributedlist(vinNumber));
     }
 
     /**

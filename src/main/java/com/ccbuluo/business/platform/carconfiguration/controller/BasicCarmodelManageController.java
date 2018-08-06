@@ -169,11 +169,7 @@ public class BasicCarmodelManageController extends BaseController {
     @GetMapping("/delete")
     @ApiImplicitParam(name = "id", value = "车型id", required = true, paramType = "query")
     public StatusDto delete(@RequestParam Long id) {
-        int flag = basicCarmodelManageService.deleteCarmodelManageById(id);
-        if (flag == Constants.SUCCESSSTATUS) {
-            return StatusDto.buildSuccessStatusDto("删除成功！");
-        }
-        return StatusDto.buildFailureStatusDto("删除失败！");
+        return basicCarmodelManageService.deleteCarmodelManageById(id);
     }
 
 }

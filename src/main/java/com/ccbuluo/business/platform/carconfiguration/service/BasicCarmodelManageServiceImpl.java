@@ -7,10 +7,13 @@ import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelConfigurati
 import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelManage;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarseriesManage;
 import com.ccbuluo.business.platform.carconfiguration.utils.RegularCodeProductor;
+import com.ccbuluo.business.platform.carmanage.dao.BasicCarcoreInfoDao;
+import com.ccbuluo.business.platform.carmanage.dto.ListCarcoreInfoDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.constants.SystemPropertyHolder;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +45,8 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
     private RegularCodeProductor product;
     @Autowired
     private UserHolder userHolder;
+    @Resource
+    BasicCarcoreInfoDao basicCarcoreInfoDao;
 
     /**
      * 存储redis时当前模块的名字
@@ -52,6 +57,10 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
      * XXXXX已经存在！
      */
     private static final String CAR_MODEL_EXIST = "车型已经存在！";
+    /**
+     * 被车辆引用过的车型不能删除
+     */
+    private static final String CARMODEL_CANNOT_DELETE = "被车辆引用过的车型不能删除！";
 
     /**
      * 分页查询车型列表
@@ -296,7 +305,53 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
      * @date 2018-08-01 09:37:13
      */
     @Override
-    public int deleteCarmodelManageById(Long id){
-        return basicCarmodelManageDao.deleteCarmodelManageById(id);
+    public StatusDto deleteCarmodelManageById(Long id){
+        //被车辆引用过的车型不能删除
+        StatusDto statusDto = findCarmodelListById(id);
+        if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
+            return statusDto;
+        }
+        int flag = basicCarmodelManageDao.deleteCarmodelManageById(id);
+        if (flag == Constants.SUCCESSSTATUS) {
+            return StatusDto.buildSuccessStatusDto("删除成功！");
+        }
+        return StatusDto.buildFailureStatusDto("删除失败！");
+    }
+    /**
+     * * 车型是否可以删除
+     * * @param labelId 车型标签id
+     * * @return com.ccbuluo.http.StatusDto
+     * * @exception
+     * @author wuyibo
+     * @date 2018-07-30 14:02:30
+     */
+    public StatusDto findCarmodelListById(Long id) {
+        int count = basicCarcoreInfoDao.findCarmodelParameterById(id);
+        StringBuilder result = new StringBuilder();
+        if (count > 0) {
+            result.append(CARMODEL_CANNOT_DELETE);
+        }
+        if (StringUtils.isNotBlank(result.toString())) {
+            return StatusDto.buildFailureStatusDto(result.toString());
+        }
+        return StatusDto.buildSuccessStatusDto();
+    }
+    /**
+     * 把车型id转换成车型名字
+     */
+    public void buildCarModeName(List<BasicCarpartsProductDTO> list){
+        if(list.size() == 0){
+            return;
+        }
+        //获取车型列表（包括删除的）
+        List<Map<String, Object>> mList = basicCarmodelManageDao.queryAllCarMobelList();
+        for(BasicCarpartsProductDTO bd : list){
+            for(Map<String, Object> map : mList){
+                if(map.get("id").toString().equals(bd.getFitCarmodel())){
+                    bd.setCarmodelName(map.get("name").toString());
+                    continue;
+                }
+            }
+        }
     }
 }

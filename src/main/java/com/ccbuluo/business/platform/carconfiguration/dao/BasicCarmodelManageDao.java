@@ -122,7 +122,7 @@ public class BasicCarmodelManageDao extends BaseDao<CarmodelManage> {
         sql.append("select ")
             .append(SQL_BUILD)
             .append(" FROM basic_carmodel_manage")
-            .append(" where carseries_id = :id");
+            .append(" where delete_flag=0 and carseries_id = :id");
         List<CarmodelManage> carmodelManages = super.queryListBean(CarmodelManage.class, sql.toString(), param);
         return carmodelManages;
     }
@@ -300,6 +300,19 @@ public class BasicCarmodelManageDao extends BaseDao<CarmodelManage> {
         params.put("id", id);
         params.put("deleteFlag", Constants.DELETE_FLAG_DELETE);
         return super.updateForMap(sql.toString(), params);
+    }
+    /**
+     * 查询所有的车型列表（包括逻辑删除的）
+     * @return 结果集
+     * @author Ryze
+     * @date 2018-06-12 15:31:17
+     */
+    public List<Map<String, Object>> queryAllCarMobelList() {
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT id,carmodel_name as name FROM ")
+                .append(" basic_carmodel_manage ");
+        Map<String, Object> params = Maps.newHashMap();
+        return super.queryListMap(sql.toString(), params);
     }
 
 }
