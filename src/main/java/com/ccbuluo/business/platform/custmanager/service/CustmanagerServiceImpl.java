@@ -258,7 +258,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         userInfoDTO.setSecretId(SystemPropertyHolder.getBaseSecret());
         userInfoDTO.setOrgCode(Constants.CUSTMANAGER_ORG_CODE);
         // 排序字段
-        userInfoDTO.setSortField(Constants.SORT_FIELD_ID);
+        userInfoDTO.setSortField(Constants.SORT_FIELD_OPERATE);
         //查询用户信息
         StatusDtoThriftPage<UserInfoDTO> userInfoDTOStatusDtoThriftPage = innerUserInfoService.queryUserList(userInfoDTO);
         StatusDto<Page<UserInfoDTO>> userInfoStatusDto = StatusDtoThriftUtils.resolve(userInfoDTOStatusDtoThriftPage, UserInfoDTO.class);
