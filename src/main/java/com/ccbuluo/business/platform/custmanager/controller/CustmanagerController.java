@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.custmanager.controller;
 
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.custmanager.dto.CustManagerDetailDTO;
 import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
@@ -10,21 +11,25 @@ import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftBean;
+import com.ccbuluo.http.StatusDtoThriftList;
+import com.ccbuluo.http.StatusDtoThriftUtils;
+import com.ccbuluo.usercoreintf.dto.BasicUserOrganizationDTO;
 import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
+import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
+import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * 客户经理
@@ -41,6 +46,7 @@ public class CustmanagerController extends BaseController {
     private UserHolder userHolder;
     @Resource
     private CustmanagerServiceImpl custmanagerServiceImpl;
+
 
     /**
      * 添加用户
@@ -61,7 +67,9 @@ public class CustmanagerController extends BaseController {
         @ApiImplicitParam(name = "telephone", value = "联系电话", required = true, paramType = "query"),
         @ApiImplicitParam(name = "hiredate", value = "入职时间(秒值)", required = true, paramType = "query", dataType = "Long"),
         @ApiImplicitParam(name = "officePhone", value = "办公手机号", required = true, paramType = "query"),
-        @ApiImplicitParam(name = "receivingAddress", value = "收货地址", required = true, paramType = "query")
+        @ApiImplicitParam(name = "receivingAddress", value = "收货地址", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "orgCode", value = "组织架构code", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "servicecenterCode", value = "服务中心code", required = true, paramType = "query")
     })
     @PostMapping("/createuser")
     public StatusDto<String> createUser(@ApiIgnore UserInfoDTO userInfoDTO, @ApiIgnore BizServiceCustmanager bizServiceCustmanager) {
@@ -108,7 +116,10 @@ public class CustmanagerController extends BaseController {
         @ApiImplicitParam(name = "telephone", value = "联系电话", required = true, paramType = "query"),
         @ApiImplicitParam(name = "hiredate", value = "入职时间(秒值)", required = true, paramType = "query", dataType = "Long"),
         @ApiImplicitParam(name = "officePhone", value = "办公手机号", required = true, paramType = "query"),
-        @ApiImplicitParam(name = "receivingAddress", value = "收货地址", required = true, paramType = "query")
+        @ApiImplicitParam(name = "receivingAddress", value = "收货地址", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "orgCode", value = "组织架构code", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "vinNumber", value = "vin", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "servicecenterCode", value = "服务中心code", required = true, paramType = "query")
     })
     public StatusDto editUser(@ApiIgnore UserInfoDTO userInfoDTO, @ApiIgnore BizServiceCustmanager bizServiceCustmanager) {
         return custmanagerServiceImpl.editUser(userInfoDTO, bizServiceCustmanager);
@@ -139,11 +150,32 @@ public class CustmanagerController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "userUuid", value = "用户uuid", required = true, paramType = "query"),
         @ApiImplicitParam(name = "officePhone", value = "办公手机号", required = true, paramType = "query"),
-        @ApiImplicitParam(name = "receivingAddress", value = "收货地址", required = true, paramType = "query")
+        @ApiImplicitParam(name = "receivingAddress", value = "收货地址", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "servicecenterCode", value = "服务中心code", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "vinNumber", value = "vin", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "name", value = "客户经理姓名", required = true, paramType = "query")
     })
     @PostMapping("/updatecustmanager")
     public StatusDto<String> updateCustManager(@ApiIgnore BizServiceCustmanager bizServiceCustmanager) {
         return custmanagerServiceImpl.updateCustManager(bizServiceCustmanager);
+    }
+
+    /**
+     * 获取组织架构子节点
+     * @param parentId 组织架构父级id
+     * @param isSearchClose 是否获取关闭的组织架构
+     * @return StatusDto
+     * @author zhangkangjian
+     * @date 2018-07-31 14:58:20
+     */
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "parentId", value = "组织架构父级id(注：第一次调用填0)", required = true, paramType = "query", dataType = "int"),
+        @ApiImplicitParam(name = "isSearchClose", value = "是否获取关闭的组织架构（注：不获取关闭的组织架构，false）", required = true, paramType = "query", dataType = "boolean")
+    })
+    @ApiOperation(value = "查询部门树", notes = "【张康健】")
+    @GetMapping("/orglist")
+    public StatusDto queryOrganizationByParentId(int parentId, boolean isSearchClose) {
+       return custmanagerServiceImpl.queryOrgList(parentId, isSearchClose);
     }
 
 

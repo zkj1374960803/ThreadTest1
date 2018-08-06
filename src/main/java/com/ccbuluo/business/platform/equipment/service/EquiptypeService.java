@@ -20,7 +20,7 @@ public interface EquiptypeService {
     * @author liuduo
     * @date 2018-07-17 14:31:15
     */
-    int save(SaveBizServiceEquiptypeDTO saveBizServiceEquiptypeDTO);
+    StatusDto save(SaveBizServiceEquiptypeDTO saveBizServiceEquiptypeDTO);
     /**
     * 查询物料列表
     * @return 物料类型列表

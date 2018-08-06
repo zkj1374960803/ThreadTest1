@@ -30,6 +30,8 @@ public class MaintainitemServiceImpl implements MaintainitemService{
     @Autowired
     private GenerateProjectCodeService generateProjectCodeService;
     @Autowired
+    private MultiplepriceServiceImpl multiplepriceService;
+    @Autowired
     private UserHolder userHolder;
 
     /**
@@ -108,7 +110,6 @@ public class MaintainitemServiceImpl implements MaintainitemService{
      */
     @Override
     public Page<DetailBizServiceMaintainitemDTO> queryList(String keyword, Integer offset, Integer pagesize) {
-        // todo 缺少地区倍数数量
         return bizServiceMaintainitemDao.queryList(keyword, offset, pagesize);
     }
 }

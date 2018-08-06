@@ -1,10 +1,13 @@
 package com.ccbuluo.business.platform.carmanage.service;
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarseriesManageDao;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarcoreInfo;
+import com.ccbuluo.business.platform.carconfiguration.entity.CarseriesManage;
 import com.ccbuluo.business.platform.carconfiguration.utils.RegularCodeProductor;
 import com.ccbuluo.business.platform.carmanage.dao.BasicCarcoreInfoDao;
-import com.ccbuluo.business.platform.carmanage.dto.SearchCarcoreInfoDTO;
+import com.ccbuluo.business.platform.carmanage.dto.*;
+import com.ccbuluo.business.platform.maintaincar.dto.ListServiceMaintaincarDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.constants.SystemPropertyHolder;
 import com.ccbuluo.db.Page;
@@ -16,8 +19,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -38,6 +46,7 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
     @Autowired
     private UserHolder userHolder;
     @Autowired
+    BasicCarseriesManageDao basicCarseriesManageDao;
 
     /**
      * 存储redis时当前模块的名字
@@ -148,6 +157,7 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
         }
         //新增默认未分配：0
         carcoreInfo.setCarStatus(Constants.STATUS_FLAG_ZERO);
+        carcoreInfo.setStoreAssigned(Constants.STATUS_FLAG_ZERO);
         // 3.通用字段
         carcoreInfo.preInsert(userHolder.getLoggedUserId());
     }
@@ -243,8 +253,22 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
      * @date 2018-07-13 19:52:44
      */
     @Override
-    public Page<SearchCarcoreInfoDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer carStatus, String Keyword, Integer offset, Integer pageSize){
-        return basicCarcoreInfoDao.queryCarcoreInfoList(carbrandId, carseriesId, carStatus, Keyword, offset, pageSize);
+    public Page<SearchCarcoreInfoDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer storeAssigned, String custmanagerUuid, String Keyword, Integer offset, Integer pageSize){
+        Page<SearchCarcoreInfoDTO> searchCarcoreInfoDTOPage =  basicCarcoreInfoDao.queryCarcoreInfoList(carbrandId, carseriesId, storeAssigned, custmanagerUuid, Keyword, offset, pageSize);
+        //拼装车系
+        buildCarseriesManage(searchCarcoreInfoDTOPage);
+        return searchCarcoreInfoDTOPage;
+    }
+    // 组装车系的名称
+    private void buildCarseriesManage(Page<SearchCarcoreInfoDTO> searchCarcoreInfoDTOPage){
+        List<CarseriesManage> list = basicCarseriesManageDao.queryAllCarseriesManageList();
+        for(SearchCarcoreInfoDTO sd : searchCarcoreInfoDTOPage.getRows()){
+            for(CarseriesManage cm : list){//获取车系的名称
+                if(sd.getCarseriesId().intValue() == cm.getId().intValue()){
+                    sd.setCarseriesName(cm.getCarseriesName());
+                }
+            }
+        }
     }
     /**
      * 车辆删除验证
@@ -263,5 +287,82 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
         }
         return StatusDto.buildSuccessStatusDto();
     }
+
+    /**
+     * 查询未分配的车辆列表
+     * @author weijb
+     * @date 2018-07-31 15:59:51
+     */
+    @Override
+    public List<ListCarcoreInfoDTO> queryuUndistributedList(String vinNumber){
+        List<ListCarcoreInfoDTO> queryundistributedlist = basicCarcoreInfoDao.queryuUndistributedList(vinNumber);
+        List<Long> carModelIds = queryundistributedlist.stream().map(a -> a.getCarmodelId()).distinct().collect(Collectors.toList());
+        List<ListCarcoreInfoDTO> listCarcoreInfoDTOS = basicCarcoreInfoDao.queryCarMobelNameByIds(carModelIds);
+        Map<Long, String> collect = listCarcoreInfoDTOS.stream().collect(Collectors.toMap(a -> a.getCarmodelId(), b -> b.getCarmodelName()));
+        queryundistributedlist.forEach(item -> {
+            item.setCarmodelName(collect.get(item.getCarmodelId()));
+        });
+        return queryundistributedlist;
+    }
+
+    /**
+     * 根据车辆code更新车辆状态
+     * @param list
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author weijb
+     * @date 2018-07-31 15:59:51
+     */
+    @Override
+    public int updateStatusByCode(List<UpdateCarcoreInfoDTO> list){
+        return basicCarcoreInfoDao.updateStatusByCode(list);
+    }
+    /**
+     * 根据车架号查询车辆信息
+     * @param vinNumber 车辆vin
+     * @exception
+     * @author weijb
+     * @date 2018-06-08 13:55:14
+     */
+    @Override
+    public VinCarcoreInfoDTO getCarInfoByVin(String vinNumber){
+        return basicCarcoreInfoDao.getCarInfoByVin(vinNumber);
+    }
+
+    @Override
+    public int release(String carNumber) {
+        return basicCarcoreInfoDao.release(carNumber);
+    }
+
+    /**
+     * 根据车辆vin更新车辆的门店信息
+     * @param vinNumber 车架号
+     * @param storeCode 门店code
+     * @param storeName 门店名称
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author weijb
+     * @date 2018-08-01 15:55:14
+     */
+    @Override
+    public int updateCarcoreInfoByVin(String vinNumber, String storeCode, String storeName){
+        return basicCarcoreInfoDao.updateCarcoreInfoByVin(vinNumber,storeCode,storeName);
+    }
+
+    /**
+     * 根据客户经理uuids查询名下的车辆数
+     * @param cusmanagerUuids 客户经理uuids
+     * @return 客户经理名下的车辆数
+     * @author liuduo
+     * @date 2018-08-02 10:09:30
+     */
+    @Override
+    public List<CusmanagerCarCountDTO> queryCarNumByCusmanagerUuid(List<String> cusmanagerUuids) {
+        if (cusmanagerUuids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return basicCarcoreInfoDao.queryCarNumByCusmanagerUuid(cusmanagerUuids);
+    }
+
 
 }

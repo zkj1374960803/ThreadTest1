@@ -2,6 +2,8 @@ package com.ccbuluo.business.platform.maintaincar.dao;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceMaintaincar;
+import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
+import com.ccbuluo.business.platform.maintaincar.dto.ListServiceMaintaincarDTO;
 import com.ccbuluo.business.platform.maintaincar.dto.SearchBizServiceMaintaincarDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
@@ -11,6 +13,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -160,7 +163,7 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT bci.id,bci.mend_code,bci.vin_number,bci.car_status,")
+        sql.append("SELECT bci.id,bci.mend_code,bci.vin_number,bci.car_status,bci.cusmanager_uuid,bci.cusmanager_name,")
                 .append("bcm.carbrand_name,bcmm.carseries_name,bcmmm.carmodel_name")
                 .append(" FROM biz_service_maintaincar bci LEFT JOIN basic_carbrand_manage bcm on bci.carbrand_id=bcm.id ")
                 .append(" LEFT JOIN basic_carseries_manage bcmm on bci.carseries_id=bcmm.id ")
@@ -185,10 +188,80 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
         if (StringUtils.isNotBlank(keyword)) {
             param.put("Keyword", keyword);
             //目前只根据车架号查询
-            sql.append(" AND bci.vin_number LIKE CONCAT('%',:Keyword,'%') ");
+            sql.append(" AND (bci.vin_number LIKE CONCAT('%',:Keyword,'%')  OR  bci.cusmanager_name LIKE CONCAT('%',:Keyword,'%'))");
         }
         sql.append("  ORDER BY bci.operate_time DESC");
         Page<SearchBizServiceMaintaincarDTO> DTOS = super.queryPageForBean(SearchBizServiceMaintaincarDTO.class, sql.toString(), param,offset,pageSize);
         return DTOS;
+    }
+    //查询未分配的维修车列表
+    public List<ListServiceMaintaincarDTO> queryundistributedlist(String vinNumber){
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT mend_code,vin_number ")
+                .append(" FROM biz_service_maintaincar WHERE car_status=0 ");
+        Map<String, Object> params = Maps.newHashMap();
+        if (StringUtils.isNotBlank(vinNumber)) {
+            params.put("vinNumber", vinNumber);
+            sql.append(" AND vin_number LIKE CONCAT('%',:vinNumber,'%')");
+        }
+        return super.queryListBean(ListServiceMaintaincarDTO.class, sql.toString(), params);
+    }
+    /**
+     * 根据维修车code更新维修车状态
+     * @param mendCode code
+     * @param status
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author weijb
+     * @date 2018-07-31 15:59:51
+     */
+    public int updatestatusbycode(String mendCode, Integer status){
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("mendCode", mendCode);
+        params.put("status", status);
+        String sql = "UPDATE biz_service_maintaincar SET car_status = :status WHERE mend_code = :mendCode";
+        return updateForMap(sql, params);
+    }
+    /**
+     *  根据维修车code更新维修车信息
+     * @param
+     * @exception 
+     * @return 
+     * @author zhangkangjian
+     * @date 2018-08-01 20:27:32
+     */
+    public int updateCustmanager(BizServiceCustmanager bizServiceCustmanager){
+        String sql = "UPDATE biz_service_maintaincar SET cusmanager_uuid = :userUuid, cusmanager_name = :name, car_status = 1 WHERE vin_number = :vinNumber";
+        return updateForBean(sql, bizServiceCustmanager);
+    }
+    /**
+     * 根据uuid更新维修车状态
+     * @param useruuid 项目经理id
+     * @param status
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author zhangkangjian
+     * @date 2018-07-31 15:59:51
+     */
+    public int updateStatusbyUuid(String useruuid, Integer status){
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("useruuid", useruuid);
+        params.put("status", status);
+        String sql = "UPDATE biz_service_maintaincar SET car_status = :status,cusmanager_uuid = null,cusmanager_name = null WHERE cusmanager_uuid = :useruuid";
+        return updateForMap(sql, params);
+    }
+    /**
+     * 查询vin编码
+     * @param useruudis 用户的uuids
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-08-01 20:52:09
+     */
+    public List<BizServiceCustmanager> queryVinNumberByuuid(List<String> useruudis) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("useruudis", useruudis);
+        String sql = " SELECT a.cusmanager_uuid as 'userUuid', a.vin_number as 'vinNumber' FROM biz_service_maintaincar a WHERE a.`cusmanager_uuid` IN (:useruudis)";
+        return queryListBean(BizServiceCustmanager.class, sql, params);
     }
 }

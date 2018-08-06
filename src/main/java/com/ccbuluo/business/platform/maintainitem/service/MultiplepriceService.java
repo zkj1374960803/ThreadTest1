@@ -1,10 +1,12 @@
 package com.ccbuluo.business.platform.maintainitem.service;
 
 import com.ccbuluo.business.entity.BizServiceMultipleprice;
-import com.ccbuluo.business.platform.maintainitem.dto.DetailBizServiceMaintainitemDTO;
+import com.ccbuluo.business.platform.maintainitem.dto.CorrespondAreaDTO;
 import com.ccbuluo.business.platform.maintainitem.dto.SaveBizServiceMaintainitemDTO;
 import com.ccbuluo.business.platform.maintainitem.dto.SaveBizServiceMultiplepriceDTO;
 import com.ccbuluo.db.Page;
+
+import java.util.List;
 
 /**
  * 倍数service

@@ -1,6 +1,6 @@
 #开发环境 配置文件
 server:
-  port: 15201
+  port: 8093
   maxPostSize: 20971520
 
 #tomcatJdbc 配置信息
@@ -45,7 +45,11 @@ base:
   #本系统的secret
   secret: 883c12f76921465aa5bfb74e9d9ac9cc
   #顶级服务中心code
-  topservicecenter: "SC000001"
+  topservicecenter: "SC000002"
+  #客户经理组织机构
+  custmanager: "SC000003"
+  #客户经理角色code
+  custmanagerrolecode: "JS024"
 
 #web端配置:
 cookie:
@@ -75,8 +79,8 @@ swagger:
   description: 售后服务平台PC端api
 
 #文件上传目录
-upload:
-  dir: uploads/
+oss:
+  bucket-name: zht-dev-nosec
 
 #thrift微服务配置
 ccbuluo:

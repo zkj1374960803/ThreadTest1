@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -16,11 +18,11 @@ import java.util.Date;
 public class CarCommonEntity extends IdEntity {
 
     @ApiModelProperty(name = "createTime", value = "创建时间")
-    protected Date createTime;
+    protected LocalDateTime createTime;
     @ApiModelProperty(name = "creator", value = "创建人")
     protected String creator;
     @ApiModelProperty(name = "operateTime", value = "操作时间")
-    protected Date operateTime;
+    protected LocalDateTime operateTime;
     @ApiModelProperty(name = "operator", value = "操作人")
     protected String operator;
     @ApiModelProperty(name = "deleteFlag", value = "删除标识")
@@ -31,7 +33,7 @@ public class CarCommonEntity extends IdEntity {
             this.creator = userId;
             this.operator = userId;
         }
-        this.operateTime = new Date();
+        this.operateTime = LocalDateTime.now();
         this.createTime = this.operateTime;
         this.deleteFlag = Constants.DELETE_FLAG_NORMAL;
     }
@@ -40,14 +42,14 @@ public class CarCommonEntity extends IdEntity {
         if (StringUtils.isNotBlank(userId)){
             this.operator = userId;
         }
-        this.operateTime = new Date();
+        this.operateTime = LocalDateTime.now();
     }
 
-    public Date getCreateTime() {
+    public LocalDateTime getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(LocalDateTime createTime) {
         this.createTime = createTime;
     }
 
@@ -59,11 +61,11 @@ public class CarCommonEntity extends IdEntity {
         this.creator = creator;
     }
 
-    public Date getOperateTime() {
+    public LocalDateTime getOperateTime() {
         return operateTime;
     }
 
-    public void setOperateTime(Date operateTime) {
+    public void setOperateTime(LocalDateTime operateTime) {
         this.operateTime = operateTime;
     }
 

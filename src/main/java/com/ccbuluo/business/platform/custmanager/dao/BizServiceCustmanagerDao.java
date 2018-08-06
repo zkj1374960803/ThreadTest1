@@ -10,6 +10,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,8 +41,8 @@ public class BizServiceCustmanagerDao extends BaseDao<BizServiceCustmanager> {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO biz_service_custmanager ( office_phone,receiving_address,")
             .append("user_uuid,remark,creator,operator,")
-            .append("delete_flag ) VALUES (  :officePhone, :receivingAddress, :userUuid,")
-            .append(" :remark, :creator,  :operator,  :deleteFlag")
+            .append("delete_flag,servicecenter_code ) VALUES (  :officePhone, :receivingAddress, :userUuid,")
+            .append(" :remark, :creator,  :operator,  :deleteFlag, :servicecenterCode ")
             .append(" )");
         return super.save(sql.toString(), entity);
     }
@@ -57,7 +58,7 @@ public class BizServiceCustmanagerDao extends BaseDao<BizServiceCustmanager> {
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE biz_service_custmanager SET office_phone = :officePhone,")
             .append("receiving_address = :receivingAddress, ")
-            .append("operator = :operator,operate_time = :operateTime WHERE user_uuid = :userUuid");
+            .append("operator = :operator,operate_time = :operateTime,servicecenter_code = :servicecenterCode WHERE user_uuid = :userUuid");
         return super.updateForBean(sql.toString(), entity);
     }
 
@@ -123,10 +124,17 @@ public class BizServiceCustmanagerDao extends BaseDao<BizServiceCustmanager> {
     public BizServiceCustmanager queryCustManagerByUuid(String useruuid) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT bsc.id,bsc.office_phone,bsc.receiving_address,bsc.user_uuid as 'useruuid',")
-            .append("bsc.remark,bsc.creator,bsc.create_time,bsc.operator,bsc.operate_time,")
+            .append("bsc.servicecenter_code,bsc.creator,bsc.create_time,bsc.operator,bsc.operate_time,")
             .append("bsc.delete_flag FROM biz_service_custmanager AS bsc WHERE bsc.user_uuid= :useruuid");
         Map<String, Object> params = Maps.newHashMap();
         params.put("useruuid", useruuid);
         return super.findForBean(BizServiceCustmanager.class, sql.toString(), params);
+    }
+
+    public List<String> queryIds(String value, String fields, String tableName) {
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("value", value);
+        String sql = "SELECT user_uuid FROM " + tableName + "  WHERE " + fields + " = :value ";
+        return querySingColum(String.class, sql, map);
     }
 }

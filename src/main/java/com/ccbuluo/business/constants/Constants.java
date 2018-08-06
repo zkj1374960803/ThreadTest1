@@ -125,9 +125,17 @@ public class Constants {
     /**
      * 排序字段
      */
-    public static final String SORT_FIELD_ID = "id";
+    public static final String SORT_FIELD_OPERATE = "operate_time";
     /**
      * 用户是对内用户、还是对外用户
      */
     public static final String USER_TYPE_INNER = "inner";
+    /**
+     * 零配件
+     */
+    public static final String PRODUCT_TYPE_FITTINGS = "FITTINGS";
+    /**
+     * 物料
+     */
+    public static final String PRODUCT_TYPE_EQUIPMENT = "EQUIPMENT";
 }

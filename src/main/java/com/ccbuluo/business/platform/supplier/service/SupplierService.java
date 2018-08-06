@@ -1,10 +1,7 @@
 package com.ccbuluo.business.platform.supplier.service;
 
 import com.ccbuluo.business.entity.BizServiceSupplier;
-import com.ccbuluo.business.platform.supplier.dto.EditSupplierDTO;
-import com.ccbuluo.business.platform.supplier.dto.QuerySupplierListDTO;
-import com.ccbuluo.business.platform.supplier.dto.ResultFindSupplierDetailDTO;
-import com.ccbuluo.business.platform.supplier.dto.ResultSupplierListDTO;
+import com.ccbuluo.business.platform.supplier.dto.*;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import org.apache.thrift.TException;
@@ -57,4 +54,49 @@ public interface SupplierService {
      * @date 2018-07-04 10:41:23
      */
     ResultFindSupplierDetailDTO findSupplierDetail(Long id);
+
+    /**
+     * 添加关联商品
+     * @param saveRelSupplierProductDTO 关联商品DTO
+     * @return StatusDto
+     * @author zhangkangjian
+     * @date 2018-08-01 10:06:19
+     */
+    StatusDto<String> createRelSupplierProduct(SaveRelSupplierProductDTO saveRelSupplierProductDTO);
+
+    /**
+     * 查询供应商的商品（零配件，物料）
+     * @param relSupplierProduct 查询条件
+     * @return StatusDto<Page<RelSupplierProduct>> 分页信息
+     * @author zhangkangjian
+     * @date 2018-08-01 11:46:53
+     */
+    Page<QueryRelSupplierProduct> findSupplierProduct(QueryRelSupplierProduct relSupplierProduct);
+    /**
+     * 删除供应商关系
+     * @param id
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-08-01 20:12:26
+     */
+    void deleteSupplierProduct(Long id);
+
+    /**
+     * 查询供商零配件商品
+     * @param qeryRelSupplierProduct 查询条件
+     * @return Page<QueryRelSupplierProduct> 分页零配件信息
+     * @author zhangkangjian
+     * @date 2018-08-01 14:40:39
+     */
+    Page<QueryRelSupplierProduct> queryFittingsProduct(QueryRelSupplierProduct qeryRelSupplierProduct);
+    /**
+     * 查询供商物料商品
+     * @param qeryRelSupplierProduct 查询条件
+     * @return Page<QueryRelSupplierProduct> 分页物料信息
+     * @author zhangkangjian
+     * @date 2018-08-01 14:40:39
+     */
+    Page<QueryRelSupplierProduct> queryEquipmentProduct(QueryRelSupplierProduct qeryRelSupplierProduct);
+
 }

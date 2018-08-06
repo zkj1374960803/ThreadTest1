@@ -5,6 +5,7 @@ import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizCarmodelLabel;
 import com.ccbuluo.business.platform.carmodellabel.dto.BizCarmodelLabelDTO;
 import com.ccbuluo.business.platform.carmodellabel.dto.SearchBizCarmodelLabelDTO;
+import com.ccbuluo.business.platform.carmodellabel.dto.ViewCarmodelLabelDTO;
 import com.ccbuluo.business.platform.carmodellabel.service.BizCarmodelLabelService;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.controller.BaseController;
@@ -14,6 +15,7 @@ import io.swagger.annotations.*;
 import org.apache.thrift.TException;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
+import javax.swing.text.View;
 import java.util.List;
 
 /**
@@ -85,23 +87,22 @@ public class BizCarmodelLabelController extends BaseController {
 
     /**
      * 删除车型标签
-     * @param labelCode 车型标签id
+     * @param id 车型标签id
      * @return
      * @exception
      * @author weijb
      * @date 2018-07-18 14:59:51
      */
     @ApiOperation(value = "删除车型标签",notes = "【魏俊标】")
-    @GetMapping("/delete/{labelCode}")
-    @ApiImplicitParam(name = "labelCode", value = "车型标签labelCode", required = true, paramType = "path")
-    public StatusDto delete(@PathVariable String labelCode) {
-        bizCarmodelLabelService.deleteCarcoreInfoBylabelCode(labelCode);
-        return StatusDto.buildSuccessStatusDto();
+    @GetMapping("/delete/{id}")
+    @ApiImplicitParam(name = "id", value = "车型标签id", required = true, paramType = "path")
+    public StatusDto delete(@PathVariable Long id) {
+        return bizCarmodelLabelService.deleteCarcoreInfoBylabelCode(id);
     }
 
     /**
      * 车型标签列表分页查询
-     * @param Keyword (车车型标签名称)
+     * @param keyword (车车型标签名称)
      * @param offset 起始数
      * @param pageSize 每页数量
      * @author weijb
@@ -109,13 +110,13 @@ public class BizCarmodelLabelController extends BaseController {
      */
     @ApiOperation(value = "车型标签列表",notes = "【魏俊标】")
     @GetMapping("/list")
-    @ApiImplicitParams({@ApiImplicitParam(name = "Keyword", value = "关键字", required = false, paramType = "query"),
+    @ApiImplicitParams({@ApiImplicitParam(name = "keyword", value = "关键字", required = false, paramType = "query"),
             @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
             @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
-    public StatusDto<Page<SearchBizCarmodelLabelDTO>> queryCarmodelLabelList(@RequestParam(required = false) String Keyword,
+    public StatusDto<Page<SearchBizCarmodelLabelDTO>> queryCarmodelLabelList(@RequestParam(required = false) String keyword,
                                                                            @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                            @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
-        return StatusDto.buildDataSuccessStatusDto(bizCarmodelLabelService.queryCarmodelLabelList(Keyword, offset, pageSize));
+        return StatusDto.buildDataSuccessStatusDto(bizCarmodelLabelService.queryCarmodelLabelList(keyword, offset, pageSize));
     }
 
     /**
@@ -127,6 +128,16 @@ public class BizCarmodelLabelController extends BaseController {
     @GetMapping("/alllist")
     protected StatusDto<List<BizCarmodelLabelDTO>> getAllCarmodelLabelList() {
         return StatusDto.buildDataSuccessStatusDto(bizCarmodelLabelService.getAllCarmodelLabelList());
+    }
+    /**
+     * 获取车型标签以及标签所关联的车型参数
+     * @author weijb
+     * @date 2018-07-31 14:59:51
+     */
+    @ApiOperation(value = "获取车型标签以及标签所关联的车型参数",notes = "【魏俊标】")
+    @GetMapping("/alllistandparameter")
+    protected StatusDto<List<ViewCarmodelLabelDTO>> getAllCarmodelLabelAndParameterList() {
+        return StatusDto.buildDataSuccessStatusDto(bizCarmodelLabelService.getAllCarmodelLabelAndParameterList());
     }
 
 }

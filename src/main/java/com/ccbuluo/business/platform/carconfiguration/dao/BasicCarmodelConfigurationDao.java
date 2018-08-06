@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.carconfiguration.dao;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelConfiguration;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
@@ -122,5 +123,21 @@ public class BasicCarmodelConfigurationDao extends BaseDao<CarmodelConfiguration
         sql.append(" DELETE FROM basic_carmodel_configuration WHERE carmodel_id = :modelId ");
         int i = super.updateForMap(sql.toString(), param);
         return i;
+    }
+    /**
+     * 根据参数id查询此参数被引用过的次数
+     * @param id
+     * @return int
+     * @exception
+     * @author wuyibo
+     * @date 2018-08-03 12:41:36
+     */
+    public int findCarmodelParameterById(Long id) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT COUNT(*) FROM basic_carmodel_configuration ")
+                .append("   WHERE carmodel_parameter_id = :id");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("id", id);
+        return namedParameterJdbcTemplate.queryForObject(sql.toString(), params, Integer.class);
     }
 }

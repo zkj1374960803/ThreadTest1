@@ -131,4 +131,19 @@ public class BizServiceMultiplepriceDao extends BaseDao<BizServiceMultipleprice>
 
         return updateForBean(sql.toString(), bizServiceMultipleprice);
     }
+
+    /**
+     * 根据服务项删除原有地区倍数
+     * @param maintainitemCode 服务项code
+     * @author liuduo
+     * @date 2018-07-30 16:27:24
+     */
+    public void deleteOld(String maintainitemCode) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("maintainitemCode", maintainitemCode);
+
+        String sql = "DELETE FROM biz_service_multipleprice WHERE maintainitem_code = :maintainitemCode";
+
+        super.updateForMap(sql, params);
+    }
 }

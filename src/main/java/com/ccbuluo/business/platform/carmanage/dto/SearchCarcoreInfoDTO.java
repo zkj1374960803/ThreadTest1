@@ -36,6 +36,11 @@ public class SearchCarcoreInfoDTO {
     /**
      * 所属车系id
      */
+    @ApiModelProperty(name = "carseriesId", value = "所属车系id",required = true)
+    private Long carseriesId;
+    /**
+     * 所属车系id
+     */
     @ApiModelProperty(name = "carseriesName", value = "所属车系名字")
     private String carseriesName;
     /**
@@ -43,6 +48,25 @@ public class SearchCarcoreInfoDTO {
      */
     @ApiModelProperty(name = "carmodelName", value = "所属车型名字")
     private String carmodelName;
+    /**
+     * 车主（在租赁系统中的门店名称）
+     */
+    @ApiModelProperty(name = "storeName", value = "车主（在租赁系统中的门店名称）")
+    private String storeName;
+    /**
+     * 客户经理名称
+     */
+    @ApiModelProperty(name = "cusmanagerName", value = "客户经理名称")
+    private String cusmanagerName;
+    /**
+     * 车辆状态
+     */
+    private Integer carStatus;
+    /**
+     * 车辆租赁状态（是否已分配门店）
+     */
+    @ApiModelProperty(name = "storeAssigned", value = "车辆租赁状态（是否已分配门店）")
+    private Integer storeAssigned;
 
     public void setId(Long id) {
         this.id = id;
@@ -76,6 +100,14 @@ public class SearchCarcoreInfoDTO {
         this.carbrandName = carbrandName;
     }
 
+    public Long getCarseriesId() {
+        return carseriesId;
+    }
+
+    public void setCarseriesId(Long carseriesId) {
+        this.carseriesId = carseriesId;
+    }
+
     public String getCarseriesName() {
         return carseriesName;
     }
@@ -92,4 +124,35 @@ public class SearchCarcoreInfoDTO {
         this.carmodelName = carmodelName;
     }
 
+    public Integer getCarStatus() {
+        return carStatus;
+    }
+
+    public void setCarStatus(Integer carStatus) {
+        this.carStatus = carStatus;
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
+    }
+
+    public String getCusmanagerName() {
+        return cusmanagerName;
+    }
+
+    public void setCusmanagerName(String cusmanagerName) {
+        this.cusmanagerName = cusmanagerName;
+    }
+
+    public Integer getStoreAssigned() {
+        return storeAssigned;
+    }
+
+    public void setStoreAssigned(Integer storeAssigned) {
+        this.storeAssigned = storeAssigned;
+    }
 }

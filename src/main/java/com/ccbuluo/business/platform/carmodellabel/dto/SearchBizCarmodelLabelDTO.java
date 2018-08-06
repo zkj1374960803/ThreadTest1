@@ -12,6 +12,11 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(value = "客服经理 上门维修 使用的维修车 实体表实体", description = "客服经理 上门维修 使用的维修车 实体表")
 public class SearchBizCarmodelLabelDTO {
     /**
+     * 标签id
+     */
+    @ApiModelProperty(name = "id", value = "标签id")
+    private Long id;
+    /**
      * 标签编号
      */
     @ApiModelProperty(name = "labelCode", value = "标签编号")
@@ -32,6 +37,14 @@ public class SearchBizCarmodelLabelDTO {
      */
     @ApiModelProperty(name = "parameterTotal", value = "参数量")
     private Integer parameterTotal;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getLabelCode() {
         return labelCode;

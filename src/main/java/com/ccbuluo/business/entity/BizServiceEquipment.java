@@ -19,6 +19,11 @@ public class BizServiceEquipment extends AftersaleCommonEntity{
     @ApiModelProperty(name = "equipCode", value = "物料编号")
     private String equipCode;
     /**
+     * 计量单位
+     */
+    @ApiModelProperty(name = "equipUnit", value = "计量单位")
+    private String equipUnit;
+    /**
      * 物料名称
      */
     @ApiModelProperty(name = "equipName", value = "物料名称")
@@ -66,4 +71,11 @@ public class BizServiceEquipment extends AftersaleCommonEntity{
         return this.remark;
     }
 
+    public String getEquipUnit() {
+        return equipUnit;
+    }
+
+    public void setEquipUnit(String equipUnit) {
+        this.equipUnit = equipUnit;
+    }
 }

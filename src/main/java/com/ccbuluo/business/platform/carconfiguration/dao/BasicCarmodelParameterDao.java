@@ -40,12 +40,13 @@ public class BasicCarmodelParameterDao extends BaseDao<CarmodelParameter> {
     public Page<CarmodelParameter> queryPageForParameter(String parameterName, int offset, int limit){
         Map<String ,Object> param = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT id,parameter_name,value_type,optional_list,sort_number FROM basic_carmodel_parameter ");
+        sql.append(" SELECT bcp.id,bcp.parameter_name,bcp.value_type,bcp.optional_list,bcp.sort_number,bcp.required_flag,bci.label_name FROM basic_carmodel_parameter bcp ");
+        sql.append(" LEFT JOIN basic_carmodel_label bci on bcp.carmodel_label_id=bci.id ");
         if(null != parameterName){
-            sql.append(" where parameter_name LIKE CONCAT( :parameterName,'%')");
+            sql.append(" where bcp.parameter_name LIKE CONCAT('%',:parameterName,'%')");
             param.put("parameterName",parameterName);
         }
-        sql.append(" ORDER BY id DESC");
+        sql.append(" ORDER BY bcp.operate_time DESC");
         Page<CarmodelParameter> parameterPage = super.queryPageForBean(CarmodelParameter.class, sql.toString(), param, offset, limit);
         return parameterPage;
     }

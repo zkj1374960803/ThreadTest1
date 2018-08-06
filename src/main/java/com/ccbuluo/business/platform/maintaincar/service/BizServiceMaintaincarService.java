@@ -1,9 +1,14 @@
 package com.ccbuluo.business.platform.maintaincar.service;
 
 import com.ccbuluo.business.entity.BizServiceMaintaincar;
+import com.ccbuluo.business.platform.maintaincar.dto.ListServiceMaintaincarDTO;
 import com.ccbuluo.business.platform.maintaincar.dto.SearchBizServiceMaintaincarDTO;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
 
 /**
  * 车辆基本信息service
@@ -72,5 +77,22 @@ public interface BizServiceMaintaincarService {
      * @date 2018-07-13 19:52:44
      */
     Page<SearchBizServiceMaintaincarDTO> queryServiceMaintaincarList(Long carbrandId, Long carseriesId, Integer carStatus, String keyword, Integer offset, Integer pageSize);
+
+    /**
+     * 查询未分配的维修车列表
+     * @author weijb
+     * @date 2018-07-31 15:59:51
+     */
+    List<ListServiceMaintaincarDTO> queryundistributedlist(String vinNumber);
+    /**
+     * 根据维修车code更新维修车状态
+     * @param mendCode code
+     * @param status
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author weijb
+     * @date 2018-07-31 15:59:51
+     */
+    int updatestatusbycode(String mendCode, Integer status);
 
 }

@@ -1,6 +1,6 @@
 #开发环境 配置文件
 server:
-  port: 15231
+  port: 8093
   maxPostSize: 20971520
 
 #tomcatJdbc 配置信息
@@ -44,7 +44,11 @@ base:
   #本系统的secret
   secret: 6c28edbc36214242858fbea49fe58098
   #顶级服务中心code
-  topservicecenter: "SC000001"
+  topservicecenter: "SC000002"
+  #客户经理组织机构
+  custmanager: "SC000003"
+  #客户经理角色code
+  custmanagerrolecode: "JS024"
 
 
 cookie:
@@ -64,8 +68,8 @@ dev-default:
   username: "ZHT0007"
   password: "123456"
 #文件上传目录
-upload:
-  dir: uploads/
+oss:
+  bucket-name: zht-test-nosec
 
 
 #swagger相关配置

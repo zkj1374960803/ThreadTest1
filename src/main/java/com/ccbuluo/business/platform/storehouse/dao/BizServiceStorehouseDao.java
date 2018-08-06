@@ -128,31 +128,34 @@ public class BizServiceStorehouseDao extends BaseDao<BizServiceStorehouse> {
      */
     public Page<SearchStorehouseListDTO> queryList(String provinceName, String cityName, String areaName, Integer storeHouseStatus, String keyword, List<String> serviceCenterCode, Integer offset, Integer pagesize) {
         Map<String, Object> params = Maps.newHashMap();
-        params.put("provinceName", provinceName);
-        params.put("cityName", cityName);
-        params.put("areaName", areaName);
-        params.put("storeHouseStatus", storeHouseStatus);
-        params.put("keyword", keyword);
-        params.put("serviceCenterCode", serviceCenterCode);
-
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,storehouse_code,storehouse_name,storehouse_acreage,servicecenter_code,storehouse_status FROM biz_service_storehouse")
+        sql.append("SELECT id,storehouse_code,storehouse_name,storehouse_acreage,servicecenter_code,storehouse_address,storehouse_status FROM biz_service_storehouse")
             .append(" WHERE 1=1");
         if (storeHouseStatus != null) {
+            params.put("storeHouseStatus", storeHouseStatus);
             sql.append(" AND storehouse_status = :storeHouseStatus");
         }
         if (StringUtils.isNotBlank(provinceName)) {
+            params.put("provinceName", provinceName);
             sql.append(" AND province_name = :provinceName");
         }
         if (StringUtils.isNotBlank(cityName)) {
+            params.put("cityName", cityName);
             sql.append(" AND city_name = :cityName");
         }
         if (StringUtils.isNotBlank(areaName)) {
+            params.put("areaName", areaName);
             sql.append(" AND area_name = :areaName");
         }
         if (StringUtils.isNotBlank(keyword)) {
-            sql.append(" AND (storehouse_code LIKE CONCAT('%',:keyword,'%') OR storehouse_name LIKE CONCAT('%',:keyword,'%') OR servicecenter_code IN (:serviceCenterCode))");
+            params.put("keyword", keyword);
+            sql.append(" AND (storehouse_code LIKE CONCAT('%',:keyword,'%') OR storehouse_name LIKE CONCAT('%',:keyword,'%')");
+            if(!serviceCenterCode.isEmpty()){
+                params.put("serviceCenterCode", serviceCenterCode);
+                sql.append("  OR servicecenter_code IN (:serviceCenterCode)");
+            }
+            sql.append(" )");
         }
         sql.append(" ORDER BY operate_time DESC");
 

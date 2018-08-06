@@ -25,6 +25,16 @@ public class CarmodelManageDTO {
     private String carmodelName; // 车型名称
     private String carmodelNumber; // 车型编号,  C+6位自增编号，例如：C000001
     private String displacementGearbox; // 排量+变速箱
+    /**
+     * 所属品牌id
+     */
+    @ApiModelProperty(name = "carbrandName", value = "所属品牌名字")
+    private String carbrandName;
+    /**
+     * 所属车系id
+     */
+    @ApiModelProperty(name = "carseriesName", value = "所属车系名字")
+    private String carseriesName;
 
     public Long getId() {
         return id;
@@ -136,5 +146,21 @@ public class CarmodelManageDTO {
 
     public void setDisplacementGearbox(String displacementGearbox) {
         this.displacementGearbox = displacementGearbox;
+    }
+
+    public String getCarbrandName() {
+        return carbrandName;
+    }
+
+    public void setCarbrandName(String carbrandName) {
+        this.carbrandName = carbrandName;
+    }
+
+    public String getCarseriesName() {
+        return carseriesName;
+    }
+
+    public void setCarseriesName(String carseriesName) {
+        this.carseriesName = carseriesName;
     }
 }

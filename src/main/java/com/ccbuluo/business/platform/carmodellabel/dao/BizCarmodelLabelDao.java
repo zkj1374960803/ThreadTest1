@@ -7,6 +7,7 @@ import com.ccbuluo.business.platform.carmodellabel.dto.BizCarmodelLabelDTO;
 import com.ccbuluo.business.platform.carmodellabel.dto.SearchBizCarmodelLabelDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
+import com.ccbuluo.http.StatusDto;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -59,7 +60,7 @@ public class BizCarmodelLabelDao extends BaseDao<BizServiceMaintaincar> {
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE basic_carmodel_label SET ")
             .append(" label_name = :labelName,sort = :sort,")
-            .append("operator = :operator,operate_time = :operateTime,")
+            .append("operator = :operator,operate_time = :operateTime")
             .append(" WHERE label_code= :labelCode");
         return super.updateForBean(sql.toString(), entity);
     }
@@ -82,16 +83,16 @@ public class BizCarmodelLabelDao extends BaseDao<BizServiceMaintaincar> {
 
     /**
      * 删除 车型标签 实体表
-     * @param labelCode  labelCode
+     * @param labelId  labelId
      * @return 影响条数
      * @author liuduo
      * @date 2018-07-17 13:57:53
      */
-    public int deleteCarcoreInfoBylabelCode(String labelCode) {
+    public int deleteCarcoreInfoBylabelCode(Long labelId) {
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE basic_carmodel_label SET delete_flag = :deleteFlag  WHERE label_code= :labelCode ");
+        sql.append("UPDATE basic_carmodel_label SET delete_flag = :deleteFlag  WHERE id= :labelId ");
         Map<String, Object> params = Maps.newHashMap();
-        params.put("labelCode", labelCode);
+        params.put("labelId", labelId);
         params.put("deleteFlag", com.ccbuluo.merchandiseintf.carparts.Constants.Constants.DELETE_FLAG_DELETE);
         return super.updateForMap(sql.toString(), params);
     }
@@ -107,11 +108,11 @@ public class BizCarmodelLabelDao extends BaseDao<BizServiceMaintaincar> {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT COUNT(*) FROM basic_carmodel_label ")
                 .append("   WHERE label_name = :labelName AND delete_flag = :deleteFlag");
-        if (null != bizCarmodelLabel.getId()) {
-            sql.append(" AND id != :id");
+        if (null != bizCarmodelLabel.getLabelCode()) {
+            sql.append(" AND label_code != :labelCode");
         }
         Map<String, Object> params = Maps.newHashMap();
-        params.put("id", bizCarmodelLabel.getId());
+        params.put("labelCode", bizCarmodelLabel.getLabelCode());
         params.put("labelName", bizCarmodelLabel.getLabelName());
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         return namedParameterJdbcTemplate.queryForObject(sql.toString(), params, Integer.class);
@@ -119,13 +120,13 @@ public class BizCarmodelLabelDao extends BaseDao<BizServiceMaintaincar> {
 
     /**
      * 车型标签列表分页查询
-     * @param Keyword (车型标签名称)
+     * @param keyword (车型标签名称)
      * @param offset 起始数
      * @param pageSize 每页数量
      * @author weijb
      * @date 2018-07-13 19:52:44
      */
-    public Page<SearchBizCarmodelLabelDTO> queryCarmodelLabelList(String Keyword, Integer offset, Integer pageSize){
+    public Page<SearchBizCarmodelLabelDTO> queryCarmodelLabelList(String keyword, Integer offset, Integer pageSize){
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
@@ -133,13 +134,30 @@ public class BizCarmodelLabelDao extends BaseDao<BizServiceMaintaincar> {
                 .append(" FROM basic_carmodel_label bci ")
                 .append(" WHERE bci.delete_flag = :deleteFlag ");
         // 标签名称
-        if (StringUtils.isNotBlank(Keyword)) {
-            param.put("Keyword", Keyword);
-            sql.append(" AND bci.label_name LIKE CONCAT('%',:Keyword,'%') ");
+        if (StringUtils.isNotBlank(keyword)) {
+            param.put("keyword", keyword);
+            sql.append(" AND (bci.label_name LIKE CONCAT('%',:keyword,'%') OR bci.label_code LIKE CONCAT('%',:keyword,'%'))");
         }
-        sql.append("  ORDER BY bci.sort,bci.id");
+        sql.append("  ORDER BY bci.operate_time DESC");
         Page<SearchBizCarmodelLabelDTO> DTOS = super.queryPageForBean(SearchBizCarmodelLabelDTO.class, sql.toString(), param,offset,pageSize);
         return DTOS;
+    }
+    /**
+     * * 标签是否可以删除
+     * * @param labelid 车型标签id
+     * * @return com.ccbuluo.http.StatusDto
+     * * @exception
+     * @author wuyibo
+     * @date 2018-07-30 14:02:30
+     */
+    public int findCarmodelParameterByLabelCode(long labelid) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT COUNT(*) FROM basic_carmodel_parameter ")
+                .append(" WHERE carmodel_label_id = :labelid AND delete_flag = :deleteFlag");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("labelid", labelid);
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        return namedParameterJdbcTemplate.queryForObject(sql.toString(), params, Integer.class);
     }
 
     /**

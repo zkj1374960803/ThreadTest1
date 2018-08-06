@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.equipment.service;
 
 import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.constants.EquipUnitEnum;
 import com.ccbuluo.business.entity.BizServiceEquipment;
 import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
 import com.ccbuluo.business.platform.equipment.dto.DetailBizServiceEquipmentDTO;
@@ -12,8 +13,9 @@ import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 
-import java.util.List;
+import java.util.*;
 
 /**
  * 物料service实现
@@ -57,6 +59,7 @@ public class EquipmentServiceImpl implements EquipmentService{
         bizServiceEquipment.setEquipCode(serviceCenterCode);
         bizServiceEquipment.setEquipName(saveBizServiceEquipmentDTO.getEquipName());
         bizServiceEquipment.setEquiptypeId(saveBizServiceEquipmentDTO.getEquiptypeId());
+        bizServiceEquipment.setEquipUnit(saveBizServiceEquipmentDTO.getEquipUnit());
         bizServiceEquipment.preInsert(userHolder.getLoggedUserId());
         return bizServiceEquipmentDao.saveEntity(bizServiceEquipment);
     }
@@ -90,6 +93,7 @@ public class EquipmentServiceImpl implements EquipmentService{
         BizServiceEquipment bizServiceEquipment = new BizServiceEquipment();
         bizServiceEquipment.setEquipName(saveBizServiceEquipmentDTO.getEquipName());
         bizServiceEquipment.setEquiptypeId(saveBizServiceEquipmentDTO.getEquiptypeId());
+        bizServiceEquipment.setEquipUnit(saveBizServiceEquipmentDTO.getEquipUnit());
         bizServiceEquipment.preUpdate(userHolder.getLoggedUserId());
         bizServiceEquipment.setId(saveBizServiceEquipmentDTO.getId());
         return bizServiceEquipmentDao.update(bizServiceEquipment);
@@ -109,4 +113,36 @@ public class EquipmentServiceImpl implements EquipmentService{
     public Page<DetailBizServiceEquipmentDTO> queryList(Long equiptypeId, String keyword, Integer offset, Integer pagesize) {
         return bizServiceEquipmentDao.queryList(equiptypeId, keyword, offset, pagesize);
     }
+
+    /**
+     * 返回计量单位
+     * @return 枚举
+     * @author liuduo
+     * @date 2018-08-01 17:56:07
+     */
+    @Override
+    public List<Map<String, String>> getUnit() {
+        List<Map<String,String>> list = new ArrayList<>();
+        List<EquipUnitEnum> equipUnitEnums = Arrays.asList(EquipUnitEnum.values());
+        equipUnitEnums.forEach(item -> {
+            Map<String, String> map = new HashMap<>();
+            map.put("unitKey", item.name());
+            map.put("unitValue", item.getLabel());
+            list.add(map);
+        });
+        return list;
+    }
+
+    /**
+     * 根据物料类型id查询物料
+     * @param equiptypeId 物料类型id
+     * @return 物料
+     * @author liuduo
+     * @date 2018-08-02 10:41:20
+     */
+    @Override
+    public List<DetailBizServiceEquipmentDTO> queryEqupmentByEquiptype(Long equiptypeId) {
+        return bizServiceEquipmentDao.queryEqupmentByEquiptype(equiptypeId);
+    }
+
 }

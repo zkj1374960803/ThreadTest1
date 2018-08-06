@@ -19,6 +19,11 @@ public class SaveBizServiceEquipmentDTO extends IdEntity {
     @ApiModelProperty(name = "equipName", value = "物料名称", required = true)
     private String equipName;
     /**
+     * 计量单位
+     */
+    @ApiModelProperty(name = "equipUnit", value = "计量单位")
+    private String equipUnit;
+    /**
      * 物料类型的id
      */
     @ApiModelProperty(name = "equiptypeId", value = "物料类型的id", required = true)
@@ -53,4 +58,11 @@ public class SaveBizServiceEquipmentDTO extends IdEntity {
         return this.remark;
     }
 
+    public String getEquipUnit() {
+        return equipUnit;
+    }
+
+    public void setEquipUnit(String equipUnit) {
+        this.equipUnit = equipUnit;
+    }
 }

@@ -45,10 +45,16 @@ public class BasicCarmodelManageDao extends BaseDao<CarmodelManage> {
         Map<String ,Object> param = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT bcmm.carbrand_id,bcmm.carseries_id,bcmm.id,bcmm.carmodel_name,bcmm.carmodel_number, bcmm.car_type ,bcmm.model_image, ")
-            .append(" bcmm.model_master_image,bcmm.`carmodel_status`,bcmm.model_title,a.car_count ")
-            .append(" FROM basic_carmodel_manage bcmm ")
+            .append(" bcmm.model_master_image,bcmm.`carmodel_status`,bcmm.model_title,a.car_count,bcm.carbrand_name ")
+            .append(" FROM basic_carmodel_manage bcmm  LEFT JOIN basic_carbrand_manage bcm on bcmm.carbrand_id=bcm.id ")
             .append(" LEFT JOIN (SELECT bcci.carmodel_id, count(*) AS car_count FROM basic_carcore_info bcci WHERE bcci.delete_flag = 0 GROUP BY bcci.carmodel_id) a  ")
-            .append(" ON a.carmodel_id = bcmm.id WHERE 1=1 ");
+            .append(" ON a.carmodel_id = bcmm.id WHERE bcmm.delete_flag = :deleteFlag ");
+
+        param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        if (null != carbrandId){
+            sql.append(" AND bcmm.carbrand_id = :carbrandId ");
+            param.put("carbrandId",carbrandId);
+        }
         if (null != carseriesId){
             sql.append(" AND bcmm.carseries_id = :carseriesId ");
             param.put("carseriesId",carseriesId);
@@ -59,9 +65,9 @@ public class BasicCarmodelManageDao extends BaseDao<CarmodelManage> {
         }
         if(null != carmodelName && !"".equals(carmodelName)){
             param.put("carmodelName",carmodelName);
-            sql.append(" AND bcmm.carmodel_name LIKE CONCAT( :carmodelName,'%') ");
+            sql.append(" AND bcmm.carmodel_name LIKE CONCAT('%',:carmodelName,'%') ");
         }
-        sql.append(" ORDER BY bcmm.id DESC");
+        sql.append(" ORDER BY bcmm.operate_time DESC");
         Page<CarmodelManageDTO> carmodelManageDTOPage = super.queryPageForBean(CarmodelManageDTO.class, sql.toString(), param, offset, limit);
         return carmodelManageDTOPage;
     }
@@ -116,7 +122,7 @@ public class BasicCarmodelManageDao extends BaseDao<CarmodelManage> {
         sql.append("select ")
             .append(SQL_BUILD)
             .append(" FROM basic_carmodel_manage")
-            .append(" where carseries_id = :id");
+            .append(" where delete_flag=0 and carseries_id = :id");
         List<CarmodelManage> carmodelManages = super.queryListBean(CarmodelManage.class, sql.toString(), param);
         return carmodelManages;
     }
@@ -257,6 +263,56 @@ public class BasicCarmodelManageDao extends BaseDao<CarmodelManage> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("carmodelId", carmodelId);
         return super.queryListBean(CarmodelManage.class, sql.toString(), params);
+    }
+    /**
+     * 数据验证唯一性
+     * @param carmodelManageDTO 车型基本信息
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author wuyibo
+     * @date 2018-08-01 09:37:13
+     */
+    public int countEntity(CarmodelManageDTO carmodelManageDTO) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT COUNT(*) FROM basic_carmodel_manage ")
+                .append("   WHERE carmodel_name = :carmodelName AND delete_flag = :deleteFlag");
+        if (null != carmodelManageDTO.getId()) {
+            sql.append(" AND id != :id");
+        }
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("carmodelName", carmodelManageDTO.getCarmodelName());
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        params.put("id", carmodelManageDTO.getId());
+        return namedParameterJdbcTemplate.queryForObject(sql.toString(), params, Integer.class);
+    }
+    /**
+     * 删除车型
+     * @param id 车型id
+     * @return
+     * @exception
+     * @author weijb
+     * @date 2018-08-01 09:37:13
+     */
+    public int deleteCarmodelManageById(Long id){
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE basic_carmodel_manage SET delete_flag = :deleteFlag  WHERE id= :id ");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("id", id);
+        params.put("deleteFlag", Constants.DELETE_FLAG_DELETE);
+        return super.updateForMap(sql.toString(), params);
+    }
+    /**
+     * 查询所有的车型列表（包括逻辑删除的）
+     * @return 结果集
+     * @author Ryze
+     * @date 2018-06-12 15:31:17
+     */
+    public List<Map<String, Object>> queryAllCarMobelList() {
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT id,carmodel_name as name FROM ")
+                .append(" basic_carmodel_manage ");
+        Map<String, Object> params = Maps.newHashMap();
+        return super.queryListMap(sql.toString(), params);
     }
 
 }

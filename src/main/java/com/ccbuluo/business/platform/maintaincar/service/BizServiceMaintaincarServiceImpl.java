@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.maintaincar.service;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceMaintaincar;
 import com.ccbuluo.business.platform.maintaincar.dao.BizServiceMaintaincarDao;
+import com.ccbuluo.business.platform.maintaincar.dto.ListServiceMaintaincarDTO;
 import com.ccbuluo.business.platform.maintaincar.dto.SearchBizServiceMaintaincarDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.constants.SystemPropertyHolder;
@@ -13,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 /**
@@ -176,5 +179,27 @@ public class BizServiceMaintaincarServiceImpl implements BizServiceMaintaincarSe
         return bizServiceMaintaincarDao.queryCarcoreInfoList(carbrandId, carseriesId, carStatus, keyword, offset, pageSize);
     }
 
+    /**
+     * 查询未分配的维修车列表
+     * @author weijb
+     * @date 2018-07-31 15:59:51
+     */
+    @Override
+    public List<ListServiceMaintaincarDTO> queryundistributedlist(String vinNumber){
+        return bizServiceMaintaincarDao.queryundistributedlist(vinNumber);
+    }
 
+    /**
+     * 根据维修车code更新维修车状态
+     * @param mendCode code
+     * @param status
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author weijb
+     * @date 2018-07-31 15:59:51
+     */
+    @Override
+    public int updatestatusbycode(String mendCode, Integer status){
+        return bizServiceMaintaincarDao.updatestatusbycode(mendCode, status);
+    }
 }

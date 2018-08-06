@@ -12,6 +12,11 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(value = "车型标签（获取全部车型标签用） 实体表实体", description = "车型标签（获取全部车型标签用） 实体表实体")
 public class BizCarmodelLabelDTO {
     /**
+     * 标签id
+     */
+    @ApiModelProperty(name = "id", value = "标签id")
+    private Long id;
+    /**
      * 标签编号
      */
     @ApiModelProperty(name = "labelCode", value = "标签编号")
@@ -21,6 +26,14 @@ public class BizCarmodelLabelDTO {
      */
     @ApiModelProperty(name = "labelName", value = "标签名称",required = true)
     private String labelName;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getLabelCode() {
         return labelCode;

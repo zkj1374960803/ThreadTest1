@@ -1,15 +1,21 @@
 package com.ccbuluo.business.platform.carconfiguration.service;
 
+import com.auth0.jwt.internal.org.apache.commons.lang3.StringUtils;
+import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.carconfiguration.dao.*;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelConfiguration;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelManage;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarseriesManage;
 import com.ccbuluo.business.platform.carconfiguration.utils.RegularCodeProductor;
+import com.ccbuluo.business.platform.carmanage.dao.BasicCarcoreInfoDao;
+import com.ccbuluo.business.platform.carmanage.dto.ListCarcoreInfoDTO;
+import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.constants.SystemPropertyHolder;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,11 +47,24 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
     private RegularCodeProductor product;
     @Autowired
     private UserHolder userHolder;
+    @Resource
+    BasicCarcoreInfoDao basicCarcoreInfoDao;
 
     /**
      * 存储redis时当前模块的名字
      */
     private static final String CAR_MODEL_NUMBER = "car_model_number";
+
+    /**
+     * XXXXX已经存在！
+     */
+    private static final String CAR_MODEL_EXIST = "车型已经存在！";
+    /**
+     * 被车辆引用过的车型不能删除
+     */
+    private static final String CARMODEL_CANNOT_DELETE = "被车辆引用过的车型不能删除！";
+    @Resource
+    private GenerateProjectCodeService generateProjectCodeService;
 
     /**
      * 分页查询车型列表
@@ -61,7 +80,20 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
     @Override
     public Page<CarmodelManageDTO> queryPageForCarModelManage(Long carbrandId, Long carseriesId, Integer status, String carmodelName, int offset, int limit) {
         Page<CarmodelManageDTO> carmodelManageDTOPage = this.basicCarmodelManageDao.queryPageForCarModelManage(carbrandId, carseriesId, status,carmodelName, offset, limit);
+        //拼装车系
+        buildCarseriesManage(carmodelManageDTOPage);
         return carmodelManageDTOPage;
+    }
+    // 组装车系的名称
+    private void buildCarseriesManage(Page<CarmodelManageDTO> carmodelManageDTOPage){
+        List<CarseriesManage> list = basicCarseriesManageDao.queryAllCarseriesManageList();
+        for(CarmodelManageDTO cd : carmodelManageDTOPage.getRows()){
+            for(CarseriesManage cm : list){//获取车系的名称
+                if(cd.getCarseriesId().intValue() == cm.getId().intValue()){
+                    cd.setCarseriesName(cm.getCarseriesName());
+                }
+            }
+        }
     }
 
     /**
@@ -82,7 +114,7 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
      * @param id 车系id
      * @exception
      * @author chaoshuai
-     * @Date 2018-05-10 09:37:13
+     * @Date 2018-08-01 09:37:13
      */
     @Override
     public List<CarmodelManage> getByCarSeriesId(Long id) {
@@ -101,7 +133,18 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
     @Transactional(rollbackFor = Exception.class)
     public StatusDto createCarModel(CarmodelManageDTO carmodelManageDTO) {
         try {
+            // 信息验证唯一性
+            StatusDto statusDto = checkUniqueVerification(carmodelManageDTO);
+            if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
+                return statusDto;
+            }
             CarmodelManage carmodelManage = buildCarModelManage(carmodelManageDTO);
+            StatusDto<String> _statusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FH);
+            //获取code失败
+            if(!_statusDto.isSuccess()){
+                return _statusDto;
+            }
+            carmodelManage.setCarmodelNumber(_statusDto.getData());
             //保存车型主体信息
             long carmodelId = this.basicCarmodelManageDao.create(carmodelManage);
             List<CarmodelConfiguration> configurations = carmodelManageDTO.getConfigurations();
@@ -118,6 +161,25 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
         }
 
     }
+    /**
+     * 数据验证唯一性
+     * @param carmodelManageDTO 车型基本信息
+     * @return com.ccbuluo.http.StatusDto
+     * @exception
+     * @author wuyibo
+     * @date 2018-08-01 19:43:22
+     */
+    public StatusDto checkUniqueVerification(CarmodelManageDTO carmodelManageDTO) {
+        int entityCount = basicCarmodelManageDao.countEntity(carmodelManageDTO);
+        StringBuilder result = new StringBuilder();
+        if (entityCount > 0) {
+            result.append(CAR_MODEL_EXIST);
+        }
+        if (StringUtils.isNotBlank(result.toString())) {
+            return StatusDto.buildFailureStatusDto(result.toString());
+        }
+        return StatusDto.buildSuccessStatusDto();
+    }
 
     /**
      * 车型编辑
@@ -130,6 +192,11 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
     @Transactional(rollbackFor = Exception.class)
     public StatusDto editCarModel(CarmodelManageDTO carmodelManageDTO) {
         try {
+            // 信息验证唯一性
+            StatusDto statusDto = checkUniqueVerification(carmodelManageDTO);
+            if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
+                return statusDto;
+            }
             CarmodelManage carmodelManage = buildCarModelManage(carmodelManageDTO);
             if(null != carmodelManageDTO.getId()){
                 this.basicCarmodelConfigurationDao.deleteByModelId(carmodelManageDTO.getId());
@@ -203,11 +270,6 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
 
         // 新增or编辑
         if(null != carseriesManageDetail){
-            StringBuilder carModelName = new StringBuilder();
-            carModelName.append(carseriesManageDetail.getCarseriesName())
-                        .append(" ")
-                        .append(carmodelManageDTO.getDisplacementGearbox());
-            carmodelManage.setCarmodelName(carModelName.toString());
             // 基础字段的维护
             if(null != carmodelManageDTO.getId()){
                 carmodelManage.preUpdate(userHolder.getLoggedUserId());
@@ -226,14 +288,11 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
            .append(Constants.CAR_COLON)
            .append(CAR_MODEL_NUMBER);
 
-        if(null == carmodelManageDTO.getId()){
-            String carModelNumber = product.getNextCode(key.toString(), Constants.CAR_CONFIGURATION_CODING, Constants.CAR_CONFIGURATION_CODING_LENGTH);
-            carmodelManage.setCarmodelNumber(carModelNumber);
-        }
-
         if( null != carmodelManageDTO.getId()){
             carmodelManage.setId(carmodelManageDTO.getId());
         }
+        carmodelManage.setCarType(carmodelManageDTO.getCarType());
+        carmodelManage.setCarmodelName(carmodelManageDTO.getCarmodelName());
         carmodelManage.setCarbrandId(carmodelManageDTO.getCarbrandId());
         carmodelManage.setCarseriesId(carmodelManageDTO.getCarseriesId());
         carmodelManage.setModelTitle(carmodelManageDTO.getModelTitle());
@@ -241,5 +300,63 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
         carmodelManage.setModelMasterImage(carmodelManageDTO.getModelMasterImage());
         carmodelManage.preUpdate(userHolder.getLoggedUserId());
         return carmodelManage;
+    }
+    /**
+     * 删除车型
+     * @param id 车型id
+     * @return
+     * @exception
+     * @author weijb
+     * @date 2018-08-01 09:37:13
+     */
+    @Override
+    public StatusDto deleteCarmodelManageById(Long id){
+        //被车辆引用过的车型不能删除
+        StatusDto statusDto = findCarmodelListById(id);
+        if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
+            return statusDto;
+        }
+        int flag = basicCarmodelManageDao.deleteCarmodelManageById(id);
+        if (flag == Constants.SUCCESSSTATUS) {
+            return StatusDto.buildSuccessStatusDto("删除成功！");
+        }
+        return StatusDto.buildFailureStatusDto("删除失败！");
+    }
+    /**
+     * * 车型是否可以删除
+     * * @param labelId 车型标签id
+     * * @return com.ccbuluo.http.StatusDto
+     * * @exception
+     * @author wuyibo
+     * @date 2018-07-30 14:02:30
+     */
+    public StatusDto findCarmodelListById(Long id) {
+        int count = basicCarcoreInfoDao.findCarmodelParameterById(id);
+        StringBuilder result = new StringBuilder();
+        if (count > 0) {
+            result.append(CARMODEL_CANNOT_DELETE);
+        }
+        if (StringUtils.isNotBlank(result.toString())) {
+            return StatusDto.buildFailureStatusDto(result.toString());
+        }
+        return StatusDto.buildSuccessStatusDto();
+    }
+    /**
+     * 把车型id转换成车型名字
+     */
+    public void buildCarModeName(List<BasicCarpartsProductDTO> list){
+        if(list.size() == 0){
+            return;
+        }
+        //获取车型列表（包括删除的）
+        List<Map<String, Object>> mList = basicCarmodelManageDao.queryAllCarMobelList();
+        for(BasicCarpartsProductDTO bd : list){
+            for(Map<String, Object> map : mList){
+                if(map.get("id").toString().equals(bd.getFitCarmodel())){
+                    bd.setCarmodelName(map.get("name").toString());
+                    continue;
+                }
+            }
+        }
     }
 }

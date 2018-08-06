@@ -66,7 +66,7 @@ public class BasicCarseriesManageDao extends BaseDao<CarseriesManage> {
      * @author wuyibo
      * @date 2018-05-08 16:08:02
      */
-    public long saveCarseriesManage(CarseriesManage carseriesManage) {
+    public long   saveCarseriesManage(CarseriesManage carseriesManage) {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO basic_carseries_manage ( ")
             .append("   carseries_name, carbrand_id, sort_number, carseries_number, ")
@@ -175,7 +175,7 @@ public class BasicCarseriesManageDao extends BaseDao<CarseriesManage> {
             .append(" FROM basic_carseries_manage ")
             .append(" WHERE carbrand_id = :carbrandId AND delete_flag = :deleteFlag ");
         if (StringUtils.isNotBlank(carseriesName)) {
-            sql.append(" AND carseries_name LIKE CONCAT(:carseriesName, '%') ");
+            sql.append(" AND carseries_name LIKE CONCAT('%',:carseriesName, '%') ");
         }
         sql.append(" ORDER BY id DESC");
 
@@ -204,7 +204,7 @@ public class BasicCarseriesManageDao extends BaseDao<CarseriesManage> {
             .append(" FROM basic_carseries_manage ")
             .append(" WHERE carbrand_id = :carbrandId AND delete_flag = :deleteFlag ");
         if (StringUtils.isNotBlank(carseriesName)) {
-            sql.append(" AND carseries_name LIKE CONCAT(:carseriesName, '%') ");
+            sql.append(" AND carseries_name LIKE CONCAT('%',:carseriesName, '%') ");
         }
         sql.append(" ORDER BY id DESC");
 

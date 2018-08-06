@@ -13,7 +13,8 @@ import java.util.List;
  * @version V1.0.0
  */
 @ApiModel(value = "SaveBizServiceMultiplepriceDTO", description = "服务项目 各地区对基本定价的倍数")
-public class SaveBizServiceMultiplepriceDTO extends IdEntity {
+public class SaveBizServiceMultiplepriceDTO {
+
     /**
      * 服务项目的编码
      */

@@ -1,5 +1,7 @@
 package com.ccbuluo.business.platform.carconfiguration.service;
 
+import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarmodelConfigurationDao;
 import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarmodelParameterDao;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelParameter;
 import com.ccbuluo.core.common.UserHolder;
@@ -11,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,6 +32,13 @@ public class BasicCarmodelParameterServiceImpl implements BasicCarmodelParameter
     private BasicCarmodelParameterDao basicCarmodelParameterDao;
     @Autowired
     private UserHolder userHolder;
+    @Resource
+    BasicCarmodelConfigurationDao basicCarmodelConfigurationDao;
+
+    /**
+     * 被车型引用过的参数不能删除
+     */
+    private static final String CARMODELPARAMETER_CANNOT_DELETE = "被车型引用过的参数不能删除！";
     
     /**
      * 分页查询所有配置参数
@@ -157,12 +167,36 @@ public class BasicCarmodelParameterServiceImpl implements BasicCarmodelParameter
     @Override
     public StatusDto deleteParameter(Long id) {
         try {
+            //被车型参数引用过的参数不能删除CARMODELPARAMETER_CANNOT_DELETE
+            StatusDto statusDto = findCarmodelParameterById(id);
+            if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
+                return statusDto;
+            }
             this.basicCarmodelParameterDao.deleteParameter(id);
             return StatusDto.buildSuccessStatusDto("删除车型参数配置成功！！！");
         }catch (Exception e){
             logger.error("删除车型参数配置失败！！！",e);
             throw e;
         }
+    }
+    /**
+     * * 车型参数是否可以删除
+     * * @param labelId 车型标签id
+     * * @return com.ccbuluo.http.StatusDto
+     * * @exception
+     * @author wuyibo
+     * @date 2018-07-30 14:02:30
+     */
+    public StatusDto findCarmodelParameterById(Long id) {
+        int count = basicCarmodelConfigurationDao.findCarmodelParameterById(id);
+        StringBuilder result = new StringBuilder();
+        if (count > 0) {
+            result.append(CARMODELPARAMETER_CANNOT_DELETE);
+        }
+        if (StringUtils.isNotBlank(result.toString())) {
+            return StatusDto.buildFailureStatusDto(result.toString());
+        }
+        return StatusDto.buildSuccessStatusDto();
     }
 
     /**
