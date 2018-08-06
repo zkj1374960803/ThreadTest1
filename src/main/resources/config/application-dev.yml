@@ -45,7 +45,7 @@ base:
   #本系统的secret
   secret: 883c12f76921465aa5bfb74e9d9ac9cc
   #顶级服务中心code
-  topservicecenter: "SC000001"
+  topservicecenter: "SC000002"
   #客户经理组织机构
   custmanager: "SC000003"
   #客户经理角色code

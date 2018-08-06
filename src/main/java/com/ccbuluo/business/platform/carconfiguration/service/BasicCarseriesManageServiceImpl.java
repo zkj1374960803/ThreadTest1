@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.carconfiguration.service;
 
+import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarbrandManageDao;
 import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarmodelManageDao;
@@ -7,6 +8,7 @@ import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarseriesManageDa
 import com.ccbuluo.business.platform.carconfiguration.entity.CarbrandManage;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarseriesManage;
 import com.ccbuluo.business.platform.carconfiguration.utils.RegularCodeProductor;
+import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.constants.SystemPropertyHolder;
 import com.ccbuluo.db.Page;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +44,8 @@ public class BasicCarseriesManageServiceImpl implements BasicCarseriesManageServ
     private RegularCodeProductor regularCodeProductor;
     @Autowired
     private UserHolder userHolder;
+    @Resource
+    private GenerateProjectCodeService generateProjectCodeService;
 
     /**
      * 存储redis时当前模块的名字
@@ -73,7 +78,12 @@ public class BasicCarseriesManageServiceImpl implements BasicCarseriesManageServ
             return StatusDto.buildFailureStatusDto(CARSERIES_NUME_VERIFY);
         }
         // 2.车系编码
-        carseriesManage.setCarseriesNumber(findCarseriesNumber());
+        StatusDto<String> statusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FN);
+        //获取code失败
+        if(!statusDto.isSuccess()){
+            return statusDto;
+        }
+        carseriesManage.setCarseriesNumber(statusDto.getData());
         // 3.公共字段
         carseriesManage.preInsert(userHolder.getLoggedUserId());
 
