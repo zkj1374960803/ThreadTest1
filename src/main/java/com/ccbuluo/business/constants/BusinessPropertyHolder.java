@@ -26,10 +26,16 @@ public class BusinessPropertyHolder {
         TOP_SERVICECENTER = topservicecenter;
     }
 
-    // 客户经理
+    // 客户经理组织机构
     public static String custManager;
     @Value("${base.custmanager}")
     public void setCustManager(String custManager) {
         BusinessPropertyHolder.custManager = custManager;
+    }
+    //custmanagerrolecode 客户经理角色
+    public static String custManagerRoleCode;
+    @Value("${base.custmanagerrolecode}")
+    public void setCustManagerRoleCode(String custManagerRoleCode) {
+        BusinessPropertyHolder.custManagerRoleCode = custManagerRoleCode;
     }
 }

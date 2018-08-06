@@ -45,8 +45,10 @@ base:
   secret: 6c28edbc36214242858fbea49fe58098
   #顶级服务中心code
   topservicecenter: "SC000001"
-  #客户经理
+  #客户经理组织机构
   custmanager: "SC000003"
+  #客户经理角色code
+  custmanagerrolecode: "JS024"
 
 
 cookie:

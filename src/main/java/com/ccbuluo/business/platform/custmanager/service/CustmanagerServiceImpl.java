@@ -232,7 +232,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
      */
     private void checkedRoleCodeAndOrgCode(UserInfoDTO userInfoDTO) {
         // 角色校验
-        StatusDtoThriftList<Long> statusDtoRole = basicUserRoleService.queryRoleByRoleCode(Constants.CUSTMANAGER_ROLE_CODE);
+        StatusDtoThriftList<Long> statusDtoRole = basicUserRoleService.queryRoleByRoleCode(BusinessPropertyHolder.custManagerRoleCode);
         if(!statusDtoRole.isSuccess()){
             throw new CommonException(statusDtoRole.getCode(), "客户经理角色不存在！");
         }
@@ -442,7 +442,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         StatusDto<UserInfoDTO> resolve = StatusDtoThriftUtils.resolve(userDetail, UserInfoDTO.class);
         List<RelUserRole> userRoles = resolve.getData().getUserRoles();
         if(userRoles != null && userRoles.size() > 0){
-            List<RelUserRole> temp = userRoles.stream().filter(a -> Constants.CUSTMANAGER_ROLE_CODE.equals(a.getRoleCode())).collect(Collectors.toList());
+            List<RelUserRole> temp = userRoles.stream().filter(a -> BusinessPropertyHolder.custManagerRoleCode.equals(a.getRoleCode())).collect(Collectors.toList());
             if( temp != null && temp.size() > 0){
                 RelUserRole relUserRole = temp.get(0);
                 resolve.getData().setRoleName(relUserRole.getRoleName());
