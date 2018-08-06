@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.carconfiguration.service;
 
 import com.auth0.jwt.internal.org.apache.commons.lang3.StringUtils;
+import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.carconfiguration.dao.*;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelConfiguration;
@@ -9,6 +10,7 @@ import com.ccbuluo.business.platform.carconfiguration.entity.CarseriesManage;
 import com.ccbuluo.business.platform.carconfiguration.utils.RegularCodeProductor;
 import com.ccbuluo.business.platform.carmanage.dao.BasicCarcoreInfoDao;
 import com.ccbuluo.business.platform.carmanage.dto.ListCarcoreInfoDTO;
+import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.constants.SystemPropertyHolder;
 import com.ccbuluo.db.Page;
@@ -61,6 +63,8 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
      * 被车辆引用过的车型不能删除
      */
     private static final String CARMODEL_CANNOT_DELETE = "被车辆引用过的车型不能删除！";
+    @Resource
+    private GenerateProjectCodeService generateProjectCodeService;
 
     /**
      * 分页查询车型列表
@@ -135,6 +139,12 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
                 return statusDto;
             }
             CarmodelManage carmodelManage = buildCarModelManage(carmodelManageDTO);
+            StatusDto<String> _statusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FH);
+            //获取code失败
+            if(!_statusDto.isSuccess()){
+                return _statusDto;
+            }
+            carmodelManage.setCarmodelNumber(_statusDto.getData());
             //保存车型主体信息
             long carmodelId = this.basicCarmodelManageDao.create(carmodelManage);
             List<CarmodelConfiguration> configurations = carmodelManageDTO.getConfigurations();
@@ -277,11 +287,6 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
            .append(Constants.CAR_CONFIGURATION)
            .append(Constants.CAR_COLON)
            .append(CAR_MODEL_NUMBER);
-
-        if(null == carmodelManageDTO.getId()){
-            String carModelNumber = product.getNextCode(key.toString(), Constants.CAR_CONFIGURATION_CODING, Constants.CAR_CONFIGURATION_CODING_LENGTH);
-            carmodelManage.setCarmodelNumber(carModelNumber);
-        }
 
         if( null != carmodelManageDTO.getId()){
             carmodelManage.setId(carmodelManageDTO.getId());
