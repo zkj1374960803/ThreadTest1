@@ -20,7 +20,12 @@ public enum CodePrefixEnum {
     FD("车型标签"),
     FB("车品牌"),
     FN("车系"),
-    FH("车型");
+    FH("车型"),
+    SW("申请单号"),
+    R("入库单号"),
+    C("出库单号"),
+    PK("盘库单号"),
+    TH("退换单号");
 
 
     CodePrefixEnum(String label){

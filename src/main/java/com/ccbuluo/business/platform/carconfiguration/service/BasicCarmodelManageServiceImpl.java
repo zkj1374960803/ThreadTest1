@@ -144,7 +144,7 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
             if(!_statusDto.isSuccess()){
                 return _statusDto;
             }
-            carmodelManage.setCarmodelNumber(_statusDto.getCode());
+            carmodelManage.setCarmodelNumber(_statusDto.getData());
             //保存车型主体信息
             long carmodelId = this.basicCarmodelManageDao.create(carmodelManage);
             List<CarmodelConfiguration> configurations = carmodelManageDTO.getConfigurations();

@@ -70,7 +70,7 @@ public class BasicCarbrandManageServiceImpl implements BasicCarbrandManageServic
         if(!statusDto.isSuccess()){
             return statusDto;
         }
-        carbrandManage.setCarbrandNumber(statusDto.getCode());
+        carbrandManage.setCarbrandNumber(statusDto.getData());
         // 3.公共字段
         carbrandManage.preInsert(userHolder.getLoggedUserId());
 

@@ -83,7 +83,7 @@ public class BasicCarseriesManageServiceImpl implements BasicCarseriesManageServ
         if(!statusDto.isSuccess()){
             return statusDto;
         }
-        carseriesManage.setCarseriesNumber(statusDto.getCode());
+        carseriesManage.setCarseriesNumber(statusDto.getData());
         // 3.公共字段
         carseriesManage.preInsert(userHolder.getLoggedUserId());
 
