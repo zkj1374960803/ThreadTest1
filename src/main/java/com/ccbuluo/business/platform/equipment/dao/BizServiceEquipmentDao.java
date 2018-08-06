@@ -71,7 +71,7 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
      */
     public DetailBizServiceEquipmentDTO getById(long id) {
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT bse.id,bse.equip_name,bse.equip_unit,bse.equip_code,bse.equiptype_id,bsee.type_name AS equiptypeName ")
+        sql.append("SELECT bse.id,bse.equip_name,bse.remark,bse.equip_unit,bse.equip_code,bse.equiptype_id,bsee.type_name AS equiptypeName ")
             .append(" FROM biz_service_equipment AS bse LEFT JOIN biz_service_equiptype AS bsee ON bsee.id = bse.equiptype_id")
             .append(" WHERE bse.id = :id");
         Map<String, Object> params = Maps.newHashMap();
