@@ -1,10 +1,12 @@
 package com.ccbuluo.business.platform.carconfiguration.service;
 
+import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarbrandManageDao;
 import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarseriesManageDao;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarbrandManage;
 import com.ccbuluo.business.platform.carconfiguration.utils.RegularCodeProductor;
+import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.constants.SystemPropertyHolder;
 import com.ccbuluo.db.Page;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +40,8 @@ public class BasicCarbrandManageServiceImpl implements BasicCarbrandManageServic
     private RegularCodeProductor regularCodeProductor;
     @Autowired
     private UserHolder userHolder;
+    @Resource
+    private GenerateProjectCodeService generateProjectCodeService;
 
     /**
      * 存储redis时当前模块的名字
@@ -60,7 +65,12 @@ public class BasicCarbrandManageServiceImpl implements BasicCarbrandManageServic
             return StatusDto.buildFailureStatusDto("该品牌已经存在！");
         }
         // 2.品牌编码
-        carbrandManage.setCarbrandNumber(findCarBrandNumber());
+        StatusDto<String> statusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FB);
+        //获取code失败
+        if(!statusDto.isSuccess()){
+            return statusDto;
+        }
+        carbrandManage.setCarbrandNumber(statusDto.getCode());
         // 3.公共字段
         carbrandManage.preInsert(userHolder.getLoggedUserId());
 
