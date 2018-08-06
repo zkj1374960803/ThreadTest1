@@ -4,6 +4,7 @@ import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarcoreInfo;
 import com.ccbuluo.business.platform.carmanage.dto.ListCarcoreInfoDTO;
 import com.ccbuluo.business.platform.carmanage.dto.SearchCarcoreInfoDTO;
+import com.ccbuluo.business.platform.carmanage.dto.UpdateCarcoreInfoByVinDTO;
 import com.ccbuluo.business.platform.carmanage.dto.UpdateCarcoreInfoDTO;
 import com.ccbuluo.business.platform.carmanage.service.BasicCarcoreInfoService;
 import com.ccbuluo.core.controller.BaseController;
@@ -158,7 +159,9 @@ public class BasicCarcoreInfoController extends BaseController {
      * @date 2018-06-08 13:55:14
      */
     @ApiOperation(value = "根据车辆vin查询车辆信息", notes = "【魏俊标】")
-    @ApiImplicitParam(name = "vinNumber", value = "车辆vin", required = true, paramType = "query")
+    @ApiImplicitParams({@ApiImplicitParam(name = "vinNumber", value = "车辆vin", required = true, paramType = "query"),
+                        @ApiImplicitParam(name = "appId", value = "appId", required = true, paramType = "query"),
+                        @ApiImplicitParam(name = "secretId", value = "secretId", required = true, paramType = "query")})
     @GetMapping("/getcarinfobyvin")
     public StatusDto getCarInfoByVin(@RequestParam String vinNumber,@RequestParam String appId,@RequestParam String secretId) throws TException {
         StatusDto<String> statusDto = innerUserInfoService.checkAppIdAndSecretId( appId, secretId);
@@ -170,27 +173,24 @@ public class BasicCarcoreInfoController extends BaseController {
     }
     /**
      * 根据车辆vin更新车辆的门店信息
-     * @param vinNumber 车架号
-     * @param storeCode 门店code
-     * @param storeName 门店名称
+     * @param updateCarcoreInfoByVinDTO UpdateCarcoreInfoByVinDTO对象
      * @return com.ccbuluo.http.StatusDto
      * @exception
      * @author weijb
      * @date 2018-08-01 15:55:14
      */
-    @ApiOperation(value = "根据车辆vin更新车辆的门店信息", notes = "【魏俊标】")
-    @ApiImplicitParams({@ApiImplicitParam(name = "vinNumber", value = "车架号", required = false, paramType = "query"),
-            @ApiImplicitParam(name = "storeCode", value = "门店code", required = false, paramType = "query"),
-            @ApiImplicitParam(name = "storeName", value = "门店名称", required = false, paramType = "query")})
-    @GetMapping("/updatecarcoreinfobyvin")
-    public StatusDto updateCarcoreInfoByVin(@RequestParam String vinNumber,@RequestParam String storeCode,@RequestParam String storeName
-            ,@RequestParam String appId,@RequestParam String secretId) {
-        StatusDto<String> statusDto = innerUserInfoService.checkAppIdAndSecretId( appId, secretId);
+    @ApiOperation(value = "根据车辆vin批量更新车辆的门店信息", notes = "【魏俊标】")
+    @PostMapping("/batchupdatecarcoreinfobyvin")
+    public StatusDto updateCarcoreInfoByVin(@ApiParam(name = "UpdateCarcoreInfoByVinDTO", value = "传入UpdateCarcoreInfoByVinDTO对象", required = true)@RequestBody UpdateCarcoreInfoByVinDTO updateCarcoreInfoByVinDTO) {
+        StatusDto<String> statusDto = innerUserInfoService.checkAppIdAndSecretId(updateCarcoreInfoByVinDTO.getAppId(), updateCarcoreInfoByVinDTO.getSecretId());
         //权限校验
         if(Constants.ERROR_CODE.equals(statusDto.getCode())){
             return statusDto;
         }
-        int flag = basicCarcoreInfoService.updateCarcoreInfoByVin(vinNumber,storeCode,storeName);
+        if(updateCarcoreInfoByVinDTO.getCarcoreInfoList().size() == 0){
+            return StatusDto.buildFailureStatusDto("参数不能为空！");
+        }
+        int flag = basicCarcoreInfoService.batchUpdateCarcoreInfoByVin(updateCarcoreInfoByVinDTO.getCarcoreInfoList());
         if (flag != Constants.STATUS_FLAG_ZERO) {
             return StatusDto.buildSuccessStatusDto("操作成功！");
         }

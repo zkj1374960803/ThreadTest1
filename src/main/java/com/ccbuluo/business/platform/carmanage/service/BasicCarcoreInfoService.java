@@ -112,15 +112,12 @@ public interface BasicCarcoreInfoService {
 
     /**
      * 根据车辆vin更新车辆的门店信息
-     * @param vinNumber 车架号
-     * @param storeCode 门店code
-     * @param storeName 门店名称
      * @return com.ccbuluo.http.StatusDto
      * @exception
      * @author weijb
      * @date 2018-08-01 15:55:14
      */
-    int updateCarcoreInfoByVin(String vinNumber, String storeCode, String storeName);
+    int batchUpdateCarcoreInfoByVin(List<CarcoreInfoByVinDTO> list);
 
 
     /**
