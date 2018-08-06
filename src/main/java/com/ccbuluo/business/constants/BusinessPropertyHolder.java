@@ -12,24 +12,24 @@ import org.springframework.stereotype.Component;
 
 public class BusinessPropertyHolder {
 
-    // region 微服务名称配置
-    // endregion
-
-    // region redis key值前缀
-
     // 用户中心token key前缀名称
     public static String PROJECTCODE_REDIS_KEYPERFIX;
     @Value("${redis.perfix.projectcode}")
     public void setProjectcodeRedisKeyperfix(String projectcodeRedisKeyperfix) {
         PROJECTCODE_REDIS_KEYPERFIX = projectcodeRedisKeyperfix;
     }
-    // endregion
-
 
     // 顶级服务中心code
     public static String TOP_SERVICECENTER;
     @Value("${base.topservicecenter}")
     public void setTopStore(String topservicecenter) {
         TOP_SERVICECENTER = topservicecenter;
+    }
+
+    // 客户经理
+    public static String custManager;
+    @Value("${base.custmanager}")
+    public void setCustManager(String custManager) {
+        BusinessPropertyHolder.custManager = custManager;
     }
 }

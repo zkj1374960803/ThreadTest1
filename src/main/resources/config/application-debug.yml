@@ -46,6 +46,8 @@ base:
   secret: 883c12f76921465aa5bfb74e9d9ac9cc
   #顶级服务中心code
   topservicecenter: "SC000001"
+  #客户经理
+  custmanager: "SC000003"
 
 #web端配置:
 cookie:
