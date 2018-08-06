@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.custmanager.service;
 
+import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.carmanage.dto.CusmanagerCarCountDTO;
@@ -189,7 +190,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         buo.setCreateTime(System.currentTimeMillis());
         buo.setOperateTime(System.currentTimeMillis());
         // 查询组织架构信息
-        StatusDtoThriftBean<BasicUserOrganization> orgcode = basicUserOrganizationService.findOrgByCode(Constants.CUSTMANAGER_ORG_CODE);
+        StatusDtoThriftBean<BasicUserOrganization> orgcode = basicUserOrganizationService.findOrgByCode(BusinessPropertyHolder.custManager);
         StatusDto<BasicUserOrganization> resolve = StatusDtoThriftUtils.resolve(orgcode, BasicUserOrganization.class);
         // 拿到父级组织架构的id
         buo.setParentId(resolve.getData().getId());
@@ -231,12 +232,12 @@ public class CustmanagerServiceImpl implements CustmanagerService{
      */
     private void checkedRoleCodeAndOrgCode(UserInfoDTO userInfoDTO) {
         // 角色校验
-        StatusDtoThriftList<Long> statusDtoRole = basicUserRoleService.queryRoleByRoleCode(Constants.CUSTMANAGER_ROLE_CODE);
+        StatusDtoThriftList<Long> statusDtoRole = basicUserRoleService.queryRoleByRoleCode(BusinessPropertyHolder.custManagerRoleCode);
         if(!statusDtoRole.isSuccess()){
             throw new CommonException(statusDtoRole.getCode(), "客户经理角色不存在！");
         }
         // 组织架构校验
-//        userInfoDTO.setOrgCode(Constants.CUSTMANAGER_ORG_CODE);
+//        userInfoDTO.setOrgCode(BusinessPropertyHolder.custManager);
         StatusDtoThriftBean<BasicUserOrganization> orgByCode = basicUserOrganizationService.findOrgByCode(userInfoDTO.getOrgCode());
         if(!orgByCode.isSuccess()){
             throw new CommonException(statusDtoRole.getCode(), "组织架构不存在！");
@@ -256,9 +257,9 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     public StatusDto<Page<QueryUserListDTO>> queryUserList(UserInfoDTO userInfoDTO) {
         userInfoDTO.setAppId(SystemPropertyHolder.getBaseAppid());
         userInfoDTO.setSecretId(SystemPropertyHolder.getBaseSecret());
-        userInfoDTO.setOrgCode(Constants.CUSTMANAGER_ORG_CODE);
+        userInfoDTO.setOrgCode(BusinessPropertyHolder.custManager);
         // 排序字段
-        userInfoDTO.setSortField(Constants.SORT_FIELD_ID);
+        userInfoDTO.setSortField(Constants.SORT_FIELD_OPERATE);
         //查询用户信息
         StatusDtoThriftPage<UserInfoDTO> userInfoDTOStatusDtoThriftPage = innerUserInfoService.queryUserList(userInfoDTO);
         StatusDto<Page<UserInfoDTO>> userInfoStatusDto = StatusDtoThriftUtils.resolve(userInfoDTOStatusDtoThriftPage, UserInfoDTO.class);
@@ -380,12 +381,12 @@ public class CustmanagerServiceImpl implements CustmanagerService{
      */
     @Override
     public StatusDto queryOrgList(int parentId, boolean isSearchClose) {
-        StatusDtoThriftBean<BasicUserOrganization> orgByCode = basicUserOrganizationService.findOrgByCode(Constants.CUSTMANAGER_ORG_CODE);
+        StatusDtoThriftBean<BasicUserOrganization> orgByCode = basicUserOrganizationService.findOrgByCode(BusinessPropertyHolder.custManager);
         StatusDto<BasicUserOrganization> orgByCodeStatusDto = StatusDtoThriftUtils.resolve(orgByCode, BasicUserOrganization.class);
         StatusDtoThriftList<BasicUserOrganizationDTO> basicUserOrganizationDTO = orgService.queryOrganizationByParentId(orgByCodeStatusDto.getData().getParentId(), isSearchClose);
         StatusDto<List<BasicUserOrganizationDTO>> resolve = StatusDtoThriftUtils.resolve(basicUserOrganizationDTO, BasicUserOrganizationDTO.class);
         List<BasicUserOrganizationDTO> data = resolve.getData();
-        BasicUserOrganizationDTO basicUserOrganizationDTO1 = data.stream().filter(a -> Constants.CUSTMANAGER_ORG_CODE.equals(a.getOrgCode())).findFirst().get();
+        BasicUserOrganizationDTO basicUserOrganizationDTO1 = data.stream().filter(a -> BusinessPropertyHolder.custManager.equals(a.getOrgCode())).findFirst().get();
         basicUserOrganizationDTO1.setLeaf(true);
         return StatusDto.buildDataSuccessStatusDto(basicUserOrganizationDTO1);
     }
@@ -441,7 +442,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         StatusDto<UserInfoDTO> resolve = StatusDtoThriftUtils.resolve(userDetail, UserInfoDTO.class);
         List<RelUserRole> userRoles = resolve.getData().getUserRoles();
         if(userRoles != null && userRoles.size() > 0){
-            List<RelUserRole> temp = userRoles.stream().filter(a -> Constants.CUSTMANAGER_ROLE_CODE.equals(a.getRoleCode())).collect(Collectors.toList());
+            List<RelUserRole> temp = userRoles.stream().filter(a -> BusinessPropertyHolder.custManagerRoleCode.equals(a.getRoleCode())).collect(Collectors.toList());
             if( temp != null && temp.size() > 0){
                 RelUserRole relUserRole = temp.get(0);
                 resolve.getData().setRoleName(relUserRole.getRoleName());

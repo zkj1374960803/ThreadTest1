@@ -46,6 +46,10 @@ base:
   secret: 883c12f76921465aa5bfb74e9d9ac9cc
   #顶级服务中心code
   topservicecenter: "SC000001"
+  #客户经理组织机构
+  custmanager: "SC000003"
+  #客户经理角色code
+  custmanagerrolecode: "JS024"
 
 #web端配置:
 cookie:
@@ -61,7 +65,7 @@ verification:
 #dev开发环境中配置默认登录用户:
 dev-default:
   #是否开启自动登录 只要有值即可!
-  #needLogin: need
+  needLogin: need
   username: "ZHT00512"
   password: "ZHT00512"
 
