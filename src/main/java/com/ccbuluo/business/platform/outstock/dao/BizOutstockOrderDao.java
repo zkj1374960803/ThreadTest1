@@ -1,5 +1,6 @@
-package com.ccbuluo.business.thrid;
+package com.ccbuluo.business.platform.outstock.dao;
 
+import com.ccbuluo.business.entity.BizOutstockOrder;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -9,13 +10,13 @@ import javax.annotation.Resource;
 import java.util.Map;
 
 /**
- *  dao
+ *  出库单dao
  * @author liuduo
  * @date 2018-08-07 11:55:41
  * @version V1.0.0
  */
 @Repository
-public class BizInstockOrderDao extends BaseDao<BizInstockOrder> {
+public class BizOutstockOrderDao extends BaseDao<BizOutstockOrder> {
     @Resource
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
@@ -31,14 +32,14 @@ public class BizInstockOrderDao extends BaseDao<BizInstockOrder> {
      * @author liuduo
      * @date 2018-08-07 11:55:41
      */
-    public int saveEntity(BizInstockOrder entity) {
+    public int saveEntity(BizOutstockOrder entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO biz_instock_order ( instock_orderno,trade_docno,")
-            .append("in_repository_no,instock_operator,instock_type,instock_time,")
-            .append("transportorder_no,checked,ceecked_time,creator,create_time,operator,")
-            .append("operate_time,delete_flag,remark ) VALUES (  :instockOrderno,")
-            .append(" :tradeDocno, :inRepositoryNo, :instockOperator, :instockType,")
-            .append(" :instockTime, :transportorderNo, :checked, :ceeckedTime, :creator,")
+        sql.append("INSERT INTO biz_outstock_order ( outstockorder_no,out_repository_no,")
+            .append("outstock_operator,trade_docno,outstock_type,outstock_time,")
+            .append("transportorder_no,checked,checked_time,creator,create_time,operator,")
+            .append("operate_time,delete_flag,remark ) VALUES (  :outstockorderNo,")
+            .append(" :outRepositoryNo, :outstockOperator, :tradeDocno, :outstockType,")
+            .append(" :outstockTime, :transportorderNo, :checked, :checkedTime, :creator,")
             .append(" :createTime, :operator, :operateTime, :deleteFlag, :remark )");
         return super.save(sql.toString(), entity);
     }
@@ -50,13 +51,14 @@ public class BizInstockOrderDao extends BaseDao<BizInstockOrder> {
      * @author liuduo
      * @date 2018-08-07 11:55:41
      */
-    public int update(BizInstockOrder entity) {
+    public int update(BizOutstockOrder entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_instock_order SET instock_orderno = :instockOrderno,")
-            .append("trade_docno = :tradeDocno,in_repository_no = :inRepositoryNo,")
-            .append("instock_operator = :instockOperator,instock_type = :instockType,")
-            .append("instock_time = :instockTime,transportorder_no = :transportorderNo,")
-            .append("checked = :checked,ceecked_time = :ceeckedTime,creator = :creator,")
+        sql.append("UPDATE biz_outstock_order SET outstockorder_no = :outstockorderNo,")
+            .append("out_repository_no = :outRepositoryNo,")
+            .append("outstock_operator = :outstockOperator,trade_docno = :tradeDocno,")
+            .append("outstock_type = :outstockType,outstock_time = :outstockTime,")
+            .append("transportorder_no = :transportorderNo,checked = :checked,")
+            .append("checked_time = :checkedTime,creator = :creator,")
             .append("create_time = :createTime,operator = :operator,")
             .append("operate_time = :operateTime,delete_flag = :deleteFlag,")
             .append("remark = :remark WHERE id= :id");
@@ -69,15 +71,15 @@ public class BizInstockOrderDao extends BaseDao<BizInstockOrder> {
      * @author liuduo
      * @date 2018-08-07 11:55:41
      */
-    public BizInstockOrder getById(long id) {
+    public BizOutstockOrder getById(long id) {
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,instock_orderno,trade_docno,in_repository_no,")
-            .append("instock_operator,instock_type,instock_time,transportorder_no,checked,")
-            .append("ceecked_time,creator,create_time,operator,operate_time,delete_flag,")
-            .append("remark FROM biz_instock_order WHERE id= :id");
+        sql.append("SELECT id,outstockorder_no,out_repository_no,outstock_operator,")
+            .append("trade_docno,outstock_type,outstock_time,transportorder_no,checked,")
+            .append("checked_time,creator,create_time,operator,operate_time,delete_flag,")
+            .append("remark FROM biz_outstock_order WHERE id= :id");
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
-        return super.findForBean(BizInstockOrder.class, sql.toString(), params);
+        return super.findForBean(BizOutstockOrder.class, sql.toString(), params);
     }
 
     /**
@@ -89,7 +91,7 @@ public class BizInstockOrderDao extends BaseDao<BizInstockOrder> {
      */
     public int deleteById(long id) {
         StringBuilder sql = new StringBuilder();
-        sql.append("DELETE  FROM biz_instock_order WHERE id= :id ");
+        sql.append("DELETE  FROM biz_outstock_order WHERE id= :id ");
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
         return super.updateForMap(sql.toString(), params);

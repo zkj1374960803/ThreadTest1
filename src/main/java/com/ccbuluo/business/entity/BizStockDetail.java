@@ -1,4 +1,4 @@
-package com.ccbuluo.business.thrid;
+package com.ccbuluo.business.entity;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -13,12 +13,7 @@ import java.util.Date;
  * @version V1.0.0
  */
 @ApiModel(value = "批次库存表，由交易批次号、供应商、仓库等多维度唯一主键 区分的库存表实体", description = "批次库存表，由交易批次号、供应商、仓库等多维度唯一主键 区分的库存表")
-public class BizStockDetail {
-    /**
-     * 
-     */
-    @ApiModelProperty(name = "id", value = "")
-    private Long id;
+public class BizStockDetail extends AftersaleCommonEntity{
     /**
      * 仓库编号
      */
@@ -30,7 +25,7 @@ public class BizStockDetail {
     @ApiModelProperty(name = "orgNo", value = "所属机构的编号")
     private String orgNo;
     /**
-     * 
+     * 商品编号
      */
     @ApiModelProperty(name = "productNo", value = "")
     private String productNo;
@@ -45,17 +40,17 @@ public class BizStockDetail {
     @ApiModelProperty(name = "tradeNo", value = "交易批次号,可以是调拨申请单号等")
     private String tradeNo;
     /**
-     * 
+     * 供应商
      */
     @ApiModelProperty(name = "supplierNo", value = "")
     private String supplierNo;
     /**
-     * 
+     * 有效库存
      */
     @ApiModelProperty(name = "validStock", value = "")
     private Long validStock;
     /**
-     * 
+     * 占用库存
      */
     @ApiModelProperty(name = "occupyStock", value = "")
     private Long occupyStock;
@@ -85,12 +80,12 @@ public class BizStockDetail {
     @ApiModelProperty(name = "sellerOrgno", value = "商品从哪个机构买来的")
     private String sellerOrgno;
     /**
-     * 
+     * 成本价
      */
     @ApiModelProperty(name = "costPrice", value = "")
     private BigDecimal costPrice;
     /**
-     * 
+     * 入库计划明细id
      */
     @ApiModelProperty(name = "instockPlanid", value = "")
     private Long instockPlanid;
@@ -99,44 +94,6 @@ public class BizStockDetail {
      */
     @ApiModelProperty(name = "latestCorrectTime", value = "最后一次矫正该库存(盘库)的时间")
     private Date latestCorrectTime;
-    /**
-     * 创建人
-     */
-    @ApiModelProperty(name = "creator", value = "创建人")
-    private String creator;
-    /**
-     * 创建时间
-     */
-    @ApiModelProperty(name = "createTime", value = "创建时间")
-    private Date createTime;
-    /**
-     * 更新人
-     */
-    @ApiModelProperty(name = "operator", value = "更新人")
-    private String operator;
-    /**
-     * 更新时间
-     */
-    @ApiModelProperty(name = "operateTime", value = "更新时间")
-    private Date operateTime;
-    /**
-     * 删除标识
-     */
-    @ApiModelProperty(name = "deleteFlag", value = "删除标识")
-    private Long deleteFlag;
-    /**
-     * 备注
-     */
-    @ApiModelProperty(name = "remark", value = "备注")
-    private String remark;
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return this.id;
-    }
 
     public void setRepositoryNo(String repositoryNo) {
         this.repositoryNo = repositoryNo;
@@ -265,54 +222,5 @@ public class BizStockDetail {
     public Date getLatestCorrectTime() {
         return this.latestCorrectTime;
     }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
-    public String getCreator() {
-        return this.creator;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getCreateTime() {
-        return this.createTime;
-    }
-
-    public void setOperator(String operator) {
-        this.operator = operator;
-    }
-
-    public String getOperator() {
-        return this.operator;
-    }
-
-    public void setOperateTime(Date operateTime) {
-        this.operateTime = operateTime;
-    }
-
-    public Date getOperateTime() {
-        return this.operateTime;
-    }
-
-    public void setDeleteFlag(Long deleteFlag) {
-        this.deleteFlag = deleteFlag;
-    }
-
-    public Long getDeleteFlag() {
-        return this.deleteFlag;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-
-    public String getRemark() {
-        return this.remark;
-    }
-
 
 }

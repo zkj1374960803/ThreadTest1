@@ -1,5 +1,6 @@
-package com.ccbuluo.business.thrid;
+package com.ccbuluo.business.platform.instock.dao;
 
+import com.ccbuluo.business.entity.BizInstockorderDetail;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -9,7 +10,7 @@ import javax.annotation.Resource;
 import java.util.Map;
 
 /**
- *  dao
+ *  入库单详情dao
  * @author liuduo
  * @date 2018-08-07 11:55:41
  * @version V1.0.0

@@ -1,4 +1,4 @@
-package com.ccbuluo.business.thrid;
+package com.ccbuluo.business.entity;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -6,18 +6,13 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
 
 /**
- * 实体
+ * 出库单实体
  * @author liuduo
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "实体", description = "")
-public class BizOutstockOrder {
-    /**
-     * id
-     */
-    @ApiModelProperty(name = "id", value = "id")
-    private Long id;
+@ApiModel(value = "出库单实体", description = "出库单实体")
+public class BizOutstockOrder extends AftersaleCommonEntity{
     /**
      * 出库单编号
      */
@@ -33,6 +28,11 @@ public class BizOutstockOrder {
      */
     @ApiModelProperty(name = "outstockOperator", value = "出库人")
     private String outstockOperator;
+    /**
+     * 出库单所属机构
+     */
+    @ApiModelProperty(name = "outstockOrgno", value = "出库单所属机构")
+    private String outstockOrgno;
     /**
      * 交易单据号，可以是调拨申请单、维修销售单
      */
@@ -63,44 +63,6 @@ public class BizOutstockOrder {
      */
     @ApiModelProperty(name = "checkedTime", value = "复核完成时间")
     private Date checkedTime;
-    /**
-     * 创建人
-     */
-    @ApiModelProperty(name = "creator", value = "创建人")
-    private String creator;
-    /**
-     * 创建时间
-     */
-    @ApiModelProperty(name = "createTime", value = "创建时间")
-    private Date createTime;
-    /**
-     * 更新人
-     */
-    @ApiModelProperty(name = "operator", value = "更新人")
-    private String operator;
-    /**
-     * 更新时间
-     */
-    @ApiModelProperty(name = "operateTime", value = "更新时间")
-    private Date operateTime;
-    /**
-     * 删除标识
-     */
-    @ApiModelProperty(name = "deleteFlag", value = "删除标识")
-    private Long deleteFlag;
-    /**
-     * 备注
-     */
-    @ApiModelProperty(name = "remark", value = "备注")
-    private String remark;
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return this.id;
-    }
 
     public void setOutstockorderNo(String outstockorderNo) {
         this.outstockorderNo = outstockorderNo;
@@ -174,53 +136,11 @@ public class BizOutstockOrder {
         return this.checkedTime;
     }
 
-    public void setCreator(String creator) {
-        this.creator = creator;
+    public String getOutstockOrgno() {
+        return outstockOrgno;
     }
 
-    public String getCreator() {
-        return this.creator;
+    public void setOutstockOrgno(String outstockOrgno) {
+        this.outstockOrgno = outstockOrgno;
     }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getCreateTime() {
-        return this.createTime;
-    }
-
-    public void setOperator(String operator) {
-        this.operator = operator;
-    }
-
-    public String getOperator() {
-        return this.operator;
-    }
-
-    public void setOperateTime(Date operateTime) {
-        this.operateTime = operateTime;
-    }
-
-    public Date getOperateTime() {
-        return this.operateTime;
-    }
-
-    public void setDeleteFlag(Long deleteFlag) {
-        this.deleteFlag = deleteFlag;
-    }
-
-    public Long getDeleteFlag() {
-        return this.deleteFlag;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-
-    public String getRemark() {
-        return this.remark;
-    }
-
-
 }
