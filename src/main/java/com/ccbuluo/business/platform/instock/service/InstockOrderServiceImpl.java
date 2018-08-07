@@ -1,9 +1,11 @@
 package com.ccbuluo.business.platform.instock.service;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizInstockOrder;
 import com.ccbuluo.business.platform.instock.dao.BizInstockOrderDao;
 import com.ccbuluo.business.platform.storehouse.service.StoreHouseService;
 import com.ccbuluo.core.common.UserHolder;
+import com.ccbuluo.http.StatusDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +55,7 @@ public class InstockOrderServiceImpl implements InstockOrderService{
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int saveInstockOrder(BizInstockOrder bizInstockOrder) {
+    public StatusDto<String> saveInstockOrder(BizInstockOrder bizInstockOrder) {
         try {
             // 1、保存入库单
             // todo 等待生成编号方法修改完成后生成编号
@@ -62,11 +64,14 @@ public class InstockOrderServiceImpl implements InstockOrderService{
             // 根据入库仓库编号查询入库机构编号
             String orgCodeByStoreHouseCode = storeHouseService.getOrgCodeByStoreHouseCode(bizInstockOrder.getInRepositoryNo());
             bizInstockOrder.setInstockOrgno(orgCodeByStoreHouseCode);
-            bizInstockOrderDao.saveEntity(bizInstockOrder);
+            int i = bizInstockOrderDao.saveEntity(bizInstockOrder);
+            if (i == Constants.FAILURESTATUS) {
+                return StatusDto.buildFailure("生成入库单失败！");
+            }
             // 2、保存入库单详单
 
             // 3、修改库存明细
-            return 0;
+            return StatusDto.buildSuccessStatusDto();
         } catch (Exception e) {
             logger.error("保存失败！", e);
             throw e;

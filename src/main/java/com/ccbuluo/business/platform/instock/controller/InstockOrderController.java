@@ -52,11 +52,7 @@ public class InstockOrderController extends BaseController {
      */
     @ApiOperation(value = "入库单新增", notes = "【刘铎】")
     @PostMapping("/save")
-    public StatusDto saveInstockOrder(@ApiParam(name = "入库单实体", value = "传入json格式", required = true)@RequestBody BizInstockOrder bizInstockOrder) {
-        int status = instockOrderService.saveInstockOrder(bizInstockOrder);
-        if (status == Constants.SUCCESSSTATUS) {
-            return StatusDto.buildSuccessStatusDto("保存成功！");
-        }
-        return StatusDto.buildFailureStatusDto("保存失败！");
+    public StatusDto<String> saveInstockOrder(@ApiParam(name = "入库单实体", value = "传入json格式", required = true)@RequestBody BizInstockOrder bizInstockOrder) {
+        return instockOrderService.saveInstockOrder(bizInstockOrder);
     }
 }
