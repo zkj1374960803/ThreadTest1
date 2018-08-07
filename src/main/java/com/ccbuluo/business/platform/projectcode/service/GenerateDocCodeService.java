@@ -98,7 +98,7 @@ public class GenerateDocCodeService {
             String redisKey = buildRedisKey(prefix);
             String redisCodeStr = jedisCluster.get(redisKey);
             if (StringUtils.isNotBlank(redisCodeStr)) {
-                Integer redisCode = Integer.parseInt(redisCodeStr);
+                Long redisCode = Long.valueOf(redisCodeStr);
                 redisCode++;
                 newCode = produceCode(redisCode);
                 // 重新放入redis，
@@ -114,7 +114,7 @@ public class GenerateDocCodeService {
         return newCode;
     }
     // 获取后两位自增字符
-    private static String produceCode(int redisCode){
+    private static String produceCode(Long redisCode){
         if(redisCode >= 100){
             redisCode = redisCode % 100;
         }
