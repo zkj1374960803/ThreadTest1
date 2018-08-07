@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.carmodellabel.service;
 
+import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizCarmodelLabel;
 import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarmodelParameterDao;
@@ -8,6 +9,7 @@ import com.ccbuluo.business.platform.carmodellabel.dao.BizCarmodelLabelDao;
 import com.ccbuluo.business.platform.carmodellabel.dto.BizCarmodelLabelDTO;
 import com.ccbuluo.business.platform.carmodellabel.dto.SearchBizCarmodelLabelDTO;
 import com.ccbuluo.business.platform.carmodellabel.dto.ViewCarmodelLabelDTO;
+import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -17,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +41,8 @@ public class BizCarmodelLabelServiceImpl implements BizCarmodelLabelService {
     private UserHolder userHolder;
     @Autowired
     private BasicCarmodelParameterDao basicCarmodelParameterDao;
+    @Resource
+    private GenerateProjectCodeService generateProjectCodeService;
 
     /**
      * 该标签已经存在！
@@ -65,6 +70,21 @@ public class BizCarmodelLabelServiceImpl implements BizCarmodelLabelService {
             if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
                 return statusDto;
             }
+
+
+
+
+
+
+            // 生成编码
+            StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FD);
+            // 获取code失败
+            if(!Constants.SUCCESS_CODE.equals(stringStatusDto.getCode())){
+                return stringStatusDto;
+            }
+            bizCarmodelLabel.setLabelCode(stringStatusDto.getData());
+
+
             // 1.保存车型标签基本信息
             buildServiceMaintaincar(bizCarmodelLabel);
             long carcoreInfoId = bizCarmodelLabelDao.saveCarmodelLabel(bizCarmodelLabel);
@@ -161,7 +181,7 @@ public class BizCarmodelLabelServiceImpl implements BizCarmodelLabelService {
      */
     @Override
     public StatusDto deleteCarcoreInfoBylabelCode(Long labelId){
-        //被车型参数引用过的标签不能删除————————
+        // 被车型参数引用过的标签不能删除
         StatusDto statusDto = findCarmodelParameterByLabelCode(labelId);
         if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
             return statusDto;
@@ -216,13 +236,13 @@ public class BizCarmodelLabelServiceImpl implements BizCarmodelLabelService {
      */
     @Override
     public List<ViewCarmodelLabelDTO> getAllCarmodelLabelAndParameterList(){
-        //查询所有的标签
+        // 查询所有的标签
         List<BizCarmodelLabelDTO> labelList = bizCarmodelLabelDao.getAllCarmodelLabelList();
-        //查询所有的车型参数
+        // 查询所有的车型参数
         List<CarmodelParameter> parametersList = this.basicCarmodelParameterDao.queryAllParameter();
         return buildViewCarmodelLabelDTO(labelList,parametersList);
     }
-    //组装标签数据
+    // 组装标签数据
     private List<ViewCarmodelLabelDTO> buildViewCarmodelLabelDTO(List<BizCarmodelLabelDTO> labelList, List<CarmodelParameter> parametersList){
         List<ViewCarmodelLabelDTO> list = new ArrayList<ViewCarmodelLabelDTO>();
         for(BizCarmodelLabelDTO label : labelList){
@@ -232,7 +252,7 @@ public class BizCarmodelLabelServiceImpl implements BizCarmodelLabelService {
             vl.setLabelName(label.getLabelName());
             List<CarmodelParameter> pList = new ArrayList<CarmodelParameter>();
             for(CarmodelParameter parameter : parametersList){
-                //如果参数所关联的标签id等于标签id
+                // 如果参数所关联的标签id等于标签id
                 if(label.getId().intValue() == parameter.getCarmodelLabelId()){
                     pList.add(parameter);
                 }

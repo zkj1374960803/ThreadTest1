@@ -99,7 +99,7 @@ public interface BasicCarcoreInfoService {
      * @author weijb
      * @date 2018-06-08 13:55:14
      */
-    VinCarcoreInfoDTO getCarInfoByVin(String vinNumber);
+    StatusDto getCarInfoByVin(String vinNumber,String appId,String secretId);
 
     /**
      * 解除车辆与客户经理的关联关系
@@ -117,7 +117,7 @@ public interface BasicCarcoreInfoService {
      * @author weijb
      * @date 2018-08-01 15:55:14
      */
-    int batchUpdateCarcoreInfoByVin(List<CarcoreInfoByVinDTO> list);
+    StatusDto batchUpdateCarcoreInfoByVin(UpdateCarcoreInfoByVinDTO updateCarcoreInfoByVinDTO);
 
 
     /**

@@ -167,7 +167,7 @@ public class BasicCarmodelParameterServiceImpl implements BasicCarmodelParameter
     @Override
     public StatusDto deleteParameter(Long id) {
         try {
-            //被车型参数引用过的参数不能删除CARMODELPARAMETER_CANNOT_DELETE
+            // 被车型参数引用过的参数不能删除CARMODELPARAMETER_CANNOT_DELETE
             StatusDto statusDto = findCarmodelParameterById(id);
             if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
                 return statusDto;

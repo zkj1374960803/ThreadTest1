@@ -164,12 +164,7 @@ public class BasicCarcoreInfoController extends BaseController {
                         @ApiImplicitParam(name = "secretId", value = "secretId", required = true, paramType = "query")})
     @GetMapping("/getcarinfobyvin")
     public StatusDto getCarInfoByVin(@RequestParam String vinNumber,@RequestParam String appId,@RequestParam String secretId) throws TException {
-        StatusDto<String> statusDto = innerUserInfoService.checkAppIdAndSecretId( appId, secretId);
-        //权限校验
-        if(Constants.ERROR_CODE.equals(statusDto.getCode())){
-            return statusDto;
-        }
-        return StatusDto.buildDataSuccessStatusDto(basicCarcoreInfoService.getCarInfoByVin(vinNumber));
+        return basicCarcoreInfoService.getCarInfoByVin(vinNumber, appId, secretId);
     }
     /**
      * 根据车辆vin更新车辆的门店信息
@@ -182,19 +177,10 @@ public class BasicCarcoreInfoController extends BaseController {
     @ApiOperation(value = "根据车辆vin批量更新车辆的门店信息", notes = "【魏俊标】")
     @PostMapping("/batchupdatecarcoreinfobyvin")
     public StatusDto updateCarcoreInfoByVin(@ApiParam(name = "UpdateCarcoreInfoByVinDTO", value = "传入UpdateCarcoreInfoByVinDTO对象", required = true)@RequestBody UpdateCarcoreInfoByVinDTO updateCarcoreInfoByVinDTO) {
-        StatusDto<String> statusDto = innerUserInfoService.checkAppIdAndSecretId(updateCarcoreInfoByVinDTO.getAppId(), updateCarcoreInfoByVinDTO.getSecretId());
-        //权限校验
-        if(Constants.ERROR_CODE.equals(statusDto.getCode())){
-            return statusDto;
-        }
-        if(updateCarcoreInfoByVinDTO.getCarcoreInfoList().size() == 0){
+        if(null == updateCarcoreInfoByVinDTO.getCarcoreInfoList() || updateCarcoreInfoByVinDTO.getCarcoreInfoList().size() == 0){
             return StatusDto.buildFailureStatusDto("参数不能为空！");
         }
-        int flag = basicCarcoreInfoService.batchUpdateCarcoreInfoByVin(updateCarcoreInfoByVinDTO.getCarcoreInfoList());
-        if (flag != Constants.STATUS_FLAG_ZERO) {
-            return StatusDto.buildSuccessStatusDto("操作成功！");
-        }
-        return StatusDto.buildFailureStatusDto("操作失败！");
+        return basicCarcoreInfoService.batchUpdateCarcoreInfoByVin(updateCarcoreInfoByVinDTO);
     }
 
     /**

@@ -13,6 +13,7 @@ import com.ccbuluo.core.constants.SystemPropertyHolder;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
+import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -47,6 +49,8 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
     private UserHolder userHolder;
     @Autowired
     BasicCarseriesManageDao basicCarseriesManageDao;
+    @Resource
+    private InnerUserInfoService innerUserInfoService;
 
     /**
      * 存储redis时当前模块的名字
@@ -155,7 +159,7 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
         if (null == carcoreInfo.getId()) {
             carcoreInfo.setCarNumber(findCarNumber());
         }
-        //新增默认未分配：0
+        // 新增默认未分配：0
         carcoreInfo.setCarStatus(Constants.STATUS_FLAG_ZERO);
         carcoreInfo.setStoreAssigned(Constants.STATUS_FLAG_ZERO);
         // 3.通用字段
@@ -255,7 +259,7 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
     @Override
     public Page<SearchCarcoreInfoDTO> queryCarcoreInfoList(Long carbrandId, Long carseriesId, Integer storeAssigned, String custmanagerUuid, String Keyword, Integer offset, Integer pageSize){
         Page<SearchCarcoreInfoDTO> searchCarcoreInfoDTOPage =  basicCarcoreInfoDao.queryCarcoreInfoList(carbrandId, carseriesId, storeAssigned, custmanagerUuid, Keyword, offset, pageSize);
-        //拼装车系
+        // 拼装车系
         buildCarseriesManage(searchCarcoreInfoDTOPage);
         return searchCarcoreInfoDTOPage;
     }
@@ -325,8 +329,13 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
      * @date 2018-06-08 13:55:14
      */
     @Override
-    public VinCarcoreInfoDTO getCarInfoByVin(String vinNumber){
-        return basicCarcoreInfoDao.getCarInfoByVin(vinNumber);
+    public StatusDto getCarInfoByVin(String vinNumber,String appId,String secretId){
+        StatusDto<String> statusDto = innerUserInfoService.checkAppIdAndSecretId( appId, secretId);
+        // 权限校验
+        if(Constants.ERROR_CODE.equals(statusDto.getCode())){
+            return statusDto;
+        }
+        return StatusDto.buildDataSuccessStatusDto(basicCarcoreInfoDao.getCarInfoByVin(vinNumber));
     }
 
     @Override
@@ -342,8 +351,17 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
      * @date 2018-08-01 15:55:14
      */
     @Override
-    public int batchUpdateCarcoreInfoByVin(List<CarcoreInfoByVinDTO> list){
-        return basicCarcoreInfoDao.batchUpdateCarcoreInfoByVin(list);
+    public StatusDto batchUpdateCarcoreInfoByVin(UpdateCarcoreInfoByVinDTO updateCarcoreInfoByVinDTO){
+        StatusDto<String> statusDto = innerUserInfoService.checkAppIdAndSecretId(updateCarcoreInfoByVinDTO.getAppId(), updateCarcoreInfoByVinDTO.getSecretId());
+        // 权限校验
+        if(Constants.ERROR_CODE.equals(statusDto.getCode())){
+            return statusDto;
+        }
+        int flag =  basicCarcoreInfoDao.batchUpdateCarcoreInfoByVin(updateCarcoreInfoByVinDTO.getCarcoreInfoList());
+        if (flag != Constants.STATUS_FLAG_ZERO) {
+            return StatusDto.buildSuccessStatusDto("操作成功！");
+        }
+        return StatusDto.buildFailureStatusDto("操作失败！");
     }
 
     /**
