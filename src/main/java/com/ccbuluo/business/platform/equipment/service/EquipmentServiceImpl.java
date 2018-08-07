@@ -61,6 +61,7 @@ public class EquipmentServiceImpl implements EquipmentService{
         bizServiceEquipment.setEquiptypeId(saveBizServiceEquipmentDTO.getEquiptypeId());
         bizServiceEquipment.setEquipUnit(saveBizServiceEquipmentDTO.getEquipUnit());
         bizServiceEquipment.preInsert(userHolder.getLoggedUserId());
+        bizServiceEquipment.setRemark(saveBizServiceEquipmentDTO.getRemark());
         return bizServiceEquipmentDao.saveEntity(bizServiceEquipment);
     }
 
@@ -96,6 +97,7 @@ public class EquipmentServiceImpl implements EquipmentService{
         bizServiceEquipment.setEquipUnit(saveBizServiceEquipmentDTO.getEquipUnit());
         bizServiceEquipment.preUpdate(userHolder.getLoggedUserId());
         bizServiceEquipment.setId(saveBizServiceEquipmentDTO.getId());
+        bizServiceEquipment.setRemark(saveBizServiceEquipmentDTO.getRemark());
         return bizServiceEquipmentDao.update(bizServiceEquipment);
     }
 

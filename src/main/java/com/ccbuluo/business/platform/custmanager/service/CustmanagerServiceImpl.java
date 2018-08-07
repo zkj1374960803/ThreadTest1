@@ -30,6 +30,7 @@ import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -273,26 +274,29 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         List<String> useruudis = data.stream().map(QueryUserListDTO::getUseruuid).collect(Collectors.toList());
         // 查询维修车编号
         List<BizServiceCustmanager> vinList = bizServiceMaintaincarDao.queryVinNumberByuuid(useruudis);
+        // 查询管理车辆数量
         List<CusmanagerCarCountDTO> carList = basicCarcoreInfoService.queryCarNumByCusmanagerUuid(useruudis);
-        Map<String, CusmanagerCarCountDTO> carMap = null;
+        // list 转 map
+        Map<String, CusmanagerCarCountDTO> carMap = Collections.emptyMap();
         if(carList != null && carList.size() > 0){
             carMap = carList.stream().collect(Collectors.toMap(CusmanagerCarCountDTO::getCusmanagerUuid, a -> a,(k1,k2)->k1));
         }
-        if(vinList != null && vinList.size() > 0){
-            Map<String, BizServiceCustmanager> vinMap = vinList.stream().collect(Collectors.toMap(BizServiceCustmanager::getUserUuid, a -> a,(k1,k2)->k1));
-            for (int i = 0; i < data.size(); i++) {
-                QueryUserListDTO queryUserListDTO = data.get(i);
-                BizServiceCustmanager bizServiceCustmanager = vinMap.get(queryUserListDTO.getUseruuid());
-                CusmanagerCarCountDTO cusmanagerCarCountDTO = carMap.get(queryUserListDTO.getUseruuid());
-                if(bizServiceCustmanager != null){
-                    queryUserListDTO.setVinNumber(bizServiceCustmanager.getVinNumber());
-                }
-                if(cusmanagerCarCountDTO != null){
-                    queryUserListDTO.setCarsNumber(Long.valueOf(cusmanagerCarCountDTO.getCarNum()));
-                }
+        // list 转 map
+        Map<String, BizServiceCustmanager> vinMap = Collections.emptyMap();
+        if(vinList != null && vinList.size() > 0) {
+            vinMap = vinList.stream().collect(Collectors.toMap(BizServiceCustmanager::getUserUuid, a -> a, (k1, k2) -> k1));
+        }
+        for (int i = 0; i < data.size(); i++) {
+            QueryUserListDTO queryUserListDTO = data.get(i);
+            BizServiceCustmanager bizServiceCustmanager = vinMap.get(queryUserListDTO.getUseruuid());
+            CusmanagerCarCountDTO cusmanagerCarCountDTO = carMap.get(queryUserListDTO.getUseruuid());
+            if(bizServiceCustmanager != null){
+                queryUserListDTO.setVinNumber(bizServiceCustmanager.getVinNumber());
+            }
+            if(cusmanagerCarCountDTO != null){
+                queryUserListDTO.setCarsNumber(Long.valueOf(cusmanagerCarCountDTO.getCarNum()));
             }
         }
-
         // 组装分页信息
         Page<QueryUserListDTO> page = buildCustManagerData(userInfoStatusDto, custManagerList);
         return StatusDto.buildDataSuccessStatusDto(page);
