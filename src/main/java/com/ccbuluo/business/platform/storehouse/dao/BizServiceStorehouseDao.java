@@ -190,8 +190,9 @@ public class BizServiceStorehouseDao extends BaseDao<BizServiceStorehouse> {
         Map<String, Object> param = Maps.newHashMap();
         param.put("storehouseName", storehouseName);
         param.put("id", id);
+        param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
 
-        String sql = "SELECT COUNT(id) > 0 FROM biz_service_storehouse WHERE id <> :id AND storehouse_name = :storehouseName";
+        String sql = "SELECT COUNT(id) > 0 FROM biz_service_storehouse WHERE id <> :id AND storehouse_name = :storehouseName AND delete_flag = :deleteFlag";
 
         return findForObject(sql, param, Boolean.class);
     }

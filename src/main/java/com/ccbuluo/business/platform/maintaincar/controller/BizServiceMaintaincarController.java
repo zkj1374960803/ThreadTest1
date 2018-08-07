@@ -24,7 +24,7 @@ import java.util.List;
  * @version v 1.0.0
  */
 @RestController
-@RequestMapping("/afterSales/servicemaintaincar")
+@RequestMapping("/aftersales/servicemaintaincar")
 @Api(tags = "维修车辆管理")
 public class BizServiceMaintaincarController extends BaseController {
 
@@ -46,7 +46,7 @@ public class BizServiceMaintaincarController extends BaseController {
     public StatusDto create(@ApiParam(name = "bizServiceMaintaincar对象", value = "传入json格式", required = true)@RequestBody BizServiceMaintaincar bizServiceMaintaincar) {
         // 生成编码
         StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FR);
-        //获取code失败
+        // 获取code失败
         if(!Constants.SUCCESS_CODE.equals(stringStatusDto.getCode())){
             return stringStatusDto;
         }
