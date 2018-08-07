@@ -27,7 +27,7 @@ import java.util.List;
  */
 @Api(tags = "零配件管理(平台端)")
 @RestController
-@RequestMapping("/afterSales/carpartsProduct")
+@RequestMapping("/aftersales/carpartsproduct")
 public class CarpartsProductController extends BaseController {
 
     @ThriftRPCClient("BasicMerchandiseSer")
@@ -60,7 +60,7 @@ public class CarpartsProductController extends BaseController {
     public StatusDto<String> saveCarpartsProduct(@ApiParam(name = "saveBasicCarpartsProductDTO对象", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO){
         // 生成编码
         StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FP);
-        //获取code失败
+        // 获取code失败
         if(!Constants.SUCCESS_CODE.equals(stringStatusDto.getCode())){
             return stringStatusDto;
         }
@@ -133,7 +133,7 @@ public class CarpartsProductController extends BaseController {
                                                                              @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                              @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
         StatusDto<Page<BasicCarpartsProductDTO>> list = StatusDtoThriftUtils.resolve(carpartsProductService.queryCarpartsProductList(categoryCode, keyword, offset, pageSize),BasicCarpartsProductDTO.class);
-        //把车型id转换成车型名字
+        // 把车型id转换成车型名字
         if(null != list){
             basicCarmodelManageService.buildCarModeName(list.getData().getRows());
         }

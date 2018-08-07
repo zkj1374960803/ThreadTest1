@@ -1,13 +1,10 @@
 package com.ccbuluo.business.platform.carmodellabel.controller;
 
-import com.ccbuluo.business.constants.CodePrefixEnum;
-import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizCarmodelLabel;
 import com.ccbuluo.business.platform.carmodellabel.dto.BizCarmodelLabelDTO;
 import com.ccbuluo.business.platform.carmodellabel.dto.SearchBizCarmodelLabelDTO;
 import com.ccbuluo.business.platform.carmodellabel.dto.ViewCarmodelLabelDTO;
 import com.ccbuluo.business.platform.carmodellabel.service.BizCarmodelLabelService;
-import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -15,7 +12,6 @@ import io.swagger.annotations.*;
 import org.apache.thrift.TException;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
-import javax.swing.text.View;
 import java.util.List;
 
 /**
@@ -31,8 +27,6 @@ public class BizCarmodelLabelController extends BaseController {
 
     @Resource
     private BizCarmodelLabelService bizCarmodelLabelService;
-    @Resource
-    private GenerateProjectCodeService generateProjectCodeService;
 
     /**
      * 车型标签新增
@@ -45,13 +39,6 @@ public class BizCarmodelLabelController extends BaseController {
     @ApiOperation(value = "新增车型标签", notes = "【weijb】")
     @PostMapping("/create")
     public StatusDto create(@ApiParam(name = "bizCarmodelLabel对象", value = "传入json格式", required = true)@RequestBody BizCarmodelLabel bizCarmodelLabel) {
-        // 生成编码
-        StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FD);
-        //获取code失败
-        if(!Constants.SUCCESS_CODE.equals(stringStatusDto.getCode())){
-            return stringStatusDto;
-        }
-        bizCarmodelLabel.setLabelCode(stringStatusDto.getData());
         return bizCarmodelLabelService.saveCarmodelLabel(bizCarmodelLabel);
     }
 
