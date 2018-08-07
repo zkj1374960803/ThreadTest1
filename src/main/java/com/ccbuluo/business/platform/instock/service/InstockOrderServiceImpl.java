@@ -1,6 +1,8 @@
 package com.ccbuluo.business.platform.instock.service;
 
 import com.ccbuluo.business.entity.BizInstockOrder;
+import com.ccbuluo.business.platform.instock.dao.BizInstockOrderDao;
+import com.ccbuluo.business.platform.storehouse.service.StoreHouseService;
 import com.ccbuluo.core.common.UserHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,9 +23,14 @@ import java.util.List;
 @Service
 public class InstockOrderServiceImpl implements InstockOrderService{
 
+    Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     private UserHolder userHolder;
-    Logger logger = LoggerFactory.getLogger(getClass());
+    @Autowired
+    private StoreHouseService storeHouseService;
+    @Autowired
+    private BizInstockOrderDao bizInstockOrderDao;
+
     /**
      * 根据申请单号状态查询申请单号集合
      * @param applyStatus 申请单状态
@@ -47,9 +56,15 @@ public class InstockOrderServiceImpl implements InstockOrderService{
     public int saveInstockOrder(BizInstockOrder bizInstockOrder) {
         try {
             // 1、保存入库单
-            bizInstockOrder.setInstockOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+            // todo 等待生成编号方法修改完成后生成编号
             bizInstockOrder.setInstockOperator(userHolder.getLoggedUserId());
+            bizInstockOrder.setInstockTime(new Date());
+            // 根据入库仓库编号查询入库机构编号
+            String orgCodeByStoreHouseCode = storeHouseService.getOrgCodeByStoreHouseCode(bizInstockOrder.getInRepositoryNo());
+            bizInstockOrder.setInstockOrgno(orgCodeByStoreHouseCode);
+            bizInstockOrderDao.saveEntity(bizInstockOrder);
             // 2、保存入库单详单
+
             // 3、修改库存明细
             return 0;
         } catch (Exception e) {

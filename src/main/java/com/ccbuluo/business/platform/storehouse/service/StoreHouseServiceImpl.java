@@ -192,4 +192,16 @@ public class StoreHouseServiceImpl implements StoreHouseService{
     public List<BizServiceStorehouse> getStorehousrByCode(String serviceCenterCode) {
         return bizServiceStorehouseDao.getStorehousrByCode(serviceCenterCode);
     }
+
+    /**
+     * 根据仓库code查询机构code
+     * @param storeHouseCode 仓库code
+     * @return 机构code
+     * @author liuduo
+     * @date 2018-08-07 16:08:52
+     */
+    @Override
+    public String getOrgCodeByStoreHouseCode(String storeHouseCode) {
+        return bizServiceStorehouseDao.getOrgCodeByStoreHouseCode(storeHouseCode);
+    }
 }
