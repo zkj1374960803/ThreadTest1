@@ -123,7 +123,7 @@ public class GenerateProjectCodeService {
             String redisKey = buildRedisKey(prefix);
             String redisCodeStr = jedisCluster.get(redisKey);
             if (StringUtils.isNotBlank(redisCodeStr)) {
-                //判断当前值是否超出了范围
+                // 判断当前值是否超出了范围
                 if(checkCode(autoIncreasedcodeLength, redisCodeStr)){
                     return StatusDto.buildStatusDtoWithCode(BizErrorCodeEnum.CODE_OVERRANGE.getErrorCode(),
                             BizErrorCodeEnum.CODE_OVERRANGE.getMessage());
@@ -140,7 +140,7 @@ public class GenerateProjectCodeService {
             // redis里没有编码，或根据redis生成编码异常时，从数据库中查询
             BizServiceProjectcode maxCode = bizServiceProjectcodeDao.getMaxCode(prefix);
             if (maxCode != null && maxCode.getCurrentCount() != null) {
-                //判断当前值是否超出了范围
+                // 判断当前值是否超出了范围
                 if(checkCode(autoIncreasedcodeLength, maxCode.getCurrentCount().toString())){
                     return StatusDto.buildStatusDtoWithCode(BizErrorCodeEnum.CODE_OVERRANGE.getErrorCode(),
                             BizErrorCodeEnum.CODE_OVERRANGE.getMessage());
@@ -272,74 +272,10 @@ public class GenerateProjectCodeService {
         for(int i=0; i < autoIncreasedcodeSize; i++){
             autoSize.append("9");
         }
-        //如果当前值大于定义的最大值
+        // 如果当前值大于定义的最大值
         if(Integer.parseInt(code) > Integer.parseInt(autoSize.toString())){
             result = true;
         }
         return result;
     }
-
-    /**
-     * 根据前缀生成各种单号的编码
-     * @param prefix 实体前缀
-     * @return
-     * @author weijb
-     * @date 2018-08-06 14:41:37
-     */
-    public synchronized StatusDto<String> grantCodeByPrefix(CodePrefixEnum prefix) {
-        StatusDto<String> resultDto;
-        switch (prefix){
-            case SW:    // 申请单号
-                resultDto = getCode(prefix.toString());
-                break;
-            case R:    // 入库单号
-                resultDto = getCode(prefix.toString());
-                break;
-            case C:    // 出库单号
-                resultDto = getCode(prefix.toString());
-                break;
-            case PK:    // 盘库单号
-                resultDto = getCode(prefix.toString());
-                break;
-            case TH:    // 退换单号
-                resultDto = getCode(prefix.toString());
-                break;
-            default:
-                resultDto = StatusDto.buildStatusDtoWithCode(BizErrorCodeEnum.CODE_UNKONEPREFIX.getErrorCode(),
-                        BizErrorCodeEnum.CODE_UNKONEPREFIX.getMessage());
-                break;
-        }
-        return resultDto;
-    }
-    /**
-     * 根据前缀生成各种单号的编码
-     * @param prefix 实体前缀
-     * @return
-     * @author weijb
-     * @date 2018-08-06 14:41:37
-     */
-    private StatusDto<String> getCode(String prefix){
-        StatusDto<String> newCodeDto = StatusDto.buildSuccessStatusDto();
-        try {
-            StringBuilder newCode = new StringBuilder();//根据时间获取字段
-            newCode.append(prefix).append(getTime()).append(getRandom(2));
-            if (StringUtils.isNotBlank(newCode)) {
-                newCodeDto.setData(newCode.toString());
-                return newCodeDto;
-            }
-        }catch (Exception exp){
-            logger.error(String.format("前缀%s生成编码时异常"), exp);
-            throw exp;
-        }
-        return newCodeDto;
-    }
-    //获取年月日十分字符串
-    private String getTime(){
-        LocalDateTime localDateTime = LocalDateTime.now();
-        StringBuilder sb = new StringBuilder();
-        sb.append(localDateTime.getYear()).append(localDateTime.getMonthValue()).append(localDateTime.getDayOfMonth())
-                .append(localDateTime.getHour()).append(localDateTime.getMinute());
-        return sb.toString();
-    }
-
 }
