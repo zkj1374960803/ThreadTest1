@@ -37,22 +37,22 @@ public class BizAllocateApply {
     /**
      * 入库仓库编号
      */
-    @ApiModelProperty(name = "instockOrgno", value = "")
+    @ApiModelProperty(name = "instockOrgno", value = "入库仓库编号")
     private String instockOrgno;
     /**
      * 出库仓库编号
      */
-    @ApiModelProperty(name = "inRepositoryNo", value = "")
+    @ApiModelProperty(name = "inRepositoryNo", value = "出库仓库编号")
     private String inRepositoryNo;
     /**
-     * 出库的类型
+     * 出库的机构的类型
      */
-    @ApiModelProperty(name = "outstockOrgtype", value = "")
+    @ApiModelProperty(name = "outstockOrgtype", value = "出库的机构的类型")
     private String outstockOrgtype;
     /**
      * 出库的组织架构
      */
-    @ApiModelProperty(name = "outstockOrgno", value = "")
+    @ApiModelProperty(name = "outstockOrgno", value = "出库的组织架构")
     private String outstockOrgno;
     /**
      * 处理申请人的uuid
@@ -77,32 +77,32 @@ public class BizAllocateApply {
     /**
      * 创建人
      */
-    @ApiModelProperty(name = "creator", value = "创建人")
+    @ApiModelProperty(name = "creator", value = "创建人", hidden = true)
     private String creator;
     /**
      * 创建时间
      */
-    @ApiModelProperty(name = "createTime", value = "创建时间")
+    @ApiModelProperty(name = "createTime", value = "创建时间", hidden = true)
     private Date createTime;
     /**
      * 更新人
      */
-    @ApiModelProperty(name = "operator", value = "更新人")
+    @ApiModelProperty(name = "operator", value = "更新人", hidden = true)
     private String operator;
     /**
      * 更新时间
      */
-    @ApiModelProperty(name = "operateTime", value = "更新时间")
+    @ApiModelProperty(name = "operateTime", value = "更新时间", hidden = true)
     private Date operateTime;
     /**
      * 删除标识
      */
-    @ApiModelProperty(name = "deleteFlag", value = "删除标识")
-    private Long deleteFlag;
+    @ApiModelProperty(name = "deleteFlag", value = "删除标识", hidden = true)
+    private Long deleteFlag = 0L;
     /**
      * 备注
      */
-    @ApiModelProperty(name = "remark", value = "备注")
+    @ApiModelProperty(name = "remark", value = "备注", hidden = true)
     private String remark;
     /**
      * 申请商品详情列表

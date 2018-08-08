@@ -6,6 +6,7 @@ import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,7 +18,7 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("/platform/allocateapply")
-@Api(tags = "品牌")
+@Api(tags = "申请管理")
 public class AllocateApplyController extends BaseController {
     @Resource(name = "allocateApplyImpl")
     private AllocateApply allocateApplyImpl;
@@ -31,7 +32,7 @@ public class AllocateApplyController extends BaseController {
      */
     @ApiOperation(value = "创建物料或者零配件申请", notes = "【张康健】")
     @PostMapping("/create")
-    public StatusDto<String> createAllocateApply(@ApiParam(name = "bizAllocateApply", value = "创建申请json", required = true) BizAllocateApply bizAllocateApply){
+    public StatusDto<String> createAllocateApply(@ApiParam(name = "bizAllocateApply", value = "创建申请json", required = true) @RequestBody BizAllocateApply bizAllocateApply){
         allocateApplyImpl.createAllocateApply(bizAllocateApply);
         return null;
     }

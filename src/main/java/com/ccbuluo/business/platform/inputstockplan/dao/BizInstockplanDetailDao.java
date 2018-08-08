@@ -1,6 +1,6 @@
 package com.ccbuluo.business.platform.inputstockplan.dao;
 
-import com.ccbuluo.business.thrid.BizInstockplanDetail;
+import com.ccbuluo.business.entity.BizInstockplanDetail;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;

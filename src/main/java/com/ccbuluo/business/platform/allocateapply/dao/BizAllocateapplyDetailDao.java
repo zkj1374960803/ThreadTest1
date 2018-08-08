@@ -1,5 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.dao;
 
+import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateapplyDetail;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
@@ -7,6 +9,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -94,5 +97,23 @@ public class BizAllocateapplyDetailDao extends BaseDao<BizAllocateapplyDetail> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
         return super.updateForMap(sql.toString(), params);
+    }
+    /**
+     * 根据调拨申请单code获取调拨申请单详情
+     * @param applyNo  applyNo
+     * @return 影响条数
+     * @author weijb
+     * @date 2018-08-07 13:55:41
+     */
+    public List<AllocateapplyDetailDTO> getAllocateapplyDetailByapplyNo(String applyNo){
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT bad.id,bad.apply_no,bad.product_no,bad.product_type,bad.product_categoryname,")
+                .append("bad.apply_num,bad.unit,bad.sell_price,bad.cost_price,bad.supplier_no,bad.creator,bad.create_time,")
+                .append("bad.operator,bad.operate_time,baa.instock_orgno,baa.outstock_orgno")
+                .append(" FROM biz_allocateapply_detail bad LEFT JOIN biz_allocate_apply baa on bad.apply_no=baa.apply_no WHERE bad.delete_flag = :deleteFlag AND  bad.apply_no= :applyNo");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        params.put("applyNo", applyNo);
+        return super.queryListBean(AllocateapplyDetailDTO.class, sql.toString(), params);
     }
 }

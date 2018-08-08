@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.order.dao;
 
-import com.ccbuluo.business.thrid.BizAllocateTradeorder;
+
+import com.ccbuluo.business.entity.BizAllocateTradeorder;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;

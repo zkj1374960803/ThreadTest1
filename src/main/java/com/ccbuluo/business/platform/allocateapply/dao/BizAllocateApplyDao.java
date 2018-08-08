@@ -1,12 +1,14 @@
 package com.ccbuluo.business.platform.allocateapply.dao;
 
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateApply;
+import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateapplyDetail;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -96,5 +98,24 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
         return super.updateForMap(sql.toString(), params);
+    }
+
+    /**
+     * 批量插入申请单详情表
+     * @param allocateapplyDetailList
+     * @author zhangkangjian
+     * @date 2018-08-08 10:45:24
+     */
+    public void batchInsertForapplyDetailList(List<BizAllocateapplyDetail> allocateapplyDetailList) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO biz_allocateapply_detail ( apply_no,product_no,")
+            .append("product_type,product_categoryname,apply_num,unit,sell_price,")
+            .append("cost_price,supplier_no,creator,create_time,operator,operate_time,")
+            .append("delete_flag,remark ) VALUES (  :applyNo, :productNo, :productType,")
+            .append(" :productCategoryname, :applyNum, :unit, :sellPrice, :costPrice,")
+            .append(" :supplierNo, :creator, :createTime, :operator, :operateTime,")
+            .append(" :deleteFlag, :remark )");
+        batchInsertForListBean(sql.toString(), allocateapplyDetailList);
+
     }
 }
