@@ -1,5 +1,6 @@
-package com.ccbuluo.business.thrid;
+package com.ccbuluo.business.platform.allocateapply.dao;
 
+import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateapplyDetail;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;

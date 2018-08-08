@@ -171,7 +171,7 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("equiptypeId", equiptypeId);
 
-        String sql = "SELECT equip_code,equip_name FROM biz_service_equipment WHERE equiptype_id = :equiptypeId";
+        String sql = "SELECT equip_code,equip_name,equip_unit FROM biz_service_equipment WHERE equiptype_id = :equiptypeId";
 
         return queryListBean(DetailBizServiceEquipmentDTO.class, sql, params);
     }
