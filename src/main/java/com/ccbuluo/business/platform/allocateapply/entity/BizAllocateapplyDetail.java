@@ -7,12 +7,12 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 实体
+ * 申请详情
  * @author liuduo
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "实体", description = "")
+@ApiModel(value = "BizAllocateapplyDetail", description = "申请详情")
 public class BizAllocateapplyDetail {
     /**
      * 
@@ -25,9 +25,9 @@ public class BizAllocateapplyDetail {
     @ApiModelProperty(name = "applyNo", value = "调拨申请单编号")
     private String applyNo;
     /**
-     * 
+     * 商品的编号
      */
-    @ApiModelProperty(name = "productNo", value = "")
+    @ApiModelProperty(name = "productNo", value = "商品的编号")
     private String productNo;
     /**
      * 是物料、零配件
@@ -40,14 +40,14 @@ public class BizAllocateapplyDetail {
     @ApiModelProperty(name = "productCategoryname", value = "做冗余，分类整个路径的名字，多级用逗号隔开")
     private String productCategoryname;
     /**
-     * 
+     * 申请的商品数量
      */
-    @ApiModelProperty(name = "applyNum", value = "")
+    @ApiModelProperty(name = "applyNum", value = "申请的商品数量")
     private Long applyNum;
     /**
-     * 用作展示冗余
+     * 计量单位，用作展示冗余
      */
-    @ApiModelProperty(name = "unit", value = "用作展示冗余")
+    @ApiModelProperty(name = "unit", value = "计量单位")
     private String unit;
     /**
      * 销售单价
@@ -55,9 +55,9 @@ public class BizAllocateapplyDetail {
     @ApiModelProperty(name = "sellPrice", value = "销售单价")
     private BigDecimal sellPrice;
     /**
-     * 
+     * 成本单价
      */
-    @ApiModelProperty(name = "costPrice", value = "")
+    @ApiModelProperty(name = "costPrice", value = "成本单价")
     private BigDecimal costPrice;
     /**
      * 当集团采购时，可以设置供应商，将调拨申请单作为采购单
@@ -67,32 +67,32 @@ public class BizAllocateapplyDetail {
     /**
      * 创建人
      */
-    @ApiModelProperty(name = "creator", value = "创建人")
+    @ApiModelProperty(name = "creator", value = "创建人", hidden = true)
     private String creator;
     /**
      * 创建时间
      */
-    @ApiModelProperty(name = "createTime", value = "创建时间")
+    @ApiModelProperty(name = "createTime", value = "创建时间", hidden = true)
     private Date createTime;
     /**
      * 更新人
      */
-    @ApiModelProperty(name = "operator", value = "更新人")
+    @ApiModelProperty(name = "operator", value = "更新人", hidden = true)
     private String operator;
     /**
      * 更新时间
      */
-    @ApiModelProperty(name = "operateTime", value = "更新时间")
+    @ApiModelProperty(name = "operateTime", value = "更新时间", hidden = true)
     private Date operateTime;
     /**
      * 删除标识
      */
-    @ApiModelProperty(name = "deleteFlag", value = "删除标识")
-    private Long deleteFlag;
+    @ApiModelProperty(name = "deleteFlag", value = "删除标识", hidden = true)
+    private Long deleteFlag = 0L;
     /**
      * 备注
      */
-    @ApiModelProperty(name = "remark", value = "备注")
+    @ApiModelProperty(name = "remark", value = "备注", hidden = true)
     private String remark;
 
     public void setId(Long id) {
