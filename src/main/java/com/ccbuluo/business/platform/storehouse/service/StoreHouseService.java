@@ -1,9 +1,11 @@
 package com.ccbuluo.business.platform.storehouse.service;
 
 import com.ccbuluo.business.entity.BizServiceStorehouse;
+import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.dto.SaveBizServiceStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.dto.SearchStorehouseListDTO;
 import com.ccbuluo.db.Page;
+import com.ccbuluo.http.StatusDto;
 import org.apache.thrift.TException;
 
 import java.util.List;
@@ -85,4 +87,12 @@ public interface StoreHouseService {
     * @date 2018-08-07 16:08:52
     */
     String getOrgCodeByStoreHouseCode(String storeHouseCode);
+    /**
+     * 根据服务中心查询启用的仓库列表（下拉框）
+     * @param serviceCenterCode 据服务中心code
+     * @return StatusDto<QueryStorehouseDTO>
+     * @author zhangkangjian
+     * @date 2018-08-07 14:32:09
+     */
+    StatusDto<List<QueryStorehouseDTO>> queryStorehouseByServiceCenterCode(String serviceCenterCode);
 }

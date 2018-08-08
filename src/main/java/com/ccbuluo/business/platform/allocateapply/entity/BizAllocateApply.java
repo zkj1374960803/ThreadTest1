@@ -1,13 +1,14 @@
-package com.ccbuluo.business.thrid;
+package com.ccbuluo.business.platform.allocateapply.entity;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 物料和零配件调拨的申请实体
- * @author liuduo
+ * @author zhangkangjian
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
@@ -34,22 +35,22 @@ public class BizAllocateApply {
     @ApiModelProperty(name = "applyer", value = "申请人的uuid")
     private String applyer;
     /**
-     * 
+     * 入库仓库编号
      */
     @ApiModelProperty(name = "instockOrgno", value = "")
     private String instockOrgno;
     /**
-     * 
+     * 出库仓库编号
      */
     @ApiModelProperty(name = "inRepositoryNo", value = "")
     private String inRepositoryNo;
     /**
-     * 
+     * 出库的类型
      */
     @ApiModelProperty(name = "outstockOrgtype", value = "")
     private String outstockOrgtype;
     /**
-     * 
+     * 出库的组织架构
      */
     @ApiModelProperty(name = "outstockOrgno", value = "")
     private String outstockOrgno;
@@ -103,6 +104,19 @@ public class BizAllocateApply {
      */
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
+    /**
+     * 申请商品详情列表
+     */
+    @ApiModelProperty(name = "allocateapplyDetailList", value = "申请商品详情列表")
+    private List<BizAllocateapplyDetail> allocateapplyDetailList;
+
+    public List<BizAllocateapplyDetail> getAllocateapplyDetailList() {
+        return allocateapplyDetailList;
+    }
+
+    public void setAllocateapplyDetailList(List<BizAllocateapplyDetail> allocateapplyDetailList) {
+        this.allocateapplyDetailList = allocateapplyDetailList;
+    }
 
     public void setId(Long id) {
         this.id = id;

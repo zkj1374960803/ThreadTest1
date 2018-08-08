@@ -4,6 +4,7 @@ import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceStorehouse;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
+import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.dto.SaveBizServiceStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.dto.SearchStorehouseListDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
@@ -203,5 +204,18 @@ public class StoreHouseServiceImpl implements StoreHouseService{
     @Override
     public String getOrgCodeByStoreHouseCode(String storeHouseCode) {
         return bizServiceStorehouseDao.getOrgCodeByStoreHouseCode(storeHouseCode);
+    }
+
+    /**
+     * 根据服务中心查询启用的仓库列表（下拉框）
+     * @param serviceCenterCode 据服务中心code
+     * @return StatusDto<QueryStorehouseDTO>
+     * @author zhangkangjian
+     * @date 2018-08-07 14:32:09
+     */
+    @Override
+    public StatusDto<List<QueryStorehouseDTO>> queryStorehouseByServiceCenterCode(String serviceCenterCode) {
+        List<QueryStorehouseDTO> queryStorehouseDTOList = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(serviceCenterCode);
+        return StatusDto.buildDataSuccessStatusDto(queryStorehouseDTOList);
     }
 }
