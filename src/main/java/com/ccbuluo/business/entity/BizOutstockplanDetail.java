@@ -1,4 +1,4 @@
-package com.ccbuluo.business.thrid;
+package com.ccbuluo.business.entity;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -13,17 +13,22 @@ import java.util.Date;
  * @version V1.0.0
  */
 @ApiModel(value = "实体", description = "")
-public class BizInstockplanDetail {
+public class BizOutstockplanDetail {
     /**
-     * id
+     * 
      */
-    @ApiModelProperty(name = "id", value = "id")
+    @ApiModelProperty(name = "id", value = "")
     private Long id;
     /**
-     * 入库类型(采购入库，调拨入库)
+     * 出库类型
      */
-    @ApiModelProperty(name = "instockType", value = "入库类型(采购入库，调拨入库)")
-    private String instockType;
+    @ApiModelProperty(name = "outstockType", value = "出库类型")
+    private String outstockType;
+    /**
+     * 使用的批次库存的id
+     */
+    @ApiModelProperty(name = "stockId", value = "使用的批次库存的id")
+    private Long stockId;
     /**
      * 商品编号
      */
@@ -35,14 +40,9 @@ public class BizInstockplanDetail {
     @ApiModelProperty(name = "productType", value = "商品类型")
     private String productType;
     /**
-     * 商品分类名称,多级逗号隔开
+     * 交易批次号,可以是调拨申请的单号或维修销售的服务单号
      */
-    @ApiModelProperty(name = "productCategoryname", value = "商品分类名称,多级逗号隔开")
-    private String productCategoryname;
-    /**
-     * 交易批次号,可以是调拨申请单号等
-     */
-    @ApiModelProperty(name = "tradeNo", value = "交易批次号,可以是调拨申请单号等")
+    @ApiModelProperty(name = "tradeNo", value = "交易批次号,可以是调拨申请的单号或维修销售的服务单号")
     private String tradeNo;
     /**
      * 供应商编号
@@ -50,40 +50,45 @@ public class BizInstockplanDetail {
     @ApiModelProperty(name = "supplierNo", value = "供应商编号")
     private String supplierNo;
     /**
-     * 入库仓库编号
+     * 
      */
-    @ApiModelProperty(name = "instockRepositoryNo", value = "入库仓库编号")
-    private String instockRepositoryNo;
+    @ApiModelProperty(name = "applyDetailId", value = "")
+    private Long applyDetailId;
     /**
      * 成本单价
      */
     @ApiModelProperty(name = "costPrice", value = "成本单价")
     private BigDecimal costPrice;
     /**
-     * 计划入库数量
+     * 销售单价
      */
-    @ApiModelProperty(name = "planInstocknum", value = "计划入库数量")
-    private Long planInstocknum;
+    @ApiModelProperty(name = "salesPrice", value = "销售单价")
+    private BigDecimal salesPrice;
     /**
-     * 实际入库数量
+     * 出库仓库编号
      */
-    @ApiModelProperty(name = "actualInstocknum", value = "实际入库数量")
-    private Long actualInstocknum;
+    @ApiModelProperty(name = "outRepositoryNo", value = "出库仓库编号")
+    private String outRepositoryNo;
     /**
-     * 完成状态（入库中，完成）
+     * 计划出库数量
      */
-    @ApiModelProperty(name = "completeStatus", value = "完成状态（入库中，完成）")
-    private String completeStatus;
+    @ApiModelProperty(name = "planOutstocknum", value = "计划出库数量")
+    private Long planOutstocknum;
+    /**
+     * 实际出库数量
+     */
+    @ApiModelProperty(name = "actualOutstocknum", value = "实际出库数量")
+    private Long actualOutstocknum;
+    /**
+     * 出库计划的状态
+     */
+    @ApiModelProperty(name = "planStatus", value = "出库计划的状态")
+    private String planStatus;
     /**
      * 完成时间
      */
     @ApiModelProperty(name = "completeTime", value = "完成时间")
     private Date completeTime;
-    /**
-     * 成对生成的出库计划的id
-     */
-    @ApiModelProperty(name = "outstockPlanid", value = "成对生成的出库计划的id")
-    private Long outstockPlanid;
     /**
      * 创建人
      */
@@ -114,6 +119,11 @@ public class BizInstockplanDetail {
      */
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
+    /**
+     * 商品分类名称,多级逗号隔开
+     */
+    @ApiModelProperty(name = "productCategoryname", value = "商品分类名称,多级逗号隔开")
+    private String productCategoryname;
 
     public void setId(Long id) {
         this.id = id;
@@ -123,12 +133,20 @@ public class BizInstockplanDetail {
         return this.id;
     }
 
-    public void setInstockType(String instockType) {
-        this.instockType = instockType;
+    public void setOutstockType(String outstockType) {
+        this.outstockType = outstockType;
     }
 
-    public String getInstockType() {
-        return this.instockType;
+    public String getOutstockType() {
+        return this.outstockType;
+    }
+
+    public void setStockId(Long stockId) {
+        this.stockId = stockId;
+    }
+
+    public Long getStockId() {
+        return this.stockId;
     }
 
     public void setProductNo(String productNo) {
@@ -147,14 +165,6 @@ public class BizInstockplanDetail {
         return this.productType;
     }
 
-    public void setProductCategoryname(String productCategoryname) {
-        this.productCategoryname = productCategoryname;
-    }
-
-    public String getProductCategoryname() {
-        return this.productCategoryname;
-    }
-
     public void setTradeNo(String tradeNo) {
         this.tradeNo = tradeNo;
     }
@@ -171,12 +181,12 @@ public class BizInstockplanDetail {
         return this.supplierNo;
     }
 
-    public void setInstockRepositoryNo(String instockRepositoryNo) {
-        this.instockRepositoryNo = instockRepositoryNo;
+    public void setApplyDetailId(Long applyDetailId) {
+        this.applyDetailId = applyDetailId;
     }
 
-    public String getInstockRepositoryNo() {
-        return this.instockRepositoryNo;
+    public Long getApplyDetailId() {
+        return this.applyDetailId;
     }
 
     public void setCostPrice(BigDecimal costPrice) {
@@ -187,28 +197,44 @@ public class BizInstockplanDetail {
         return this.costPrice;
     }
 
-    public void setPlanInstocknum(Long planInstocknum) {
-        this.planInstocknum = planInstocknum;
+    public void setSalesPrice(BigDecimal salesPrice) {
+        this.salesPrice = salesPrice;
     }
 
-    public Long getPlanInstocknum() {
-        return this.planInstocknum;
+    public BigDecimal getSalesPrice() {
+        return this.salesPrice;
     }
 
-    public void setActualInstocknum(Long actualInstocknum) {
-        this.actualInstocknum = actualInstocknum;
+    public void setOutRepositoryNo(String outRepositoryNo) {
+        this.outRepositoryNo = outRepositoryNo;
     }
 
-    public Long getActualInstocknum() {
-        return this.actualInstocknum;
+    public String getOutRepositoryNo() {
+        return this.outRepositoryNo;
     }
 
-    public void setCompleteStatus(String completeStatus) {
-        this.completeStatus = completeStatus;
+    public void setPlanOutstocknum(Long planOutstocknum) {
+        this.planOutstocknum = planOutstocknum;
     }
 
-    public String getCompleteStatus() {
-        return this.completeStatus;
+    public Long getPlanOutstocknum() {
+        return this.planOutstocknum;
+    }
+
+    public void setActualOutstocknum(Long actualOutstocknum) {
+        this.actualOutstocknum = actualOutstocknum;
+    }
+
+    public Long getActualOutstocknum() {
+        return this.actualOutstocknum;
+    }
+
+    public void setPlanStatus(String planStatus) {
+        this.planStatus = planStatus;
+    }
+
+    public String getPlanStatus() {
+        return this.planStatus;
     }
 
     public void setCompleteTime(Date completeTime) {
@@ -217,14 +243,6 @@ public class BizInstockplanDetail {
 
     public Date getCompleteTime() {
         return this.completeTime;
-    }
-
-    public void setOutstockPlanid(Long outstockPlanid) {
-        this.outstockPlanid = outstockPlanid;
-    }
-
-    public Long getOutstockPlanid() {
-        return this.outstockPlanid;
     }
 
     public void setCreator(String creator) {
@@ -273,6 +291,14 @@ public class BizInstockplanDetail {
 
     public String getRemark() {
         return this.remark;
+    }
+
+    public void setProductCategoryname(String productCategoryname) {
+        this.productCategoryname = productCategoryname;
+    }
+
+    public String getProductCategoryname() {
+        return this.productCategoryname;
     }
 
 

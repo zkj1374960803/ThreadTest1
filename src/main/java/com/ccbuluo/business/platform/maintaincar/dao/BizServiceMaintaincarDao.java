@@ -184,17 +184,16 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
             param.put("carStatus", carStatus);
             sql.append(" AND bci.car_status = :carStatus ");
         }
-        // 车架号
+        // 车架号和客户经理名称查询
         if (StringUtils.isNotBlank(keyword)) {
             param.put("Keyword", keyword);
-            //目前只根据车架号查询
             sql.append(" AND (bci.vin_number LIKE CONCAT('%',:Keyword,'%')  OR  bci.cusmanager_name LIKE CONCAT('%',:Keyword,'%'))");
         }
         sql.append("  ORDER BY bci.operate_time DESC");
         Page<SearchBizServiceMaintaincarDTO> DTOS = super.queryPageForBean(SearchBizServiceMaintaincarDTO.class, sql.toString(), param,offset,pageSize);
         return DTOS;
     }
-    //查询未分配的维修车列表
+    // 查询未分配的维修车列表
     public List<ListServiceMaintaincarDTO> queryundistributedlist(String vinNumber){
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT mend_code,vin_number ")

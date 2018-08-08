@@ -78,6 +78,15 @@ public interface StoreHouseService {
     * @date 2018-07-05 10:27:40
     */
     List<BizServiceStorehouse> getStorehousrByCode(String serviceCenterCode);
+
+    /**
+    * 根据仓库code查询机构code
+    * @param storeHouseCode 仓库code
+    * @return 机构code
+    * @author liuduo
+    * @date 2018-08-07 16:08:52
+    */
+    String getOrgCodeByStoreHouseCode(String storeHouseCode);
     /**
      * 根据服务中心查询启用的仓库列表（下拉框）
      * @param serviceCenterCode 据服务中心code

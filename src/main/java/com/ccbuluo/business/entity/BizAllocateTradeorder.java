@@ -1,4 +1,4 @@
-package com.ccbuluo.business.thrid;
+package com.ccbuluo.business.entity;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

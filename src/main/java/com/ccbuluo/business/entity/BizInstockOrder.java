@@ -1,23 +1,19 @@
-package com.ccbuluo.business.thrid;
+package com.ccbuluo.business.entity;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
+import java.util.List;
 
 /**
- * 实体
+ * 入库单实体
  * @author liuduo
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "实体", description = "")
-public class BizInstockOrder {
-    /**
-     * id
-     */
-    @ApiModelProperty(name = "id", value = "id")
-    private Long id;
+@ApiModel(value = "入库单实体", description = "入库单实体")
+public class BizInstockOrder extends AftersaleCommonEntity{
     /**
      * 入库单编号
      */
@@ -33,6 +29,11 @@ public class BizInstockOrder {
      */
     @ApiModelProperty(name = "inRepositoryNo", value = "要入货的仓库编号")
     private String inRepositoryNo;
+    /**
+     * 入库单所属机构
+     */
+    @ApiModelProperty(name = "instockOrgno", value = "入库单所属机构")
+    private String instockOrgno;
     /**
      * 入库人的uuid
      */
@@ -63,44 +64,13 @@ public class BizInstockOrder {
      */
     @ApiModelProperty(name = "ceeckedTime", value = "复核完成时间")
     private Date ceeckedTime;
-    /**
-     * 创建人
-     */
-    @ApiModelProperty(name = "creator", value = "创建人")
-    private String creator;
-    /**
-     * 创建时间
-     */
-    @ApiModelProperty(name = "createTime", value = "创建时间")
-    private Date createTime;
-    /**
-     * 更新人
-     */
-    @ApiModelProperty(name = "operator", value = "更新人")
-    private String operator;
-    /**
-     * 更新时间
-     */
-    @ApiModelProperty(name = "operateTime", value = "更新时间")
-    private Date operateTime;
-    /**
-     * 删除标识
-     */
-    @ApiModelProperty(name = "deleteFlag", value = "删除标识")
-    private Long deleteFlag;
-    /**
-     * 备注
-     */
-    @ApiModelProperty(name = "remark", value = "备注")
-    private String remark;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    /**
+     * 入库单详情
+     */
+    @ApiModelProperty(name = "instockorderDetailList", value = "入库单详情")
+    private List<BizInstockorderDetail> instockorderDetailList;
 
-    public Long getId() {
-        return this.id;
-    }
 
     public void setInstockOrderno(String instockOrderno) {
         this.instockOrderno = instockOrderno;
@@ -174,53 +144,19 @@ public class BizInstockOrder {
         return this.ceeckedTime;
     }
 
-    public void setCreator(String creator) {
-        this.creator = creator;
+    public String getInstockOrgno() {
+        return instockOrgno;
     }
 
-    public String getCreator() {
-        return this.creator;
+    public void setInstockOrgno(String instockOrgno) {
+        this.instockOrgno = instockOrgno;
     }
 
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    public List<BizInstockorderDetail> getInstockorderDetailList() {
+        return instockorderDetailList;
     }
 
-    public Date getCreateTime() {
-        return this.createTime;
+    public void setInstockorderDetailList(List<BizInstockorderDetail> instockorderDetailList) {
+        this.instockorderDetailList = instockorderDetailList;
     }
-
-    public void setOperator(String operator) {
-        this.operator = operator;
-    }
-
-    public String getOperator() {
-        return this.operator;
-    }
-
-    public void setOperateTime(Date operateTime) {
-        this.operateTime = operateTime;
-    }
-
-    public Date getOperateTime() {
-        return this.operateTime;
-    }
-
-    public void setDeleteFlag(Long deleteFlag) {
-        this.deleteFlag = deleteFlag;
-    }
-
-    public Long getDeleteFlag() {
-        return this.deleteFlag;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-
-    public String getRemark() {
-        return this.remark;
-    }
-
-
 }
