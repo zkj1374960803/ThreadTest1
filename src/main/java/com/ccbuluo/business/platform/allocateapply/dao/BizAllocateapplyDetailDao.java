@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.allocateapply.dao;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateapplyDetail;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
@@ -7,6 +8,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -94,5 +96,23 @@ public class BizAllocateapplyDetailDao extends BaseDao<BizAllocateapplyDetail> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
         return super.updateForMap(sql.toString(), params);
+    }
+    /**
+     * 根据调拨申请单code获取调拨申请单详情
+     * @param applyNo  applyNo
+     * @return 影响条数
+     * @author weijb
+     * @date 2018-08-07 13:55:41
+     */
+    public List<BizAllocateapplyDetail> getAllocateapplyDetailByapplyNo(String applyNo){
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,apply_no,product_no,product_type,product_categoryname,")
+                .append("apply_num,unit,sell_price,cost_price,supplier_no,creator,create_time,")
+                .append("operator,operate_time,delete_flag,remark")
+                .append(" FROM biz_allocateapply_detail WHERE delete_flag = :deleteFlag AND  apply_no= :applyNo");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        params.put("applyNo", applyNo);
+        return super.queryListBean(BizAllocateapplyDetail.class, sql.toString(), params);
     }
 }

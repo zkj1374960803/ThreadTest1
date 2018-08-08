@@ -3,9 +3,11 @@ package com.ccbuluo.business.platform.order.service;
 
 import com.ccbuluo.business.entity.BizAllocateTradeorder;
 import com.ccbuluo.business.entity.BizStockDetail;
+import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateapplyDetail;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +19,9 @@ import java.util.List;
  * @date 2018-08-08 10:45:41
  */
 public class TradeOrderServiceImpl implements TradeOrderService {
+    @Resource
+    private BizAllocateapplyDetailDao bizAllocateapplyDetailDao;
+
     /**
      *  采购申请处理
      * @param applyNo 申请单编号
@@ -26,7 +31,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     @Transactional(rollbackFor = Exception.class)
     public int purchaseApplyHandle(String applyNo){
         // 根据申请单获取申请单详情
-        List<BizAllocateapplyDetail> details = new ArrayList<BizAllocateapplyDetail>();//bizAllocateapplyDetailDao.getXXXXByapplyNo(applyNo);
+        List<BizAllocateapplyDetail> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
         // 构建生成订单
         List<BizAllocateTradeorder> allocateTradeorderList = buildOrderEntity(details);
         // 构建占用库存
