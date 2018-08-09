@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.order.service;
 
 
 import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
+import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.DocCodePrefixEnum;
 import com.ccbuluo.business.entity.*;
@@ -62,14 +63,16 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             // 构建生成订单（机构1对平台）
             BizAllocateTradeorder bizAllocateTradeorder1 = buildOrderEntity(details);
             BizAllocateTradeorder bizAllocateTradeorder2 = buildOrderEntity(details);
-            bizAllocateTradeorder1.setSellerOrgno("平台code");// 从买方到平台
-            bizAllocateTradeorder2.setPurchaserOrgno("平台code");// 从平台到卖方
+            bizAllocateTradeorder1.setSellerOrgno(BusinessPropertyHolder.TOP_SERVICECENTER);// 从买方到平台"平台code"
+            bizAllocateTradeorder2.setPurchaserOrgno(BusinessPropertyHolder.TOP_SERVICECENTER);// 从平台到卖方"平台code"
             List<BizAllocateTradeorder> list = new ArrayList<BizAllocateTradeorder>();
             bizAllocateTradeorder2.setSellerOrgno("");// (供应商不填为空)
             list.add(bizAllocateTradeorder1);// 从买方到平台
             list.add(bizAllocateTradeorder2);// 从平台到卖方
             //构建出库和入库计划
-            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pair = buildOutAndInstockplanDetail(details, bizAllocateTradeorder1.getPurchaserOrgno(), bizAllocateTradeorder1.getSellerOrgno());
+            //查询库存列表(平台的库存列表)
+            List<BizStockDetail> stockDetails = getStockDetailList(BusinessPropertyHolder.TOP_SERVICECENTER, details);
+            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pair = buildOutAndInstockplanDetail(details, stockDetails);
             // 保存生成订单
             bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
             //保存出库计划
@@ -85,11 +88,11 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     /**
      *  构建出库和入库计划
      * @param details 申请单详情
-     * @param purchaserOrgno 买方机构code
-     * @paarm sellerOrgno 卖方机构code
+     * @param stockDetails 库存详情列表
      * @return
      */
-    private Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> buildOutAndInstockplanDetail(List<AllocateapplyDetailDTO> details, String purchaserOrgno, String sellerOrgno){
+    private Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> buildOutAndInstockplanDetail(List<AllocateapplyDetailDTO> details, List<BizStockDetail> stockDetails){
+        //申请单处理之后生成的出入库计划状态默认为：未生效
         return Pair.of(null, null);
     }
 
@@ -111,15 +114,17 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             // 构建生成订单（机构1对平台）
             BizAllocateTradeorder bizAllocateTradeorder1 = buildOrderEntity(details);
             BizAllocateTradeorder bizAllocateTradeorder2 = buildOrderEntity(details);
-            bizAllocateTradeorder1.setSellerOrgno("平台code");// 从买方到平台
-            bizAllocateTradeorder2.setPurchaserOrgno("平台code");// 从平台到卖方
+            bizAllocateTradeorder1.setSellerOrgno(BusinessPropertyHolder.TOP_SERVICECENTER);// 从买方到平台"平台code"
+            bizAllocateTradeorder2.setPurchaserOrgno(BusinessPropertyHolder.TOP_SERVICECENTER);// 从平台到卖方"平台code"
             List<BizAllocateTradeorder> list = new ArrayList<BizAllocateTradeorder>();
             list.add(bizAllocateTradeorder1);// 从买方到平台
             list.add(bizAllocateTradeorder2);// 从平台到卖方
             // 保存生成订单
             bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
             // 构建占用库存和订单占用库存关系
-            Pair<List<BizStockDetail>, List<RelOrdstockOccupy>> pair = buildStockAndRelOrdEntity(details,bizAllocateTradeorder2.getSellerOrgno());
+            //查询库存列表
+            List<BizStockDetail> stockDetails = getStockDetailList(bizAllocateTradeorder2.getSellerOrgno(), details);
+            Pair<List<BizStockDetail>, List<RelOrdstockOccupy>> pair = buildStockAndRelOrdEntity(details,stockDetails);
             List<BizStockDetail> stockDetailList = pair.getLeft();
             // 构建订单占用库存关系
             List<RelOrdstockOccupy> relOrdstockOccupies = pair.getRight();
@@ -135,6 +140,10 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         return flag;
     }
 
+    //构建订单list用于批量保存
+    private List<BizAllocateTradeorder> buildOrderEntityList(){
+        return null;
+    }
     // 构建生成订单
     private BizAllocateTradeorder buildOrderEntity(List<AllocateapplyDetailDTO> details){
         BizAllocateTradeorder bt = new BizAllocateTradeorder();
@@ -171,17 +180,13 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     /**
      * 构建占用库存和订单占用库存关系
      * @param details 申请单详情
-     * @param sellerOrgno 卖方机构code
+     * @param stockDetails 库存列表
      * @author weijb
      * @date 2018-08-08 17:55:41
      */
-    private Pair<List<BizStockDetail>, List<RelOrdstockOccupy>>  buildStockAndRelOrdEntity(List<AllocateapplyDetailDTO> details, String sellerOrgno){
+    private Pair<List<BizStockDetail>, List<RelOrdstockOccupy>>  buildStockAndRelOrdEntity(List<AllocateapplyDetailDTO> details, List<BizStockDetail> stockDetails){
         //订单占用库存关系
         List<RelOrdstockOccupy> relOrdstockOccupies = new ArrayList<RelOrdstockOccupy>();
-        // 根据卖方code和商品code（list）查出库存列表
-        List<String> codeList = getProductList(details);
-        //查询库存列表
-        List<BizStockDetail> stockDetails = bizStockDetailDao.getStockDetailListByOrgAndProduct(sellerOrgno, codeList);
         for(BizStockDetail ad : stockDetails){// 遍历库存
             //占用库存
             Long occupyStockNum = convertStockDetail(details, ad);
@@ -200,6 +205,13 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             relOrdstockOccupies.add(ro);
         }
         return Pair.of(stockDetails, relOrdstockOccupies);
+    }
+
+    // 根据卖方机构code获取库存详情
+    private List<BizStockDetail> getStockDetailList(String sellerOrgno, List<AllocateapplyDetailDTO> details){
+        // 根据卖方code和商品code（list）查出库存列表
+        List<String> codeList = getProductList(details);
+        return bizStockDetailDao.getStockDetailListByOrgAndProduct(sellerOrgno, codeList);
     }
     // 获取商品code
     private List<String> getProductList(List<AllocateapplyDetailDTO> details){
