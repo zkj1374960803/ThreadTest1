@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.allocateapply.entity;
+package com.ccbuluo.business.platform.allocateapply.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -7,22 +7,22 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 申请详情
- * @author liuduo
+ * 申请单详情（用于处理申请的时候，构建订单）
+ * @author weijb
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "BizAllocateapplyDetail", description = "申请详情")
-public class BizAllocateapplyDetail {
+@ApiModel(value = "AllocateapplyDetailDTO", description = "申请详情")
+public class AllocateapplyDetailDTO {
     /**
      * 
      */
-    @ApiModelProperty(name = "id", value = "", hidden = true)
+    @ApiModelProperty(name = "id", value = "")
     private Long id;
     /**
      * 调拨申请单编号
      */
-    @ApiModelProperty(name = "applyNo", value = "调拨申请单编号", hidden = true)
+    @ApiModelProperty(name = "applyNo", value = "调拨申请单编号")
     private String applyNo;
     /**
      * 商品的编号
@@ -30,9 +30,9 @@ public class BizAllocateapplyDetail {
     @ApiModelProperty(name = "productNo", value = "商品的编号")
     private String productNo;
     /**
-     * 商品类型（注：FITTINGS零配件，EQUIPMENT物料）
+     * 是物料、零配件
      */
-    @ApiModelProperty(name = "productType", value = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）")
+    @ApiModelProperty(name = "productType", value = "是物料、零配件")
     private String productType;
     /**
      * 做冗余，分类整个路径的名字，多级用逗号隔开
@@ -85,15 +85,21 @@ public class BizAllocateapplyDetail {
     @ApiModelProperty(name = "operateTime", value = "更新时间", hidden = true)
     private Date operateTime;
     /**
-     * 删除标识
+     * 买方机构的编号
      */
-    @ApiModelProperty(name = "deleteFlag", value = "删除标识", hidden = true)
-    private Long deleteFlag = 0L;
+    @ApiModelProperty(name = "instockOrgno", value = "买方机构的编号", hidden = true)
+    private String instockOrgno;
     /**
-     * 备注
+     * 卖方机构的编号
      */
-    @ApiModelProperty(name = "remark", value = "备注", hidden = true)
-    private String remark;
+    @ApiModelProperty(name = "outstockOrgno", value = "卖方机构的编号", hidden = true)
+    private String outstockOrgno;
+
+    /**
+     * 交易类型
+     */
+    @ApiModelProperty(name = "processType", value = "交易类型（采购或是调拨）", hidden = true)
+    private String processType;
 
     public void setId(Long id) {
         this.id = id;
@@ -148,7 +154,6 @@ public class BizAllocateapplyDetail {
     }
 
     public String getUnit() {
-
         return this.unit;
     }
 
@@ -208,21 +213,27 @@ public class BizAllocateapplyDetail {
         return this.operateTime;
     }
 
-    public void setDeleteFlag(Long deleteFlag) {
-        this.deleteFlag = deleteFlag;
+    public String getInstockOrgno() {
+        return instockOrgno;
     }
 
-    public Long getDeleteFlag() {
-        return this.deleteFlag;
+    public void setInstockOrgno(String instockOrgno) {
+        this.instockOrgno = instockOrgno;
     }
 
-    public void setRemark(String remark) {
-        this.remark = remark;
+    public String getOutstockOrgno() {
+        return outstockOrgno;
     }
 
-    public String getRemark() {
-        return this.remark;
+    public void setOutstockOrgno(String outstockOrgno) {
+        this.outstockOrgno = outstockOrgno;
     }
 
+    public String getProcessType() {
+        return processType;
+    }
 
+    public void setProcessType(String processType) {
+        this.processType = processType;
+    }
 }

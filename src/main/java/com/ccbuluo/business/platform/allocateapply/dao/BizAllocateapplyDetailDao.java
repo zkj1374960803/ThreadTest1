@@ -109,7 +109,7 @@ public class BizAllocateapplyDetailDao extends BaseDao<BizAllocateapplyDetail> {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT bad.id,bad.apply_no,bad.product_no,bad.product_type,bad.product_categoryname,")
                 .append("bad.apply_num,bad.unit,bad.sell_price,bad.cost_price,bad.supplier_no,bad.creator,bad.create_time,")
-                .append("bad.operator,bad.operate_time,baa.instock_orgno,baa.outstock_orgno")
+                .append("bad.operator,bad.operate_time,baa.instock_orgno,baa.outstock_orgno,baa.process_type ")
                 .append(" FROM biz_allocateapply_detail bad LEFT JOIN biz_allocate_apply baa on bad.apply_no=baa.apply_no WHERE bad.delete_flag = :deleteFlag AND  bad.apply_no= :applyNo");
         Map<String, Object> params = Maps.newHashMap();
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);

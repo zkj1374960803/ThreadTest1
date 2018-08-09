@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.allocateapply.entity;
+package com.ccbuluo.business.platform.allocateapply.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -7,18 +7,14 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 申请详情
+ * 查询申请详单DTO
  * @author liuduo
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "BizAllocateapplyDetail", description = "申请详情")
-public class BizAllocateapplyDetail {
-    /**
-     * 
-     */
-    @ApiModelProperty(name = "id", value = "", hidden = true)
-    private Long id;
+@ApiModel(value = "QueryAllocateapplyDetailDTO", description = "查询申请详单DTO")
+public class QueryAllocateapplyDetailDTO {
+
     /**
      * 调拨申请单编号
      */
@@ -29,6 +25,11 @@ public class BizAllocateapplyDetail {
      */
     @ApiModelProperty(name = "productNo", value = "商品的编号")
     private String productNo;
+    /**
+     * 商品的名称
+     */
+    @ApiModelProperty(name = "productName", value = "商品的名称")
+    private String productName;
     /**
      * 商品类型（注：FITTINGS零配件，EQUIPMENT物料）
      */
@@ -65,42 +66,25 @@ public class BizAllocateapplyDetail {
     @ApiModelProperty(name = "supplierNo", value = "当集团采购时，可以设置供应商，将调拨申请单作为采购单")
     private String supplierNo;
     /**
-     * 创建人
+     * 供应商的名称
      */
-    @ApiModelProperty(name = "creator", value = "创建人", hidden = true)
-    private String creator;
-    /**
-     * 创建时间
-     */
-    @ApiModelProperty(name = "createTime", value = "创建时间", hidden = true)
-    private Date createTime;
-    /**
-     * 更新人
-     */
-    @ApiModelProperty(name = "operator", value = "更新人", hidden = true)
-    private String operator;
-    /**
-     * 更新时间
-     */
-    @ApiModelProperty(name = "operateTime", value = "更新时间", hidden = true)
-    private Date operateTime;
-    /**
-     * 删除标识
-     */
-    @ApiModelProperty(name = "deleteFlag", value = "删除标识", hidden = true)
-    private Long deleteFlag = 0L;
-    /**
-     * 备注
-     */
-    @ApiModelProperty(name = "remark", value = "备注", hidden = true)
-    private String remark;
+    @ApiModelProperty(name = "supplierName", value = "供应商的名称")
+    private String supplierName;
 
-    public void setId(Long id) {
-        this.id = id;
+    public String getProductName() {
+        return productName;
     }
 
-    public Long getId() {
-        return this.id;
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
     }
 
     public void setApplyNo(String applyNo) {
@@ -174,54 +158,6 @@ public class BizAllocateapplyDetail {
 
     public String getSupplierNo() {
         return this.supplierNo;
-    }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
-    public String getCreator() {
-        return this.creator;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getCreateTime() {
-        return this.createTime;
-    }
-
-    public void setOperator(String operator) {
-        this.operator = operator;
-    }
-
-    public String getOperator() {
-        return this.operator;
-    }
-
-    public void setOperateTime(Date operateTime) {
-        this.operateTime = operateTime;
-    }
-
-    public Date getOperateTime() {
-        return this.operateTime;
-    }
-
-    public void setDeleteFlag(Long deleteFlag) {
-        this.deleteFlag = deleteFlag;
-    }
-
-    public Long getDeleteFlag() {
-        return this.deleteFlag;
-    }
-
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-
-    public String getRemark() {
-        return this.remark;
     }
 
 
