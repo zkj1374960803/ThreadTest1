@@ -133,7 +133,7 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
     public FindAllocateApplyDTO findDetail(String applyNo) {
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.apply_no,a.apply_status,a.applyer_name,b.storehouse_name,b.storehouse_address, ")
-            .append(" a.create_time,a.process_type,b.servicecenter_code as 'instockOrgno',a.outstock_orgno ")
+            .append(" a.create_time,a.process_type,b.servicecenter_code as 'instockOrgno',a.outstock_orgno,a.in_repository_no as 'inRepositoryNo' ")
             .append(" FROM biz_allocate_apply a LEFT JOIN biz_service_storehouse b ON a.in_repository_no = b.storehouse_code ")
             .append(" WHERE a.apply_no = :applyNo ");
         HashMap<String, Object> map = Maps.newHashMap();

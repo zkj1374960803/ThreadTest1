@@ -89,7 +89,7 @@ public class RelOrdstockOccupy {
      * 删除标识
      */
     @ApiModelProperty(name = "deleteFlag", value = "删除标识", hidden = true)
-    private Integer deleteFlag = 0L;
+    private Integer deleteFlag = 0;
 
     public Long getId() {
         return id;
