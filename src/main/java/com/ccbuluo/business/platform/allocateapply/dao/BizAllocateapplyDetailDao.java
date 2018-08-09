@@ -107,9 +107,9 @@ public class BizAllocateapplyDetailDao extends BaseDao<BizAllocateapplyDetail> {
     public List<BizAllocateapplyDetail> getAllocateapplyDetailByapplyNo(String applyNo){
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,apply_no,product_no,product_type,product_categoryname,")
-                .append("apply_num,unit,sell_price,cost_price,supplier_no,creator,create_time,")
-                .append("operator,operate_time,delete_flag,remark")
-                .append(" FROM biz_allocateapply_detail WHERE delete_flag = :deleteFlag AND  apply_no= :applyNo");
+            .append("apply_num,unit,sell_price,cost_price,supplier_no,creator,create_time,")
+            .append("operator,operate_time,delete_flag,remark")
+            .append(" FROM biz_allocateapply_detail WHERE delete_flag = :deleteFlag AND  apply_no= :applyNo");
         Map<String, Object> params = Maps.newHashMap();
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         params.put("applyNo", applyNo);

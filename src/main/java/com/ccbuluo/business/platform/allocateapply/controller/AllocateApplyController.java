@@ -1,14 +1,12 @@
 package com.ccbuluo.business.platform.allocateapply.controller;
 
+import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateApply;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApply;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.*;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -34,6 +32,21 @@ public class AllocateApplyController extends BaseController {
     @PostMapping("/create")
     public StatusDto<String> createAllocateApply(@ApiParam(name = "bizAllocateApply", value = "创建申请json", required = true) @RequestBody BizAllocateApply bizAllocateApply){
         allocateApplyImpl.createAllocateApply(bizAllocateApply);
-        return null;
+        return StatusDto.buildSuccessStatusDto();
+    }
+
+    /**
+     * 查询申请单详情
+     * @param
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-08-08 17:02:58
+     */
+    @ApiOperation(value = "查询申请单详情", notes = "【张康健】")
+    @GetMapping("/detail")
+    @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query")
+    public StatusDto<FindAllocateApplyDTO> detail(String applyNo){
+        return StatusDto.buildDataSuccessStatusDto(allocateApplyImpl.findDetail(applyNo));
     }
 }

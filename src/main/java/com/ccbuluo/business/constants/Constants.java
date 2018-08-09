@@ -138,4 +138,12 @@ public class Constants {
      * 物料
      */
     public static final String PRODUCT_TYPE_EQUIPMENT = "EQUIPMENT";
+    /**
+     * TRANSFER调拨
+     */
+    public static final String PROCESS_TYPE_TRANSFER = "TRANSFER";
+    /**
+     * PURCHASE采购
+     */
+    public static final String PROCESS_TYPE_PURCHASE = "PURCHASE";
 }

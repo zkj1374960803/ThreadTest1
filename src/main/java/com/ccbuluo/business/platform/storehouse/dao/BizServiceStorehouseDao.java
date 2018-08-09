@@ -226,7 +226,7 @@ public class BizServiceStorehouseDao extends BaseDao<BizServiceStorehouse> {
 
         String sql = "SELECT servicecenter_code FROM biz_service_storehouse WHERE storehouse_code = :storeHouseCode";
 
-        return findForObject(sql, param, String.class);
+        return namedParameterJdbcTemplate.queryForObject(sql, param, String.class);
     }
 
     /**

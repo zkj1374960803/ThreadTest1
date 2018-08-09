@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import redis.clients.jedis.JedisCluster;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
  * @version v1.0.0
  * @date 2018-08-07 20:11:59
  */
+@Service
 public class GenerateDocCodeService {
 
     Logger logger = LoggerFactory.getLogger(GenerateProjectCodeService.class);
