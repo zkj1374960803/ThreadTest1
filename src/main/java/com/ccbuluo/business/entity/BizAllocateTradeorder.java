@@ -94,6 +94,11 @@ public class BizAllocateTradeorder {
      */
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
+    /**
+     *  采购类型
+     */
+    @ApiModelProperty(name = "tradeType", value = "交易类型（采购或是调拨）")
+    private String tradeType;
 
     public void setId(Long id) {
         this.id = id;
@@ -223,5 +228,11 @@ public class BizAllocateTradeorder {
         return this.remark;
     }
 
+    public String getTradeType() {
+        return tradeType;
+    }
 
+    public void setTradeType(String tradeType) {
+        this.tradeType = tradeType;
+    }
 }
