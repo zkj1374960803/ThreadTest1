@@ -296,6 +296,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             CusmanagerCarCountDTO cusmanagerCarCountDTO = carMap.get(queryUserListDTO.getUseruuid());
             if(bizServiceCustmanager != null){
                 queryUserListDTO.setVinNumber(bizServiceCustmanager.getVinNumber());
+                queryUserListDTO.setVinId(bizServiceCustmanager.getId());
             }
             if(cusmanagerCarCountDTO != null){
                 queryUserListDTO.setCarsNumber(Long.valueOf(cusmanagerCarCountDTO.getCarNum()));

@@ -23,6 +23,16 @@ public class QueryUserListDTO {
     private Long carsNumber;
     @ApiModelProperty(name = "materialsNumber", value = "物料领取数量")
     private Long materialsNumber;
+    @ApiModelProperty(name = "vinId", value = "维修车id")
+    private Long vinId;
+
+    public Long getVinId() {
+        return vinId;
+    }
+
+    public void setVinId(Long vinId) {
+        this.vinId = vinId;
+    }
 
     public String getName() {
         return name;
