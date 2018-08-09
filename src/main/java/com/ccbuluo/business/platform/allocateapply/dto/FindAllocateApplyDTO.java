@@ -61,6 +61,11 @@ public class FindAllocateApplyDTO {
     @ApiModelProperty(name = "instockOrgno", value = "入库组织架构(采购类型时，不必填)")
     private String instockOrgno;
     /**
+     * 入库仓库编号
+     */
+    @ApiModelProperty(name = "inRepositoryNo", value = "入库仓库编号")
+    private String inRepositoryNo;
+    /**
      * 入库组织架构
      */
     @ApiModelProperty(name = "instockOrgName", value = "入库的组织架构名称")
@@ -121,6 +126,14 @@ public class FindAllocateApplyDTO {
 
     public void setApplyerName(String applyerName) {
         this.applyerName = applyerName;
+    }
+
+    public String getInRepositoryNo() {
+        return inRepositoryNo;
+    }
+
+    public void setInRepositoryNo(String inRepositoryNo) {
+        this.inRepositoryNo = inRepositoryNo;
     }
 
     public String getProcessType() {
