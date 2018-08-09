@@ -88,7 +88,7 @@ public class BizAllocateTradeorder {
      * 删除标识
      */
     @ApiModelProperty(name = "deleteFlag", value = "删除标识")
-    private Long deleteFlag;
+    private Integer deleteFlag;
     /**
      * 备注
      */
@@ -207,11 +207,11 @@ public class BizAllocateTradeorder {
         return this.operateTime;
     }
 
-    public void setDeleteFlag(Long deleteFlag) {
+    public void setDeleteFlag(Integer deleteFlag) {
         this.deleteFlag = deleteFlag;
     }
 
-    public Long getDeleteFlag() {
+    public Integer getDeleteFlag() {
         return this.deleteFlag;
     }
 
