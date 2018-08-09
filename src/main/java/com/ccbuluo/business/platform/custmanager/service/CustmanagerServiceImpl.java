@@ -271,6 +271,10 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             return StatusDto.buildFailure(custManagerList.getMessage());
         }
         List<QueryUserListDTO> data = custManagerList.getData();
+        if(data == null || data.size() == 0){
+            Page<QueryUserListDTO> page = buildCustManagerData(userInfoStatusDto, custManagerList);
+            return StatusDto.buildDataSuccessStatusDto(page);
+        }
         List<String> useruudis = data.stream().map(QueryUserListDTO::getUseruuid).collect(Collectors.toList());
         // 查询维修车编号
         List<BizServiceCustmanager> vinList = bizServiceMaintaincarDao.queryVinNumberByuuid(useruudis);
