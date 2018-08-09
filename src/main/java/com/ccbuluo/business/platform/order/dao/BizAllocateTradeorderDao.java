@@ -2,12 +2,15 @@ package com.ccbuluo.business.platform.order.dao;
 
 
 import com.ccbuluo.business.entity.BizAllocateTradeorder;
+import com.ccbuluo.business.entity.RelOrdstockOccupy;
+import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelConfiguration;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -94,5 +97,43 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
         return super.updateForMap(sql.toString(), params);
+    }
+    /**
+     * 批量新增订单
+     * @param list 订单列表
+     * @exception
+     * @author weijb
+     * @Date 2018-08-08 17:37:32
+     */
+    public List<Long> batchInsertAllocateTradeorder(List<BizAllocateTradeorder> list){
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO biz_allocate_tradeorder ( order_no,apply_no,")
+                .append("purchaser_orgno,seller_orgno,order_status,total_price,payer,")
+                .append("pay_method,payed_time,creator,create_time,operator,operate_time,")
+                .append("delete_flag,remark,trade_type ) VALUES (  :orderNo, :applyNo, :purchaserOrgno,")
+                .append(" :sellerOrgno, :orderStatus, :totalPrice, :payer, :payMethod,")
+                .append(" :payedTime, :creator, :createTime, :operator, :operateTime,")
+                .append(" :deleteFlag, :remark ,:tradeType)");
+        List<Long> longs = super.batchInsertForListBean(sql.toString(), list);
+        return longs;
+    }
+
+    /**
+     * 批量新增订单占用库存关系
+     * @param list 订单占用库存关系
+     * @exception
+     * @author weijb
+     * @Date 2018-08-08 17:37:32
+     */
+    public List<Long> batchInsertRelOrdstockOccupy(List<RelOrdstockOccupy> list){
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO rel_ordstock_occupy ( order_type,doc_no,")
+                .append("stock_id,occupy_num,occupy_status,occupy_starttime,occupy_endtime,")
+                .append("creator,create_time,delete_flag )")
+                .append(" VALUES (  :orderType, :docNo, :stockId,")
+                .append(" :occupyNum, :occupyStatus, :occupyStarttime, :occupyEndtime, :creator,")
+                .append(" :createTime, :deleteFlag");
+        List<Long> longs = super.batchInsertForListBean(sql.toString(), list);
+        return longs;
     }
 }

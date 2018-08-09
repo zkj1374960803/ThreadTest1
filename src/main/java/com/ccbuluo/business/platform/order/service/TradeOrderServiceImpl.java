@@ -1,15 +1,15 @@
 package com.ccbuluo.business.platform.order.service;
 
 
+import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.DocCodePrefixEnum;
-import com.ccbuluo.business.entity.BizAllocateTradeorder;
-import com.ccbuluo.business.entity.BizStockDetail;
+import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
-import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateapplyDetail;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
+import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.http.StatusDto;
@@ -38,6 +38,8 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     private GenerateDocCodeService generateDocCodeService;
     @Resource
     BizAllocateTradeorderDao bizAllocateTradeorderDao;
+    @Resource
+    BizStockDetailDao bizStockDetailDao;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -50,20 +52,45 @@ public class TradeOrderServiceImpl implements TradeOrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     public int purchaseApplyHandle(String applyNo){
+        int flag = 0;
         try {
             // 根据申请单获取申请单详情
             List<AllocateapplyDetailDTO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
             if(null == details || details.size() == 0){
                 return 0;
             }
-            // 构建生成订单
-            BizAllocateTradeorder bizAllocateTradeorder = buildOrderEntity(details);
+            // 构建生成订单（机构1对平台）
+            BizAllocateTradeorder bizAllocateTradeorder1 = buildOrderEntity(details);
+            BizAllocateTradeorder bizAllocateTradeorder2 = buildOrderEntity(details);
+            bizAllocateTradeorder1.setSellerOrgno("平台code");// 从买方到平台
+            bizAllocateTradeorder2.setPurchaserOrgno("平台code");// 从平台到卖方
+            List<BizAllocateTradeorder> list = new ArrayList<BizAllocateTradeorder>();
+            bizAllocateTradeorder2.setSellerOrgno("");// (供应商不填为空)
+            list.add(bizAllocateTradeorder1);// 从买方到平台
+            list.add(bizAllocateTradeorder2);// 从平台到卖方
+            //构建出库和入库计划
+            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pair = buildOutAndInstockplanDetail(details, bizAllocateTradeorder1.getPurchaserOrgno(), bizAllocateTradeorder1.getSellerOrgno());
             // 保存生成订单
-            return bizAllocateTradeorderDao.saveEntity(bizAllocateTradeorder);
+            bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
+            //保存出库计划
+            //保存入库计划
+            flag =1;
         } catch (Exception e) {
             logger.error("提交失败！", e);
             throw e;
         }
+        return flag;
+    }
+
+    /**
+     *  构建出库和入库计划
+     * @param details 申请单详情
+     * @param purchaserOrgno 买方机构code
+     * @paarm sellerOrgno 卖方机构code
+     * @return
+     */
+    private Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> buildOutAndInstockplanDetail(List<AllocateapplyDetailDTO> details, String purchaserOrgno, String sellerOrgno){
+        return Pair.of(null, null);
     }
 
     /**
@@ -74,7 +101,38 @@ public class TradeOrderServiceImpl implements TradeOrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     public int allocateApplyHandle(String applyNo){
-        return 0;
+        int flag = 0;
+        try {
+            // 根据申请单获取申请单详情
+            List<AllocateapplyDetailDTO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
+            if(null == details || details.size() == 0){
+                return 0;
+            }
+            // 构建生成订单（机构1对平台）
+            BizAllocateTradeorder bizAllocateTradeorder1 = buildOrderEntity(details);
+            BizAllocateTradeorder bizAllocateTradeorder2 = buildOrderEntity(details);
+            bizAllocateTradeorder1.setSellerOrgno("平台code");// 从买方到平台
+            bizAllocateTradeorder2.setPurchaserOrgno("平台code");// 从平台到卖方
+            List<BizAllocateTradeorder> list = new ArrayList<BizAllocateTradeorder>();
+            list.add(bizAllocateTradeorder1);// 从买方到平台
+            list.add(bizAllocateTradeorder2);// 从平台到卖方
+            // 保存生成订单
+            bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
+            // 构建占用库存和订单占用库存关系
+            Pair<List<BizStockDetail>, List<RelOrdstockOccupy>> pair = buildStockAndRelOrdEntity(details,bizAllocateTradeorder2.getSellerOrgno());
+            List<BizStockDetail> stockDetailList = pair.getLeft();
+            // 构建订单占用库存关系
+            List<RelOrdstockOccupy> relOrdstockOccupies = pair.getRight();
+            // 保存占用库存
+            bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
+            // 保存订单占用库存关系
+            bizAllocateTradeorderDao.batchInsertRelOrdstockOccupy(relOrdstockOccupies);
+            flag =1;
+        } catch (Exception e) {
+            logger.error("提交失败！", e);
+            throw e;
+        }
+        return flag;
     }
 
     // 构建生成订单
@@ -94,6 +152,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             bt.setApplyNo(bd.getApplyNo());// 申请单编号
             bt.setPurchaserOrgno(bd.getInstockOrgno());//买方机构
             bt.setSellerOrgno(bd.getOutstockOrgno());//卖方机构
+            bt.setTradeType(bd.getProcessType());//交易类型
             break;
         }
         // 计算订单总价
@@ -109,10 +168,92 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         }
         return bigDecimal;
     }
+    /**
+     * 构建占用库存和订单占用库存关系
+     * @param details 申请单详情
+     * @param sellerOrgno 卖方机构code
+     * @author weijb
+     * @date 2018-08-08 17:55:41
+     */
+    private Pair<List<BizStockDetail>, List<RelOrdstockOccupy>>  buildStockAndRelOrdEntity(List<AllocateapplyDetailDTO> details, String sellerOrgno){
+        //订单占用库存关系
+        List<RelOrdstockOccupy> relOrdstockOccupies = new ArrayList<RelOrdstockOccupy>();
+        // 根据卖方code和商品code（list）查出库存列表
+        List<String> codeList = getProductList(details);
+        //查询库存列表
+        List<BizStockDetail> stockDetails = bizStockDetailDao.getStockDetailListByOrgAndProduct(sellerOrgno, codeList);
+        for(BizStockDetail ad : stockDetails){// 遍历库存
+            //占用库存
+            Long occupyStockNum = convertStockDetail(details, ad);
+            //构建订单占用库存关系
+            RelOrdstockOccupy ro = new RelOrdstockOccupy();
+            ro.setOrderType("调拨");//订单类型TODO这里肯定是调拨，采购不占用库存，这个字段是不是没有意义
+            ro.setDocNo(ad.getTradeNo());//申请单号
+            ro.setStockId(ad.getId());//库存id
+            ro.setOccupyNum(occupyStockNum);//占用数量
+            ro.setOccupyStatus("占用中");//占用状态occupy_status
+            Date time = new Date();
+            ro.setOccupyStarttime(time);//占用开始时间
+            ro.setCreator(userHolder.getLoggedUserId());//创建人
+            ro.setCreateTime(time);//创建时间
+            ro.setDeleteFlag(Constants.DELETE_FLAG_NORMAL);//删除标识
+            relOrdstockOccupies.add(ro);
+        }
+        return Pair.of(stockDetails, relOrdstockOccupies);
+    }
+    // 获取商品code
+    private List<String> getProductList(List<AllocateapplyDetailDTO> details){
+        List<String> list = new ArrayList<String>();
+        for(AllocateapplyDetailDTO ad : details){
+            list.add(ad.getProductNo());
+        }
+        return list;
+    }
 
-    // 构建占用库存
-    private List<BizStockDetail> buildStockEntity(List<AllocateapplyDetailDTO> details){
-        return null;
+    /**
+     * 遍历库存并转换可用库存
+     * @param details 申请单详情
+     * @param stockDetail 库存对象
+     * @author weijb
+     * @date 2018-08-08 17:55:41
+     */
+    private Long convertStockDetail(List<AllocateapplyDetailDTO> details, BizStockDetail stockDetail){
+        Long occupyStockNum = 0l;//占用数量
+        for(AllocateapplyDetailDTO ad : details){
+            if(ad.getProductNo().equals(stockDetail.getProductNo())){// 找到对应商品
+                // 调拨申请数量
+                Long applyNum = ad.getApplyNum();
+                if(applyNum.intValue() == 0){// 库存有多批次重复的商品，那么下次遍历的时候就不用作处理了
+                    continue;
+                }
+                // 有效库存
+                Long validStock = stockDetail.getValidStock();
+                if(validStock.intValue() == applyNum.intValue()){// 如果本批次的库存正好等于要调拨的数量
+                    validStock = 0l;// 剩余库存为零
+                    ad.setApplyNum(0l);//需要调拨的数量也设置为零
+                    //记录占用数量
+                    occupyStockNum = validStock;
+                }
+                if(validStock.intValue() < applyNum.intValue()){// 如果本批次的库存缺少
+                    validStock = 0l;// 剩余库存为零
+                    ad.setApplyNum(applyNum - validStock);// 下次再有库存过来的时候，就会减去剩下的调拨商品数量
+                    //记录占用数量
+                    occupyStockNum = validStock;
+                }
+                if(validStock.intValue() > applyNum.intValue()){// 如果本批次的库存充足
+                    validStock = applyNum - validStock;// 剩余库存为零
+                    ad.setApplyNum(0l);//需要调拨的数量也设置为零,下次再有库存过来的时候就不操作了
+                    //记录占用数量
+                    occupyStockNum = applyNum;
+                }
+                // 占用库存
+                stockDetail.setOccupyStock(applyNum);
+                // 有效库存
+                stockDetail.setValidStock(validStock);
+                break;
+            }
+        }
+        return occupyStockNum;
     }
 
 }

@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.stockdetail.dao;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
@@ -7,6 +8,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -102,5 +104,39 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
         return super.updateForMap(sql.toString(), params);
+    }
+
+    /**
+     * 根据卖方code和商品code（list）查出库存列表
+     * @param sellerOrgno 卖方机构code
+     * @param codes 商品codes（list）
+     * @author weijb
+     * @date 2018-08-07 13:55:41
+     */
+    public List<BizStockDetail> getStockDetailListByOrgAndProduct(String sellerOrgno, List<String> codes){
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,repository_no,org_no,product_no,product_type,trade_no,")
+                .append("supplier_no,valid_stock,occupy_stock,problem_stock,damaged_stock,")
+                .append("transit_stock,freeze_stock,seller_orgno,cost_price,instock_planid,")
+                .append("latest_correct_time,creator,create_time,operator,operate_time,")
+                .append("delete_flag,remark FROM biz_stock_detail WHERE delete_flag = :deleteFlag and org_no= :sellerOrgno and product_no IN(:codes) ")
+                .append(" order by create_time");//先进先出排序取出，按创建时间的正序排列
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        params.put("sellerOrgno", sellerOrgno);
+        params.put("codes", codes);
+        return super.queryListBean(BizStockDetail.class, sql.toString(), params);
+    }
+
+    /**
+     * 根据仓库明细id更新仓库的有效库存和占用库存
+     * @param stockDetailList 仓库详情list
+     * @exception
+     * @author weijb
+     * @date 2018-08-08 19:59:51
+     */
+    public int batchUpdateStockDetil(List<BizStockDetail> stockDetailList){
+        String sql = "update biz_stock_detail set valid_stock=:validStock, occupy_stock=:occupyStock where id=:id";
+        return batchUpdateForListBean(sql, stockDetailList);
     }
 }
