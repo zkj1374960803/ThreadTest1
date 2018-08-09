@@ -2,11 +2,14 @@ package com.ccbuluo.business.platform.allocateapply.dao;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateApply;
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateapplyDetail;
 import com.ccbuluo.dao.BaseDao;
+import com.ccbuluo.db.Page;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -158,5 +161,32 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
         params.put("applyNo", applyNo);
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         return queryListBean(QueryAllocateapplyDetailDTO.class, sql.toString(), params);
+    }
+    /**
+     * 查询申请列表
+     * @param useruudis 用户的uuid
+     * @return Page<QueryAllocateApplyListDTO> 分页的信息
+     * @author zhangkangjian
+     * @date 2018-08-09 10:36:34
+     */
+    public Page<QueryAllocateApplyListDTO> findApplyList(String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize, List<String> useruudis) {
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("useruudis", useruudis);
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT a.apply_no,a.applyer_name,a.create_time,a.process_type,a.apply_status ")
+            .append(" FROM biz_allocate_apply a WHERE 1 = 1 ");
+        if(useruudis != null && useruudis.size() > 0){
+            sql.append(" AND a.applyer IN (:useruudis) ");
+        }
+        if(StringUtils.isNotBlank(processType)){
+            sql.append(" AND a.process_type = :processType ");
+        }
+        if(StringUtils.isNotBlank(applyStatus)){
+            sql.append(" AND a.apply_status = :applyStatus ");
+        }
+        if(StringUtils.isNotBlank(applyNo)){
+            sql.append(" AND a.apply_no = :applyNo ");
+        }
+        return queryPageForBean(QueryAllocateApplyListDTO.class, sql.toString(), map, offset, pageSize);
     }
 }

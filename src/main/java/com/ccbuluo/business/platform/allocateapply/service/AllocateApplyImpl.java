@@ -6,23 +6,30 @@ import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.DocCodePrefixEnum;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateApply;
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateapplyDetail;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.core.common.UserHolder;
+import com.ccbuluo.core.constants.SystemPropertyHolder;
 import com.ccbuluo.core.entity.BusinessUser;
 import com.ccbuluo.core.entity.Organization;
+import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
+import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftBean;
 import com.ccbuluo.http.StatusDtoThriftList;
 import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
+import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
 import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
+import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +55,8 @@ public class AllocateApplyImpl implements AllocateApply{
     GenerateDocCodeService generateDocCodeService;
     @ThriftRPCClient("UserCoreSerService")
     private BasicUserOrganizationService basicUserOrganizationService;
+    @ThriftRPCClient("UserCoreSerService")
+    private InnerUserInfoService innerUserInfoService;
 //    BasicMerchandiseSer
     @ThriftRPCClient("BasicMerchandiseSer")
     private CarpartsProductService carpartsProductService;
@@ -158,5 +167,59 @@ public class AllocateApplyImpl implements AllocateApply{
         }
         allocateApplyDTO.setQueryAllocateapplyDetailDTO(queryAllocateapplyDetailDTOS);
         return allocateApplyDTO;
+    }
+
+    /**
+     * 查询申请列表
+     * @return Page<QueryAllocateApplyListDTO> 分页的信息
+     * @author zhangkangjian
+     * @date 2018-08-09 10:36:34
+     */
+    @Override
+    public Page<QueryAllocateApplyListDTO> findApplyList(String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize) {
+        BusinessUser loggedUser = userHolder.getLoggedUser();
+        Page<QueryAllocateApplyListDTO> page = null;
+        if(loggedUser != null){
+            Organization organization = loggedUser.getOrganization();
+            if(organization == null){
+                throw new CommonException(Constants.ERROR_CODE, loggedUser.getName() + ":组织架构数据异常");
+            }
+            String orgCode = organization.getOrgCode();
+            if(StringUtils.isBlank(orgCode)){
+                throw new CommonException(Constants.ERROR_CODE, loggedUser.getName() + ":组织架构数据异常");
+            }
+            // 根据组织架构code查询人员的信息
+            UserInfoDTO userInfoDTO = new UserInfoDTO();
+            userInfoDTO.setAppId(SystemPropertyHolder.getBaseAppid());
+            userInfoDTO.setSecretId(SystemPropertyHolder.getBaseSecret());
+            userInfoDTO.setOrgCode(orgCode);
+            StatusDtoThriftList<UserInfoDTO> userInfoDTOs = innerUserInfoService.queryUserListByOrgCode(userInfoDTO);
+            StatusDto<List<UserInfoDTO>> resolve = StatusDtoThriftUtils.resolve(userInfoDTOs, UserInfoDTO.class);
+            List<UserInfoDTO> userInfoDTOList = resolve.getData();
+            if(userInfoDTOList != null && userInfoDTOList.size() > 0){
+                List<String> useruudis = userInfoDTOList.stream().map(UserInfoDTO::getUseruuid).collect(Collectors.toList());
+                // 查询分页的申请列表
+                page = bizAllocateApplyDao.findApplyList(processType, applyStatus, applyNo, offset, pageSize,useruudis);
+            }
+        }
+        return page;
+    }
+
+    /**
+     * 查询处理申请列表
+     *
+     * @param processType
+     * @param applyStatus
+     * @param applyNo
+     * @param offset
+     * @param pageSize
+     * @return Page<QueryAllocateApplyListDTO> 分页的信息
+     * @throws
+     * @author zhangkangjian
+     * @date 2018-08-09 10:36:34
+     */
+    @Override
+    public Page<QueryAllocateApplyListDTO> findProcessApplyList(String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize) {
+        return null;
     }
 }

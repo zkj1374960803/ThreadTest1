@@ -1,7 +1,9 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateApply;
+import com.ccbuluo.db.Page;
 
 /**
  * @author zhangkangjian
@@ -23,4 +25,22 @@ public interface AllocateApply {
      * @date 2018-08-08 17:19:17
      */
     FindAllocateApplyDTO findDetail(String applyNo);
+    /**
+     * 查询申请列表
+     * @param
+     * @exception
+     * @return Page<QueryAllocateApplyListDTO> 分页的信息
+     * @author zhangkangjian
+     * @date 2018-08-09 10:36:34
+     */
+    Page<QueryAllocateApplyListDTO> findApplyList(String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize);
+    /**
+     * 查询处理申请列表
+     * @param
+     * @exception
+     * @return Page<QueryAllocateApplyListDTO> 分页的信息
+     * @author zhangkangjian
+     * @date 2018-08-09 10:36:34
+     */
+    Page<QueryAllocateApplyListDTO> findProcessApplyList(String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize);
 }

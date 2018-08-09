@@ -8,7 +8,7 @@ import java.util.Date;
 
 /**
  * 查询申请详单DTO
- * @author liuduo
+ * @author zhangkangjian
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
