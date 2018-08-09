@@ -12,67 +12,67 @@ import java.util.List;
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "物料和零配件调拨的申请实体", description = "物料和零配件调拨的申请")
+@ApiModel(value = "BizAllocateApply", description = "物料和零配件调拨的申请")
 public class BizAllocateApply {
     /**
      * 
      */
-    @ApiModelProperty(name = "id", value = "")
+    @ApiModelProperty(name = "id", value = "", hidden = true)
     private Long id;
     /**
      * 申请单的编号
      */
-    @ApiModelProperty(name = "applyNo", value = "申请单的编号")
+    @ApiModelProperty(name = "applyNo", value = "申请单的编号", hidden = true)
     private String applyNo;
     /**
      * 发起申请的机构编号
      */
-    @ApiModelProperty(name = "applyorgNo", value = "发起申请的机构编号")
+    @ApiModelProperty(name = "applyorgNo", value = "发起申请的机构编号", hidden = true)
     private String applyorgNo;
     /**
      * 申请人的uuid
      */
-    @ApiModelProperty(name = "applyer", value = "申请人的uuid")
+    @ApiModelProperty(name = "applyer", value = "申请人的uuid", hidden = true)
     private String applyer;
+    /**
+     * 入库组织架构编号
+     */
+    @ApiModelProperty(name = "instockOrgno", value = "入库组织架构编号", hidden = true)
+    private String instockOrgno;
     /**
      * 入库仓库编号
      */
-    @ApiModelProperty(name = "instockOrgno", value = "入库仓库编号")
-    private String instockOrgno;
-    /**
-     * 出库仓库编号
-     */
-    @ApiModelProperty(name = "inRepositoryNo", value = "出库仓库编号")
+    @ApiModelProperty(name = "inRepositoryNo", value = "入库仓库编号")
     private String inRepositoryNo;
     /**
      * 出库的机构的类型
      */
-    @ApiModelProperty(name = "outstockOrgtype", value = "出库的机构的类型")
+    @ApiModelProperty(name = "outstockOrgtype", value = "出库的机构的类型(采购类型，不必填)", hidden = true)
     private String outstockOrgtype;
     /**
      * 出库的组织架构
      */
-    @ApiModelProperty(name = "outstockOrgno", value = "出库的组织架构")
+    @ApiModelProperty(name = "outstockOrgno", value = "出库的组织架构(采购类型时，不必填)")
     private String outstockOrgno;
     /**
      * 处理申请人的uuid
      */
-    @ApiModelProperty(name = "applyProcessor", value = "处理申请人的uuid")
+    @ApiModelProperty(name = "applyProcessor", value = "处理申请人的uuid", hidden = true)
     private String applyProcessor;
     /**
      * 处理申请的时间
      */
-    @ApiModelProperty(name = "processTime", value = "处理申请的时间")
+    @ApiModelProperty(name = "processTime", value = "处理申请的时间", hidden = true)
     private Date processTime;
     /**
      * 平台决定的处理类型：调拨、采购
      */
-    @ApiModelProperty(name = "processType", value = "平台决定的处理类型：调拨、采购")
+    @ApiModelProperty(name = "processType", value = "平台决定的处理类型(注：TRANSFER调拨、PURCHASE采购)")
     private String processType;
     /**
      * 待处理、申请撤销、等待付款、等待发货、（平台待出入库只用在平台端）、等待收货、确认收货、申请完成
      */
-    @ApiModelProperty(name = "applyStatus", value = "待处理、申请撤销、等待付款、等待发货、（平台待出入库只用在平台端）、等待收货、确认收货、申请完成")
+    @ApiModelProperty(name = "applyStatus", value = "10待处理、15申请撤销、20等待付款、30等待发货、40 50（平台待出入库只用在平台端）、60等待收货、70确认收货、80申请完成", hidden = true)
     private String applyStatus;
     /**
      * 创建人

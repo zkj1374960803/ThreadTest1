@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
+import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateApply;
 
 /**
@@ -14,4 +15,12 @@ public interface AllocateApply {
      * @date 2018-08-07 20:54:24
      */
     void createAllocateApply(BizAllocateApply bizAllocateApply);
+    /**
+     * 查询申请单详情
+     * @param applyNo 申请单号
+     * @return BizAllocateApply 申请单详情
+     * @author zhangkangjian
+     * @date 2018-08-08 17:19:17
+     */
+    FindAllocateApplyDTO findDetail(String applyNo);
 }
