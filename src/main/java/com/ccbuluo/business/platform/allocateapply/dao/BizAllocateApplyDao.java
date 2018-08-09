@@ -164,19 +164,46 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
     }
     /**
      * 查询申请列表
-     * @param useruudis 用户的uuid
+     * @param userOrgCode 用户机构
      * @return Page<QueryAllocateApplyListDTO> 分页的信息
      * @author zhangkangjian
      * @date 2018-08-09 10:36:34
      */
-    public Page<QueryAllocateApplyListDTO> findApplyList(String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize, List<String> useruudis) {
+    public Page<QueryAllocateApplyListDTO> findApplyList(String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode) {
         HashMap<String, Object> map = Maps.newHashMap();
-        map.put("useruudis", useruudis);
+        map.put("userOrgCode", userOrgCode);
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.apply_no,a.applyer_name,a.create_time,a.process_type,a.apply_status ")
             .append(" FROM biz_allocate_apply a WHERE 1 = 1 ");
-        if(useruudis != null && useruudis.size() > 0){
-            sql.append(" AND a.applyer IN (:useruudis) ");
+        if(StringUtils.isNotBlank(userOrgCode)){
+            sql.append(" AND a.applyorg_no = :userOrgCode ");
+        }
+        if(StringUtils.isNotBlank(processType)){
+            sql.append(" AND a.process_type = :processType ");
+        }
+        if(StringUtils.isNotBlank(applyStatus)){
+            sql.append(" AND a.apply_status = :applyStatus ");
+        }
+        if(StringUtils.isNotBlank(applyNo)){
+            sql.append(" AND a.apply_no = :applyNo ");
+        }
+        return queryPageForBean(QueryAllocateApplyListDTO.class, sql.toString(), map, offset, pageSize);
+    }
+    /**
+     * 查询申请列表
+     * @param userOrgCode 用户机构
+     * @return Page<QueryAllocateApplyListDTO> 分页的信息
+     * @author zhangkangjian
+     * @date 2018-08-09 10:36:34
+     */
+    public Page<QueryAllocateApplyListDTO> findProcessApplyList(String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode) {
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("userOrgCode", userOrgCode);
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT a.apply_no,a.applyer_name,a.create_time,a.process_type,a.apply_status ")
+            .append(" FROM biz_allocate_apply a WHERE 1 = 1 ");
+        if(StringUtils.isNotBlank(userOrgCode)){
+            sql.append(" AND a.outstock_orgno = :userOrgCode ");
         }
         if(StringUtils.isNotBlank(processType)){
             sql.append(" AND a.process_type = :processType ");

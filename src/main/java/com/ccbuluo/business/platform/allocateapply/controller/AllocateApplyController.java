@@ -95,4 +95,19 @@ public class AllocateApplyController extends BaseController {
         return StatusDto.buildDataSuccessStatusDto(page);
     }
 
+    /**
+     * 查询客户经理类型下拉框
+     * @param
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-08-09 16:58:03
+     */
+    @ApiOperation(value = "查询客户经理类型下拉框", notes = "【张康健】")
+    @GetMapping("/querycustmanagerlist")
+
+    public StatusDto<Page<QueryAllocateApplyListDTO>> queryCustManagerList(){
+
+        return null;
+    }
 }

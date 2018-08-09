@@ -57,7 +57,6 @@ public class AllocateApplyImpl implements AllocateApply{
     private BasicUserOrganizationService basicUserOrganizationService;
     @ThriftRPCClient("UserCoreSerService")
     private InnerUserInfoService innerUserInfoService;
-//    BasicMerchandiseSer
     @ThriftRPCClient("BasicMerchandiseSer")
     private CarpartsProductService carpartsProductService;
 
@@ -102,7 +101,11 @@ public class AllocateApplyImpl implements AllocateApply{
                 bizAllocateApply.setOutstockOrgtype(data.getOrgType());
             }
         }
-
+        // 如果是采购类型的，入库机构是平台
+        String processType = bizAllocateApply.getProcessType();
+        if(Constants.PROCESS_TYPE_PURCHASE.equals(processType)){
+            bizAllocateApply.setApplyorgNo(BusinessPropertyHolder.TOP_SERVICECENTER);
+        }
         // 保存申请单基础数据
         bizAllocateApplyDao.saveEntity(bizAllocateApply);
         // 保存申请单详情数据
@@ -177,8 +180,21 @@ public class AllocateApplyImpl implements AllocateApply{
      */
     @Override
     public Page<QueryAllocateApplyListDTO> findApplyList(String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize) {
+        // 获取用户的组织机构
+        String userOrgCode = getUserOrgCode();
+        // 查询分页的申请列表
+        Page<QueryAllocateApplyListDTO> page = bizAllocateApplyDao.findApplyList(processType, applyStatus, applyNo, offset, pageSize, userOrgCode);
+        return page;
+    }
+
+    /**
+     * 获取用户的组织机构
+     * @return String 用户的orgCode
+     * @author zhangkangjian
+     * @date 2018-08-09 15:38:41
+     */
+    private String getUserOrgCode() {
         BusinessUser loggedUser = userHolder.getLoggedUser();
-        Page<QueryAllocateApplyListDTO> page = null;
         if(loggedUser != null){
             Organization organization = loggedUser.getOrganization();
             if(organization == null){
@@ -188,21 +204,9 @@ public class AllocateApplyImpl implements AllocateApply{
             if(StringUtils.isBlank(orgCode)){
                 throw new CommonException(Constants.ERROR_CODE, loggedUser.getName() + ":组织架构数据异常");
             }
-            // 根据组织架构code查询人员的信息
-            UserInfoDTO userInfoDTO = new UserInfoDTO();
-            userInfoDTO.setAppId(SystemPropertyHolder.getBaseAppid());
-            userInfoDTO.setSecretId(SystemPropertyHolder.getBaseSecret());
-            userInfoDTO.setOrgCode(orgCode);
-            StatusDtoThriftList<UserInfoDTO> userInfoDTOs = innerUserInfoService.queryUserListByOrgCode(userInfoDTO);
-            StatusDto<List<UserInfoDTO>> resolve = StatusDtoThriftUtils.resolve(userInfoDTOs, UserInfoDTO.class);
-            List<UserInfoDTO> userInfoDTOList = resolve.getData();
-            if(userInfoDTOList != null && userInfoDTOList.size() > 0){
-                List<String> useruudis = userInfoDTOList.stream().map(UserInfoDTO::getUseruuid).collect(Collectors.toList());
-                // 查询分页的申请列表
-                page = bizAllocateApplyDao.findApplyList(processType, applyStatus, applyNo, offset, pageSize,useruudis);
-            }
+            return orgCode;
         }
-        return page;
+        return StringUtils.EMPTY;
     }
 
     /**
@@ -214,12 +218,14 @@ public class AllocateApplyImpl implements AllocateApply{
      * @param offset
      * @param pageSize
      * @return Page<QueryAllocateApplyListDTO> 分页的信息
-     * @throws
      * @author zhangkangjian
      * @date 2018-08-09 10:36:34
      */
     @Override
     public Page<QueryAllocateApplyListDTO> findProcessApplyList(String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize) {
-        return null;
+        String userOrgCode = getUserOrgCode();
+        // 查询分页的申请列表
+        Page<QueryAllocateApplyListDTO> page = bizAllocateApplyDao.findProcessApplyList(processType, applyStatus, applyNo, offset, pageSize, userOrgCode);
+        return page;
     }
 }
