@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.allocateapply.service;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.constants.DocCodePrefixEnum;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateapplyDetailDTO;
@@ -64,7 +65,7 @@ public class AllocateApplyImpl implements AllocateApply{
         bizAllocateApply.setApplyer(loggedUserId);
         String orgCode = bizServiceStorehouseDao.getOrgCodeByStoreHouseCode(bizAllocateApply.getInRepositoryNo());
         bizAllocateApply.setInstockOrgno(orgCode);
-        StatusDto<String> stringStatusDto = generateDocCodeService.grantCodeByPrefix(CodePrefixEnum.SW);
+        StatusDto<String> stringStatusDto = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.SW);
         bizAllocateApply.setApplyNo(stringStatusDto.getData());
         BusinessUser loggedUser = userHolder.getLoggedUser();
         if(loggedUser != null){
