@@ -1,5 +1,7 @@
-package com.ccbuluo.business.entity;
+package com.ccbuluo.business.platform.instock.dto;
 
+import com.ccbuluo.business.entity.AftersaleCommonEntity;
+import com.ccbuluo.business.entity.BizInstockorderDetail;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -13,7 +15,7 @@ import java.util.List;
  * @version V1.0.0
  */
 @ApiModel(value = "入库单实体", description = "入库单实体")
-public class BizInstockOrder extends AftersaleCommonEntity{
+public class SaveBizInstockOrderDTO extends AftersaleCommonEntity{
     /**
      * 入库单编号
      */
@@ -62,8 +64,15 @@ public class BizInstockOrder extends AftersaleCommonEntity{
     /**
      * 复核完成时间
      */
-    @ApiModelProperty(name = "checkedTime", value = "复核完成时间")
-    private Date checkedTime;
+    @ApiModelProperty(name = "ceeckedTime", value = "复核完成时间")
+    private Date ceeckedTime;
+
+    /**
+     * 入库单详情
+     */
+    @ApiModelProperty(name = "instockorderDetailList", value = "入库单详情")
+    private List<BizInstockorderDetail> instockorderDetailList;
+
 
     public void setInstockOrderno(String instockOrderno) {
         this.instockOrderno = instockOrderno;
@@ -129,12 +138,12 @@ public class BizInstockOrder extends AftersaleCommonEntity{
         return this.checked;
     }
 
-    public Date getCheckedTime() {
-        return checkedTime;
+    public void setCeeckedTime(Date ceeckedTime) {
+        this.ceeckedTime = ceeckedTime;
     }
 
-    public void setCheckedTime(Date checkedTime) {
-        this.checkedTime = checkedTime;
+    public Date getCeeckedTime() {
+        return this.ceeckedTime;
     }
 
     public String getInstockOrgno() {
@@ -145,4 +154,11 @@ public class BizInstockOrder extends AftersaleCommonEntity{
         this.instockOrgno = instockOrgno;
     }
 
+    public List<BizInstockorderDetail> getInstockorderDetailList() {
+        return instockorderDetailList;
+    }
+
+    public void setInstockorderDetailList(List<BizInstockorderDetail> instockorderDetailList) {
+        this.instockorderDetailList = instockorderDetailList;
+    }
 }

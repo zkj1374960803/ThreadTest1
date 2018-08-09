@@ -124,6 +124,11 @@ public class BizOutstockplanDetail {
      */
     @ApiModelProperty(name = "productCategoryname", value = "商品分类名称,多级逗号隔开")
     private String productCategoryname;
+    /**
+     * 乐观锁使用的版本号
+     */
+    @ApiModelProperty(name = "versionNo", value = "乐观锁使用的版本号")
+    private Integer versionNo;
 
     public void setId(Long id) {
         this.id = id;
@@ -301,5 +306,11 @@ public class BizOutstockplanDetail {
         return this.productCategoryname;
     }
 
+    public Integer getVersionNo() {
+        return versionNo;
+    }
 
+    public void setVersionNo(Integer versionNo) {
+        this.versionNo = versionNo;
+    }
 }

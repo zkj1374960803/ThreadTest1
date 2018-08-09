@@ -114,6 +114,11 @@ public class BizInstockplanDetail {
      */
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
+    /**
+     * 乐观锁使用的版本号
+     */
+    @ApiModelProperty(name = "versionNo", value = "乐观锁使用的版本号")
+    private Integer versionNo;
 
     public void setId(Long id) {
         this.id = id;
@@ -275,5 +280,11 @@ public class BizInstockplanDetail {
         return this.remark;
     }
 
+    public Integer getVersionNo() {
+        return versionNo;
+    }
 
+    public void setVersionNo(Integer versionNo) {
+        this.versionNo = versionNo;
+    }
 }
