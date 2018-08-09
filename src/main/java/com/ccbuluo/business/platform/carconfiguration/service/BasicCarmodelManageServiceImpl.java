@@ -80,7 +80,7 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
     @Override
     public Page<CarmodelManageDTO> queryPageForCarModelManage(Long carbrandId, Long carseriesId, Integer status, String carmodelName, int offset, int limit) {
         Page<CarmodelManageDTO> carmodelManageDTOPage = this.basicCarmodelManageDao.queryPageForCarModelManage(carbrandId, carseriesId, status,carmodelName, offset, limit);
-        //拼装车系
+        // 拼装车系
         buildCarseriesManage(carmodelManageDTOPage);
         return carmodelManageDTOPage;
     }
@@ -140,18 +140,18 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
             }
             CarmodelManage carmodelManage = buildCarModelManage(carmodelManageDTO);
             StatusDto<String> _statusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FH);
-            //获取code失败
+            // 获取code失败
             if(!_statusDto.isSuccess()){
                 return _statusDto;
             }
             carmodelManage.setCarmodelNumber(_statusDto.getData());
-            //保存车型主体信息
+            // 保存车型主体信息
             long carmodelId = this.basicCarmodelManageDao.create(carmodelManage);
             List<CarmodelConfiguration> configurations = carmodelManageDTO.getConfigurations();
             for (CarmodelConfiguration configuration : configurations){
                 configuration.setCarmodelId(carmodelId);
             }
-            //车型具体配置表（车身颜色变速箱、排量等）包括车型配置id，以及选择的某些部分配置参数parameter_value
+            // 车型具体配置表（车身颜色变速箱、排量等）包括车型配置id，以及选择的某些部分配置参数parameter_value
             this.basicCarmodelConfigurationDao.batchCreate(carmodelManageDTO.getConfigurations());
 
             return StatusDto.buildSuccessStatusDto("车型新增成功！！！");
@@ -311,7 +311,7 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
      */
     @Override
     public StatusDto deleteCarmodelManageById(Long id){
-        //被车辆引用过的车型不能删除
+        // 被车辆引用过的车型不能删除
         StatusDto statusDto = findCarmodelListById(id);
         if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
             return statusDto;
@@ -348,7 +348,7 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
         if(list.size() == 0){
             return;
         }
-        //获取车型列表（包括删除的）
+        // 获取车型列表（包括删除的）
         List<Map<String, Object>> mList = basicCarmodelManageDao.queryAllCarMobelList();
         for(BasicCarpartsProductDTO bd : list){
             for(Map<String, Object> map : mList){

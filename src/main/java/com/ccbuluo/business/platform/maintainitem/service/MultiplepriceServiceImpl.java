@@ -69,6 +69,7 @@ public class MultiplepriceServiceImpl implements MultiplepriceService{
                         bizServiceMultipleprice.setMultiple(saveBizServiceMultiplepriceDTO.getMultiple());
                         bizServiceMultipleprice.setCityCode(correspondAreaDTO.getCityCode());
                         bizServiceMultipleprice.setMaintainitemCode(saveBizServiceMultiplepriceDTO.getMaintainitemCode());
+                        bizServiceMultipleprice.setDeleteFlag(Constants.DELETE_FLAG_NORMAL);
                         bizServiceMultiplepriceDao.update(bizServiceMultipleprice);
                     }
                 }

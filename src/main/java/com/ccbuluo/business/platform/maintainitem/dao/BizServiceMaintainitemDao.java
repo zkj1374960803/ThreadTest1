@@ -123,8 +123,9 @@ public class BizServiceMaintainitemDao extends BaseDao<BizServiceMaintainitem> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("maintainitemName", saveBizServiceMaintainitemDTO.getMaintainitemName());
         params.put("id", saveBizServiceMaintainitemDTO.getId());
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
 
-        String sql = "SELECT COUNT(id) > 0 FROM biz_service_maintainitem WHERE id <> :id AND maintainitem_name = :maintainitemName";
+        String sql = "SELECT COUNT(id) > 0 FROM biz_service_maintainitem WHERE id <> :id AND maintainitem_name = :maintainitemName AND delete_flag = :deleteFlag";
 
         return findForObject(sql, params, Boolean.class);
     }

@@ -123,7 +123,7 @@ public class GenerateProjectCodeService {
             String redisKey = buildRedisKey(prefix);
             String redisCodeStr = jedisCluster.get(redisKey);
             if (StringUtils.isNotBlank(redisCodeStr)) {
-                //判断当前值是否超出了范围
+                // 判断当前值是否超出了范围
                 if(checkCode(autoIncreasedcodeLength, redisCodeStr)){
                     return StatusDto.buildStatusDtoWithCode(BizErrorCodeEnum.CODE_OVERRANGE.getErrorCode(),
                             BizErrorCodeEnum.CODE_OVERRANGE.getMessage());
@@ -140,7 +140,7 @@ public class GenerateProjectCodeService {
             // redis里没有编码，或根据redis生成编码异常时，从数据库中查询
             BizServiceProjectcode maxCode = bizServiceProjectcodeDao.getMaxCode(prefix);
             if (maxCode != null && maxCode.getCurrentCount() != null) {
-                //判断当前值是否超出了范围
+                // 判断当前值是否超出了范围
                 if(checkCode(autoIncreasedcodeLength, maxCode.getCurrentCount().toString())){
                     return StatusDto.buildStatusDtoWithCode(BizErrorCodeEnum.CODE_OVERRANGE.getErrorCode(),
                             BizErrorCodeEnum.CODE_OVERRANGE.getMessage());
@@ -272,7 +272,7 @@ public class GenerateProjectCodeService {
         for(int i=0; i < autoIncreasedcodeSize; i++){
             autoSize.append("9");
         }
-        //如果当前值大于定义的最大值
+        // 如果当前值大于定义的最大值
         if(Integer.parseInt(code) > Integer.parseInt(autoSize.toString())){
             result = true;
         }

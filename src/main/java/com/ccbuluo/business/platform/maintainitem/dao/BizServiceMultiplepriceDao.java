@@ -126,7 +126,7 @@ public class BizServiceMultiplepriceDao extends BaseDao<BizServiceMultipleprice>
      */
     public int update(BizServiceMultipleprice bizServiceMultipleprice) {
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_service_multipleprice SET multiple = :multiple WHERE")
+        sql.append("UPDATE biz_service_multipleprice SET multiple = :multiple,delete_flag = :deleteFlag WHERE")
             .append(" maintainitem_code = :maintainitemCode AND city_code = :cityCode");
 
         return updateForBean(sql.toString(), bizServiceMultipleprice);

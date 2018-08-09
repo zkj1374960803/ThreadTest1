@@ -79,7 +79,7 @@ public class BasicCarseriesManageServiceImpl implements BasicCarseriesManageServ
         }
         // 2.车系编码
         StatusDto<String> statusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FN);
-        //获取code失败
+        // 获取code失败
         if(!statusDto.isSuccess()){
             return statusDto;
         }
