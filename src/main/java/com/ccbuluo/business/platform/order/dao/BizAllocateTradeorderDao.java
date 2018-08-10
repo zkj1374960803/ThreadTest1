@@ -132,7 +132,7 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
                 .append("creator,create_time,delete_flag )")
                 .append(" VALUES (  :orderType, :docNo, :stockId,")
                 .append(" :occupyNum, :occupyStatus, :occupyStarttime, :occupyEndtime, :creator,")
-                .append(" :createTime, :deleteFlag");
+                .append(" :createTime, :deleteFlag )");
         List<Long> longs = super.batchInsertForListBean(sql.toString(), list);
         return longs;
     }
