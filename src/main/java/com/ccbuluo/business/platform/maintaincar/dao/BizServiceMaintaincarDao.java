@@ -260,7 +260,7 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
     public List<BizServiceCustmanager> queryVinNumberByuuid(List<String> useruudis) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("useruudis", useruudis);
-        String sql = " SELECT a.cusmanager_uuid as 'userUuid', a.vin_number as 'vinNumber' FROM biz_service_maintaincar a WHERE a.`cusmanager_uuid` IN (:useruudis)";
+        String sql = " SELECT a.id,a.cusmanager_uuid as 'userUuid', a.vin_number as 'vinNumber' FROM biz_service_maintaincar a WHERE a.`cusmanager_uuid` IN (:useruudis)";
         return queryListBean(BizServiceCustmanager.class, sql, params);
     }
 }
