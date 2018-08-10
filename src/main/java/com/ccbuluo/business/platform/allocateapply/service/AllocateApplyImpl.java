@@ -135,10 +135,13 @@ public class AllocateApplyImpl implements AllocateApply{
         // 查询组织架构的名字
         StatusDtoThriftBean<BasicUserOrganization> outstockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getOutstockOrgno());
         StatusDtoThriftBean<BasicUserOrganization> instockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getInstockOrgno());
+        StatusDtoThriftBean<BasicUserOrganization> applyorgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getApplyorgNo());
         StatusDto<BasicUserOrganization> outstockOrgNameresolve = StatusDtoThriftUtils.resolve(outstockOrgName, BasicUserOrganization.class);
         StatusDto<BasicUserOrganization> instockOrgNameresolve = StatusDtoThriftUtils.resolve(instockOrgName, BasicUserOrganization.class);
+        StatusDto<BasicUserOrganization> applyorgNameResolve = StatusDtoThriftUtils.resolve(applyorgName, BasicUserOrganization.class);
         BasicUserOrganization outstockOrgdata = outstockOrgNameresolve.getData();
         BasicUserOrganization instockOrgdata = instockOrgNameresolve.getData();
+        BasicUserOrganization applyorgNamedata = applyorgNameResolve.getData();
         if (outstockOrgdata != null) {
             String orgName = outstockOrgdata.getOrgName();
             allocateApplyDTO.setOutstockOrgName(orgName);
@@ -146,6 +149,10 @@ public class AllocateApplyImpl implements AllocateApply{
         if (instockOrgdata != null) {
             String orgName = instockOrgdata.getOrgName();
             allocateApplyDTO.setInstockOrgName(orgName);
+        }
+        if(applyorgNamedata != null){
+            String orgName = applyorgNamedata.getOrgName();
+            allocateApplyDTO.setApplyorgName(orgName);
         }
         // 查询申请单的详单
         List<QueryAllocateapplyDetailDTO> queryAllocateapplyDetailDTOS = bizAllocateApplyDao.queryAllocateapplyDetail(applyNo);
