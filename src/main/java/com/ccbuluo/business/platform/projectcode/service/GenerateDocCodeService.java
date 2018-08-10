@@ -3,11 +3,13 @@ package com.ccbuluo.business.platform.projectcode.service;
 import com.ccbuluo.business.constants.BizErrorCodeEnum;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.CodePrefixEnum;
+import com.ccbuluo.business.constants.DocCodePrefixEnum;
 import com.ccbuluo.http.StatusDto;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import redis.clients.jedis.JedisCluster;
 
 import java.time.LocalDateTime;
@@ -19,6 +21,7 @@ import java.time.LocalDateTime;
  * @version v1.0.0
  * @date 2018-08-07 20:11:59
  */
+@Service
 public class GenerateDocCodeService {
 
     Logger logger = LoggerFactory.getLogger(GenerateProjectCodeService.class);
@@ -32,7 +35,7 @@ public class GenerateDocCodeService {
      * @author weijb
      * @date 2018-08-06 14:41:37
      */
-    public synchronized StatusDto<String> grantCodeByPrefix(CodePrefixEnum prefix) {
+    public synchronized StatusDto<String> grantCodeByPrefix(DocCodePrefixEnum prefix) {
         StatusDto<String> resultDto;
         switch (prefix){
             case SW:    // 申请单号
@@ -98,7 +101,7 @@ public class GenerateDocCodeService {
             String redisKey = buildRedisKey(prefix);
             String redisCodeStr = jedisCluster.get(redisKey);
             if (StringUtils.isNotBlank(redisCodeStr)) {
-                Integer redisCode = Integer.parseInt(redisCodeStr);
+                Long redisCode = Long.valueOf(redisCodeStr);
                 redisCode++;
                 newCode = produceCode(redisCode);
                 // 重新放入redis，
@@ -114,7 +117,7 @@ public class GenerateDocCodeService {
         return newCode;
     }
     // 获取后两位自增字符
-    private static String produceCode(int redisCode){
+    private String produceCode(Long redisCode){
         if(redisCode >= 100){
             redisCode = redisCode % 100;
         }

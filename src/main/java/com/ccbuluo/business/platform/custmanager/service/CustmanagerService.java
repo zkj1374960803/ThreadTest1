@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.custmanager.service;
 
+import com.ccbuluo.business.platform.allocateapply.dto.QueryCustManagerListDTO;
 import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
 import com.ccbuluo.db.Page;
@@ -67,4 +68,13 @@ public interface CustmanagerService {
      * @date 2018-07-31 14:58:20
      */
     StatusDto queryOrgList(int parentId, boolean isSearchClose);
+    /**
+     * 查询客户经理列表(创建申请)
+     * @param queryCustManagerListDTO 查询条件
+     * @exception 
+     * @return 
+     * @author zhangkangjian
+     * @date 2018-08-09 19:03:17
+     */
+    Page<QueryCustManagerListDTO> queryCustManagerList(QueryCustManagerListDTO queryCustManagerListDTO);
 }

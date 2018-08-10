@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.custmanager.service;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.platform.allocateapply.dto.QueryCustManagerListDTO;
 import com.ccbuluo.business.platform.carmanage.dto.CusmanagerCarCountDTO;
 import com.ccbuluo.business.platform.carmanage.service.BasicCarcoreInfoService;
 import com.ccbuluo.business.platform.custmanager.dao.BizServiceCustmanagerDao;
@@ -21,6 +22,7 @@ import com.ccbuluo.http.*;
 import com.ccbuluo.json.JsonUtils;
 import com.ccbuluo.merchandiseintf.carparts.category.service.CarpartsCategoryService;
 import com.ccbuluo.usercoreintf.dto.BasicUserOrganizationDTO;
+import com.ccbuluo.usercoreintf.dto.QueryServiceCenterListDTO;
 import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
 import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import com.ccbuluo.usercoreintf.model.RelUserRole;
@@ -271,6 +273,10 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             return StatusDto.buildFailure(custManagerList.getMessage());
         }
         List<QueryUserListDTO> data = custManagerList.getData();
+        if(data == null || data.size() == 0){
+            Page<QueryUserListDTO> page = buildCustManagerData(userInfoStatusDto, custManagerList);
+            return StatusDto.buildDataSuccessStatusDto(page);
+        }
         List<String> useruudis = data.stream().map(QueryUserListDTO::getUseruuid).collect(Collectors.toList());
         // 查询维修车编号
         List<BizServiceCustmanager> vinList = bizServiceMaintaincarDao.queryVinNumberByuuid(useruudis);
@@ -292,6 +298,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             CusmanagerCarCountDTO cusmanagerCarCountDTO = carMap.get(queryUserListDTO.getUseruuid());
             if(bizServiceCustmanager != null){
                 queryUserListDTO.setVinNumber(bizServiceCustmanager.getVinNumber());
+                queryUserListDTO.setVinId(bizServiceCustmanager.getId());
             }
             if(cusmanagerCarCountDTO != null){
                 queryUserListDTO.setCarsNumber(Long.valueOf(cusmanagerCarCountDTO.getCarNum()));
@@ -393,6 +400,30 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         BasicUserOrganizationDTO basicUserOrganizationDTO1 = data.stream().filter(a -> BusinessPropertyHolder.custManager.equals(a.getOrgCode())).findFirst().get();
         basicUserOrganizationDTO1.setLeaf(true);
         return StatusDto.buildDataSuccessStatusDto(basicUserOrganizationDTO1);
+    }
+
+    /**
+     * 查询客户经理列表(创建申请)
+     * @param queryCustManagerListDTO 查询条件
+     * @return Page<QueryCustManagerListDTO> 分页的客户经理列表
+     * @author zhangkangjian
+     * @date 2018-08-09 19:03:17
+     */
+    @Override
+    public Page<QueryCustManagerListDTO> queryCustManagerList(QueryCustManagerListDTO queryCustManagerListDTO) {
+        Page<QueryCustManagerListDTO> queryCustManagerListDTOPage = bizServiceCustmanagerDao.queryCustManagerList(queryCustManagerListDTO);
+        StatusDtoThriftList<QueryServiceCenterListDTO> queryServiceCenterList = orgService.queryServiceCenter(null, null, null, null);
+        StatusDto<List<QueryServiceCenterListDTO>> resolve = StatusDtoThriftUtils.resolve(queryServiceCenterList, QueryServiceCenterListDTO.class);
+        List<QueryServiceCenterListDTO> data = resolve.getData();
+        Map<String, QueryServiceCenterListDTO> map = data.stream().collect(Collectors.toMap(QueryServiceCenterListDTO::getServiceCenterCode, a -> a,(k1,k2)->k1));
+        List<QueryCustManagerListDTO> rows = queryCustManagerListDTOPage.getRows();
+        rows.stream().forEach(a -> {
+            QueryServiceCenterListDTO queryServiceCenterListDTO = map.get(a.getServiceCenter());
+            if(queryServiceCenterListDTO != null){
+                a.setServiceCenterName(queryServiceCenterListDTO.getServiceCenterName());
+            }
+        });
+        return queryCustManagerListDTOPage;
     }
 
     /**

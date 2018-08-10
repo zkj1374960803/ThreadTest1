@@ -4,8 +4,6 @@ import com.ccbuluo.business.entity.BizServiceSupplier;
 import com.ccbuluo.business.platform.supplier.dto.*;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
-import org.apache.thrift.TException;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
@@ -71,7 +69,7 @@ public interface SupplierService {
      * @author zhangkangjian
      * @date 2018-08-01 11:46:53
      */
-    Page<QueryRelSupplierProduct> findSupplierProduct(QueryRelSupplierProduct relSupplierProduct);
+    Page<QueryRelSupplierProductDTO> findSupplierProduct(QueryRelSupplierProductDTO relSupplierProduct);
     /**
      * 删除供应商关系
      * @param id
@@ -89,7 +87,7 @@ public interface SupplierService {
      * @author zhangkangjian
      * @date 2018-08-01 14:40:39
      */
-    Page<QueryRelSupplierProduct> queryFittingsProduct(QueryRelSupplierProduct qeryRelSupplierProduct);
+    Page<QueryRelSupplierProductDTO> queryFittingsProduct(QueryRelSupplierProductDTO qeryRelSupplierProduct);
     /**
      * 查询供商物料商品
      * @param qeryRelSupplierProduct 查询条件
@@ -97,6 +95,13 @@ public interface SupplierService {
      * @author zhangkangjian
      * @date 2018-08-01 14:40:39
      */
-    Page<QueryRelSupplierProduct> queryEquipmentProduct(QueryRelSupplierProduct qeryRelSupplierProduct);
-
+    Page<QueryRelSupplierProductDTO> queryEquipmentProduct(QueryRelSupplierProductDTO qeryRelSupplierProduct);
+    /**
+     * 根据商品的code查询供应商的信息（下拉框）
+     * @param code 商品的code
+     * @return StatusDto<List<RelSupplierProduct>>
+     * @author zhangkangjian
+     * @date 2018-08-07 15:32:17
+     */
+    List<QuerySupplierInfoDTO> querySupplierInfo(String code, String type);
 }
