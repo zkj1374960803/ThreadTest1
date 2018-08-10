@@ -16,7 +16,7 @@ public class ProcessApplyDTO {
     /**
      * 调拨申请单编号
      */
-    @ApiModelProperty(name = "applyNo", value = "调拨申请单编号", hidden = true)
+    @ApiModelProperty(name = "applyNo", value = "调拨申请单编号")
     private String applyNo;
     /**
      * 平台决定的处理类型：调拨、采购
@@ -26,7 +26,7 @@ public class ProcessApplyDTO {
     /**
      * 出库的组织架构的类型
      */
-    @ApiModelProperty(name = "outstockOrgType", value = "出库的组织架构的类型")
+    @ApiModelProperty(name = "outstockOrgType", value = "出库的组织架构的类型", hidden = true)
     private String outstockOrgType;
 
     /**
