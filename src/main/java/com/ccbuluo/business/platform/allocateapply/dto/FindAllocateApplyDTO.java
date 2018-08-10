@@ -87,6 +87,33 @@ public class FindAllocateApplyDTO {
      */
     @ApiModelProperty(name = "ueryAllocateapplyDetailDTO", value = "申请商品详情列表")
     private List<QueryAllocateapplyDetailDTO> queryAllocateapplyDetailDTO;
+    /**
+     * 申请来源机构
+     */
+    @ApiModelProperty(name = "applyorgNo", value = "申请来源(申请详情用不到，处理详情需要)")
+    private String applyorgNo;
+
+    /**
+     * 申请来源机构名称
+     */
+    @ApiModelProperty(name = "applyorgName", value = "申请来源机构名称(申请详情用不到，处理详情需要)")
+    private String applyorgName;
+
+    public String getApplyorgName() {
+        return applyorgName;
+    }
+
+    public void setApplyorgName(String applyorgName) {
+        this.applyorgName = applyorgName;
+    }
+
+    public String getApplyorgNo() {
+        return applyorgNo;
+    }
+
+    public void setApplyorgNo(String applyorgNo) {
+        this.applyorgNo = applyorgNo;
+    }
 
     public List<QueryAllocateapplyDetailDTO> getQueryAllocateapplyDetailDTO() {
         return queryAllocateapplyDetailDTO;

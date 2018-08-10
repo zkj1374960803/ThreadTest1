@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.allocateapply.dao;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.ProcessApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateApply;
@@ -135,7 +136,7 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
      */
     public FindAllocateApplyDTO findDetail(String applyNo) {
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.apply_no,a.apply_status,a.applyer_name,b.storehouse_name,b.storehouse_address, ")
+        sql.append(" SELECT a.apply_no,a.applyorg_no,a.apply_status,a.applyer_name,b.storehouse_name,b.storehouse_address, ")
             .append(" a.create_time,a.process_type,b.servicecenter_code as 'instockOrgno',a.outstock_orgno,a.in_repository_no as 'inRepositoryNo' ")
             .append(" FROM biz_allocate_apply a LEFT JOIN biz_service_storehouse b ON a.in_repository_no = b.storehouse_code ")
             .append(" WHERE a.apply_no = :applyNo ");
@@ -152,7 +153,7 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
      */
     public List<QueryAllocateapplyDetailDTO> queryAllocateapplyDetail(String applyNo) {
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.apply_no,a.product_no,a.product_type,a.product_categoryname, ")
+        sql.append(" SELECT a.id,a.apply_no,a.product_no,a.product_type,a.product_categoryname, ")
             .append("  a.apply_num,a.unit,a.sell_price,a.cost_price,a.supplier_no,b.supplier_name,c.equip_name as 'productName' ")
             .append("  FROM biz_allocateapply_detail a LEFT JOIN  biz_service_supplier b ON a.supplier_no = b.supplier_code ")
             .append("  LEFT JOIN biz_service_equipment c ON a.product_no = c.equip_code AND a.product_type = 'EQUIPMENT' ")
@@ -215,5 +216,41 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
             sql.append(" AND a.apply_no = :applyNo ");
         }
         return queryPageForBean(QueryAllocateApplyListDTO.class, sql.toString(), map, offset, pageSize);
+    }
+    /**
+     * 查询乐观锁的值
+     * @param applyNo 申请单的编号
+     * @return Long
+     * @author zhangkangjian
+     * @date 2018-08-10 11:54:41
+     */
+    public Long findVersionNo(String applyNo) {
+        String sql = " SELECT a.version_no FROM biz_allocate_apply a WHERE a.applyorg_no = :applyNo ";
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("applyNo", applyNo);
+        return namedParameterJdbcTemplate.queryForObject(sql, map, Long.class);
+    }
+    /**
+     *
+     * @param
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-08-10 12:01:05
+     */
+    public void updateAllocateApply(ProcessApplyDTO processApplyDTO) {
+        StringBuilder sql = new StringBuilder();
+        sql.append(" UPDATE biz_allocate_apply SET apply_processor = :applyProcessor,process_time = :processTime ");
+        if(StringUtils.isNotBlank(processApplyDTO.getOutstockOrgno())){
+            sql.append(" ,outstock_orgno = outstockOrgno ");
+        }
+        if(StringUtils.isNotBlank(processApplyDTO.getProcessType())){
+            sql.append(" ,process_type = :processType ");
+        }
+        if (StringUtils.isNotBlank(processApplyDTO.getOutstockOrgType())){
+            sql.append(" ,outstock_orgtype = :outstockOrgType ");
+        }
+        sql.append(" WHERE version_no = :versionNo AND apply_no = :applyNo ");
+        updateForBean(sql.toString(), processApplyDTO);
     }
 }

@@ -1,11 +1,9 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
-import com.ccbuluo.business.constants.BusinessPropertyHolder;
-import com.ccbuluo.business.constants.CodePrefixEnum;
-import com.ccbuluo.business.constants.Constants;
-import com.ccbuluo.business.constants.DocCodePrefixEnum;
+import com.ccbuluo.business.constants.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.ProcessApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateApply;
@@ -72,8 +70,10 @@ public class AllocateApplyImpl implements AllocateApply{
         bizAllocateApply.setOperator(loggedUserId);
         bizAllocateApply.setCreator(loggedUserId);
         bizAllocateApply.setApplyer(loggedUserId);
+        // 入库仓库查询入库组织机构
         String orgCode = bizServiceStorehouseDao.getOrgCodeByStoreHouseCode(bizAllocateApply.getInRepositoryNo());
         bizAllocateApply.setInstockOrgno(orgCode);
+        // 生成申请单编号
         StatusDto<String> stringStatusDto = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.SW);
         bizAllocateApply.setApplyNo(stringStatusDto.getData());
         BusinessUser loggedUser = userHolder.getLoggedUser();
@@ -92,15 +92,9 @@ public class AllocateApplyImpl implements AllocateApply{
                 }
             }
         }
-        // 组织架构类型
-        StatusDtoThriftBean<BasicUserOrganization> orgByCode = basicUserOrganizationService.findOrgByCode(bizAllocateApply.getOutstockOrgno());
-        if(orgByCode.isSuccess()){
-            StatusDto<BasicUserOrganization> resolve = StatusDtoThriftUtils.resolve(orgByCode, BasicUserOrganization.class);
-            BasicUserOrganization data = resolve.getData();
-            if(data != null){
-                bizAllocateApply.setOutstockOrgtype(data.getOrgType());
-            }
-        }
+        // 查询组织架构类型
+        String orgTypeByCode = getOrgTypeByCode(bizAllocateApply.getOutstockOrgno());
+        bizAllocateApply.setOutstockOrgtype(orgTypeByCode);
         // 如果是采购类型的，入库机构是平台
         String processType = bizAllocateApply.getProcessType();
         if(Constants.PROCESS_TYPE_PURCHASE.equals(processType)){
@@ -118,6 +112,24 @@ public class AllocateApplyImpl implements AllocateApply{
         bizAllocateApplyDao.batchInsertForapplyDetailList(allocateapplyDetailList);
 
     }
+    /**
+     *  查询组织架构类型
+     * @param orgCode 组织架构code
+     * @return String 机构类型
+     * @author zhangkangjian
+     * @date 2018-08-10 12:04:37
+     */
+    private String getOrgTypeByCode(String orgCode) {
+        StatusDtoThriftBean<BasicUserOrganization> orgByCode = basicUserOrganizationService.findOrgByCode(orgCode);
+        if(orgByCode.isSuccess()){
+            StatusDto<BasicUserOrganization> resolve = StatusDtoThriftUtils.resolve(orgByCode, BasicUserOrganization.class);
+            BasicUserOrganization data = resolve.getData();
+            if(data != null){
+                return data.getOrgType();
+            }
+        }
+        return StringUtils.EMPTY;
+    }
 
     /**
      * 查询申请单详情
@@ -133,10 +145,13 @@ public class AllocateApplyImpl implements AllocateApply{
         // 查询组织架构的名字
         StatusDtoThriftBean<BasicUserOrganization> outstockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getOutstockOrgno());
         StatusDtoThriftBean<BasicUserOrganization> instockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getInstockOrgno());
+        StatusDtoThriftBean<BasicUserOrganization> applyorgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getApplyorgNo());
         StatusDto<BasicUserOrganization> outstockOrgNameresolve = StatusDtoThriftUtils.resolve(outstockOrgName, BasicUserOrganization.class);
         StatusDto<BasicUserOrganization> instockOrgNameresolve = StatusDtoThriftUtils.resolve(instockOrgName, BasicUserOrganization.class);
+        StatusDto<BasicUserOrganization> applyorgNameResolve = StatusDtoThriftUtils.resolve(applyorgName, BasicUserOrganization.class);
         BasicUserOrganization outstockOrgdata = outstockOrgNameresolve.getData();
         BasicUserOrganization instockOrgdata = instockOrgNameresolve.getData();
+        BasicUserOrganization applyorgNamedata = applyorgNameResolve.getData();
         if (outstockOrgdata != null) {
             String orgName = outstockOrgdata.getOrgName();
             allocateApplyDTO.setOutstockOrgName(orgName);
@@ -144,6 +159,10 @@ public class AllocateApplyImpl implements AllocateApply{
         if (instockOrgdata != null) {
             String orgName = instockOrgdata.getOrgName();
             allocateApplyDTO.setInstockOrgName(orgName);
+        }
+        if(applyorgNamedata != null){
+            String orgName = applyorgNamedata.getOrgName();
+            allocateApplyDTO.setApplyorgName(orgName);
         }
         // 查询申请单的详单
         List<QueryAllocateapplyDetailDTO> queryAllocateapplyDetailDTOS = bizAllocateApplyDao.queryAllocateapplyDetail(applyNo);
@@ -227,5 +246,36 @@ public class AllocateApplyImpl implements AllocateApply{
         // 查询分页的申请列表
         Page<QueryAllocateApplyListDTO> page = bizAllocateApplyDao.findProcessApplyList(processType, applyStatus, applyNo, offset, pageSize, userOrgCode);
         return page;
+    }
+
+    /**
+     * 处理申请单
+     *
+     * @param processApplyDTO@exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-08-10 11:24:53
+     */
+    @Override
+    public void processApply(ProcessApplyDTO processApplyDTO) {
+        String processType = processApplyDTO.getProcessType();
+        // 如果是调拨类型的
+        if(Constants.PROCESS_TYPE_TRANSFER.equals(processType)){
+            String outstockOrgno = processApplyDTO.getOutstockOrgno();
+            if(StringUtils.isBlank(outstockOrgno)){
+                 throw new CommonException(Constants.ERROR_CODE, "参数异常！");
+            }
+            String orgTypeByCode = getOrgTypeByCode(outstockOrgno);
+            processApplyDTO.setOutstockOrgType(orgTypeByCode);
+        }
+        // 查询乐观锁的值
+        Long versionNo = bizAllocateApplyDao.findVersionNo(processApplyDTO.getApplyNo());
+        processApplyDTO.setVersionNo(versionNo);
+        processApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.getKey());
+        // 更新申请单的基础数据
+        bizAllocateApplyDao.updateAllocateApply(processApplyDTO);
+        // 更新申请单的详单数据
+
+
     }
 }
