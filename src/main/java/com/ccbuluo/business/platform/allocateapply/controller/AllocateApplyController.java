@@ -132,7 +132,8 @@ public class AllocateApplyController extends BaseController {
      */
     @ApiOperation(value = "处理申请单（当选择采购时不显示调拨目标）", notes = "【张康健】")
     @GetMapping("/processapply")
-    public StatusDto processApply(@ApiParam(name = "processApplyDTO", value = "json数据格式", required = true)ProcessApplyDTO processApplyDTO){
+    public StatusDto<String> processApply(@ApiParam(name = "processApplyDTO", value = "json数据格式", required = true)ProcessApplyDTO processApplyDTO){
+        allocateApplyImpl.processApply(processApplyDTO);
         return null;
     }
 }

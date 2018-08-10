@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.allocateapply.dao;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.ProcessApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateApply;
@@ -215,5 +216,41 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
             sql.append(" AND a.apply_no = :applyNo ");
         }
         return queryPageForBean(QueryAllocateApplyListDTO.class, sql.toString(), map, offset, pageSize);
+    }
+    /**
+     * 查询乐观锁的值
+     * @param applyNo 申请单的编号
+     * @return Long
+     * @author zhangkangjian
+     * @date 2018-08-10 11:54:41
+     */
+    public Long findVersionNo(String applyNo) {
+        String sql = " SELECT a.version_no FROM biz_allocate_apply a WHERE a.applyorg_no = :applyNo ";
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("applyNo", applyNo);
+        return namedParameterJdbcTemplate.queryForObject(sql, map, Long.class);
+    }
+    /**
+     *
+     * @param
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-08-10 12:01:05
+     */
+    public void updateAllocateApply(ProcessApplyDTO processApplyDTO) {
+        StringBuilder sql = new StringBuilder();
+        sql.append(" UPDATE biz_allocate_apply SET apply_processor = :applyProcessor,process_time = :processTime ");
+        if(StringUtils.isNotBlank(processApplyDTO.getOutstockOrgno())){
+            sql.append(" ,outstock_orgno = outstockOrgno ");
+        }
+        if(StringUtils.isNotBlank(processApplyDTO.getProcessType())){
+            sql.append(" ,process_type = :processType ");
+        }
+        if (StringUtils.isNotBlank(processApplyDTO.getOutstockOrgType())){
+            sql.append(" ,outstock_orgtype = :outstockOrgType ");
+        }
+        sql.append(" WHERE version_no = :versionNo AND apply_no = :applyNo ");
+        updateForBean(sql.toString(), processApplyDTO);
     }
 }

@@ -23,6 +23,11 @@ public class ProcessApplyDTO {
      */
     @ApiModelProperty(name = "processType", value = "平台决定的处理类型(注：TRANSFER调拨、PURCHASE采购)")
     private String processType;
+    /**
+     * 出库的组织架构的类型
+     */
+    @ApiModelProperty(name = "outstockOrgType", value = "出库的组织架构的类型")
+    private String outstockOrgType;
 
     /**
      * 出库的组织架构
@@ -35,6 +40,34 @@ public class ProcessApplyDTO {
      */
     @ApiModelProperty(name = "processApplyDetailDTO", value = "申请详单列表")
     private List<ProcessApplyDetailDTO> processApplyDetailDTO;
+    @ApiModelProperty(name = "versionNo", value = "版本号", hidden = true)
+    private Long versionNo;
+    @ApiModelProperty(name = "applyStatus", value = "申请单状态", hidden = true)
+    private String applyStatus;
+
+    public String getApplyStatus() {
+        return applyStatus;
+    }
+
+    public void setApplyStatus(String applyStatus) {
+        this.applyStatus = applyStatus;
+    }
+
+    public Long getVersionNo() {
+        return versionNo;
+    }
+
+    public void setVersionNo(Long versionNo) {
+        this.versionNo = versionNo;
+    }
+
+    public String getOutstockOrgType() {
+        return outstockOrgType;
+    }
+
+    public void setOutstockOrgType(String outstockOrgType) {
+        this.outstockOrgType = outstockOrgType;
+    }
 
     public String getProcessType() {
         return processType;
