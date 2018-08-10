@@ -2,13 +2,17 @@ package com.ccbuluo.business.platform.allocateapply.controller;
 
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.QueryCustManagerListDTO;
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateApply;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApply;
+import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
+import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 
@@ -22,6 +26,8 @@ import javax.annotation.Resource;
 public class AllocateApplyController extends BaseController {
     @Resource(name = "allocateApplyImpl")
     private AllocateApply allocateApplyImpl;
+    @Resource(name = "custmanagerServiceImpl")
+    private CustmanagerService custmanagerService;
 
     /**
      * 创建物料或者零配件申请
@@ -96,18 +102,22 @@ public class AllocateApplyController extends BaseController {
     }
 
     /**
-     * 查询客户经理类型下拉框
-     * @param
-     * @exception
-     * @return
+     * 查询客户经理列表(创建申请)
+     * @param queryCustManagerListDTO 查询条件
+     * @return StatusDto<Page<QueryCustManagerListDTO>>
      * @author zhangkangjian
      * @date 2018-08-09 16:58:03
      */
-    @ApiOperation(value = "查询客户经理类型下拉框", notes = "【张康健】")
+    @ApiOperation(value = "查询客户经理列表", notes = "【张康健】")
     @GetMapping("/querycustmanagerlist")
-
-    public StatusDto<Page<QueryAllocateApplyListDTO>> queryCustManagerList(){
-
-        return null;
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "name", value = "客户经理的姓名或vin码", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "serviceCenter", value = "服务中心的code", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query")
+    })
+    public StatusDto<Page<QueryCustManagerListDTO>> queryCustManagerList(@ApiIgnore QueryCustManagerListDTO queryCustManagerListDTO){
+        Page<QueryCustManagerListDTO> page = custmanagerService.queryCustManagerList(queryCustManagerListDTO);
+        return StatusDto.buildDataSuccessStatusDto(page);
     }
 }

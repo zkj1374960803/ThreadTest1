@@ -72,8 +72,10 @@ public class AllocateApplyImpl implements AllocateApply{
         bizAllocateApply.setOperator(loggedUserId);
         bizAllocateApply.setCreator(loggedUserId);
         bizAllocateApply.setApplyer(loggedUserId);
+        // 入库仓库查询入库组织机构
         String orgCode = bizServiceStorehouseDao.getOrgCodeByStoreHouseCode(bizAllocateApply.getInRepositoryNo());
         bizAllocateApply.setInstockOrgno(orgCode);
+        // 生成申请单编号
         StatusDto<String> stringStatusDto = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.SW);
         bizAllocateApply.setApplyNo(stringStatusDto.getData());
         BusinessUser loggedUser = userHolder.getLoggedUser();
