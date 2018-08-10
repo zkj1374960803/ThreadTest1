@@ -28,11 +28,11 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
     /**
      * 保存 实体
      * @param entity 实体
-     * @return int 影响条数
+     * @return Long id 新增返回
      * @author liuduo
      * @date 2018-08-07 11:55:41
      */
-    public int saveEntity(BizOutstockplanDetail entity) {
+    public Long saveEntity(BizOutstockplanDetail entity) {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO biz_outstockplan_detail ( outstock_type,stock_id,")
             .append("product_no,product_type,trade_no,supplier_no,apply_detail_id,")
@@ -44,7 +44,7 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
             .append(" :outRepositoryNo, :planOutstocknum, :actualOutstocknum, :planStatus,")
             .append(" :completeTime, :creator, :createTime, :operator, :operateTime,")
             .append(" :deleteFlag, :remark, :productCategoryname )");
-        return super.save(sql.toString(), entity);
+        return super.saveRid(sql.toString(), entity);
     }
 
     /**
