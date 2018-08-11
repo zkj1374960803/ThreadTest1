@@ -4,6 +4,7 @@ import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
+import io.swagger.models.auth.In;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -104,6 +105,65 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
         return super.updateForMap(sql.toString(), params);
+    }
+
+    /**
+     * 根据入库详单的  供应商、商品、仓库、批次号  查询在库存中有无记录
+     * @param supplierNo 供应商
+     * @param productNo 商品编号
+     * @param inRepositoryNo 入库仓库编号
+     * @param applyNo 交易单号
+     * @return 库存明细id
+     * @author liuduo
+     * @date 2018-08-08 14:55:43
+     */
+    public Long getByinstockorderDeatil(String supplierNo, String productNo, String inRepositoryNo, String applyNo) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("supplierNo", supplierNo);
+        params.put("productNo", productNo);
+        params.put("inRepositoryNo", inRepositoryNo);
+        params.put("applyNo", applyNo);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT id FROM biz_stock_detail WHERE supplier_no = :supplierNo AND repository_no = :inRepositoryNo")
+            .append(" AND trade_no = :applyNo AND product_no = :productNo");
+
+        return findForObject(sql.toString(), params, Long.class);
+    }
+
+    /**
+     * 修改有效库存
+     * @param bizStockDetail 库存明细
+     * @param versionNo 版本号
+     * @author liuduo
+     * @date 2018-08-08 15:24:09
+     */
+    public void updateValidStock(BizStockDetail bizStockDetail, Integer versionNo) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("bizStockDetail", bizStockDetail);
+        params.put("versionNo", versionNo + Constants.FLAG_ONE);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE `biz_stock_detail` SET valid_stock = :validStock+valid_stock,version_no = version_no+1")
+            .append(" WHERE id = :id AND :versionNo > version_no");
+
+        updateForBean(sql.toString(), bizStockDetail);
+    }
+
+    /**
+     * 根据库存明细id查询版本号
+     * @param id 库存明细id
+     * @return 版本号
+     * @author liuduo
+     * @date 2018-08-08 19:31:38
+     */
+    public Integer getVersionNoById(Long id) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("id", id);
+
+        String sql = "SELECT version_no FROM biz_stock_detail WHERE id = :id";
+
+        return findForObject(sql, params, Integer.class);
     }
 
     /**

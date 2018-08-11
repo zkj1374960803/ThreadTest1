@@ -2,6 +2,8 @@ package com.ccbuluo.business.platform.instock.controller;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizInstockOrder;
+import com.ccbuluo.business.entity.BizInstockorderDetail;
+import com.ccbuluo.business.platform.instock.dto.SaveBizInstockOrderDTO;
 import com.ccbuluo.business.platform.instock.service.InstockOrderService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.http.StatusDto;
@@ -45,18 +47,15 @@ public class InstockOrderController extends BaseController {
 
     /**
      * 保存入库单
-     * @param bizInstockOrder 入库单实体
+     * @param applyNo 申请单号
      * @return 是否保存成功
      * @author liuduo
      * @date 2018-08-07 15:15:07
      */
     @ApiOperation(value = "入库单新增", notes = "【刘铎】")
+    @ApiImplicitParam(name = "applyNo", value = "申请单号",  required = true, paramType = "query")
     @PostMapping("/save")
-    public StatusDto saveInstockOrder(@ApiParam(name = "入库单实体", value = "传入json格式", required = true)@RequestBody BizInstockOrder bizInstockOrder) {
-        int status = instockOrderService.saveInstockOrder(bizInstockOrder);
-        if (status == Constants.SUCCESSSTATUS) {
-            return StatusDto.buildSuccessStatusDto("保存成功！");
-        }
-        return StatusDto.buildFailureStatusDto("保存失败！");
+    public StatusDto<String> saveInstockOrder(@RequestParam String applyNo, @RequestBody List<BizInstockorderDetail> bizInstockorderDetailList) {
+        return instockOrderService.saveInstockOrder(applyNo, bizInstockorderDetailList);
     }
 }

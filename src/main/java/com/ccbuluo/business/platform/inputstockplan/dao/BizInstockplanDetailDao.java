@@ -126,4 +126,56 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
         List<Long> longs = super.batchInsertForListBean(sql.toString(), list);
         return longs;
     }
+
+    /**
+     * 根据申请单编号查询入库计划
+     * @param applyNo 申请单编号
+     * @return 入库计划
+     * @author liuduo
+     * @date 2018-08-08 11:14:56
+     */
+    public List<BizInstockplanDetail> queryListByApplyNo(String applyNo) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,instock_type,product_no,product_type,product_categoryname,")
+            .append("trade_no,supplier_no,instock_repository_no,cost_price,")
+            .append("plan_instocknum,actual_instocknum,complete_status,complete_time,")
+            .append("outstock_planid,creator,create_time,operator,operate_time,")
+            .append("delete_flag,remark FROM biz_instockplan_detail WHERE trade_no= :applyNo");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        return super.queryListBean(BizInstockplanDetail.class, sql.toString(), params);
+    }
+
+    /**
+     * 根据入库计划id查询版本号
+     * @param instockPlanid 入库计划id
+     * @return 版本号
+     * @author liuduo
+     * @date 2018-08-08 19:31:38
+     */
+    public Integer getVersionNoById(Long instockPlanid) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("instockPlanid", instockPlanid);
+
+        String sql = "SELECT version_no FROM biz_instockplan_detail WHERE id = :instockPlanid";
+
+        return findForObject(sql, params, Integer.class);
+    }
+
+    /**
+     * 更新入库佳话中的实际入库数量
+     * @param bizInstockplanDetailList 入库计划
+     * @author liuduo
+     * @date 2018-08-08 20:17:42
+     */
+    public void updateActualInstockNum(List<BizInstockplanDetail> bizInstockplanDetailList) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("bizInstockplanDetailList", bizInstockplanDetailList);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_instockplan_detail SET actual_instocknum = :actualInstocknum + actual_instocknum,version_no = version_no+1")
+            .append(" WHERE id = :id AND :versionNo > version_no");
+
+        batchUpdateForListBean(sql.toString(), bizInstockplanDetailList);
+    }
 }

@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.ProcessApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateApply;
@@ -53,4 +54,6 @@ public interface AllocateApply {
      * @date 2018-08-10 11:24:53
      */
     void processApply(ProcessApplyDTO processApplyDTO);
+    // todo
+    Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO);
 }

@@ -7,12 +7,12 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 订货单详情实体
+ * 入库单详情实体
  * @author liuduo
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "订货单详情实体", description = "订货单详情实体")
+@ApiModel(value = "入库单详情实体", description = "入库单详情实体")
 public class BizInstockorderDetail extends AftersaleCommonEntity{
     /**
      * 入库单编号
@@ -54,6 +54,11 @@ public class BizInstockorderDetail extends AftersaleCommonEntity{
      */
     @ApiModelProperty(name = "instockNum", value = "入库数量")
     private Long instockNum;
+    /**
+     * 问题件入库数量
+     */
+    @ApiModelProperty(name = "instockProblemNum", value = "问题件入库数量")
+    private Long instockProblemNum;
     /**
      * 计量单位
      */
@@ -146,4 +151,19 @@ public class BizInstockorderDetail extends AftersaleCommonEntity{
         return this.costPrice;
     }
 
+    public Long getInstockProblemNum() {
+        return instockProblemNum;
+    }
+
+    public void setInstockProblemNum(Long instockProblemNum) {
+        this.instockProblemNum = instockProblemNum;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
 }

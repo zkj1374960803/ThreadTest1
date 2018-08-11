@@ -94,6 +94,11 @@ public class BizStockDetail extends AftersaleCommonEntity{
      */
     @ApiModelProperty(name = "latestCorrectTime", value = "最后一次矫正该库存(盘库)的时间")
     private Date latestCorrectTime;
+    /**
+     * 乐观锁使用的版本号
+     */
+    @ApiModelProperty(name = "versionNo", value = "乐观锁使用的版本号")
+    private Long versionNo;
 
     public void setRepositoryNo(String repositoryNo) {
         this.repositoryNo = repositoryNo;
@@ -223,4 +228,11 @@ public class BizStockDetail extends AftersaleCommonEntity{
         return this.latestCorrectTime;
     }
 
+    public Long getVersionNo() {
+        return versionNo;
+    }
+
+    public void setVersionNo(Long versionNo) {
+        this.versionNo = versionNo;
+    }
 }

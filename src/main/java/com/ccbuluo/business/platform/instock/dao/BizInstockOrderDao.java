@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.instock.dao;
 
 import com.ccbuluo.business.entity.BizInstockOrder;
+import com.ccbuluo.business.platform.instock.dto.SaveBizInstockOrderDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -36,10 +37,10 @@ public class BizInstockOrderDao extends BaseDao<BizInstockOrder> {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO biz_instock_order ( instock_orderno,trade_docno,")
             .append("in_repository_no,instock_orgno,instock_operator,instock_type,instock_time,")
-            .append("transportorder_no,checked,ceecked_time,creator,create_time,operator,")
+            .append("transportorder_no,checked,checked_time,creator,create_time,operator,")
             .append("operate_time,delete_flag,remark ) VALUES (  :instockOrderno,")
             .append(" :tradeDocno, :inRepositoryNo, :instockOrgno, :instockOperator, :instockType,")
-            .append(" :instockTime, :transportorderNo, :checked, :ceeckedTime, :creator,")
+            .append(" :instockTime, :transportorderNo, :checked, :checkedTime, :creator,")
             .append(" :createTime, :operator, :operateTime, :deleteFlag, :remark )");
         return super.save(sql.toString(), entity);
     }

@@ -125,6 +125,11 @@ public class BizOutstockplanDetail {
      */
     @ApiModelProperty(name = "productCategoryname", value = "商品分类名称,多级逗号隔开")
     private String productCategoryname;
+    /**
+     * 乐观锁使用的版本号
+     */
+    @ApiModelProperty(name = "versionNo", value = "乐观锁使用的版本号")
+    private Integer versionNo;
 
     /**
      * 商品计量单位
@@ -311,11 +316,17 @@ public class BizOutstockplanDetail {
     public String getProductUnit() {
         return productUnit;
     }
+    public Integer getVersionNo() {
+        return versionNo;
+    }
 
     public void setProductUnit(String productUnit) {
         this.productUnit = productUnit;
     }
     public String getStatusName() {
         return StockPlanEnum.valueOf(planStatus).getLabel();
+    }
+    public void setVersionNo(Integer versionNo) {
+        this.versionNo = versionNo;
     }
 }

@@ -115,6 +115,11 @@ public class BizInstockplanDetail {
      */
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
+    /**
+     * 乐观锁使用的版本号
+     */
+    @ApiModelProperty(name = "versionNo", value = "乐观锁使用的版本号")
+    private Integer versionNo;
 
     /**
      * 商品计量单位
@@ -285,11 +290,17 @@ public class BizInstockplanDetail {
     public String getProductUnit() {
         return productUnit;
     }
+    public Integer getVersionNo() {
+        return versionNo;
+    }
 
     public void setProductUnit(String productUnit) {
         this.productUnit = productUnit;
     }
     public String getStatusName() {
         return StockPlanEnum.valueOf(completeStatus).getLabel();
+    }
+    public void setVersionNo(Integer versionNo) {
+        this.versionNo = versionNo;
     }
 }

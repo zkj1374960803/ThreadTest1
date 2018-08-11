@@ -1,10 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.dao;
 
 import com.ccbuluo.business.constants.Constants;
-import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
-import com.ccbuluo.business.platform.allocateapply.dto.ProcessApplyDTO;
-import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
-import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateapplyDetailDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateApply;
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateapplyDetail;
 import com.ccbuluo.dao.BaseDao;
@@ -136,7 +133,7 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
      */
     public FindAllocateApplyDTO findDetail(String applyNo) {
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.apply_no,a.applyorg_no,a.apply_status,a.applyer_name,b.storehouse_name,b.storehouse_address, ")
+        sql.append(" SELECT a.process_orgtype,a.process_orgno,a.apply_type,a.apply_no,a.applyorg_no,a.apply_status,a.applyer_name,b.storehouse_name,b.storehouse_address, ")
             .append(" a.create_time,a.process_type,b.servicecenter_code as 'instockOrgno',a.outstock_orgno,a.in_repository_no as 'inRepositoryNo' ")
             .append(" FROM biz_allocate_apply a LEFT JOIN biz_service_storehouse b ON a.in_repository_no = b.storehouse_code ")
             .append(" WHERE a.apply_no = :applyNo ");
@@ -252,5 +249,24 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
         }
         sql.append(" WHERE version_no = :versionNo AND apply_no = :applyNo ");
         updateForBean(sql.toString(), processApplyDTO);
+    }
+
+    /**
+     * 更新申请单详单
+     * @param processApplyDetailDTO 详单列表
+     * @author zhangkangjian
+     * @date 2018-08-10 15:20:45
+     */
+    public void batchUpdateForApplyDetail(List<ProcessApplyDetailDTO> processApplyDetailDTO) {
+        StringBuilder sql = new StringBuilder();
+        sql.append(" UPDATE biz_allocateapply_detail SET apply_num = :applyNum,sell_price = :sellPrice WHERE id = :id ");
+        batchUpdateForListBean(sql.toString(), processApplyDetailDTO);
+    }
+    // todo
+    public Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO) {
+        String sql = "  SELECT a.id,a.product_no,COUNT(a.valid_stock),b.product_name,b.product_categoryname,b.unit FROM biz_stock_detail a \n" +
+            "  LEFT JOIN (SELECT product_no,unit,product_name,product_categoryname FROM biz_instockorder_detail GROUP BY product_no) b ON a.product_no = b.product_no\n" +
+            "  GROUP BY a.product_no";
+        return null;
     }
 }

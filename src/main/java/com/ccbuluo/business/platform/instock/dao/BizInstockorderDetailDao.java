@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -95,5 +96,18 @@ public class BizInstockorderDetailDao extends BaseDao<BizInstockorderDetail> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
         return super.updateForMap(sql.toString(), params);
+    }
+
+    public List<Long> saveInstockorderDetail(List<BizInstockorderDetail> bizInstockorderDetailList) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO biz_instockorder_detail ( instock_orderno,instock_planid,")
+            .append("product_no,product_name,product_type,product_categoryname,instock_problem_num,")
+            .append("supplier_no,instock_num,unit,cost_price,creator,create_time,operator,")
+            .append("operate_time,delete_flag,remark ) VALUES (  :instockOrderno,")
+            .append(" :instockPlanid, :productNo, :productName, :productType,")
+            .append(" :productCategoryname, :instockProblemNum, :supplierNo, :instockNum, :unit, :costPrice,")
+            .append(" :creator, :createTime, :operator, :operateTime, :deleteFlag, :remark")
+            .append(" )");
+        return super.batchInsertForListBean(sql.toString(), bizInstockorderDetailList);
     }
 }

@@ -41,6 +41,21 @@ public class ProcessApplyDetailDTO {
      */
     @ApiModelProperty(name = "remark", value = "备注", hidden = true)
     private String remark;
+    /**
+     * 调拨申请单编号
+     */
+    @ApiModelProperty(name = "applyNo", value = "调拨申请单编号", hidden = true)
+    private String applyNo;
+
+
+
+    public String getApplyNo() {
+        return applyNo;
+    }
+
+    public void setApplyNo(String applyNo) {
+        this.applyNo = applyNo;
+    }
 
     public void setId(Long id) {
         this.id = id;

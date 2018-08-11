@@ -1,6 +1,9 @@
 package com.ccbuluo.business.platform.instock.service;
 
 import com.ccbuluo.business.entity.BizInstockOrder;
+import com.ccbuluo.business.entity.BizInstockorderDetail;
+import com.ccbuluo.business.platform.instock.dto.SaveBizInstockOrderDTO;
+import com.ccbuluo.http.StatusDto;
 
 import java.util.List;
 
@@ -22,10 +25,10 @@ public interface InstockOrderService {
 
     /**
      * 保存入库单
-     * @param bizInstockOrder 入库单实体
+     * @param applyNo 申请单号
      * @return 是否保存成功
      * @author liuduo
      * @date 2018-08-07 15:15:07
      */
-    int saveInstockOrder(BizInstockOrder bizInstockOrder);
+    StatusDto<String> saveInstockOrder(String applyNo, List<BizInstockorderDetail> bizInstockorderDetailList);
 }

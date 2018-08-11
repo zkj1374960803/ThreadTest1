@@ -2,10 +2,7 @@ package com.ccbuluo.business.platform.allocateapply.service;
 
 import com.ccbuluo.business.constants.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
-import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
-import com.ccbuluo.business.platform.allocateapply.dto.ProcessApplyDTO;
-import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
-import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateapplyDetailDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateApply;
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateapplyDetail;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
@@ -30,6 +27,7 @@ import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -250,13 +248,12 @@ public class AllocateApplyImpl implements AllocateApply{
 
     /**
      * 处理申请单
-     *
      * @param processApplyDTO@exception
-     * @return
      * @author zhangkangjian
      * @date 2018-08-10 11:24:53
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void processApply(ProcessApplyDTO processApplyDTO) {
         String processType = processApplyDTO.getProcessType();
         // 如果是调拨类型的
@@ -268,14 +265,21 @@ public class AllocateApplyImpl implements AllocateApply{
             String orgTypeByCode = getOrgTypeByCode(outstockOrgno);
             processApplyDTO.setOutstockOrgType(orgTypeByCode);
         }
-        // 查询乐观锁的值
+        // 查询版本号（数据库乐观锁）
         Long versionNo = bizAllocateApplyDao.findVersionNo(processApplyDTO.getApplyNo());
         processApplyDTO.setVersionNo(versionNo);
+        // 处理通过，更新申请单状态
         processApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.getKey());
         // 更新申请单的基础数据
         bizAllocateApplyDao.updateAllocateApply(processApplyDTO);
         // 更新申请单的详单数据
+        bizAllocateApplyDao.batchUpdateForApplyDetail(processApplyDTO.getProcessApplyDetailDTO());
+    }
 
-
+    @Override
+    // todo
+    public Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO) {
+        Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO);
+        return page;
     }
 }
