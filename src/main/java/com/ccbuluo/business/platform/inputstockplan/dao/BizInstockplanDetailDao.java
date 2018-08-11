@@ -178,4 +178,21 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
 
         batchUpdateForListBean(sql.toString(), bizInstockplanDetailList);
     }
+    /**
+     *  更改入库计划状态
+     * @param applyNo 申请单编号
+     * @param completeStatus 状态
+     * @param instockRepositoryNo 入库仓库编号
+     * @author weijb
+     * @date 2018-08-11 12:55:41
+     */
+    public int updateInStockPlanStatus(String applyNo, String completeStatus, String instockRepositoryNo){
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_instockplan_detail SET complete_status = :completeStatus WHERE trade_no= :applyNo and instock_repository_no = :instockRepositoryNo");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("completeStatus", completeStatus);
+        params.put("instockRepositoryNo", instockRepositoryNo);
+        return super.updateForMap(sql.toString(), params);
+    }
 }

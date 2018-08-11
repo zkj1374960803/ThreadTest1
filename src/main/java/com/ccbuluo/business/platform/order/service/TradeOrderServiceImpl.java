@@ -125,22 +125,23 @@ public class TradeOrderServiceImpl implements TradeOrderService {
                 BizOutstockplanDetail outstockplanDetail1 = new BizOutstockplanDetail();
                 outstockplanDetail1 = buildBizOutstockplanDetail(ad, processType);
                 outstockplanDetail1.setOutRepositoryNo(bd.getRepositoryNo());// 卖方仓库编号（根据机构和商品编号查询的库存）
-                // 平台入库计划
-                BizInstockplanDetail instockplanDetail1 = new BizInstockplanDetail();
-                instockplanDetail1 = buildBizInstockplanDetail(ad, processType);
-                instockplanDetail1.setInstockRepositoryNo(BusinessPropertyHolder.TOP_SERVICECENTER);// 平台code
-                // 平台出库计划
-                BizOutstockplanDetail outstockplanDetail2 = new BizOutstockplanDetail();
-                outstockplanDetail2 = buildBizOutstockplanDetail(ad, processType);
-                outstockplanDetail2.setOutRepositoryNo(BusinessPropertyHolder.TOP_SERVICECENTER);// 平台code
+                if(null != ad.getProcessOrgno() && Constants.PLATFORM.equals(ad.getProcessOrgno())){// 如果是平台参与
+                    // 平台入库计划
+                    BizInstockplanDetail instockplanDetail1 = new BizInstockplanDetail();
+                    instockplanDetail1 = buildBizInstockplanDetail(ad, processType);
+                    instockplanDetail1.setInstockRepositoryNo(BusinessPropertyHolder.TOP_SERVICECENTER);// 平台code
+                    // 平台出库计划
+                    BizOutstockplanDetail outstockplanDetail2 = new BizOutstockplanDetail();
+                    outstockplanDetail2 = buildBizOutstockplanDetail(ad, processType);
+                    outstockplanDetail2.setOutRepositoryNo(BusinessPropertyHolder.TOP_SERVICECENTER);// 平台code
+                    outList.add(outstockplanDetail2);
+                    inList.add(instockplanDetail1);
+                }
                 // 买方入库计划
                 BizInstockplanDetail instockplanDetail2 = new BizInstockplanDetail();
                 instockplanDetail2 = buildBizInstockplanDetail(ad, processType);
                 instockplanDetail2.setInstockRepositoryNo(ad.getInstockOrgno());// 买方机构仓库编号
-
                 outList.add(outstockplanDetail1);
-                outList.add(outstockplanDetail2);
-                inList.add(instockplanDetail1);
                 inList.add(instockplanDetail2);
             }
         }

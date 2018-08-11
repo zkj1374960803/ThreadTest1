@@ -40,4 +40,14 @@ public interface InputStockPlanService {
      */
     void updateActualInstockNum(List<BizInstockplanDetail> bizInstockplanDetailList);
 
+    /**
+     *  更入出库计划状态
+     * @param applyNo 申请单编号
+     * @param completeStatus 状态
+     * @param instockRepositoryNo 入库仓库编号
+     * @author weijb
+     * @date 2018-08-11 12:55:41
+     */
+    int updateInStockPlanStatus(String applyNo, String completeStatus, String instockRepositoryNo);
+
 }
