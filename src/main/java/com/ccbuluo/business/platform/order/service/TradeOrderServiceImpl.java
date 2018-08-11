@@ -9,7 +9,7 @@ import com.ccbuluo.business.constants.DocCodePrefixEnum;
 import com.ccbuluo.business.constants.StockPlanEnum;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
-import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
@@ -66,7 +66,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         int flag = 0;
         try {
             // 根据申请单获取申请单详情
-            List<AllocateapplyDetailDTO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
+            List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
             if(null == details || details.size() == 0){
                 return 0;
             }
@@ -94,12 +94,12 @@ public class TradeOrderServiceImpl implements TradeOrderService {
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> buildOutAndInstockplanDetail(List<AllocateapplyDetailDTO> details, List<BizStockDetail> stockDetails, String processType){
+    public Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> buildOutAndInstockplanDetail(List<AllocateapplyDetailBO> details, List<BizStockDetail> stockDetails, String processType){
         List<BizOutstockplanDetail> outList = new ArrayList<BizOutstockplanDetail>();
         List<BizInstockplanDetail> inList = new ArrayList<BizInstockplanDetail>();
         // 采购
         if(Constants.PROCESS_TYPE_PURCHASE.equals(processType)){
-            for(AllocateapplyDetailDTO ad : details){// 采购的时候不生成出库计划，因为没有库存信息
+            for(AllocateapplyDetailBO ad : details){// 采购的时候不生成出库计划，因为没有库存信息
                 // 平台出库计划
 //                BizOutstockplanDetail outstockplanDetail1 = buildBizOutstockplanDetail(ad, processType);
 //                outstockplanDetail1.setStockId("这个批次库存id从哪里来TODO");// 批次库存id(平台的库存)
@@ -120,7 +120,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         if(Constants.PROCESS_TYPE_TRANSFER.equals(processType)){// 调拨
             int i = 0;
             for(BizStockDetail bd : stockDetails){
-                AllocateapplyDetailDTO ad = getAllocateapplyDetailByProductNo(details, bd.getProductNo());
+                AllocateapplyDetailBO ad = getAllocateapplyDetailByProductNo(details, bd.getProductNo());
                 // 卖方机构出库计划
                 BizOutstockplanDetail outstockplanDetail1 = new BizOutstockplanDetail();
                 outstockplanDetail1 = buildBizOutstockplanDetail(ad, processType);
@@ -152,7 +152,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
      * @param ad 申请详情
      * @return
      */
-    private BizOutstockplanDetail buildBizOutstockplanDetail(AllocateapplyDetailDTO ad,String processType){
+    private BizOutstockplanDetail buildBizOutstockplanDetail(AllocateapplyDetailBO ad, String processType){
         BizOutstockplanDetail outPlan = new BizOutstockplanDetail();
         outPlan.setOutstockType(processType);// 交易类型
         outPlan.setProductNo(ad.getProductNo());// 商品编号
@@ -177,7 +177,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
      * @param ad 申请详情
      * @return
      */
-    private BizInstockplanDetail buildBizInstockplanDetail(AllocateapplyDetailDTO ad,String processType){
+    private BizInstockplanDetail buildBizInstockplanDetail(AllocateapplyDetailBO ad, String processType){
         BizInstockplanDetail inPlan = new BizInstockplanDetail();
         inPlan.setInstockType(processType);// 交易类型
         inPlan.setProductNo(ad.getProductNo());// 商品编号
@@ -197,9 +197,9 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     }
 
     // 根据商品编号查找到某个商品的申请单详情信息
-    private AllocateapplyDetailDTO getAllocateapplyDetailByProductNo(List<AllocateapplyDetailDTO> details, String productNo){
-        AllocateapplyDetailDTO applyDetail = new AllocateapplyDetailDTO();
-        for(AllocateapplyDetailDTO ad : details){
+    private AllocateapplyDetailBO getAllocateapplyDetailByProductNo(List<AllocateapplyDetailBO> details, String productNo){
+        AllocateapplyDetailBO applyDetail = new AllocateapplyDetailBO();
+        for(AllocateapplyDetailBO ad : details){
             if (productNo.equals(ad.getProductNo())){
                 applyDetail = ad;
             }
@@ -217,7 +217,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         int flag = 0;
         try {
             // 根据申请单获取申请单详情
-            List<AllocateapplyDetailDTO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
+            List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
             if(null == details || details.size() == 0){
                 return 0;
             }
@@ -237,7 +237,10 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
             Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, Constants.PROCESS_TYPE_TRANSFER);
             // 保存占用库存
-            bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
+            flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
+            if(flag == 0){// 更新失败
+                throw new CommonException("0", "更新占用库存失败！");
+            }
             // 批量保存出库计划详情
             bizOutstockplanDetailDao.batchOutstockplanDetail(pir.getLeft());
             // 批量保存入库计划详情
@@ -270,7 +273,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
      * @param processType 交易类型
      * @return
      */
-    private List<BizAllocateTradeorder> buildOrderEntityList(List<AllocateapplyDetailDTO> details, String processType){
+    private List<BizAllocateTradeorder> buildOrderEntityList(List<AllocateapplyDetailBO> details, String processType){
         // 构建生成订单（机构1对平台）
         BizAllocateTradeorder bizAllocateTradeorder1 = buildOrderEntity(details);
         BizAllocateTradeorder bizAllocateTradeorder2 = buildOrderEntity(details);
@@ -285,7 +288,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         return list;
     }
     // 构建生成订单
-    private BizAllocateTradeorder buildOrderEntity(List<AllocateapplyDetailDTO> details){
+    private BizAllocateTradeorder buildOrderEntity(List<AllocateapplyDetailBO> details){
         BizAllocateTradeorder bt = new BizAllocateTradeorder();
         // 生成订单编号
         StatusDto<String> supplierCode = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.SW);
@@ -297,7 +300,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         bt.setCreateTime(new Date());
         bt.setDeleteFlag(Constants.DELETE_FLAG_NORMAL);
         bt.setOrderStatus("PAYMENTWAITING");//默认待支付
-        for(AllocateapplyDetailDTO bd : details){
+        for(AllocateapplyDetailBO bd : details){
             bt.setApplyNo(bd.getApplyNo());// 申请单编号
             bt.setPurchaserOrgno(bd.getInstockOrgno());//买方机构
             bt.setSellerOrgno(bd.getOutstockOrgno());//卖方机构
@@ -310,9 +313,9 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         return bt;
     }
     // 计算订单总价
-    private BigDecimal getTatal(List<AllocateapplyDetailDTO> details){
+    private BigDecimal getTatal(List<AllocateapplyDetailBO> details){
         BigDecimal bigDecimal = new BigDecimal("0");
-        for(AllocateapplyDetailDTO bd : details){
+        for(AllocateapplyDetailBO bd : details){
             bigDecimal.add(bd.getSellPrice());
         }
         return bigDecimal;
@@ -324,7 +327,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
      * @author weijb
      * @date 2018-08-08 17:55:41
      */
-    private Pair<List<BizStockDetail>, List<RelOrdstockOccupy>>  buildStockAndRelOrdEntity(List<AllocateapplyDetailDTO> details, List<BizStockDetail> stockDetails){
+    private Pair<List<BizStockDetail>, List<RelOrdstockOccupy>>  buildStockAndRelOrdEntity(List<AllocateapplyDetailBO> details, List<BizStockDetail> stockDetails){
         //订单占用库存关系
         List<RelOrdstockOccupy> relOrdstockOccupies = new ArrayList<RelOrdstockOccupy>();
         for(BizStockDetail ad : stockDetails){// 遍历库存
@@ -348,15 +351,15 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     }
 
     // 根据卖方机构code获取库存详情
-    private List<BizStockDetail> getStockDetailList(String sellerOrgno, List<AllocateapplyDetailDTO> details){
+    private List<BizStockDetail> getStockDetailList(String sellerOrgno, List<AllocateapplyDetailBO> details){
         // 根据卖方code和商品code（list）查出库存列表
         List<String> codeList = getProductList(details);
         return bizStockDetailDao.getStockDetailListByOrgAndProduct(sellerOrgno, codeList);
     }
     // 获取商品code
-    private List<String> getProductList(List<AllocateapplyDetailDTO> details){
+    private List<String> getProductList(List<AllocateapplyDetailBO> details){
         List<String> list = new ArrayList<String>();
-        for(AllocateapplyDetailDTO ad : details){
+        for(AllocateapplyDetailBO ad : details){
             list.add(ad.getProductNo());
         }
         return list;
@@ -369,9 +372,9 @@ public class TradeOrderServiceImpl implements TradeOrderService {
      * @author weijb
      * @date 2018-08-08 17:55:41
      */
-    private Long convertStockDetail(List<AllocateapplyDetailDTO> details, BizStockDetail stockDetail){
+    private Long convertStockDetail(List<AllocateapplyDetailBO> details, BizStockDetail stockDetail){
         Long occupyStockNum = 0l;//占用数量
-        for(AllocateapplyDetailDTO ad : details){
+        for(AllocateapplyDetailBO ad : details){
             if(ad.getProductNo().equals(stockDetail.getProductNo())){// 找到对应商品
                 // 调拨申请数量
                 Long applyNum = ad.getApplyNum();

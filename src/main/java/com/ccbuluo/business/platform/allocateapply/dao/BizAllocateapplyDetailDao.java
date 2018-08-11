@@ -1,7 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.dao;
 
 import com.ccbuluo.business.constants.Constants;
-import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateapplyDetail;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
@@ -105,15 +105,15 @@ public class BizAllocateapplyDetailDao extends BaseDao<BizAllocateapplyDetail> {
      * @author weijb
      * @date 2018-08-07 13:55:41
      */
-    public List<AllocateapplyDetailDTO> getAllocateapplyDetailByapplyNo(String applyNo){
+    public List<AllocateapplyDetailBO> getAllocateapplyDetailByapplyNo(String applyNo){
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT bad.id,bad.apply_no,bad.product_no,bad.product_type,bad.product_categoryname,")
                 .append("bad.apply_num,bad.unit,bad.sell_price,bad.cost_price,bad.supplier_no,bad.creator,bad.create_time,")
-                .append("bad.operator,bad.operate_time,baa.instock_orgno,baa.outstock_orgno,baa.process_type ")
+                .append("bad.operator,bad.operate_time,baa.instock_orgno,baa.outstock_orgno,baa.process_type,baa.process_orgtype ")
                 .append(" FROM biz_allocateapply_detail bad LEFT JOIN biz_allocate_apply baa on bad.apply_no=baa.apply_no WHERE bad.delete_flag = :deleteFlag AND  bad.apply_no= :applyNo");
         Map<String, Object> params = Maps.newHashMap();
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         params.put("applyNo", applyNo);
-        return super.queryListBean(AllocateapplyDetailDTO.class, sql.toString(), params);
+        return super.queryListBean(AllocateapplyDetailBO.class, sql.toString(), params);
     }
 }

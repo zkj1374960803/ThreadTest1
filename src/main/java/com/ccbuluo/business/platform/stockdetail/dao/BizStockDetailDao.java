@@ -119,7 +119,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
                 .append("supplier_no,valid_stock,occupy_stock,problem_stock,damaged_stock,")
                 .append("transit_stock,freeze_stock,seller_orgno,cost_price,instock_planid,")
                 .append("latest_correct_time,creator,create_time,operator,operate_time,")
-                .append("delete_flag,remark FROM biz_stock_detail WHERE delete_flag = :deleteFlag and org_no= :sellerOrgno and product_no IN(:codes) and valid_stock > 0")
+                .append("delete_flag,remark,version_no FROM biz_stock_detail WHERE delete_flag = :deleteFlag and org_no= :sellerOrgno and product_no IN(:codes) and valid_stock > 0")
                 .append(" order by create_time");//先进先出排序取出，按创建时间的正序排列
         Map<String, Object> params = Maps.newHashMap();
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
@@ -136,7 +136,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @date 2018-08-08 19:59:51
      */
     public int batchUpdateStockDetil(List<BizStockDetail> stockDetailList){
-        String sql = "update biz_stock_detail set valid_stock=:validStock, occupy_stock=:occupyStock where id=:id";
+        String sql = "update biz_stock_detail set valid_stock=:validStock, occupy_stock=:occupyStock, version_no=version_no+1 where version_no=:versionNo and id=:id";
         return batchUpdateForListBean(sql, stockDetailList);
     }
 }
