@@ -98,7 +98,7 @@ public class BizStockDetail extends AftersaleCommonEntity{
      * 乐观锁使用的版本号
      */
     @ApiModelProperty(name = "versionNo", value = "乐观锁使用的版本号")
-    private Integer versionNo;
+    private Long versionNo;
 
     public void setRepositoryNo(String repositoryNo) {
         this.repositoryNo = repositoryNo;
@@ -228,11 +228,11 @@ public class BizStockDetail extends AftersaleCommonEntity{
         return this.latestCorrectTime;
     }
 
-    public Integer getVersionNo() {
+    public Long getVersionNo() {
         return versionNo;
     }
 
-    public void setVersionNo(Integer versionNo) {
+    public void setVersionNo(Long versionNo) {
         this.versionNo = versionNo;
     }
 }
