@@ -1,5 +1,6 @@
 package com.ccbuluo.business.entity;
 
+import com.ccbuluo.business.constants.StockPlanEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -108,7 +109,7 @@ public class BizInstockplanDetail {
      * 删除标识
      */
     @ApiModelProperty(name = "deleteFlag", value = "删除标识")
-    private Long deleteFlag;
+    private Integer deleteFlag;
     /**
      * 备注
      */
@@ -119,6 +120,12 @@ public class BizInstockplanDetail {
      */
     @ApiModelProperty(name = "versionNo", value = "乐观锁使用的版本号")
     private Integer versionNo;
+
+    /**
+     * 商品计量单位
+     */
+    @ApiModelProperty(name = "productUnit", value = "商品计量单位")
+    private String productUnit;
 
     public void setId(Long id) {
         this.id = id;
@@ -264,11 +271,11 @@ public class BizInstockplanDetail {
         return this.operateTime;
     }
 
-    public void setDeleteFlag(Long deleteFlag) {
+    public void setDeleteFlag(Integer deleteFlag) {
         this.deleteFlag = deleteFlag;
     }
 
-    public Long getDeleteFlag() {
+    public Integer getDeleteFlag() {
         return this.deleteFlag;
     }
 
@@ -280,10 +287,19 @@ public class BizInstockplanDetail {
         return this.remark;
     }
 
+    public String getProductUnit() {
+        return productUnit;
+    }
     public Integer getVersionNo() {
         return versionNo;
     }
 
+    public void setProductUnit(String productUnit) {
+        this.productUnit = productUnit;
+    }
+    public String getStatusName() {
+        return StockPlanEnum.valueOf(completeStatus).getLabel();
+    }
     public void setVersionNo(Integer versionNo) {
         this.versionNo = versionNo;
     }

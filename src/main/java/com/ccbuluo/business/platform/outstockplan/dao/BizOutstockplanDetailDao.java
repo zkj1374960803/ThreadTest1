@@ -7,6 +7,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,11 +29,11 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
     /**
      * 保存 实体
      * @param entity 实体
-     * @return int 影响条数
+     * @return Long id 新增返回
      * @author liuduo
      * @date 2018-08-07 11:55:41
      */
-    public int saveEntity(BizOutstockplanDetail entity) {
+    public Long saveEntity(BizOutstockplanDetail entity) {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO biz_outstockplan_detail ( outstock_type,stock_id,")
             .append("product_no,product_type,trade_no,supplier_no,apply_detail_id,")
@@ -44,7 +45,7 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
             .append(" :outRepositoryNo, :planOutstocknum, :actualOutstocknum, :planStatus,")
             .append(" :completeTime, :creator, :createTime, :operator, :operateTime,")
             .append(" :deleteFlag, :remark, :productCategoryname )");
-        return super.save(sql.toString(), entity);
+        return super.saveRid(sql.toString(), entity);
     }
 
     /**
@@ -103,5 +104,27 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
         return super.updateForMap(sql.toString(), params);
+    }
+    /**
+     * 批量新增出库计划详情
+     * @param list 入库计划详情
+     * @exception
+     * @author weijb
+     * @Date 2018-08-10 17:37:32
+     */
+    public List<Long> batchOutstockplanDetail(List<BizOutstockplanDetail> list){
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO biz_outstockplan_detail ( outstock_type,stock_id,")
+                .append("product_no,product_type,trade_no,supplier_no,apply_detail_id,")
+                .append("cost_price,sales_price,out_repository_no,plan_outstocknum,")
+                .append("actual_outstocknum,plan_status,complete_time,creator,create_time,")
+                .append("operator,operate_time,delete_flag,remark,product_categoryname")
+                .append(" ) VALUES (  :outstockType, :stockId, :productNo, :productType,")
+                .append(" :tradeNo, :supplierNo, :applyDetailId, :costPrice, :salesPrice,")
+                .append(" :outRepositoryNo, :planOutstocknum, :actualOutstocknum, :planStatus,")
+                .append(" :completeTime, :creator, :createTime, :operator, :operateTime,")
+                .append(" :deleteFlag, :remark, :productCategoryname )");
+        List<Long> longs = super.batchInsertForListBean(sql.toString(), list);
+        return longs;
     }
 }

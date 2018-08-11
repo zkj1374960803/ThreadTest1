@@ -14,6 +14,11 @@ import java.util.List;
  */
 @ApiModel(value = "BizAllocateApply", description = "物料和零配件调拨的申请")
 public class BizAllocateApply {
+
+    @ApiModelProperty(name = "inType", value = "入库类型(注:CUSTMANAGER客户经理,SERVICECENTER服务中心)")
+    private String inType;
+    @ApiModelProperty(name = "outType", value = "出库类型(注:CUSTMANAGER客户经理,SERVICECENTER服务中心)")
+    private String outType;
     /**
      * 
      */
@@ -116,6 +121,22 @@ public class BizAllocateApply {
 
     public void setAllocateapplyDetailList(List<BizAllocateapplyDetail> allocateapplyDetailList) {
         this.allocateapplyDetailList = allocateapplyDetailList;
+    }
+
+    public String getInType() {
+        return inType;
+    }
+
+    public void setInType(String inType) {
+        this.inType = inType;
+    }
+
+    public String getOutType() {
+        return outType;
+    }
+
+    public void setOutType(String outType) {
+        this.outType = outType;
     }
 
     public void setId(Long id) {

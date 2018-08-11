@@ -154,7 +154,7 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
         }
         if (StringUtils.isNotBlank(keyword)) {
             params.put("keywork", keyword);
-            sql.append(" AND bse.equip_name LIKE CONCAT('%',:keywork,'%')");
+            sql.append(" AND (bse.equip_name LIKE CONCAT('%',:keywork,'%') OR bse.equip_code LIKE CONCAT('%',:keywork,'%'))");
         }
         sql.append(" AND bse.delete_flag = :deleteFlag ORDER BY bse.operate_time DESC");
 

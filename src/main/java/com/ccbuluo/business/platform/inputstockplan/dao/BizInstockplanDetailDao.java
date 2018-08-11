@@ -104,6 +104,28 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
         params.put("id", id);
         return super.updateForMap(sql.toString(), params);
     }
+    /**
+     * 批量新增入库计划详情
+     * @param list 入库计划详情
+     * @exception
+     * @author weijb
+     * @Date 2018-08-10 17:37:32
+     */
+    public List<Long> batchInsertInstockplanDetail(List<BizInstockplanDetail> list){
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO biz_instockplan_detail ( instock_type,product_no,")
+                .append("product_type,product_categoryname,trade_no,supplier_no,")
+                .append("instock_repository_no,cost_price,plan_instocknum,actual_instocknum,")
+                .append("complete_status,complete_time,outstock_planid,creator,create_time,")
+                .append("operator,operate_time,delete_flag,remark ) VALUES (  :instockType,")
+                .append(" :productNo, :productType, :productCategoryname, :tradeNo,")
+                .append(" :supplierNo, :instockRepositoryNo, :costPrice, :planInstocknum,")
+                .append(" :actualInstocknum, :completeStatus, :completeTime, :outstockPlanid,")
+                .append(" :creator, :createTime, :operator, :operateTime, :deleteFlag, :remark")
+                .append(" )");
+        List<Long> longs = super.batchInsertForListBean(sql.toString(), list);
+        return longs;
+    }
 
     /**
      * 根据申请单编号查询入库计划

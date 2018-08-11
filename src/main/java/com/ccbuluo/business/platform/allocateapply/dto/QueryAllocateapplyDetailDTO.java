@@ -8,13 +8,15 @@ import java.util.Date;
 
 /**
  * 查询申请详单DTO
- * @author liuduo
+ * @author zhangkangjian
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
 @ApiModel(value = "QueryAllocateapplyDetailDTO", description = "查询申请详单DTO")
 public class QueryAllocateapplyDetailDTO {
 
+
+    private Long id;
     /**
      * 调拨申请单编号
      */
@@ -70,6 +72,14 @@ public class QueryAllocateapplyDetailDTO {
      */
     @ApiModelProperty(name = "supplierName", value = "供应商的名称")
     private String supplierName;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getProductName() {
         return productName;

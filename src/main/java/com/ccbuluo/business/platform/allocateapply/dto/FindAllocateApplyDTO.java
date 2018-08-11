@@ -87,6 +87,75 @@ public class FindAllocateApplyDTO {
      */
     @ApiModelProperty(name = "ueryAllocateapplyDetailDTO", value = "申请商品详情列表")
     private List<QueryAllocateapplyDetailDTO> queryAllocateapplyDetailDTO;
+    /**
+     * 申请来源机构
+     */
+    @ApiModelProperty(name = "applyorgNo", value = "申请来源(申请详情用不到，处理详情需要)")
+    private String applyorgNo;
+
+    /**
+     * 申请来源机构名称
+     */
+    @ApiModelProperty(name = "applyorgName", value = "申请来源机构名称(申请详情用不到，处理详情需要)")
+    private String applyorgName;
+    /**
+     * 申请处理机构类型
+     */
+    @ApiModelProperty(name = "processOrgtype", value = "申请处理机构类型")
+    private String processOrgtype;
+
+    /**
+     * 申请处理机构编号
+     */
+    @ApiModelProperty(name = "processOrgno", value = "申请处理机构编号")
+    private String processOrgno;
+
+    /**
+     * 申请的类型：平级调拨、平台调拨
+     */
+    @ApiModelProperty(name = "processOrgno", value = "申请的类型：平级调拨、平台调拨")
+    private String applyType;
+
+
+    public String getProcessOrgtype() {
+        return processOrgtype;
+    }
+
+    public void setProcessOrgtype(String processOrgtype) {
+        this.processOrgtype = processOrgtype;
+    }
+
+    public String getProcessOrgno() {
+        return processOrgno;
+    }
+
+    public void setProcessOrgno(String processOrgno) {
+        this.processOrgno = processOrgno;
+    }
+
+    public String getApplyType() {
+        return applyType;
+    }
+
+    public void setApplyType(String applyType) {
+        this.applyType = applyType;
+    }
+
+    public String getApplyorgName() {
+        return applyorgName;
+    }
+
+    public void setApplyorgName(String applyorgName) {
+        this.applyorgName = applyorgName;
+    }
+
+    public String getApplyorgNo() {
+        return applyorgNo;
+    }
+
+    public void setApplyorgNo(String applyorgNo) {
+        this.applyorgNo = applyorgNo;
+    }
 
     public List<QueryAllocateapplyDetailDTO> getQueryAllocateapplyDetailDTO() {
         return queryAllocateapplyDetailDTO;
