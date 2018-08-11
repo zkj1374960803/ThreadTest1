@@ -199,4 +199,23 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         String sql = "update biz_stock_detail set valid_stock=:validStock, occupy_stock=:occupyStock, version_no=version_no+1 where version_no=:versionNo and id=:id";
         return batchUpdateForListBean(sql, stockDetailList);
     }
+
+    /**
+     * 根据ids查询list
+     * @param sList id list
+     * @exception
+     * @author weijb
+     * @date 2018-08-11 13:59:51
+     */
+    public List<BizStockDetail> getStockDetailListByIds(List<Long> sList){
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,repository_no,org_no,product_no,product_type,trade_no,")
+                .append("supplier_no,valid_stock,occupy_stock,problem_stock,damaged_stock,")
+                .append("transit_stock,freeze_stock,seller_orgno,cost_price,instock_planid,")
+                .append("latest_correct_time,creator,create_time,operator,operate_time,")
+                .append("delete_flag,remark,version_no FROM biz_stock_detail WHERE id IN(:sList) ");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("sList", sList);
+        return super.queryListBean(BizStockDetail.class, sql.toString(), params);
+    }
 }

@@ -62,6 +62,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
      * @date 2018-08-08 10:55:41
      */
     @Transactional(rollbackFor = Exception.class)
+    @Override
     public int purchaseApplyHandle(String applyNo){
         int flag = 0;
         try {
@@ -214,6 +215,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
      * @date 2018-08-08 10:55:41
      */
     @Transactional(rollbackFor = Exception.class)
+    @Override
     public int allocateApplyHandle(String applyNo){
         int flag = 0;
         try {
@@ -409,4 +411,62 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         return occupyStockNum;
     }
 
+    /**
+     *  撤销申请
+     * @param applyNo 申请单编号
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public int cancelApply(String applyNo){
+        int flag = 0;
+        try {
+            // 根据申请单编号查询订单占用库存关系表
+            List<RelOrdstockOccupy> list = bizAllocateTradeorderDao.getRelOrdstockOccupyByApplyNo(applyNo);
+            //根据订单占用库存关系构建库存list
+            List<BizStockDetail> stockDetails = buildBizStockDetail(list);
+            // 还原被占用的库存
+            flag = bizStockDetailDao.batchUpdateStockDetil(stockDetails);
+            if(flag == 0){// 更新失败
+                throw new CommonException("0", "更新占用库存失败！");
+            }
+            //删除订单占用关系
+            bizAllocateTradeorderDao.deleteRelOrdstockOccupyByApplyNo(applyNo);
+            flag =1;
+        } catch (Exception e) {
+            logger.error("撤销失败！", e);
+            throw e;
+        }
+        return flag;
+    }
+
+    // 根据申请单编号查询订单占用库存关系表
+    private List<BizStockDetail> buildBizStockDetail(List<RelOrdstockOccupy> list){
+        List<BizStockDetail> stockDetails =  new ArrayList<BizStockDetail>();
+        List<Long> sList = getStockDtailIds(list);
+        if(null == sList || sList.size() == 0){
+            return null;
+        }
+        stockDetails = bizStockDetailDao.getStockDetailListByIds(sList);
+        for(BizStockDetail bd : stockDetails){
+            for(RelOrdstockOccupy roo : list){
+                if(bd.getId().intValue() == roo.getStockId().intValue()){
+                    if(bd.getValidStock() != null && roo.getOccupyNum() != null && bd.getOccupyStock() != null){
+                        bd.setValidStock(bd.getValidStock() + roo.getOccupyNum());//具体到某一条库存明细id，所被占用的数量（更新的时候要加上原来的数量）
+                        bd.setOccupyStock(bd.getOccupyStock() - roo.getOccupyNum());// 占用的库存也要减去当时的占用记录
+                    }
+                }
+        }
+        }
+        return stockDetails;
+    }
+    // 获取库存详情的ids
+    private List<Long> getStockDtailIds(List<RelOrdstockOccupy> list){
+        List<Long> slist = new ArrayList<Long>();
+        for(RelOrdstockOccupy r : list){
+            slist.add(r.getStockId());
+        }
+        return slist;
+    }
 }

@@ -136,4 +136,36 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
         List<Long> longs = super.batchInsertForListBean(sql.toString(), list);
         return longs;
     }
+
+    /**
+     * 根据申请单编号查询订单占用库存关系表
+     * @param applyNo  applyNo
+     * @return 影响条数
+     * @author weijb
+     * @date 2018-08-07 13:55:41
+     */
+    public List<RelOrdstockOccupy> getRelOrdstockOccupyByApplyNo(String applyNo){
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT order_type,doc_no,stock_id,occupy_num,occupy_status,occupy_starttime, ")
+                .append("occupy_endtime,creator,create_time,delete_flag ")
+                .append(" FROM rel_ordstock_occupy WHERE doc_no= :applyNo");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        return super.queryListBean(RelOrdstockOccupy.class, sql.toString(), params);
+    }
+
+    /**
+     * 根据申请单编号删除订单占用库存关系表
+     * @param applyNo  申请单编号
+     * @return 影响条数
+     * @author liuduo
+     * @date 2018-08-07 11:55:41
+     */
+    public int deleteRelOrdstockOccupyByApplyNo(String applyNo) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE  FROM rel_ordstock_occupy WHERE doc_no= :applyNo");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        return super.updateForMap(sql.toString(), params);
+    }
 }
