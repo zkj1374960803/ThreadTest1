@@ -433,6 +433,12 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             }
             //删除订单占用关系
             bizAllocateTradeorderDao.deleteRelOrdstockOccupyByApplyNo(applyNo);
+            // 删除订单
+            bizAllocateTradeorderDao.deleteAllocateTradeorderByApplyNo(applyNo);
+            // 删除出库计划
+            bizOutstockplanDetailDao.deleteOutstockplanDetailByApplyNo(applyNo);
+            // 删除入库计划
+            bizInstockplanDetailDao.batchInsertInstockplanDetail(applyNo);
             flag =1;
         } catch (Exception e) {
             logger.error("撤销失败！", e);

@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.outstockplan.dao;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizOutstockplanDetail;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
@@ -143,6 +144,21 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
         params.put("applyNo", applyNo);
         params.put("planStatus", planStatus);
         params.put("outRepositoryNo", outRepositoryNo);
+        return super.updateForMap(sql.toString(), params);
+    }
+    /**
+     * 删除出库计划详情
+     * @param applyNo 申请单编号
+     * @exception
+     * @author weijb
+     * @Date 2018-08-10 17:37:32
+     */
+    public int deleteOutstockplanDetailByApplyNo(String applyNo){
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_outstockplan_detail SET delete_flag = :deleteFlag  WHERE doc_no= :applyNo ");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("deleteFlag", Constants.DELETE_FLAG_DELETE);
         return super.updateForMap(sql.toString(), params);
     }
 }

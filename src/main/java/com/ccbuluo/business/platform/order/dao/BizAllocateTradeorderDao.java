@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.order.dao;
 
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizAllocateTradeorder;
 import com.ccbuluo.business.entity.RelOrdstockOccupy;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelConfiguration;
@@ -163,9 +164,25 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
      */
     public int deleteRelOrdstockOccupyByApplyNo(String applyNo) {
         StringBuilder sql = new StringBuilder();
-        sql.append("DELETE  FROM rel_ordstock_occupy WHERE doc_no= :applyNo");
+        sql.append("UPDATE rel_ordstock_occupy SET delete_flag = :deleteFlag  WHERE doc_no= :applyNo ");
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNo", applyNo);
+        params.put("deleteFlag", Constants.DELETE_FLAG_DELETE);
+        return super.updateForMap(sql.toString(), params);
+    }
+    /**
+     * 删除订单
+     * @param applyNo 订单编号
+     * @exception
+     * @author weijb
+     * @Date 2018-08-13 17:37:32
+     */
+    public int deleteAllocateTradeorderByApplyNo(String applyNo){
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_allocate_tradeorder SET delete_flag = :deleteFlag  WHERE doc_no= :applyNo ");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("deleteFlag", Constants.DELETE_FLAG_DELETE);
         return super.updateForMap(sql.toString(), params);
     }
 }

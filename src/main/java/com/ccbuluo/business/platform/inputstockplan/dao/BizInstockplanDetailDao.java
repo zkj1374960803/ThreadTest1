@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.inputstockplan.dao;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizInstockplanDetail;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
@@ -193,6 +194,22 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
         params.put("applyNo", applyNo);
         params.put("completeStatus", completeStatus);
         params.put("instockRepositoryNo", instockRepositoryNo);
+        return super.updateForMap(sql.toString(), params);
+    }
+
+    /**
+     * 删除入库计划详情
+     * @param applyNo 申请单编号
+     * @exception
+     * @author weijb
+     * @Date 2018-08-10 17:37:32
+     */
+    public int batchInsertInstockplanDetail(String applyNo){
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_instockplan_detail SET delete_flag = :deleteFlag  WHERE doc_no= :applyNo ");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("deleteFlag", Constants.DELETE_FLAG_DELETE);
         return super.updateForMap(sql.toString(), params);
     }
 }
