@@ -383,9 +383,10 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
     public int findCarmodelParameterById(Long carmodelId) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT COUNT(*) FROM basic_carcore_info ")
-                .append("   WHERE carmodel_id = :carmodelId");
+                .append("   WHERE carmodel_id = :carmodelId and delete_flag = :deleteFlag");
         Map<String, Object> params = Maps.newHashMap();
         params.put("carmodelId", carmodelId);
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         return namedParameterJdbcTemplate.queryForObject(sql.toString(), params, Integer.class);
     }
 }

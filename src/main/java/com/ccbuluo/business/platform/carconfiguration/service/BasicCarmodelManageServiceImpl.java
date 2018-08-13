@@ -56,13 +56,13 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
     private static final String CAR_MODEL_NUMBER = "car_model_number";
 
     /**
-     * XXXXX已经存在！
+     * 车型已经存在！
      */
     private static final String CAR_MODEL_EXIST = "车型已经存在！";
     /**
      * 被车辆引用过的车型不能删除
      */
-    private static final String CARMODEL_CANNOT_DELETE = "被车辆引用过的车型不能删除！";
+    private static final String CARMODEL_CANNOT_DELETE = "已被车辆引用不能删除！";
     @Resource
     private GenerateProjectCodeService generateProjectCodeService;
 
