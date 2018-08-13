@@ -105,6 +105,11 @@ public class AllocateapplyDetailBO {
      */
     @ApiModelProperty(name = "processOrgno", value = "申请处理机构code", hidden = true)
     private String processOrgno;
+    /**
+     * 商品名字
+     */
+    @ApiModelProperty(name = "productName", value = "商品名字")
+    private String productName;
 
     public void setId(Long id) {
         this.id = id;
@@ -248,5 +253,13 @@ public class AllocateapplyDetailBO {
 
     public void setProcessOrgno(String processOrgno) {
         this.processOrgno = processOrgno;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 }
