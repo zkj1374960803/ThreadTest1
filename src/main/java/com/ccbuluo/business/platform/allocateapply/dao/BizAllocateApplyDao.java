@@ -262,11 +262,19 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
         sql.append(" UPDATE biz_allocateapply_detail SET apply_num = :applyNum,sell_price = :sellPrice WHERE id = :id ");
         batchUpdateForListBean(sql.toString(), processApplyDetailDTO);
     }
-    // todo
+    /**
+     * 查询可调拨库存列表
+     * @param findStockListDTO 查询条件
+     * @return StatusDto<Page<FindStockListDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-10 15:45:56
+     */
     public Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO) {
-        String sql = "  SELECT a.id,a.product_no,COUNT(a.valid_stock),b.product_name,b.product_categoryname,b.unit FROM biz_stock_detail a \n" +
-            "  LEFT JOIN (SELECT product_no,unit,product_name,product_categoryname FROM biz_instockorder_detail GROUP BY product_no) b ON a.product_no = b.product_no\n" +
-            "  GROUP BY a.product_no";
-        return null;
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT a.id,a.product_no,sum(a.valid_stock) as 'total',b.product_name,b.product_categoryname,b.unit ")
+            .append(" FROM biz_stock_detail a ")
+            .append(" LEFT JOIN (SELECT product_no,unit,product_name,product_categoryname FROM biz_instockorder_detail GROUP BY product_no) b ON a.product_no = b.product_no ")
+            .append(" GROUP BY a.product_no ");
+        return queryPageForBean(FindStockListDTO.class, sql.toString(), findStockListDTO, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
     }
 }

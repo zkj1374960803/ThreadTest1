@@ -277,8 +277,17 @@ public class AllocateApplyImpl implements AllocateApply{
     }
 
     @Override
-    // todo
+    /**
+     * 查询可调拨库存列表
+     * @param findStockListDTO 查询条件
+     * @return StatusDto<Page<FindStockListDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-10 15:45:56
+     */
     public Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO) {
+        // 根据分类查询
+
+
         Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO);
         return page;
     }

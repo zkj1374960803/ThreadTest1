@@ -327,7 +327,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         userInfoDTO.setOperator(loggedUserId);
         StatusDto<String> updateUser = innerUserInfoService.updateUser(userInfoDTO);
         if(!updateUser.isSuccess()){
-            return StatusDto.buildFailure("更新失败！");
+            return StatusDto.buildFailure(updateUser.getMessage());
         }
         bizServiceCustmanager.setUserUuid(userInfoDTO.getUseruuid());
         updateCustManager(bizServiceCustmanager);

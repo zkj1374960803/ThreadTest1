@@ -132,20 +132,25 @@ public class AllocateApplyController extends BaseController {
         allocateApplyImpl.processApply(processApplyDTO);
         return StatusDto.buildSuccessStatusDto();
     }
+
     /**
      * 查询可调拨库存列表
-     * @param
-     * @exception
-     * @return
+     * @param findStockListDTO 查询条件
+     * @return StatusDto<Page<FindStockListDTO>>
      * @author zhangkangjian
      * @date 2018-08-10 15:45:56
      */
     @ApiOperation(value = "查询可调拨库存列表", notes = "【张康健】")
     @GetMapping("/findstocklist")
-    public StatusDto<Page<FindStockListDTO>> findStockList(FindStockListDTO findStockListDTO){
-        // todo
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "categoryCode", value = "分类的code", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "productNo", value = "商品的编号", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query")
+    })
+    public StatusDto<Page<FindStockListDTO>> findStockList(@ApiIgnore FindStockListDTO findStockListDTO){
         Page<FindStockListDTO> page = allocateApplyImpl.findStockList(findStockListDTO);
-        return  null;
+        return StatusDto.buildDataSuccessStatusDto(page);
     }
 
 }
