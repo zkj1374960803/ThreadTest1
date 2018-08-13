@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.outstockplan.dao;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizOutstockplanDetail;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
@@ -126,5 +127,38 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
                 .append(" :deleteFlag, :remark, :productCategoryname )");
         List<Long> longs = super.batchInsertForListBean(sql.toString(), list);
         return longs;
+    }
+
+    /**
+     *  更改出库计划状态
+     * @param applyNo 申请单编号
+     * @param planStatus 状态
+     * @param outRepositoryNo 出库仓库编号
+     * @author weijb
+     * @date 2018-08-11 12:55:41
+     */
+    public int updateOutStockPlanStatus(String applyNo, String planStatus, String outRepositoryNo){
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_outstockplan_detail SET plan_status = :planStatus WHERE trade_no= :applyNo and out_repository_no= :outRepositoryNo");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("planStatus", planStatus);
+        params.put("outRepositoryNo", outRepositoryNo);
+        return super.updateForMap(sql.toString(), params);
+    }
+    /**
+     * 删除出库计划详情
+     * @param applyNo 申请单编号
+     * @exception
+     * @author weijb
+     * @Date 2018-08-10 17:37:32
+     */
+    public int deleteOutstockplanDetailByApplyNo(String applyNo){
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_outstockplan_detail SET delete_flag = :deleteFlag  WHERE doc_no= :applyNo ");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("deleteFlag", Constants.DELETE_FLAG_DELETE);
+        return super.updateForMap(sql.toString(), params);
     }
 }

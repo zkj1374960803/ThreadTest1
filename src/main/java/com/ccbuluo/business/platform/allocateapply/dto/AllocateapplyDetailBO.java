@@ -12,8 +12,8 @@ import java.util.Date;
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "AllocateapplyDetailDTO", description = "申请详情")
-public class AllocateapplyDetailDTO {
+@ApiModel(value = "AllocateapplyDetailBO", description = "申请详情")
+public class AllocateapplyDetailBO {
     /**
      * 
      */
@@ -100,6 +100,11 @@ public class AllocateapplyDetailDTO {
      */
     @ApiModelProperty(name = "processType", value = "交易类型（采购或是调拨）", hidden = true)
     private String processType;
+    /**
+     * 申请处理机构code
+     */
+    @ApiModelProperty(name = "processOrgno", value = "申请处理机构code", hidden = true)
+    private String processOrgno;
 
     public void setId(Long id) {
         this.id = id;
@@ -235,5 +240,13 @@ public class AllocateapplyDetailDTO {
 
     public void setProcessType(String processType) {
         this.processType = processType;
+    }
+
+    public String getProcessOrgno() {
+        return processOrgno;
+    }
+
+    public void setProcessOrgno(String processOrgno) {
+        this.processOrgno = processOrgno;
     }
 }

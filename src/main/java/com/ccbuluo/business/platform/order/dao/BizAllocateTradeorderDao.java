@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.order.dao;
 
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizAllocateTradeorder;
 import com.ccbuluo.business.entity.RelOrdstockOccupy;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelConfiguration;
@@ -135,5 +136,53 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
                 .append(" :createTime, :deleteFlag )");
         List<Long> longs = super.batchInsertForListBean(sql.toString(), list);
         return longs;
+    }
+
+    /**
+     * 根据申请单编号查询订单占用库存关系表
+     * @param applyNo  applyNo
+     * @return 影响条数
+     * @author weijb
+     * @date 2018-08-07 13:55:41
+     */
+    public List<RelOrdstockOccupy> getRelOrdstockOccupyByApplyNo(String applyNo){
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT order_type,doc_no,stock_id,occupy_num,occupy_status,occupy_starttime, ")
+                .append("occupy_endtime,creator,create_time,delete_flag ")
+                .append(" FROM rel_ordstock_occupy WHERE doc_no= :applyNo");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        return super.queryListBean(RelOrdstockOccupy.class, sql.toString(), params);
+    }
+
+    /**
+     * 根据申请单编号删除订单占用库存关系表
+     * @param applyNo  申请单编号
+     * @return 影响条数
+     * @author liuduo
+     * @date 2018-08-07 11:55:41
+     */
+    public int deleteRelOrdstockOccupyByApplyNo(String applyNo) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE rel_ordstock_occupy SET delete_flag = :deleteFlag  WHERE doc_no= :applyNo ");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("deleteFlag", Constants.DELETE_FLAG_DELETE);
+        return super.updateForMap(sql.toString(), params);
+    }
+    /**
+     * 删除订单
+     * @param applyNo 订单编号
+     * @exception
+     * @author weijb
+     * @Date 2018-08-13 17:37:32
+     */
+    public int deleteAllocateTradeorderByApplyNo(String applyNo){
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_allocate_tradeorder SET delete_flag = :deleteFlag  WHERE doc_no= :applyNo ");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("deleteFlag", Constants.DELETE_FLAG_DELETE);
+        return super.updateForMap(sql.toString(), params);
     }
 }

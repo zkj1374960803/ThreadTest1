@@ -24,4 +24,12 @@ public interface TradeOrderService {
      * @date 2018-08-08 10:55:41
      */
     int allocateApplyHandle(String applyNo);
+
+    /**
+     *  撤销申请
+     * @param applyNo 申请单编号
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    int cancelApply(String applyNo);
 }
