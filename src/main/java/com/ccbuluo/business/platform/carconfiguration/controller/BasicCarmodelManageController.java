@@ -105,8 +105,7 @@ public class BasicCarmodelManageController extends BaseController {
     @ApiOperation(value = "编辑车型", notes = "【chaoshuai】")
     @PostMapping("/edit")
     public StatusDto edit(@RequestBody CarmodelManageDTO carmodelManageDTO){
-        StatusDto statusDto = this.basicCarmodelManageService.editCarModel(carmodelManageDTO);
-        return StatusDto.buildSuccessStatusDto(statusDto.getMessage());
+        return  this.basicCarmodelManageService.editCarModel(carmodelManageDTO);
     }
 
     /**
