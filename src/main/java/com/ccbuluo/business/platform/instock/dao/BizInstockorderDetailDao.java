@@ -102,12 +102,42 @@ public class BizInstockorderDetailDao extends BaseDao<BizInstockorderDetail> {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO biz_instockorder_detail ( instock_orderno,instock_planid,")
             .append("product_no,product_name,product_type,product_categoryname,instock_problem_num,")
-            .append("supplier_no,instock_num,unit,cost_price,creator,create_time,operator,")
+            .append("supplier_no,instock_num,stock_type,unit,cost_price,creator,create_time,operator,")
             .append("operate_time,delete_flag,remark ) VALUES (  :instockOrderno,")
             .append(" :instockPlanid, :productNo, :productName, :productType,")
-            .append(" :productCategoryname, :instockProblemNum, :supplierNo, :instockNum, :unit, :costPrice,")
+            .append(" :productCategoryname, :instockProblemNum, :supplierNo, :instockNum, :stockType, :unit, :costPrice,")
             .append(" :creator, :createTime, :operator, :operateTime, :deleteFlag, :remark")
             .append(" )");
         return super.batchInsertForListBean(sql.toString(), bizInstockorderDetailList);
+    }
+
+    /**
+     * 根据入库单号查询入库单详单集合
+     * @param instockNo 入库单号
+     * @return 入库单详单集合
+     * @author liuduo
+     * @date 2018-08-10 10:56:57
+     */
+    public List<BizInstockorderDetail> queryListByinstockNo(String instockNo) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,instock_orderno,instock_planid,product_no,product_name,stock_type,")
+            .append("product_type,product_categoryname,supplier_no,instock_num,unit,cost_price")
+            .append(" FROM biz_instockorder_detail WHERE instock_orderno= :instockNo");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("instockNo", instockNo);
+
+        return queryListBean(BizInstockorderDetail.class, sql.toString(), params);
+    }
+
+    /**
+     * 修改入库单详单的库存id
+     * @param bizInstockorderDetailList1 入库单详单
+     * @author liuduo
+     * @date 2018-08-10 11:04:51
+     */
+    public void updateInstockorderStockId(List<BizInstockorderDetail> bizInstockorderDetailList1) {
+        String sql = "UPDATE biz_instockorder_detail SET stock_id = stockId WHERE id = :id";
+
+        batchUpdateForListBean(sql, bizInstockorderDetailList1);
     }
 }

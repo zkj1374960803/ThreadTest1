@@ -282,4 +282,28 @@ public class AllocateApplyImpl implements AllocateApply{
         Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO);
         return page;
     }
+
+    /**
+     * 修改申请单状态
+     * @param applyNo 申请单号
+     * @param status 申请单状态
+     * @author liuduo
+     * @date 2018-08-10 13:44:37
+     */
+    @Override
+    public void updateApplyOrderStatus(String applyNo, String status) {
+        bizAllocateApplyDao.updateApplyOrderStatus(applyNo, status);
+    }
+
+    /**
+     * 根据申请单状态查询申请单
+     * @param applyNoStatus 申请单状态
+     * @return 状态为等待收货的申请单
+     * @author liuduo
+     * @date 2018-08-11 12:56:39
+     */
+    @Override
+    public List<String> queryApplyNo(String applyNoStatus) {
+        return bizAllocateApplyDao.queryApplyNo(applyNoStatus);
+    }
 }

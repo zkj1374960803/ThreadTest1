@@ -1,10 +1,10 @@
-package com.ccbuluo.business.entity;
+package com.ccbuluo.business.platform.outstock.dto;
 
+import com.ccbuluo.business.entity.AftersaleCommonEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * 出库单详情实体
@@ -13,7 +13,7 @@ import java.util.Date;
  * @version V1.0.0
  */
 @ApiModel(value = "出库单详情实体", description = "出库单详情实体")
-public class BizOutstockorderDetail extends AftersaleCommonEntity{
+public class OutstockorderDetailDTO extends AftersaleCommonEntity{
     /**
      * 出库单编号
      */
@@ -50,15 +50,25 @@ public class BizOutstockorderDetail extends AftersaleCommonEntity{
     @ApiModelProperty(name = "supplierNo", value = "供应商编号")
     private String supplierNo;
     /**
+     * 供应商名字
+     */
+    @ApiModelProperty(name = "supplierName", value = "供应商名字")
+    private String supplierName;
+    /**
      * 出库数量
      */
     @ApiModelProperty(name = "outstockNum", value = "出库数量")
     private Long outstockNum;
     /**
-     * 库存类型
+     * 出库仓库
      */
-    @ApiModelProperty(name = "stockType", value = "库存类型")
-    private String stockType;
+    @ApiModelProperty(name = "outRepositoryNo", value = "出库仓库")
+    private String outRepositoryNo;
+    /**
+     * 出库仓库
+     */
+    @ApiModelProperty(name = "outRepositoryName", value = "出库仓库")
+    private String outRepositoryName;
     /**
      * 计量单位,冗余展示用的汉字
      */
@@ -74,6 +84,17 @@ public class BizOutstockorderDetail extends AftersaleCommonEntity{
      */
     @ApiModelProperty(name = "actualPrice", value = "销售单价")
     private BigDecimal actualPrice;
+    /**
+     * 成本总价
+     */
+    @ApiModelProperty(name = "costTotalPrice", value = "成本总价")
+    private BigDecimal costTotalPrice;
+    /**
+     * 销售总价
+     */
+    @ApiModelProperty(name = "actualTotalPrice", value = "销售总价")
+    private BigDecimal actualTotalPrice;
+
 
     public void setOutstockOrderno(String outstockOrderno) {
         this.outstockOrderno = outstockOrderno;
@@ -163,11 +184,45 @@ public class BizOutstockorderDetail extends AftersaleCommonEntity{
         return this.actualPrice;
     }
 
-    public String getStockType() {
-        return stockType;
+    public String getOutRepositoryNo() {
+        return outRepositoryNo;
     }
 
-    public void setStockType(String stockType) {
-        this.stockType = stockType;
+    public void setOutRepositoryNo(String outRepositoryNo) {
+        this.outRepositoryNo = outRepositoryNo;
     }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public String getOutRepositoryName() {
+        return outRepositoryName;
+    }
+
+    public void setOutRepositoryName(String outRepositoryName) {
+        this.outRepositoryName = outRepositoryName;
+    }
+
+    public BigDecimal getCostTotalPrice() {
+        return costTotalPrice;
+    }
+
+    public void setCostTotalPrice(BigDecimal costTotalPrice) {
+        this.costTotalPrice = costTotalPrice;
+    }
+
+    public BigDecimal getActualTotalPrice() {
+        return actualTotalPrice;
+    }
+
+    public void setActualTotalPrice(BigDecimal actualTotalPrice) {
+        this.actualTotalPrice = actualTotalPrice;
+    }
+
+
 }

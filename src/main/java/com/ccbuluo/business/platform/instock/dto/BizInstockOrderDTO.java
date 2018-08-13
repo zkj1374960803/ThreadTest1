@@ -1,10 +1,10 @@
 package com.ccbuluo.business.platform.instock.dto;
 
 import com.ccbuluo.business.entity.AftersaleCommonEntity;
-import com.ccbuluo.business.entity.BizInstockorderDetail;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -15,7 +15,7 @@ import java.util.List;
  * @version V1.0.0
  */
 @ApiModel(value = "入库单实体", description = "入库单实体")
-public class SaveBizInstockOrderDTO extends AftersaleCommonEntity{
+public class BizInstockOrderDTO extends AftersaleCommonEntity{
     /**
      * 入库单编号
      */
@@ -57,22 +57,20 @@ public class SaveBizInstockOrderDTO extends AftersaleCommonEntity{
     @ApiModelProperty(name = "transportorderNo", value = "物流单号")
     private String transportorderNo;
     /**
-     * 复核完成
+     * 入库人
      */
-    @ApiModelProperty(name = "checked", value = "复核完成")
-    private String checked;
+    @ApiModelProperty(name = "instockOperatorName", value = "入库人")
+    private String instockOperatorName;
     /**
-     * 复核完成时间
+     * 入库单详单
      */
-    @ApiModelProperty(name = "ceeckedTime", value = "复核完成时间")
-    private Date ceeckedTime;
-
+    @ApiModelProperty(name = "instockorderDetailDTOList", value = "入库单详单")
+    private List<InstockorderDetailDTO> instockorderDetailDTOList;
     /**
-     * 入库单详情
+     * 成本总价
      */
-    @ApiModelProperty(name = "instockorderDetailList", value = "入库单详情")
-    private List<BizInstockorderDetail> instockorderDetailList;
-
+    @ApiModelProperty(name = "costTotalPrice", value = "成本总价")
+    private BigDecimal costTotalPrice;
 
     public void setInstockOrderno(String instockOrderno) {
         this.instockOrderno = instockOrderno;
@@ -130,22 +128,6 @@ public class SaveBizInstockOrderDTO extends AftersaleCommonEntity{
         return this.transportorderNo;
     }
 
-    public void setChecked(String checked) {
-        this.checked = checked;
-    }
-
-    public String getChecked() {
-        return this.checked;
-    }
-
-    public void setCeeckedTime(Date ceeckedTime) {
-        this.ceeckedTime = ceeckedTime;
-    }
-
-    public Date getCeeckedTime() {
-        return this.ceeckedTime;
-    }
-
     public String getInstockOrgno() {
         return instockOrgno;
     }
@@ -154,11 +136,27 @@ public class SaveBizInstockOrderDTO extends AftersaleCommonEntity{
         this.instockOrgno = instockOrgno;
     }
 
-    public List<BizInstockorderDetail> getInstockorderDetailList() {
-        return instockorderDetailList;
+    public String getInstockOperatorName() {
+        return instockOperatorName;
     }
 
-    public void setInstockorderDetailList(List<BizInstockorderDetail> instockorderDetailList) {
-        this.instockorderDetailList = instockorderDetailList;
+    public void setInstockOperatorName(String instockOperatorName) {
+        this.instockOperatorName = instockOperatorName;
+    }
+
+    public List<InstockorderDetailDTO> getInstockorderDetailDTOList() {
+        return instockorderDetailDTOList;
+    }
+
+    public void setInstockorderDetailDTOList(List<InstockorderDetailDTO> instockorderDetailDTOList) {
+        this.instockorderDetailDTOList = instockorderDetailDTOList;
+    }
+
+    public BigDecimal getCostTotalPrice() {
+        return costTotalPrice;
+    }
+
+    public void setCostTotalPrice(BigDecimal costTotalPrice) {
+        this.costTotalPrice = costTotalPrice;
     }
 }

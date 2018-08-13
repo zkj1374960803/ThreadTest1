@@ -1,10 +1,10 @@
-package com.ccbuluo.business.entity;
+package com.ccbuluo.business.platform.instock.dto;
 
+import com.ccbuluo.business.entity.AftersaleCommonEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * 入库单详情实体
@@ -13,17 +13,12 @@ import java.util.Date;
  * @version V1.0.0
  */
 @ApiModel(value = "入库单详情实体", description = "入库单详情实体")
-public class BizInstockorderDetail extends AftersaleCommonEntity{
+public class InstockorderDetailDTO extends AftersaleCommonEntity{
     /**
      * 入库单编号
      */
     @ApiModelProperty(name = "instockOrderno", value = "入库单编号")
     private String instockOrderno;
-    /**
-     * 入库计划id
-     */
-    @ApiModelProperty(name = "instockPlanid", value = "入库计划id")
-    private Long instockPlanid;
     /**
      * 商品编号
      */
@@ -70,11 +65,10 @@ public class BizInstockorderDetail extends AftersaleCommonEntity{
     @ApiModelProperty(name = "costPrice", value = "成本单价")
     private BigDecimal costPrice;
     /**
-     * 库存明细id
+     * 成本总价
      */
-    @ApiModelProperty(name = "stockId", value = "库存明细id")
-    private Long stockId;
-    private String remark;
+    @ApiModelProperty(name = "costTotalPrice", value = "成本总价")
+    private BigDecimal costTotalPrice;
 
     public void setInstockOrderno(String instockOrderno) {
         this.instockOrderno = instockOrderno;
@@ -82,14 +76,6 @@ public class BizInstockorderDetail extends AftersaleCommonEntity{
 
     public String getInstockOrderno() {
         return this.instockOrderno;
-    }
-
-    public void setInstockPlanid(Long instockPlanid) {
-        this.instockPlanid = instockPlanid;
-    }
-
-    public Long getInstockPlanid() {
-        return this.instockPlanid;
     }
 
     public void setProductNo(String productNo) {
@@ -164,19 +150,11 @@ public class BizInstockorderDetail extends AftersaleCommonEntity{
         this.stockType = stockType;
     }
 
-    public String getRemark() {
-        return remark;
+    public BigDecimal getCostTotalPrice() {
+        return costTotalPrice;
     }
 
-    public void setRemark(String remark) {
-        this.remark = remark;
-    }
-
-    public Long getStockId() {
-        return stockId;
-    }
-
-    public void setStockId(Long stockId) {
-        this.stockId = stockId;
+    public void setCostTotalPrice(BigDecimal costTotalPrice) {
+        this.costTotalPrice = costTotalPrice;
     }
 }

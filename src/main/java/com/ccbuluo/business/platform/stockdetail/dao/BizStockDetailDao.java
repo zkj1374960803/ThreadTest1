@@ -2,15 +2,17 @@ package com.ccbuluo.business.platform.stockdetail.dao;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizStockDetail;
+import com.ccbuluo.business.platform.stockdetail.dto.UpdateStockBizStockDetailDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
-import io.swagger.models.auth.In;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 批次库存表，由交易批次号、供应商、仓库等多维度唯一主键 区分的库存表 dao
@@ -35,7 +37,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author liuduo
      * @date 2018-08-07 11:55:41
      */
-    public int saveEntity(BizStockDetail entity) {
+    public Long saveEntity(BizStockDetail entity) {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO biz_stock_detail ( repository_no,org_no,product_no,")
             .append("product_type,trade_no,supplier_no,valid_stock,occupy_stock,")
@@ -47,7 +49,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
             .append(" :transitStock, :freezeStock, :sellerOrgno, :costPrice,")
             .append(" :instockPlanid, :latestCorrectTime, :creator, :createTime,")
             .append(" :operator, :operateTime, :deleteFlag, :remark )");
-        return super.save(sql.toString(), entity);
+        return super.saveRid(sql.toString(), entity);
     }
 
     /**
@@ -131,6 +133,31 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         return findForObject(sql.toString(), params, Long.class);
     }
 
+
+
+//    public List<UpdateNumByVersionNo> getByinstockorderDeatil1(List<InstockOrderServiceImpl.BatchUpdateDto> batchUpdateDtos) {
+//        Map<String, Object> params = Maps.newHashMap();
+//
+//        StringBuilder sql = new StringBuilder("SELECT id,version_no FROM biz_stock_detail WHERE 1=1");
+//        for (int i = 0;i<batchUpdateDtos.size();i++) {
+//            InstockOrderServiceImpl.BatchUpdateDto batchUpdateDto = batchUpdateDtos.get(i);
+////            sql.append(" AND (supplier_no = :supplierNo+"+i+" AND repository_no = :inRepositoryNo"+i+"  AND trade_no = :applyNo"+i+" AND product_no = :productNo"+i+")");
+//            sql.append(" AND (supplier_no = :supplierNo+").append(i)
+//                .append(" AND repository_no = :inRepositoryNo").append(i)
+//                .append(" AND trade_no = :applyNo").append(i)
+//                .append(" AND product_no = :productNo").append(i).append(")");
+//            params.put("supplierNo"+i, batchUpdateDto.getSupplierNo());
+//            params.put("productNo"+i, batchUpdateDto.getProductNo());
+//            params.put("inRepositoryNo"+i, batchUpdateDto.getInRepositoryNo());
+//            params.put("applyNo"+i, batchUpdateDto.getApplyNo());
+//            if (i < batchUpdateDtos.size() - 1) {
+//                sql.append(" OR ");
+//            }
+//        }
+//
+//        return queryListBean(UpdateNumByVersionNo.class, sql.toString(), params);
+//    }
+
     /**
      * 修改有效库存
      * @param bizStockDetail 库存明细
@@ -138,10 +165,10 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author liuduo
      * @date 2018-08-08 15:24:09
      */
-    public void updateValidStock(BizStockDetail bizStockDetail, Integer versionNo) {
+    public void updateValidStock(BizStockDetail bizStockDetail, Long versionNo) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("bizStockDetail", bizStockDetail);
-        params.put("versionNo", versionNo + Constants.FLAG_ONE);
+        params.put("versionNo", versionNo + Constants.LONG_FLAG_ONE);
 
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE `biz_stock_detail` SET valid_stock = :validStock+valid_stock,version_no = version_no+1")
@@ -217,5 +244,65 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("sList", sList);
         return super.queryListBean(BizStockDetail.class, sql.toString(), params);
+    }
+
+    /**
+     * 根据库存明细id查询所有库存明细的占用库存
+     * @param ids 库存明细id
+     * @return 库存明细
+     * @author liuduo
+     * @date 2018-08-08 14:55:43
+     */
+    public List<UpdateStockBizStockDetailDTO> getOutstockDetail(List<Long> ids) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("ids", ids);
+
+        String sql = " SELECT id,occupy_stock,problem_stock,version_no FROM biz_stock_detail WHERE id IN(:ids)";
+
+        return queryListBean(UpdateStockBizStockDetailDTO.class, sql.toString(), params);
+    }
+
+    /**
+     * 修改库存明细的占用库存
+     * @param bizStockDetails 库存明细
+     * @author liuduo
+     * @date 2018-08-09 19:14:33
+     */
+    public void updateOccupyStock(List<BizStockDetail> bizStockDetails) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_stock_detail SET occupy_stock = :occupyStock,version_no = version_no+1")
+            .append(" WHERE id = :id AND :versionNo > version_no");
+
+        batchUpdateForListBean(sql.toString(), bizStockDetails);
+    }
+
+    /**
+     * 根据库存明细id查询到控制的版本号（乐观锁使用）
+     * @param stockIds 库存明细id
+     * @return 版本号对组
+     * @author liuduo
+     * @date 2018-08-10 15:02:51
+     */
+    public List<Pair<Long,Long>> queryVersionNoById(List<Long> stockIds) {
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("stockIds", stockIds);
+
+        String sql = "SELECT id,version_no FROM biz_stock_detail  WHERE id IN(:stockIds)";
+
+        return super.queryListPair(sql, param, Long.class, Long.class);
+    }
+
+    /**
+     * 把库存明细中的有效库存更新库到占用库存
+     * @param bizStockDetails 库存明细
+     * @author liuduo
+     * @date 2018-08-10 11:48:21
+     */
+    public void updateOccupyStockById(List<BizStockDetail> bizStockDetails) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_stock_detail SET occupy_stock = valid_stock,valid_stock = 0,version_no = version_no+1")
+            .append(" WHERE id = :id AND :versionNo > version_no");
+
+        batchUpdateForListBean(sql.toString(), bizStockDetails);
     }
 }

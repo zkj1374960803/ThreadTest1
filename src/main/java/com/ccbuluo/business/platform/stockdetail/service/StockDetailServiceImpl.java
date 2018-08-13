@@ -2,8 +2,12 @@ package com.ccbuluo.business.platform.stockdetail.service;
 
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
+import com.ccbuluo.business.platform.stockdetail.dto.UpdateStockBizStockDetailDTO;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * 库存详情service实现
@@ -40,7 +44,7 @@ public class StockDetailServiceImpl implements StockDetailService{
      * @date 2018-08-08 15:24:09
      */
     @Override
-    public void updateValidStock(BizStockDetail bizStockDetail, Integer versionNo) {
+    public void updateValidStock(BizStockDetail bizStockDetail, Long versionNo) {
         bizStockDetailDao.updateValidStock(bizStockDetail, versionNo);
     }
 
@@ -51,8 +55,8 @@ public class StockDetailServiceImpl implements StockDetailService{
      * @date 2018-08-08 15:39:58
      */
     @Override
-    public void saveStockDetail(BizStockDetail bizStockDetail) {
-        bizStockDetailDao.saveEntity(bizStockDetail);
+    public Long saveStockDetail(BizStockDetail bizStockDetail) {
+        return bizStockDetailDao.saveEntity(bizStockDetail);
     }
 
     /**
@@ -65,5 +69,51 @@ public class StockDetailServiceImpl implements StockDetailService{
     @Override
     public Integer getVersionNoById(Long id) {
         return bizStockDetailDao.getVersionNoById(id);
+    }
+
+    /**
+     * 根据库存明细id查询所有库存明细的占用库存
+     * @param ids 库存明细id
+     * @return 库存明细
+     * @author liuduo
+     * @date 2018-08-08 14:55:43
+     */
+    @Override
+    public List<UpdateStockBizStockDetailDTO> getOutstockDetail(List<Long> ids) {
+        return bizStockDetailDao.getOutstockDetail(ids);
+    }
+
+    /**
+     * 修改库存明细的占用库存
+     * @param bizStockDetails 库存明细
+     * @author liuduo
+     * @date 2018-08-09 19:14:33
+     */
+    @Override
+    public void updateOccupyStock(List<BizStockDetail> bizStockDetails) {
+        bizStockDetailDao.updateOccupyStock(bizStockDetails);
+    }
+
+    /**
+     * 把库存明细中的有效库存更新库到占用库存
+     * @param bizStockDetails 库存明细
+     * @author liuduo
+     * @date 2018-08-10 11:48:21
+     */
+    @Override
+    public void updateOccupyStockById(List<BizStockDetail> bizStockDetails) {
+        bizStockDetailDao.updateOccupyStockById(bizStockDetails);
+    }
+
+    /**
+     * 根据库存明细id查询到控制的版本号（乐观锁使用）
+     * @param stockIds 库存明细id
+     * @return 版本号对组
+     * @author liuduo
+     * @date 2018-08-10 15:02:51
+     */
+    @Override
+    public List<Pair<Long,Long>> queryVersionNoById(List<Long> stockIds) {
+        return bizStockDetailDao.queryVersionNoById(stockIds);
     }
 }

@@ -65,7 +65,7 @@ verification:
 #dev开发环境中配置默认登录用户:
 dev-default:
   #是否开启自动登录 只要有值即可!
-  #needLogin: need
+  needLogin: need
   username: "ZHT00512"
   password: "ZHT00512"
 

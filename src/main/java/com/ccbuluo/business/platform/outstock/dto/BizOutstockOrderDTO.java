@@ -1,9 +1,12 @@
-package com.ccbuluo.business.entity;
+package com.ccbuluo.business.platform.outstock.dto;
 
+import com.ccbuluo.business.entity.AftersaleCommonEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 出库单实体
@@ -12,7 +15,7 @@ import java.util.Date;
  * @version V1.0.0
  */
 @ApiModel(value = "出库单实体", description = "出库单实体")
-public class BizOutstockOrder extends AftersaleCommonEntity{
+public class BizOutstockOrderDTO extends AftersaleCommonEntity{
     /**
      * 出库单编号
      */
@@ -54,20 +57,26 @@ public class BizOutstockOrder extends AftersaleCommonEntity{
     @ApiModelProperty(name = "transportorderNo", value = "物流单号")
     private String transportorderNo;
     /**
-     * 复核完成
-     */
-    @ApiModelProperty(name = "checked", value = "复核完成")
-    private Long checked;
-    /**
-     * 复核完成时间
-     */
-    @ApiModelProperty(name = "checkedTime", value = "复核完成时间")
-    private Date checkedTime;
-    /**
      * 出库人
      */
     @ApiModelProperty(name = "outstockOperatorName", value = "出库人")
     private String outstockOperatorName;
+    /**
+     * 出库单详单
+     */
+    @ApiModelProperty(name = "outstockorderDetailDTOList", value = "出库单详单")
+    private List<OutstockorderDetailDTO> outstockorderDetailDTOList;
+    /**
+     * 成本总价
+     */
+    @ApiModelProperty(name = "actualPrice", value = "成本总价")
+    private BigDecimal costTotalPrice;
+    /**
+     * 销售总价
+     */
+    @ApiModelProperty(name = "actualPrice", value = "销售总价")
+    private BigDecimal actualTotalPrice;
+
 
     public void setOutstockorderNo(String outstockorderNo) {
         this.outstockorderNo = outstockorderNo;
@@ -125,22 +134,6 @@ public class BizOutstockOrder extends AftersaleCommonEntity{
         return this.transportorderNo;
     }
 
-    public void setChecked(Long checked) {
-        this.checked = checked;
-    }
-
-    public Long getChecked() {
-        return this.checked;
-    }
-
-    public void setCheckedTime(Date checkedTime) {
-        this.checkedTime = checkedTime;
-    }
-
-    public Date getCheckedTime() {
-        return this.checkedTime;
-    }
-
     public String getOutstockOrgno() {
         return outstockOrgno;
     }
@@ -149,11 +142,35 @@ public class BizOutstockOrder extends AftersaleCommonEntity{
         this.outstockOrgno = outstockOrgno;
     }
 
+    public List<OutstockorderDetailDTO> getOutstockorderDetailDTOList() {
+        return outstockorderDetailDTOList;
+    }
+
+    public void setOutstockorderDetailDTOList(List<OutstockorderDetailDTO> outstockorderDetailDTOList) {
+        this.outstockorderDetailDTOList = outstockorderDetailDTOList;
+    }
+
     public String getOutstockOperatorName() {
         return outstockOperatorName;
     }
 
     public void setOutstockOperatorName(String outstockOperatorName) {
         this.outstockOperatorName = outstockOperatorName;
+    }
+
+    public BigDecimal getCostTotalPrice() {
+        return costTotalPrice;
+    }
+
+    public void setCostTotalPrice(BigDecimal costTotalPrice) {
+        this.costTotalPrice = costTotalPrice;
+    }
+
+    public BigDecimal getActualTotalPrice() {
+        return actualTotalPrice;
+    }
+
+    public void setActualTotalPrice(BigDecimal actualTotalPrice) {
+        this.actualTotalPrice = actualTotalPrice;
     }
 }

@@ -58,12 +58,17 @@ public class BizInstockOrder extends AftersaleCommonEntity{
      * 复核完成
      */
     @ApiModelProperty(name = "checked", value = "复核完成")
-    private String checked;
+    private Long checked;
     /**
      * 复核完成时间
      */
     @ApiModelProperty(name = "checkedTime", value = "复核完成时间")
     private Date checkedTime;
+    /**
+     * 入库人
+     */
+    @ApiModelProperty(name = "instockOperatorName", value = "入库人")
+    private String instockOperatorName;
 
     public void setInstockOrderno(String instockOrderno) {
         this.instockOrderno = instockOrderno;
@@ -121,11 +126,11 @@ public class BizInstockOrder extends AftersaleCommonEntity{
         return this.transportorderNo;
     }
 
-    public void setChecked(String checked) {
+    public void setChecked(Long checked) {
         this.checked = checked;
     }
 
-    public String getChecked() {
+    public Long getChecked() {
         return this.checked;
     }
 
@@ -145,4 +150,11 @@ public class BizInstockOrder extends AftersaleCommonEntity{
         this.instockOrgno = instockOrgno;
     }
 
+    public String getInstockOperatorName() {
+        return instockOperatorName;
+    }
+
+    public void setInstockOperatorName(String instockOperatorName) {
+        this.instockOperatorName = instockOperatorName;
+    }
 }

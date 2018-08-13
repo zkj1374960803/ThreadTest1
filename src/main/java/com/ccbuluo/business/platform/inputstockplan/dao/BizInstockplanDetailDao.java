@@ -2,7 +2,9 @@ package com.ccbuluo.business.platform.inputstockplan.dao;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizInstockplanDetail;
+import com.ccbuluo.business.platform.outstock.dto.updatePlanStatusDTO;
 import com.ccbuluo.dao.BaseDao;
+import com.ccbuluo.http.StatusDto;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -141,30 +143,31 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
             .append("trade_no,supplier_no,instock_repository_no,cost_price,")
             .append("plan_instocknum,actual_instocknum,complete_status,complete_time,")
             .append("outstock_planid,creator,create_time,operator,operate_time,")
-            .append("delete_flag,remark FROM biz_instockplan_detail WHERE trade_no= :applyNo");
+            .append("delete_flag,remark FROM biz_instockplan_detail WHERE trade_no= :applyNo AND complete_status = :completeStatus");
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNo", applyNo);
+        params.put("completeStatus", Constants.CHECKED);
         return super.queryListBean(BizInstockplanDetail.class, sql.toString(), params);
     }
 
     /**
      * 根据入库计划id查询版本号
-     * @param instockPlanid 入库计划id
+     * @param ids 入库计划id
      * @return 版本号
      * @author liuduo
      * @date 2018-08-08 19:31:38
      */
-    public Integer getVersionNoById(Long instockPlanid) {
+    public List<updatePlanStatusDTO> getVersionNoById(List<Long> ids) {
         Map<String, Object> params = Maps.newHashMap();
-        params.put("instockPlanid", instockPlanid);
+        params.put("ids", ids);
 
-        String sql = "SELECT version_no FROM biz_instockplan_detail WHERE id = :instockPlanid";
+        String sql = "SELECT id,version_no FROM biz_instockplan_detail WHERE id IN(:ids)";
 
-        return findForObject(sql, params, Integer.class);
+        return queryListBean(updatePlanStatusDTO.class, sql, params);
     }
 
     /**
-     * 更新入库佳话中的实际入库数量
+     * 更新入库计划中的实际入库数量
      * @param bizInstockplanDetailList 入库计划
      * @author liuduo
      * @date 2018-08-08 20:17:42
@@ -178,6 +181,43 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
             .append(" WHERE id = :id AND :versionNo > version_no");
 
         batchUpdateForListBean(sql.toString(), bizInstockplanDetailList);
+    }
+
+    /**
+     * 修改入库计划的完成状态
+     * @param bizInstockplanDetailList 入库计划
+     * @author liuduo
+     * @date 2018-08-09 11:16:12
+     */
+    public void updateCompleteStatus(List<BizInstockplanDetail> bizInstockplanDetailList) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("bizInstockplanDetailList", bizInstockplanDetailList);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_instockplan_detail SET complete_status = :completeStatus,version_no = version_no+1,")
+            .append(" complete_time = :completeTime WHERE id = :id AND :versionNo > version_no");
+
+        batchUpdateForListBean(sql.toString(), bizInstockplanDetailList);
+    }
+
+    /**
+     * 根据申请单号查询入库计划
+     * @param applyNo 申请单号
+     * @return 入库计划
+     * @author liuduo
+     * @date 2018-08-11 13:17:42
+     */
+    public List<BizInstockplanDetail> queryInstockplan(String applyNo) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,instock_type,product_no,product_type,product_categoryname,")
+            .append("trade_no,supplier_no,instock_repository_no,cost_price,")
+            .append("plan_instocknum,actual_instocknum,complete_status,complete_time,outstock_planid ")
+            .append(" FROM biz_instockplan_detail WHERE trade_no= :applyNo");
+
+        return queryListBean(BizInstockplanDetail.class, sql.toString(), params);
     }
     /**
      *  更改入库计划状态

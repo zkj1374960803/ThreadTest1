@@ -95,4 +95,14 @@ public interface StoreHouseService {
      * @date 2018-08-07 14:32:09
      */
     StatusDto<List<QueryStorehouseDTO>> queryStorehouseByServiceCenterCode(String serviceCenterCode);
+
+    /**
+     * 根据仓库code查询仓库信息
+     * @param codes 仓库code
+     * @return 仓库信息
+     * @author liuduo
+     * @date 2018-08-13 11:58:35
+     */
+    List<QueryStorehouseDTO> queryByCode(List<String> codes);
+
 }

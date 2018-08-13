@@ -29,4 +29,27 @@ public class InstockorderDetailServiceImpl implements InstockorderDetailService{
     public List<Long> save(List<BizInstockorderDetail> bizInstockorderDetailList) {
         return bizInstockorderDetailDao.saveInstockorderDetail(bizInstockorderDetailList);
     }
+
+    /**
+     * 根据入库单号查询入库单详单集合
+     * @param instockNo 入库单号
+     * @return 入库单详单集合
+     * @author liuduo
+     * @date 2018-08-10 10:56:57
+     */
+    @Override
+    public List<BizInstockorderDetail> queryListByinstockNo(String instockNo) {
+        return bizInstockorderDetailDao.queryListByinstockNo(instockNo);
+    }
+
+    /**
+     * 修改入库单详单的库存id
+     * @param bizInstockorderDetailList1 入库单详单
+     * @author liuduo
+     * @date 2018-08-10 11:04:51
+     */
+    @Override
+    public void updateInstockorderStockId(List<BizInstockorderDetail> bizInstockorderDetailList1) {
+        bizInstockorderDetailDao.updateInstockorderStockId(bizInstockorderDetailList1);
+    }
 }
