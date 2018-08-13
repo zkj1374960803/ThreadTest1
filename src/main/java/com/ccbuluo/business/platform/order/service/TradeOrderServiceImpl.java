@@ -160,6 +160,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         outPlan.setProductNo(ad.getProductNo());// 商品编号
         outPlan.setProductType(ad.getProductType());// 商品类型
         outPlan.setProductCategoryname(ad.getProductCategoryname());// 商品分类名称
+        outPlan.setProductName(ad.getProductName());// 商品名称
         outPlan.setProductUnit(ad.getUnit());// 商品计量单位
         outPlan.setTradeNo(String.valueOf(ad.getId()));// 交易批次号（申请单编号）
         outPlan.setSupplierNo(ad.getSupplierNo());//供应商编号
@@ -185,6 +186,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         inPlan.setProductNo(ad.getProductNo());// 商品编号
         inPlan.setProductType(ad.getProductType());// 商品类型
         inPlan.setProductCategoryname(ad.getProductCategoryname());// 商品分类名称
+        inPlan.setProductName(ad.getProductName());// 商品名称
         inPlan.setProductUnit(ad.getUnit());// 商品计量单位
         inPlan.setTradeNo(String.valueOf(ad.getId()));// 交易批次号（申请单编号）
         inPlan.setSupplierNo(ad.getSupplierNo());//供应商编号
