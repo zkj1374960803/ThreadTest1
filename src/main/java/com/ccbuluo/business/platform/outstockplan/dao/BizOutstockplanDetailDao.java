@@ -1,6 +1,8 @@
 package com.ccbuluo.business.platform.outstockplan.dao;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizOutstockplanDetail;
+import com.ccbuluo.business.platform.outstock.dto.updatePlanStatusDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -126,5 +128,116 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
                 .append(" :deleteFlag, :remark, :productCategoryname )");
         List<Long> longs = super.batchInsertForListBean(sql.toString(), list);
         return longs;
+    }
+
+    /**
+     *  更改出库计划状态
+     * @param applyNo 申请单编号
+     * @param planStatus 状态
+     * @param outRepositoryNo 出库仓库编号
+     * @author weijb
+     * @date 2018-08-11 12:55:41
+     */
+    public int updateOutStockPlanStatus(String applyNo, String planStatus, String outRepositoryNo){
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_outstockplan_detail SET plan_status = :planStatus WHERE trade_no= :applyNo and out_repository_no= :outRepositoryNo");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("planStatus", planStatus);
+        params.put("outRepositoryNo", outRepositoryNo);
+        return super.updateForMap(sql.toString(), params);
+    }
+    /**
+     * 删除出库计划详情
+     * @param applyNo 申请单编号
+     * @exception
+     * @author weijb
+     * @Date 2018-08-10 17:37:32
+     */
+    public int deleteOutstockplanDetailByApplyNo(String applyNo){
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_outstockplan_detail SET delete_flag = :deleteFlag  WHERE doc_no= :applyNo ");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("deleteFlag", Constants.DELETE_FLAG_DELETE);
+        return super.updateForMap(sql.toString(), params);
+    }
+
+    /**
+     * 根据申请单号查询出库计划
+     * @param applyNo 申请单号
+     * @return 出库计划
+     * @author liuduo
+     * @date 2018-08-09 14:38:57
+     */
+    public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String outRepositoryNo) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("outRepositoryNo", outRepositoryNo);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,outstock_type,stock_id,product_no,product_type,trade_no,")
+            .append("supplier_no,apply_detail_id,cost_price,sales_price,out_repository_no,")
+            .append("plan_outstocknum,actual_outstocknum,plan_status,complete_time,")
+            .append("creator,create_time,operator,operate_time,delete_flag,remark,version_no,")
+            .append("product_categoryname FROM biz_outstockplan_detail WHERE trade_no= :applyNo AND out_repository_no = :outRepositoryNo");
+
+        return queryListBean(BizOutstockplanDetail.class, sql.toString(), params);
+    }
+
+    /**
+     * 根据出库计划id查询版本号（乐观锁）
+     * @param ids 出库计划id
+     * @return 版本号
+     * @author liuduo
+     * @date 2018-08-10 16:43:38
+     */
+    public List<updatePlanStatusDTO> getVersionNoById(List<Long> ids) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("ids", ids);
+
+        String sql = "SELECT id,version_no FROM biz_outstockplan_detail WHERE id IN(:ids)";
+
+        return queryListBean(updatePlanStatusDTO.class, sql, params);
+    }
+
+    /**
+     * 更改出库计划的实际出库数量
+     * @param bizOutstockplanDetails 出库计划
+     * @author liuduo
+     * @date 2018-08-10 16:48:48
+     */
+    public void updateActualOutstocknum(List<BizOutstockplanDetail> bizOutstockplanDetails) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_outstockplan_detail SET actual_outstocknum = :actualOutstocknum + actual_outstocknum,version_no = version_no+1")
+            .append(" WHERE id = :id AND :versionNo > version_no");
+
+        batchUpdateForListBean(sql.toString(), bizOutstockplanDetails);
+    }
+
+    /**
+     * 更新出库计划中的状态和完成时间
+     * @param bizOutstockplanDetails 出库计划
+     * @author liuduo
+     * @date 2018-08-10 17:46:26
+     */
+    public void updatePlanStatus(List<BizOutstockplanDetail> bizOutstockplanDetails) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_outstockplan_detail SET plan_status = :planStatus,complete_time = :completeTime,version_no = version_no+1")
+            .append(" WHERE id = :id AND :versionNo > version_no");
+
+        batchUpdateForListBean(sql.toString(), bizOutstockplanDetails);
+    }
+
+    /**
+     * 根据申请单号查询出库计划(创建出库单时的要出库商品)
+     * @param applyNo 申请单号
+     * @return 出库计划
+     * @author liuduo
+     * @date 2018-08-11 13:17:42
+     */
+    public List<BizOutstockplanDetail> queryOutstockplanList(String applyNo) {
+        // todo 刘铎
+        return null;
     }
 }

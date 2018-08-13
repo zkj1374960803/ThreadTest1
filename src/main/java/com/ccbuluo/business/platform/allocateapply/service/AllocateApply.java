@@ -7,6 +7,8 @@ import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO
 import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateApply;
 import com.ccbuluo.db.Page;
 
+import java.util.List;
+
 /**
  * @author zhangkangjian
  * @date 2018-08-07 14:29:38
@@ -62,4 +64,23 @@ public interface AllocateApply {
      * @date 2018-08-10 15:45:56
      */
     Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO);
+
+    /**
+     * 修改申请单状态
+     * @param applyNo 申请单号
+     * @param status 申请单状态
+     * @author liuduo
+     * @date 2018-08-10 13:44:37
+     */
+    void updateApplyOrderStatus(String applyNo, String status);
+
+    /**
+     * 根据申请单状态查询申请单
+     * @param applyNoStatus 申请单状态
+     * @return 状态为等待收货的申请单
+     * @author liuduo
+     * @date 2018-08-11 12:56:39
+     */
+    List<String> queryApplyNo(String applyNoStatus);
+
 }

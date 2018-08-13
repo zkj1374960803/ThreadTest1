@@ -29,7 +29,11 @@ public class BizInstockplanDetail {
      * 商品编号
      */
     @ApiModelProperty(name = "productNo", value = "商品编号")
-    private String productNo;
+    private String productNo;/**
+     * 商品名字
+     */
+    @ApiModelProperty(name = "productName", value = "商品名字")
+    private String productName;
     /**
      * 商品类型
      */
@@ -115,6 +119,11 @@ public class BizInstockplanDetail {
      */
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
+    /**
+     * 乐观锁使用的版本号
+     */
+    @ApiModelProperty(name = "versionNo", value = "乐观锁使用的版本号")
+    private Long versionNo;
 
     /**
      * 商品计量单位
@@ -144,6 +153,14 @@ public class BizInstockplanDetail {
 
     public String getProductNo() {
         return this.productNo;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     public void setProductType(String productType) {
@@ -282,14 +299,23 @@ public class BizInstockplanDetail {
         return this.remark;
     }
 
+    public String getStatusName() {
+        return StockPlanEnum.valueOf(completeStatus).getLabel();
+    }
+
+    public Long getVersionNo() {
+        return versionNo;
+    }
+
+    public void setVersionNo(Long versionNo) {
+        this.versionNo = versionNo;
+    }
+
     public String getProductUnit() {
         return productUnit;
     }
 
     public void setProductUnit(String productUnit) {
         this.productUnit = productUnit;
-    }
-    public String getStatusName() {
-        return StockPlanEnum.valueOf(completeStatus).getLabel();
     }
 }

@@ -218,4 +218,16 @@ public class StoreHouseServiceImpl implements StoreHouseService{
         List<QueryStorehouseDTO> queryStorehouseDTOList = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(serviceCenterCode);
         return StatusDto.buildDataSuccessStatusDto(queryStorehouseDTOList);
     }
+
+    /**
+     * 根据仓库code查询仓库信息
+     * @param codes 仓库code
+     * @return 仓库信息
+     * @author liuduo
+     * @date 2018-08-13 11:58:35
+     */
+    @Override
+    public List<QueryStorehouseDTO> queryByCode(List<String> codes) {
+        return bizServiceStorehouseDao.queryByCode(codes);
+    }
 }

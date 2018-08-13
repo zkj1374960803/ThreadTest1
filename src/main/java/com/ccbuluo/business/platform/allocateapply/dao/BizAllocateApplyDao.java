@@ -277,4 +277,36 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
             .append(" GROUP BY a.product_no ");
         return queryPageForBean(FindStockListDTO.class, sql.toString(), findStockListDTO, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
     }
+
+    /**
+     * 修改申请单状态
+     * @param applyNo 申请单号
+     * @param status 申请单状态
+     * @author liuduo
+     * @date 2018-08-10 13:44:37
+     */
+    public void updateApplyOrderStatus(String applyNo, String status) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("status", status);
+
+        String sql = "UPDATE biz_allocate_apply SET apply_status = :status WHERE apply_no = :applyNo";
+
+        updateForMap(sql, params);
+    }
+
+    /**
+     * 根据申请单状态查询申请单
+     * @param applyNoStatus 申请单状态
+     * @return 状态为等待收货的申请单
+     * @author liuduo
+     * @date 2018-08-11 12:56:39
+     */
+    public List<String> queryApplyNo(String applyNoStatus) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNoStatus", applyNoStatus);
+
+        String sql = "SELECT apply_no FROM biz_allocate_apply WHERE apply_status = :applyNoStatus";
+
+        return querySingColum(String.class, sql, params);
+    }
 }
