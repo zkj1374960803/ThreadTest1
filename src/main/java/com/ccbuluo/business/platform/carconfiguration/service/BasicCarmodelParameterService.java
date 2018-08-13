@@ -57,7 +57,7 @@ public interface BasicCarmodelParameterService {
      * @author chaoshuai
      * @Date 2018-05-08 14:58:58
      */
-    Page<CarmodelParameter> queryPageForParameter(String parameterName, int offset, int limit);
+    Page<CarmodelParameter> queryPageForParameter(String parameterName, String valueType, Integer carmodelLabelId, int offset, int limit);
 
     /**
      * 查询所用的配置参数

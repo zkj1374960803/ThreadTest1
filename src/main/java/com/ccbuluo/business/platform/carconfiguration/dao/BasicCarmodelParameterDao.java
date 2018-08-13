@@ -37,14 +37,24 @@ public class BasicCarmodelParameterDao extends BaseDao<CarmodelParameter> {
      * @author chaoshuai
      * @Date 2018-05-08 14:58:58
      */
-    public Page<CarmodelParameter> queryPageForParameter(String parameterName, int offset, int limit){
+    public Page<CarmodelParameter> queryPageForParameter(String parameterName, String valueType, Integer carmodelLabelId, int offset, int limit){
         Map<String ,Object> param = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT bcp.id,bcp.parameter_name,bcp.value_type,bcp.optional_list,bcp.sort_number,bcp.required_flag,bci.label_name FROM basic_carmodel_parameter bcp ");
-        sql.append(" LEFT JOIN basic_carmodel_label bci on bcp.carmodel_label_id=bci.id ");
+        sql.append(" LEFT JOIN basic_carmodel_label bci on bcp.carmodel_label_id=bci.id where 1=1 ");
         if(null != parameterName){
-            sql.append(" where bcp.parameter_name LIKE CONCAT('%',:parameterName,'%')");
+            sql.append(" and bcp.parameter_name LIKE CONCAT('%',:parameterName,'%') ");
             param.put("parameterName",parameterName);
+        }
+        // 参数类型
+        if(null != valueType){
+            sql.append(" and bcp.value_type=valueType ");
+            param.put("valueType",valueType);
+        }
+        // 参数标签
+        if(null != carmodelLabelId){
+            sql.append(" and bcp.carmodel_label_id=carmodelLabelId ");
+            param.put("carmodelLabelId",carmodelLabelId);
         }
         sql.append(" ORDER BY bcp.operate_time DESC");
         Page<CarmodelParameter> parameterPage = super.queryPageForBean(CarmodelParameter.class, sql.toString(), param, offset, limit);

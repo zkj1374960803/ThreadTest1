@@ -35,13 +35,17 @@ public class BasicCarmodelParameterController extends BaseController {
      */
     @ApiOperation(value = "分页查询所有配置参数", notes = "【chaoshuai】")
     @ApiImplicitParams({@ApiImplicitParam(name = "parameterName", value = "配置参数名称", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "valueType", value = "参数类型", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "carmodelLabelId", value = "参数标签", required = true, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "当前页数", required = true, paramType = "query"),
         @ApiImplicitParam(name = "limit", value = "每页条数", required = true, paramType = "query")})
     @GetMapping("/list")
     public StatusDto list(String parameterName,
+                          String valueType,
+                          Integer carmodelLabelId,
                           @RequestParam(defaultValue = "0") int offset,
                           @RequestParam(defaultValue = "10") int limit){
-        return StatusDto.buildDataSuccessStatusDto(basicCarmodelParameterService.queryPageForParameter(parameterName, offset, limit));
+        return StatusDto.buildDataSuccessStatusDto(basicCarmodelParameterService.queryPageForParameter(parameterName, valueType, carmodelLabelId,offset, limit));
     }
 
     /**
