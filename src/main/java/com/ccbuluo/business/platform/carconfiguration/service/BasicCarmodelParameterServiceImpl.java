@@ -50,7 +50,7 @@ public class BasicCarmodelParameterServiceImpl implements BasicCarmodelParameter
      * @Date 2018-05-08 14:58:58
      */
     @Override
-    public Page<CarmodelParameter> queryPageForParameter(String parameterName, int offset, int limit) {
+    public Page<CarmodelParameter> queryPageForParameter(String parameterName, String valueType, Integer carmodelLabelId, int offset, int limit) {
         Page<CarmodelParameter> carmodelParameterPage = this.basicCarmodelParameterDao.queryPageForParameter(parameterName, offset, limit);
         return carmodelParameterPage;
     }
