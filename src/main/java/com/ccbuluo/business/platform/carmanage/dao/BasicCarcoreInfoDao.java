@@ -44,10 +44,10 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO basic_carcore_info ( car_number,vin_number,engine_number,")
                 .append("beidou_number,carbrand_id,carseries_id,carmodel_id,produce_time,")
-                .append("remark,car_status, creator,create_time,operator,operate_time,delete_flag")
+                .append("remark,car_status, creator,create_time,operator,operate_time,delete_flag,store_assigned")
                 .append(" ) VALUES (  :carNumber, :vinNumber, :engineNumber, :beidouNumber,")
                 .append(" :carbrandId, :carseriesId, :carmodelId, :produceTime, :remark, :carStatus,")
-                .append(" :creator, :createTime, :operator, :operateTime, :deleteFlag )");
+                .append(" :creator, :createTime, :operator, :operateTime, :deleteFlag, :storeAssigned )");
         return super.save(sql.toString(), entity);
     }
 
