@@ -56,7 +56,13 @@ public interface AllocateApply {
      * @date 2018-08-10 11:24:53
      */
     void processApply(ProcessApplyDTO processApplyDTO);
-    // todo
+    /**
+     * 查询可调拨库存列表
+     * @param findStockListDTO 查询条件
+     * @return StatusDto<Page<FindStockListDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-10 15:45:56
+     */
     Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO);
 
     /**
