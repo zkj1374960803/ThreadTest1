@@ -55,7 +55,6 @@ public class AllocateApplyImpl implements AllocateApply{
     private InnerUserInfoService innerUserInfoService;
     @ThriftRPCClient("BasicMerchandiseSer")
     private CarpartsProductService carpartsProductService;
-
     /**
      * 创建物料或者零配件申请
      * @param bizAllocateApply 申请单实体
@@ -276,7 +275,7 @@ public class AllocateApplyImpl implements AllocateApply{
         bizAllocateApplyDao.batchUpdateForApplyDetail(processApplyDTO.getProcessApplyDetailDTO());
     }
 
-    @Override
+
     /**
      * 查询可调拨库存列表
      * @param findStockListDTO 查询条件
@@ -284,11 +283,18 @@ public class AllocateApplyImpl implements AllocateApply{
      * @author zhangkangjian
      * @date 2018-08-10 15:45:56
      */
+    @Override
     public Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO) {
-        // 根据分类查询
-
-
-        Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO);
+        // 根据分类查询供应商的code
+        List<String> productCode = null;
+        if(StringUtils.isNotBlank(findStockListDTO.getCategoryCode())){
+            List<BasicCarpartsProductDTO> carpartsProductDTOList = carpartsProductService.queryCarpartsProductListByCategoryCode(findStockListDTO.getCategoryCode());
+            productCode = carpartsProductDTOList.stream().map(BasicCarpartsProductDTO::getCarpartsCode).collect(Collectors.toList());
+            if(productCode == null || productCode.size() == 0){
+                return new Page<FindStockListDTO>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
+            }
+        }
+        Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode);
         return page;
     }
 

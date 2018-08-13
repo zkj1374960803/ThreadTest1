@@ -265,16 +265,28 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
     /**
      * 查询可调拨库存列表
      * @param findStockListDTO 查询条件
+     * @param productCode
      * @return StatusDto<Page<FindStockListDTO>>
      * @author zhangkangjian
      * @date 2018-08-10 15:45:56
      */
-    public Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO) {
+    public Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO, List<String> productCode) {
+        HashMap<String, Object> map = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.id,a.product_no,sum(a.valid_stock) as 'total',b.product_name,b.product_categoryname,b.unit ")
             .append(" FROM biz_stock_detail a ")
             .append(" LEFT JOIN (SELECT product_no,unit,product_name,product_categoryname FROM biz_instockorder_detail GROUP BY product_no) b ON a.product_no = b.product_no ")
-            .append(" GROUP BY a.product_no ");
+            .append(" WHERE 1 = 1 ");
+        if(productCode != null && productCode.size() > 0){
+            map.put("productCode", productCode);
+            sql.append(" AND  a.product_no in (:productCode)");
+        }
+        String productNo = findStockListDTO.getProductNo();
+        if(StringUtils.isNotBlank(productNo)){
+            map.put("productNo", productNo);
+            sql.append(" AND  a.product_no = :productNo ");
+        }
+        sql.append(" GROUP BY a.product_no ");
         return queryPageForBean(FindStockListDTO.class, sql.toString(), findStockListDTO, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
     }
 

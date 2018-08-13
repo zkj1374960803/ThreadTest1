@@ -56,7 +56,7 @@ public class FindStockListDTO{
      * 分类的code
      */
     @ApiModelProperty(name = "categoryCode", value = "分类的code", hidden = true)
-    private Integer categoryCode;
+    private String categoryCode;
 
     /**
      * 偏移量
@@ -133,11 +133,11 @@ public class FindStockListDTO{
         this.total = total;
     }
 
-    public Integer getCategoryCode() {
+    public String getCategoryCode() {
         return categoryCode;
     }
 
-    public void setCategoryCode(Integer categoryCode) {
+    public void setCategoryCode(String categoryCode) {
         this.categoryCode = categoryCode;
     }
 
