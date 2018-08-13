@@ -48,12 +48,12 @@ public class BasicCarmodelParameterDao extends BaseDao<CarmodelParameter> {
         }
         // 参数类型
         if(null != valueType){
-            sql.append(" and bcp.value_type=valueType ");
+            sql.append(" and bcp.value_type = :valueType ");
             param.put("valueType",valueType);
         }
         // 参数标签
         if(null != carmodelLabelId){
-            sql.append(" and bcp.carmodel_label_id=carmodelLabelId ");
+            sql.append(" and bcp.carmodel_label_id = :carmodelLabelId ");
             param.put("carmodelLabelId",carmodelLabelId);
         }
         sql.append(" ORDER BY bcp.operate_time DESC");
