@@ -4,6 +4,7 @@ import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelParameter;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -47,7 +48,7 @@ public class BasicCarmodelParameterDao extends BaseDao<CarmodelParameter> {
             param.put("parameterName",parameterName);
         }
         // 参数类型
-        if(null != valueType){
+        if(StringUtils.isNotBlank(valueType)){
             sql.append(" and bcp.value_type = :valueType ");
             param.put("valueType",valueType);
         }
