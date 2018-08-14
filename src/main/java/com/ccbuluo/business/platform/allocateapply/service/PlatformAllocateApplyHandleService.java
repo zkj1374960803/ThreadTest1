@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
+import com.auth0.jwt.internal.org.apache.commons.lang3.StringUtils;
 import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.entity.*;
@@ -9,24 +10,25 @@ import com.ccbuluo.business.platform.allocateapply.utils.ApplyHandleUtils;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
+import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
+import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 平台直接调拨申请处理
+ * 平台调拨申请处理
  *
  * @author weijb
  * @version v1.0.0
  * @date 2018-08-13 18:13:50
  */
 @Service
-public class DirectAllocateApplyHandleService extends ApplyHandleServiceImpl {
+public class PlatformAllocateApplyHandleService extends ApplyHandleServiceImpl {
 
     @Resource
     private BizAllocateapplyDetailDao bizAllocateapplyDetailDao;
@@ -35,16 +37,16 @@ public class DirectAllocateApplyHandleService extends ApplyHandleServiceImpl {
     @Resource
     private BizAllocateTradeorderDao bizAllocateTradeorderDao;
     @Resource
-    ApplyHandleUtils applyHandleUtils;
-    @Resource
     private BizStockDetailDao bizStockDetailDao;
     @Resource
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
+    @Resource
+    ApplyHandleUtils applyHandleUtils;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
-     *  平台直接调拨申请处理
+     *  平台调拨申请处理
      * @param applyNo 申请单编号
      * @applyType 申请类型
      * @author weijb

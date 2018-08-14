@@ -41,11 +41,7 @@ public class PurchaseApplyHandleService extends ApplyHandleServiceImpl {
     @Resource
     private BizAllocateTradeorderDao bizAllocateTradeorderDao;
     @Resource
-    private BizStockDetailDao bizStockDetailDao;
-    @Resource
     private UserHolder userHolder;
-    @Resource
-    private GenerateDocCodeService generateDocCodeService;
     @Resource
     ApplyHandleUtils applyHandleUtils;
 
@@ -53,10 +49,11 @@ public class PurchaseApplyHandleService extends ApplyHandleServiceImpl {
     /**
      *  采购申请处理
      * @param applyNo 申请单编号
+     * @applyType 申请类型
      * @author weijb
      * @date 2018-08-08 10:55:41
      */
-    public int applyHandle(String applyNo){
+    public int applyHandle(String applyNo, String applyType){
         int flag = 0;
         try {
             // 根据申请单获取申请单详情
@@ -65,14 +62,14 @@ public class PurchaseApplyHandleService extends ApplyHandleServiceImpl {
                 return 0;
             }
             // 构建生成订单（采购）
-            List<BizAllocateTradeorder> list = applyHandleUtils.buildOrderEntityList(details, Constants.PROCESS_TYPE_PURCHASE);
+            List<BizAllocateTradeorder> list = applyHandleUtils.buildOrderEntityList(details, applyType);
             // 查询库存列表(平台的库存列表)
             List<BizStockDetail> stockDetails = applyHandleUtils.getStockDetailList(BusinessPropertyHolder.TOP_SERVICECENTER, details);
             if(null == stockDetails || stockDetails.size() == 0){
                 return 0;
             }
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
-            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = applyHandleUtils.buildOutAndInstockplanDetail(details, stockDetails, Constants.PROCESS_TYPE_PURCHASE);
+            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = applyHandleUtils.buildOutAndInstockplanDetail(details, stockDetails, applyType);
             bizInstockplanDetailDao.batchInsertInstockplanDetail(pir.getRight());
             // 保存生成订单
             bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);

@@ -1,18 +1,15 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
+import com.ccbuluo.business.constants.AllocateApplyEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
-import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
-import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * 申请处理入口
@@ -28,9 +25,13 @@ public class ApplyHandleCall {
     @Resource
     private BizAllocateApplyDao bizAllocateApplyDao;
     @Resource
-    private AllocateApplyHandleService allocateApplyHandleService;
+    private PlatformAllocateApplyHandleService platformAllocateApplyHandleService;
     @Resource
     private PurchaseApplyHandleService purchaseApplyHandleService;
+    @Resource
+    ServiceAllocateApplyHandleService serviceAllocateApplyHandleService;
+    @Resource
+    DirectAllocateApplyHandleService directAllocateApplyHandleService;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -42,16 +43,20 @@ public class ApplyHandleCall {
                 return 0;
             }
             // 采购
-            if(Constants.PROCESS_TYPE_PURCHASE.equals(ba.getProcessType())){
-                return purchaseApplyHandleService.applyHandle(applyNo);
+            if(AllocateApplyEnum.PURCHASE.toString().equals(ba.getApplyType())){
+                return purchaseApplyHandleService.applyHandle(applyNo,ba.getApplyType());
             }
-            // 调拨
-            if(Constants.PROCESS_TYPE_TRANSFER.equals(ba.getProcessType())){
-                return allocateApplyHandleService.applyHandle(applyNo);
+            // 平台调拨
+            if(AllocateApplyEnum.PLATFORMALLOCATE.toString().equals(ba.getApplyType())){
+                return platformAllocateApplyHandleService.applyHandle(applyNo,ba.getApplyType());
             }
-            // 直调
-            if(true){
-
+            // 平级调拨（服务间的调拨）
+            if(AllocateApplyEnum.SERVICEALLOCATE.toString().equals(ba.getApplyType())){
+                return serviceAllocateApplyHandleService.applyHandle(applyNo,ba.getApplyType());
+            }
+            // 平级直调
+            if(AllocateApplyEnum.DIRECTALLOCATE.toString().equals(ba.getApplyType())){
+                directAllocateApplyHandleService.applyHandle(applyNo,ba.getApplyType());
             }
             return 0;
         } catch (Exception e) {

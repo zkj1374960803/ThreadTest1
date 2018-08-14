@@ -11,10 +11,10 @@ public interface ApplyHandleService {
     /**
      *  申请处理
      * @param applyNo 申请单编号
-     * @author weijb
+     * @param applyType 申请类型
      * @date 2018-08-08 10:55:41
      */
-    public int applyHandle(String applyNo);
+    public int applyHandle(String applyNo, String applyType);
 
     /**
      *  申请撤销

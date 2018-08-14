@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
+import com.auth0.jwt.internal.org.apache.commons.lang3.StringUtils;
 import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.entity.*;
@@ -9,24 +10,25 @@ import com.ccbuluo.business.platform.allocateapply.utils.ApplyHandleUtils;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
+import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
+import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 平台直接调拨申请处理
+ * 平级调拨申请处理（服务间的调拨）
  *
  * @author weijb
  * @version v1.0.0
  * @date 2018-08-13 18:13:50
  */
 @Service
-public class DirectAllocateApplyHandleService extends ApplyHandleServiceImpl {
+public class ServiceAllocateApplyHandleService extends ApplyHandleServiceImpl {
 
     @Resource
     private BizAllocateapplyDetailDao bizAllocateapplyDetailDao;
@@ -35,16 +37,16 @@ public class DirectAllocateApplyHandleService extends ApplyHandleServiceImpl {
     @Resource
     private BizAllocateTradeorderDao bizAllocateTradeorderDao;
     @Resource
-    ApplyHandleUtils applyHandleUtils;
-    @Resource
     private BizStockDetailDao bizStockDetailDao;
     @Resource
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
+    @Resource
+    ApplyHandleUtils applyHandleUtils;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
-     *  平台直接调拨申请处理
+     *  调拨申请处理
      * @param applyNo 申请单编号
      * @applyType 申请类型
      * @author weijb
@@ -60,7 +62,7 @@ public class DirectAllocateApplyHandleService extends ApplyHandleServiceImpl {
                 return 0;
             }
             // 构建生成订单(调拨)
-            List<BizAllocateTradeorder> list = applyHandleUtils.buildOrderEntityList(details, applyNo);
+            List<BizAllocateTradeorder> list = applyHandleUtils.buildOrderEntityList(details, applyType);
             // 构建占用库存和订单占用库存关系
             //获取卖方机构code
             String sellerOrgNo = applyHandleUtils.getSellerOrgNo(list);
@@ -70,14 +72,14 @@ public class DirectAllocateApplyHandleService extends ApplyHandleServiceImpl {
                 return 0;
             }
             // 构建占用库存和订单占用库存关系
-            Pair<List<BizStockDetail>, List<RelOrdstockOccupy>> pair = applyHandleUtils.buildStockAndRelOrdEntity(details,stockDetails,applyNo);
+            Pair<List<BizStockDetail>, List<RelOrdstockOccupy>> pair = applyHandleUtils.buildStockAndRelOrdEntity(details,stockDetails,applyType);
             List<BizStockDetail> stockDetailList = pair.getLeft();
             // 构建订单占用库存关系
             List<RelOrdstockOccupy> relOrdstockOccupies = pair.getRight();
             // 保存生成订单
             bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
-            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = applyHandleUtils.buildOutAndInstockplanDetail(details, stockDetails, applyNo);
+            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = applyHandleUtils.buildOutAndInstockplanDetail(details, stockDetails, applyType);
             // 保存占用库存
             flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
             if(flag == 0){// 更新失败
