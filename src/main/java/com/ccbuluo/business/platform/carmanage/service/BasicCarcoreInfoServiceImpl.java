@@ -340,6 +340,8 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
 
     @Override
     public int release(String carNumber) {
+        //  根据车辆编号更新客户经理名称和门店名称
+        basicCarcoreInfoDao.updateCarcoreInfoManager(carNumber);
         return basicCarcoreInfoDao.release(carNumber);
     }
 

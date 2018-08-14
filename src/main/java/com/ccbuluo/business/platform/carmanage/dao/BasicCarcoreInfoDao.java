@@ -184,7 +184,7 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,car_number,vin_number,engine_number,beidou_number,")
                 .append("carbrand_id,carseries_id,carmodel_id,produce_time,remark,car_status, creator,")
-                .append("create_time,operator,operate_time,delete_flag FROM basic_carcore_info")
+                .append("create_time,operator,operate_time,delete_flag,store_name,cusmanager_name FROM basic_carcore_info")
                 .append(" WHERE id= :id");
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
@@ -388,5 +388,17 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
         params.put("carmodelId", carmodelId);
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         return namedParameterJdbcTemplate.queryForObject(sql.toString(), params, Integer.class);
+    }
+
+    /**
+     * 根据车辆编号把客户经理和门店信息置空
+     * @param carNumber
+     * @return
+     */
+    public int updateCarcoreInfoManager(String carNumber) {
+        String sql = "UPDATE basic_carcore_info SET store_name='',cusmanager_name = ''  WHERE car_number= :carNumber";
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("carNumber", carNumber);
+        return super.updateForMap(sql, map);
     }
 }
