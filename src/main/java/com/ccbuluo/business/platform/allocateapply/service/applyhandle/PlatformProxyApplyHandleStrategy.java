@@ -1,8 +1,6 @@
-package com.ccbuluo.business.platform.allocateapply.service;
+package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
-import com.auth0.jwt.internal.org.apache.commons.lang3.StringUtils;
 import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
-import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
@@ -10,9 +8,7 @@ import com.ccbuluo.business.platform.allocateapply.utils.ApplyHandleUtils;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
-import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
-import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +24,7 @@ import java.util.List;
  * @date 2018-08-13 18:13:50
  */
 @Service
-public class PlatformAllocateApplyHandleService extends ApplyHandleServiceImpl {
+public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy {
 
     @Resource
     private BizAllocateapplyDetailDao bizAllocateapplyDetailDao;

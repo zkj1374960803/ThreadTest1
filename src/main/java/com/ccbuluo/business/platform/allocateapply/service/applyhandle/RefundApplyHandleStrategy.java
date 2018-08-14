@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.allocateapply.service;
+package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
 import org.springframework.stereotype.Service;
 
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
  * @date 2018-08-13 18:13:50
  */
 @Service
-public class RefundApplyHandleService extends ApplyHandleServiceImpl {
+public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
     /**
      *  退款申请处理
      * @param applyNo 申请单编号

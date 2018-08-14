@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.allocateapply.service;
+package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
 /**
  * 申请处理
@@ -7,7 +7,7 @@ package com.ccbuluo.business.platform.allocateapply.service;
  * @version v1.0.0
  * @date 2018-08-13 19:26:33
  */
-public interface ApplyHandleService {
+public interface ApplyHandleStrategy {
     /**
      *  申请处理
      * @param applyNo 申请单编号

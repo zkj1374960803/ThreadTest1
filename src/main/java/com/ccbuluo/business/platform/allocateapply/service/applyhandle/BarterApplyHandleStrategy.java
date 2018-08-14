@@ -1,26 +1,24 @@
-package com.ccbuluo.business.platform.allocateapply.service;
+package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 申请处理
+ * 退换申请处理
  *
  * @author weijb
  * @version v1.0.0
- * @date 2018-08-13 18:09:03
+ * @date 2018-08-13 18:13:50
  */
 @Service
-public class ApplyHandleServiceImpl implements ApplyHandleService {
+public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
     /**
-     *  申请处理
+     *  退换申请处理
      * @param applyNo 申请单编号
-     * @param applyType 申请类型
      * @author weijb
      * @date 2018-08-08 10:55:41
      */
     @Override
-    public int applyHandle(String applyNo, String applyType){
+    public int applyHandle(String applyNo){
         return 0;
     }
 
@@ -34,5 +32,4 @@ public class ApplyHandleServiceImpl implements ApplyHandleService {
     public int cancelApply(String applyNo){
         return 0;
     }
-
 }

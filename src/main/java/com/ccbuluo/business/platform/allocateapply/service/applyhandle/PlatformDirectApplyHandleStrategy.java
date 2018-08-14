@@ -1,7 +1,6 @@
-package com.ccbuluo.business.platform.allocateapply.service;
+package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
 import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
-import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
@@ -26,7 +25,7 @@ import java.util.List;
  * @date 2018-08-13 18:13:50
  */
 @Service
-public class DirectAllocateApplyHandleService extends ApplyHandleServiceImpl {
+public class PlatformDirectApplyHandleStrategy extends DefaultApplyHandleStrategy {
 
     @Resource
     private BizAllocateapplyDetailDao bizAllocateapplyDetailDao;
