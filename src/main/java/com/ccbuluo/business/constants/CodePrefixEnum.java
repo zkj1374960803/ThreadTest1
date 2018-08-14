@@ -21,6 +21,7 @@ public enum CodePrefixEnum {
     FB("车品牌"),
     FN("车系"),
     FH("车型"),
+    FJ("车辆"),
     SW("申请单号"),
     R("入库单号"),
     C("出库单号"),
