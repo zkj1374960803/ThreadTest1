@@ -1,18 +1,19 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 采购申请处理
+ * 申请处理
  *
  * @author weijb
  * @version v1.0.0
- * @date 2018-08-13 18:13:50
+ * @date 2018-08-13 18:09:03
  */
 @Service
-public class purchaseApplyHandleService extends ApplyHandleService {
+public class ApplyHandleServiceImpl implements ApplyHandleService {
     /**
-     *  采购申请处理
+     *  申请处理
      * @param applyNo 申请单编号
      * @author weijb
      * @date 2018-08-08 10:55:41
@@ -32,4 +33,5 @@ public class purchaseApplyHandleService extends ApplyHandleService {
     public int cancelApply(String applyNo){
         return 0;
     }
+
 }

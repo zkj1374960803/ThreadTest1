@@ -163,7 +163,7 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
         carcoreInfo.setCarStatus(Constants.STATUS_FLAG_ZERO);
         carcoreInfo.setStoreAssigned(Constants.STATUS_FLAG_ZERO);
         // 3.通用字段
-        carcoreInfo.preInsert(userHolder.getLoggedUserId());
+//        carcoreInfo.preInsert(userHolder.getLoggedUserId());
     }
 
     /**

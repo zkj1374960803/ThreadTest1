@@ -1,26 +1,20 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
-import org.springframework.stereotype.Service;
-
 /**
  * 申请处理
  *
  * @author weijb
  * @version v1.0.0
- * @date 2018-08-13 18:09:03
+ * @date 2018-08-13 19:26:33
  */
-@Service
-public class ApplyHandleService implements ApplyHandle {
+public interface ApplyHandleService {
     /**
      *  申请处理
      * @param applyNo 申请单编号
      * @author weijb
      * @date 2018-08-08 10:55:41
      */
-    @Override
-    public int applyHandle(String applyNo){
-        return 0;
-    }
+    public int applyHandle(String applyNo);
 
     /**
      *  申请撤销
@@ -28,8 +22,5 @@ public class ApplyHandleService implements ApplyHandle {
      * @author weijb
      * @date 2018-08-11 13:35:41
      */
-    @Override
-    public int cancelApply(String applyNo){
-        return 0;
-    }
+    public int cancelApply(String applyNo);
 }

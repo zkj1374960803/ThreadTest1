@@ -2,7 +2,6 @@ package com.ccbuluo.business.platform.allocateapply.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -110,6 +109,12 @@ public class AllocateapplyDetailBO {
      */
     @ApiModelProperty(name = "productName", value = "商品名字")
     private String productName;
+
+    /**
+     * 处理机构类型
+     */
+    @ApiModelProperty(name = "processOrgtype", value = "处理机构类型")
+    private String processOrgtype;
 
     public void setId(Long id) {
         this.id = id;
@@ -261,5 +266,13 @@ public class AllocateapplyDetailBO {
 
     public void setProductName(String productName) {
         this.productName = productName;
+    }
+
+    public String getProcessOrgtype() {
+        return processOrgtype;
+    }
+
+    public void setProcessOrgtype(String processOrgtype) {
+        this.processOrgtype = processOrgtype;
     }
 }

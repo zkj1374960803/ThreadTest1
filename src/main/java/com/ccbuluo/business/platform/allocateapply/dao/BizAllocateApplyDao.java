@@ -321,4 +321,21 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
 
         return querySingColum(String.class, sql, params);
     }
+
+    /**
+     * 根据编号获取物料和零配件调拨的申请详情
+     * @param applyNo  code
+     * @author liuduo
+     * @date 2018-08-07 11:55:41
+     */
+    public BizAllocateApply getByNo(String applyNo) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,apply_no,applyorg_no,applyer,instock_orgno,")
+                .append("in_repository_no,outstock_orgtype,outstock_orgno,apply_processor,")
+                .append("process_time,process_type,apply_status,creator,create_time,operator,")
+                .append("operate_time,delete_flag,remark FROM biz_allocate_apply WHERE apply_no= :applyNo");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        return super.findForBean(BizAllocateApply.class, sql.toString(), params);
+    }
 }

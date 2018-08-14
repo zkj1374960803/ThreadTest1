@@ -18,11 +18,13 @@ import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.http.StatusDto;
+import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -120,8 +122,8 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         }
         if(Constants.PROCESS_TYPE_TRANSFER.equals(processType)){// 调拨
             int i = 0;
-            for(BizStockDetail bd : stockDetails){
-                AllocateapplyDetailBO ad = getAllocateapplyDetailByProductNo(details, bd.getProductNo());
+            for(AllocateapplyDetailBO ad : details){
+                BizStockDetail bd = getBizStockDetailByProductNo(stockDetails, ad.getProductNo());
                 // 卖方机构出库计划
                 BizOutstockplanDetail outstockplanDetail1 = new BizOutstockplanDetail();
                 outstockplanDetail1 = buildBizOutstockplanDetail(ad, processType);
@@ -162,7 +164,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         outPlan.setProductCategoryname(ad.getProductCategoryname());// 商品分类名称
         outPlan.setProductName(ad.getProductName());// 商品名称
         outPlan.setProductUnit(ad.getUnit());// 商品计量单位
-        outPlan.setTradeNo(String.valueOf(ad.getId()));// 交易批次号（申请单编号）
+        outPlan.setTradeNo(String.valueOf(ad.getApplyNo()));// 交易批次号（申请单编号）
         outPlan.setSupplierNo(ad.getSupplierNo());//供应商编号
         outPlan.setApplyDetailId(ad.getId());//申请单详单id
         outPlan.setCostPrice(ad.getCostPrice());// 成本价
@@ -188,7 +190,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         inPlan.setProductCategoryname(ad.getProductCategoryname());// 商品分类名称
         inPlan.setProductName(ad.getProductName());// 商品名称
         inPlan.setProductUnit(ad.getUnit());// 商品计量单位
-        inPlan.setTradeNo(String.valueOf(ad.getId()));// 交易批次号（申请单编号）
+        inPlan.setTradeNo(String.valueOf(ad.getApplyNo()));// 交易批次号（申请单编号）
         inPlan.setSupplierNo(ad.getSupplierNo());//供应商编号
         inPlan.setCostPrice(ad.getCostPrice());// 成本价
         inPlan.setPlanInstocknum(ad.getApplyNum());// 计划入库数量
@@ -201,9 +203,9 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     }
 
     // 根据商品编号查找到某个商品的申请单详情信息
-    private AllocateapplyDetailBO getAllocateapplyDetailByProductNo(List<AllocateapplyDetailBO> details, String productNo){
-        AllocateapplyDetailBO applyDetail = new AllocateapplyDetailBO();
-        for(AllocateapplyDetailBO ad : details){
+    private BizStockDetail getBizStockDetailByProductNo(List<BizStockDetail> stockDetails, String productNo){
+        BizStockDetail applyDetail = new BizStockDetail();
+        for(BizStockDetail ad : stockDetails){
             if (productNo.equals(ad.getProductNo())){
                 applyDetail = ad;
             }
@@ -335,9 +337,10 @@ public class TradeOrderServiceImpl implements TradeOrderService {
     private Pair<List<BizStockDetail>, List<RelOrdstockOccupy>>  buildStockAndRelOrdEntity(List<AllocateapplyDetailBO> details, List<BizStockDetail> stockDetails){
         //订单占用库存关系
         List<RelOrdstockOccupy> relOrdstockOccupies = new ArrayList<RelOrdstockOccupy>();
+        List<AllocateapplyDetailBO> detailBOS = copyList(details);
         for(BizStockDetail ad : stockDetails){// 遍历库存
             //占用库存
-            Long occupyStockNum = convertStockDetail(details, ad);
+            Long occupyStockNum = convertStockDetail(detailBOS, ad);
             //构建订单占用库存关系
             RelOrdstockOccupy ro = new RelOrdstockOccupy();
             ro.setOrderType(Constants.PROCESS_TYPE_TRANSFER);//订单类型(调拨，采购不占用库存)
@@ -353,6 +356,22 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             relOrdstockOccupies.add(ro);
         }
         return Pair.of(stockDetails, relOrdstockOccupies);
+    }
+    private List<AllocateapplyDetailBO> copyList(List<AllocateapplyDetailBO> details){
+        List<AllocateapplyDetailBO> detailsCopy = new ArrayList<AllocateapplyDetailBO>();
+        for (AllocateapplyDetailBO ab : details){
+            AllocateapplyDetailBO bo = new AllocateapplyDetailBO();
+            try {
+                BeanUtils.copyProperties(bo, ab);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+
+            detailsCopy.add(bo);
+        }
+        return detailsCopy;
     }
 
     // 根据卖方机构code获取库存详情

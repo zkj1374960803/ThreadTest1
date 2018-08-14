@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
  * @date 2018-08-13 18:13:50
  */
 @Service
-public class DirectAllocateApplyHandleService extends ApplyHandleService {
+public class DirectAllocateApplyHandleService extends ApplyHandleServiceImpl {
     /**
      *  平台直接调拨申请处理
      * @param applyNo 申请单编号

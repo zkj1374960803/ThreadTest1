@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
  * @date 2018-08-13 18:13:50
  */
 @Service
-public class RefundApplyHandleService extends ApplyHandleService {
+public class RefundApplyHandleService extends ApplyHandleServiceImpl {
     /**
      *  退款申请处理
      * @param applyNo 申请单编号
