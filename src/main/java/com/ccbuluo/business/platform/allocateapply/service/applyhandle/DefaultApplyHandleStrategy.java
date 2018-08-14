@@ -1,24 +1,25 @@
-package com.ccbuluo.business.platform.allocateapply.service;
+package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
 import org.springframework.stereotype.Service;
 
 /**
- * 退换申请处理
+ * 申请处理
  *
  * @author weijb
  * @version v1.0.0
- * @date 2018-08-13 18:13:50
+ * @date 2018-08-13 18:09:03
  */
 @Service
-public class BarterApplyHandleService extends ApplyHandleServiceImpl {
+public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     /**
-     *  退换申请处理
+     *  申请处理
      * @param applyNo 申请单编号
+     * @param applyType 申请类型
      * @author weijb
      * @date 2018-08-08 10:55:41
      */
     @Override
-    public int applyHandle(String applyNo){
+    public int applyHandle(String applyNo, String applyType){
         return 0;
     }
 
@@ -32,4 +33,5 @@ public class BarterApplyHandleService extends ApplyHandleServiceImpl {
     public int cancelApply(String applyNo){
         return 0;
     }
+
 }

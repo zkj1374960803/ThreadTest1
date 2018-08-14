@@ -1,7 +1,6 @@
-package com.ccbuluo.business.platform.allocateapply.service;
+package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
 import com.ccbuluo.business.constants.AllocateApplyEnum;
-import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import org.slf4j.Logger;
@@ -19,19 +18,19 @@ import javax.annotation.Resource;
  * @date 2018-08-13 19:26:33
  */
 @Service
-public class ApplyHandleCall {
+public class ApplyHandleContext {
 
     Logger logger = LoggerFactory.getLogger(getClass());
     @Resource
     private BizAllocateApplyDao bizAllocateApplyDao;
     @Resource
-    private PlatformAllocateApplyHandleService platformAllocateApplyHandleService;
+    private PlatformProxyApplyHandleStrategy platformAllocateApplyHandleService;
     @Resource
-    private PurchaseApplyHandleService purchaseApplyHandleService;
+    private PurchaseApplyHandleStrategy purchaseApplyHandleService;
     @Resource
-    ServiceAllocateApplyHandleService serviceAllocateApplyHandleService;
+    SameLevelApplyHandleStrategy serviceAllocateApplyHandleService;
     @Resource
-    DirectAllocateApplyHandleService directAllocateApplyHandleService;
+    PlatformDirectApplyHandleStrategy directAllocateApplyHandleService;
 
 
     @Transactional(rollbackFor = Exception.class)
