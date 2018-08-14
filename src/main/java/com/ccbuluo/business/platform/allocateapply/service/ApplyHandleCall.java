@@ -1,10 +1,10 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
-import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateApply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
