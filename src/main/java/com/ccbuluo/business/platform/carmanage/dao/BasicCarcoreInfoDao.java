@@ -396,7 +396,7 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
      * @return
      */
     public int updateCarcoreInfoManager(String carNumber) {
-        String sql = "UPDATE basic_carcore_info SET store_name='',cusmanager_name = ''  WHERE car_number= :carNumber";
+        String sql = "UPDATE basic_carcore_info SET cusmanager_name = ''  WHERE car_number= :carNumber";
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("carNumber", carNumber);
         return super.updateForMap(sql, map);
