@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.dao;
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
