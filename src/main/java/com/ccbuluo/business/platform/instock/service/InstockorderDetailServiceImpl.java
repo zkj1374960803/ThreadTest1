@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.instock.service;
 
 import com.ccbuluo.business.entity.BizInstockorderDetail;
 import com.ccbuluo.business.platform.instock.dao.BizInstockorderDetailDao;
+import com.ccbuluo.business.platform.instock.dto.InstockorderDetailDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,5 +52,17 @@ public class InstockorderDetailServiceImpl implements InstockorderDetailService{
     @Override
     public void updateInstockorderStockId(List<BizInstockorderDetail> bizInstockorderDetailList1) {
         bizInstockorderDetailDao.updateInstockorderStockId(bizInstockorderDetailList1);
+    }
+
+    /**
+     * 根据入库单号查询入库单详单
+     * @param instockNo 入库单号
+     * @return 入库单详单
+     * @author liuduo
+     * @date 2018-08-13 15:44:47
+     */
+    @Override
+    public List<InstockorderDetailDTO> getByInstockNo(String instockNo) {
+        return bizInstockorderDetailDao.getByInstockNo(instockNo);
     }
 }

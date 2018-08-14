@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.outstock.service;
 
+import com.ccbuluo.business.constants.ApplyStatusEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.DocCodePrefixEnum;
 import com.ccbuluo.business.entity.*;
@@ -132,12 +133,12 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         List<BizOutstockplanDetail> collect = bizOutstockplanDetailList.stream().filter(item -> item.getPlanStatus().equals(Constants.CHECKED)).collect(Collectors.toList());
         if (detail.getApplyType().equals(Constants.PLATFORM_TRANSFER)) {
             if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(Constants.PLATFORM)) {
-                updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, "等待收货");
+                updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.WAITINGRECEIPT.toString());
             } else {
-                updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, "平台待入库");
+                updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.INSTORE.toString());
             }
         } else {
-            updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, "等待收货");
+            updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.WAITINGRECEIPT.toString());
         }
     }
 
@@ -166,20 +167,20 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      */
     @Override
     public List<String> queryApplyNo() {
-        return allocateApply.queryApplyNo("等待发货");
+        return allocateApply.queryApplyNo(ApplyStatusEnum.WAITDELIVERY.toString());
     }
 
     /**
      * 根据申请单号查询出库计划
-     *
      * @param applyNo 申请单号
+     * @param productType 商品类型
      * @return 出库计划
      * @author liuduo
      * @date 2018-08-11 13:17:42
      */
     @Override
-    public List<BizOutstockplanDetail> queryOutstockplan(String applyNo) {
-        return outStockPlanService.queryOutstockplanList(applyNo);
+    public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String productType) {
+        return outStockPlanService.queryOutstockplanList(applyNo, productType);
     }
 
     /**
@@ -196,7 +197,9 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      */
     @Override
     public Page<BizOutstockOrder> queryOutstockList(String productType, String outstockType, String outstockNo, Integer offset, Integer pagesize) {
-        Page<BizOutstockOrder> bizOutstockOrderPage = bizOutstockOrderDao.queryOutstockList(productType, outstockType, outstockNo, offset, pagesize);
+        // 查询当前登录人的机构下的入库单
+        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+        Page<BizOutstockOrder> bizOutstockOrderPage = bizOutstockOrderDao.queryOutstockList(productType, outstockType, outstockNo, orgCode, offset, pagesize);
         List<BizOutstockOrder> rows = bizOutstockOrderPage.getRows();
         List<String> outstockOperator = rows.stream().map(BizOutstockOrder::getOutstockOperator).collect(Collectors.toList());
         StatusDtoThriftList<QueryNameByUseruuidsDTO> queryNameByUseruuidsDTOStatusDtoThriftList = innerUserInfoService.queryNameByUseruuids(outstockOperator);
@@ -352,7 +355,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 Long occupyStock;
                 if (updateStockBizStockDetailDTO != null) {
                     BizStockDetail bizStockDetail = new BizStockDetail();
-                    if (item.getStockType().equals("有效库存")) {
+                    if (item.getStockType().equals(BizStockDetail.StockEnum.VALIDSTOCK.toString())) {
                         occupyStock = updateStockBizStockDetailDTO.getOccupyStock();// 库存明细中的占用库存数量
                         if (occupyStock <= outstockNum) {
                             bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
@@ -365,7 +368,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                             bizStockDetail.setVersionNo(updateStockBizStockDetailDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
                             bizStockDetails.add(bizStockDetail);
                         }
-                    } else if (item.getStockType().equals("问题库存")) {
+                    } else if (item.getStockType().equals(BizStockDetail.StockEnum.PROBLEMSTOCK.toString())) {
                         occupyStock = updateStockBizStockDetailDTO.getProblemStock();// 库存明细中的问题件库存数量
                         if (occupyStock <= outstockNum) {
                             bizStockDetail.setId(updateStockBizStockDetailDTO.getId());

@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.instock.service;
 
+import com.ccbuluo.business.constants.ApplyStatusEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.DocCodePrefixEnum;
 import com.ccbuluo.business.entity.BizInstockOrder;
@@ -11,6 +12,7 @@ import com.ccbuluo.business.platform.allocateapply.service.AllocateApply;
 import com.ccbuluo.business.platform.inputstockplan.service.InputStockPlanService;
 import com.ccbuluo.business.platform.instock.dao.BizInstockOrderDao;
 import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
+import com.ccbuluo.business.platform.instock.dto.InstockorderDetailDTO;
 import com.ccbuluo.business.platform.outstock.dto.updatePlanStatusDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.service.StockDetailService;
@@ -32,6 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.JedisCluster;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -74,7 +77,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
      */
     @Override
     public List<String> queryApplyNo() {
-        return allocateApply.queryApplyNo("等待收货");
+        return allocateApply.queryApplyNo(ApplyStatusEnum.WAITINGRECEIPT.toString());
     }
 
     /**
@@ -142,13 +145,14 @@ public class InstockOrderServiceImpl implements InstockOrderService {
     /**
      * 根据申请单号查询入库计划
      * @param applyNo 申请单号
+     * @param productType 商品类型
      * @return 入库计划
      * @author liuduo
      * @date 2018-08-11 13:17:42
      */
     @Override
-    public List<BizInstockplanDetail> queryInstockplan(String applyNo) {
-        return inputStockPlanService.queryInstockplan(applyNo);
+    public List<BizInstockplanDetail> queryInstockplan(String applyNo, String productType) {
+        return inputStockPlanService.queryInstockplan(applyNo, productType);
     }
 
     /**
@@ -164,7 +168,9 @@ public class InstockOrderServiceImpl implements InstockOrderService {
      */
     @Override
     public Page<BizInstockOrder> queryInstockList(String productType, String instockType, String instockNo, Integer offset, Integer pagesize) {
-        Page<BizInstockOrder> bizInstockOrderPage = bizInstockOrderDao.queryInstockList(productType, instockType, instockNo, offset, pagesize);
+        // 查询当前登录人的机构下的入库单
+        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+        Page<BizInstockOrder> bizInstockOrderPage = bizInstockOrderDao.queryInstockList(productType, instockType, instockNo, orgCode, offset, pagesize);
         List<BizInstockOrder> rows = bizInstockOrderPage.getRows();
         List<String> instockOperator = rows.stream().map(BizInstockOrder::getInstockOperator).collect(Collectors.toList());
         StatusDtoThriftList<QueryNameByUseruuidsDTO> queryNameByUseruuidsDTOStatusDtoThriftList = innerUserInfoService.queryNameByUseruuids(instockOperator);
@@ -187,7 +193,24 @@ public class InstockOrderServiceImpl implements InstockOrderService {
      */
     @Override
     public BizInstockOrderDTO getByInstockNo(String instockNo) {
-        return null;
+        // 查询入库单
+        BizInstockOrderDTO bizInstockOrderDTO = bizInstockOrderDao.getByInstockNo(instockNo);
+        // 封装入库人
+        StatusDtoThriftList<QueryNameByUseruuidsDTO> queryNameByUseruuidsDTOStatusDtoThriftList = innerUserInfoService.queryNameByUseruuids(Lists.newArrayList(bizInstockOrderDTO.getInstockOperator()));
+        StatusDto<List<QueryNameByUseruuidsDTO>> resolve = StatusDtoThriftUtils.resolve(queryNameByUseruuidsDTOStatusDtoThriftList, QueryNameByUseruuidsDTO.class);
+        List<QueryNameByUseruuidsDTO> userNames = resolve.getData();
+        Map<String, String> collect = userNames.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getAsstoreCode, QueryNameByUseruuidsDTO::getStoreName));
+        bizInstockOrderDTO.setInstockOperatorName(collect.get(bizInstockOrderDTO.getInstockOperator()));
+        // 查询入库单详单
+        List<InstockorderDetailDTO> instockorderDetailDTOS = instockorderDetailService.getByInstockNo(instockNo);
+        instockorderDetailDTOS.forEach(item -> {
+            item.setCostTotalPrice(item.getCostPrice().multiply(new BigDecimal(item.getInstockNum())));
+        });
+        BigDecimal reduce = instockorderDetailDTOS.stream().map(InstockorderDetailDTO::getCostTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+        bizInstockOrderDTO.setCostTotalPrice(reduce);
+        bizInstockOrderDTO.setInstockorderDetailDTOList(instockorderDetailDTOS);
+
+        return bizInstockOrderDTO;
     }
 
     /**
@@ -224,12 +247,12 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(Constants.PLATFORM)) {
             List<BizInstockplanDetail> collect = bizInstockplanDetails.stream().filter(item -> item.getCompleteStatus().equals(Constants.CHECKED)).collect(Collectors.toList());
             if (collect.size() == bizInstockplanDetails.size()) {
-                allocateApply.updateApplyOrderStatus(applyNo, "平台待出库");
+                allocateApply.updateApplyOrderStatus(applyNo, ApplyStatusEnum.OUTSTORE.toString());
             }
         } else {
             List<BizInstockplanDetail> collect = bizInstockplanDetails.stream().filter(item -> item.getCompleteStatus().equals(Constants.CHECKED)).collect(Collectors.toList());
             if (collect.size() == bizInstockplanDetails.size()) {
-                allocateApply.updateApplyOrderStatus(applyNo, "确认收货");
+                allocateApply.updateApplyOrderStatus(applyNo, ApplyStatusEnum.CONFIRMRECEIPT.toString());
             }
         }
     }
@@ -347,9 +370,9 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                 bizStockDetail.setProductType(item.getProductType());
                 bizStockDetail.setTradeNo(applyNo);
                 bizStockDetail.setSupplierNo(item.getSupplierNo());
-                if (item.getStockType().equals("有效库存")) {
+                if (item.getStockType().equals(BizStockDetail.StockEnum.VALIDSTOCK.toString())) {
                     bizStockDetail.setValidStock(item.getInstockNum());
-                } else if (item.getStockType().equals("问题库存")) {
+                } else if (item.getStockType().equals(BizStockDetail.StockEnum.PROBLEMSTOCK.toString())) {
                     bizStockDetail.setProblemStock(item.getInstockNum());
                 }
                 bizStockDetail.setSellerOrgno(bizAllocateApply.getOutstockOrgno());

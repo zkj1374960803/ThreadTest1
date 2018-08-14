@@ -36,11 +36,12 @@ public interface InstockOrderService {
     /**
      * 根据申请单号查询入库计划
      * @param applyNo 申请单号
+     * @param productType 商品类型
      * @return 入库计划
      * @author liuduo
      * @date 2018-08-11 13:17:42
      */
-    List<BizInstockplanDetail> queryInstockplan(String applyNo);
+    List<BizInstockplanDetail> queryInstockplan(String applyNo, String productType);
 
     /**
      * 分页查询入库单列表

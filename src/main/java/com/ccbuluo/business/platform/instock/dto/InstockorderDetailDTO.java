@@ -42,8 +42,13 @@ public class InstockorderDetailDTO extends AftersaleCommonEntity{
     /**
      * 供应商编号
      */
-    @ApiModelProperty(name = "supplierNo", value = "")
+    @ApiModelProperty(name = "supplierNo", value = "供应商编号")
     private String supplierNo;
+    /**
+     * 供应商名字
+     */
+    @ApiModelProperty(name = "supplierName", value = "供应商名字")
+    private String supplierName;
     /**
      * 入库数量
      */
@@ -156,5 +161,13 @@ public class InstockorderDetailDTO extends AftersaleCommonEntity{
 
     public void setCostTotalPrice(BigDecimal costTotalPrice) {
         this.costTotalPrice = costTotalPrice;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
     }
 }

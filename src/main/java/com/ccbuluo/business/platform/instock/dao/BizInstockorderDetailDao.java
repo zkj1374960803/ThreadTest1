@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.instock.dao;
 
 import com.ccbuluo.business.entity.BizInstockorderDetail;
+import com.ccbuluo.business.platform.instock.dto.InstockorderDetailDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -139,5 +140,25 @@ public class BizInstockorderDetailDao extends BaseDao<BizInstockorderDetail> {
         String sql = "UPDATE biz_instockorder_detail SET stock_id = stockId WHERE id = :id";
 
         batchUpdateForListBean(sql, bizInstockorderDetailList1);
+    }
+
+    /**
+     * 根据入库单号查询入库单详单
+     * @param instockNo 入库单号
+     * @return 入库单详单
+     * @author liuduo
+     * @date 2018-08-13 15:44:47
+     */
+    public List<InstockorderDetailDTO> getByInstockNo(String instockNo) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("instockNo", instockNo);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT bid.instock_orderno,bid.product_no,bid.product_name,bid.product_categoryname,bid.supplier_no,")
+            .append(" bss.supplier_name,bid.instock_num,bid.cost_price,bid.unit FROM biz_instockorder_detail AS bid")
+            .append(" LEFT JOIN biz_service_supplier AS bss ON bss.supplier_code = bid.supplier_no")
+            .append("  WHERE bid.instock_orderno = :instockNo");
+
+        return queryListBean(InstockorderDetailDTO.class, sql.toString(), params);
     }
 }
