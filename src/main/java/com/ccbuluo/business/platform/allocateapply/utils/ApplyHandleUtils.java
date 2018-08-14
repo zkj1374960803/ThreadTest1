@@ -118,6 +118,21 @@ public class ApplyHandleUtils {
     }
 
     /**
+     *  入库计划去重
+     * @param
+     * @return
+     */
+    private void distinctInstockplan(List<BizInstockplanDetail> inList){
+        for  ( int  i  =   0 ; i  <  inList.size()  -   1 ; i ++ )  {
+            for  ( int  j  =  inList.size()  -   1 ; j  >  i; j -- )  {
+                if  (inList.get(j).getProductNo().equals(inList.get(i).getProductNo()))  {
+                    inList.remove(j);
+                }
+            }
+        }
+    }
+
+    /**
      *  构建出库和入库计划并保存
      * @param details 申请单详情
      * @param stockDetails 库存详情列表
@@ -137,11 +152,11 @@ public class ApplyHandleUtils {
                 // 平台入库计划
                 BizInstockplanDetail instockplanDetail1 = new BizInstockplanDetail();
                 instockplanDetail1 = buildBizInstockplanDetail(ad, applyType);
-                instockplanDetail1.setInstockRepositoryNo(BusinessPropertyHolder.TOP_SERVICECENTER);// 入库仓库编号
+                instockplanDetail1.setInstockRepositoryNo(ad.getInRepositoryNo());// 入库仓库编号
                 // 买入方入库计划
                 BizInstockplanDetail instockplanDetail2 = new BizInstockplanDetail();
                 instockplanDetail2 = buildBizInstockplanDetail(ad, applyType);
-                instockplanDetail2.setInstockRepositoryNo(ad.getInstockOrgno());// 入库仓库编号
+                instockplanDetail2.setInstockRepositoryNo(ad.getInRepositoryNo());// 入库仓库编号
 
                 inList.add(instockplanDetail1);
                 inList.add(instockplanDetail2);
@@ -160,20 +175,21 @@ public class ApplyHandleUtils {
                     // 平台入库计划
                     BizInstockplanDetail instockplanDetail1 = new BizInstockplanDetail();
                     instockplanDetail1 = buildBizInstockplanDetail(ad, applyType);
-                    instockplanDetail1.setInstockRepositoryNo(BusinessPropertyHolder.TOP_SERVICECENTER);// 平台code
+                    instockplanDetail1.setInstockRepositoryNo(ad.getInRepositoryNo());// 平台仓库code
                     // 平台出库计划
                     BizOutstockplanDetail outstockplanDetail2 = new BizOutstockplanDetail();
                     outstockplanDetail2 = buildBizOutstockplanDetail(ad, applyType);
-                    outstockplanDetail2.setOutRepositoryNo(BusinessPropertyHolder.TOP_SERVICECENTER);// 平台code
+                    outstockplanDetail2.setOutRepositoryNo(bd.getRepositoryNo());// 平台code
                     outList.add(outstockplanDetail2);
                     inList.add(instockplanDetail1);
                 }
                 // 买方入库计划
                 BizInstockplanDetail instockplanDetail2 = new BizInstockplanDetail();
                 instockplanDetail2 = buildBizInstockplanDetail(ad, applyType);
-                instockplanDetail2.setInstockRepositoryNo(ad.getInstockOrgno());// 买方机构仓库编号
+                instockplanDetail2.setInstockRepositoryNo(ad.getInRepositoryNo());// 买方机构仓库编号
                 outList.add(outstockplanDetail1);
                 inList.add(instockplanDetail2);
+                distinctInstockplan(inList);
             }
         }
         // 直调
@@ -183,14 +199,15 @@ public class ApplyHandleUtils {
                 BizStockDetail bd = getBizStockDetailByProductNo(stockDetails, ad.getProductNo());
                 BizOutstockplanDetail outstockplanDetail1 = buildBizOutstockplanDetail(ad, applyType);
                 outstockplanDetail1.setStockId(bd.getId());// 批次库存id(平台的库存)
-                outstockplanDetail1.setOutRepositoryNo(BusinessPropertyHolder.TOP_SERVICECENTER);// 出库仓库编号（平台code）
+                outstockplanDetail1.setOutRepositoryNo(bd.getRepositoryNo());// 出库仓库编号（平台code）
                 // 买入方入库计划
                 BizInstockplanDetail instockplanDetail1 = new BizInstockplanDetail();
                 instockplanDetail1 = buildBizInstockplanDetail(ad, applyType);
-                instockplanDetail1.setInstockRepositoryNo(ad.getInstockOrgno());// 入库仓库编号
+                instockplanDetail1.setInstockRepositoryNo(ad.getInRepositoryNo());// 入库仓库编号
 
                 outList.add(outstockplanDetail1);// 平台出库
                 inList.add(instockplanDetail1);// 机构1入库
+                distinctInstockplan(inList);
             }
         }
         return Pair.of(outList, inList);

@@ -89,6 +89,11 @@ public class AllocateapplyDetailBO {
     @ApiModelProperty(name = "instockOrgno", value = "买方机构的编号", hidden = true)
     private String instockOrgno;
     /**
+     * 入库仓库编号(买方仓库)
+     */
+    @ApiModelProperty(name = "instockOrgno", value = "入库仓库编号", hidden = true)
+    private String inRepositoryNo;
+    /**
      * 卖方机构的编号
      */
     @ApiModelProperty(name = "outstockOrgno", value = "卖方机构的编号", hidden = true)
@@ -240,6 +245,14 @@ public class AllocateapplyDetailBO {
 
     public void setInstockOrgno(String instockOrgno) {
         this.instockOrgno = instockOrgno;
+    }
+
+    public String getInRepositoryNo() {
+        return inRepositoryNo;
+    }
+
+    public void setInRepositoryNo(String inRepositoryNo) {
+        this.inRepositoryNo = inRepositoryNo;
     }
 
     public String getOutstockOrgno() {
