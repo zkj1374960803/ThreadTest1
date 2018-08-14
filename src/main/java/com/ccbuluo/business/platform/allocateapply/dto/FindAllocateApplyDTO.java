@@ -1,6 +1,5 @@
 package com.ccbuluo.business.platform.allocateapply.dto;
 
-import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateapplyDetail;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 

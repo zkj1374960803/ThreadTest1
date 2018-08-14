@@ -1,10 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
-import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
-import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
-import com.ccbuluo.business.platform.allocateapply.dto.ProcessApplyDTO;
-import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
-import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateApply;
+import com.ccbuluo.business.platform.allocateapply.dto.*;
+import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
 import com.ccbuluo.db.Page;
 
 import java.util.List;
@@ -16,11 +13,11 @@ import java.util.List;
 public interface AllocateApply {
     /**
      * 创建物料或者零配件申请
-     * @param bizAllocateApply 申请单实体
+     * @param allocateApplyDTO 申请单实体
      * @author zhangkangjian
      * @date 2018-08-07 20:54:24
      */
-    void createAllocateApply(BizAllocateApply bizAllocateApply);
+    void createAllocateApply(AllocateApplyDTO allocateApplyDTO);
     /**
      * 查询申请单详情
      * @param applyNo 申请单号
@@ -82,5 +79,13 @@ public interface AllocateApply {
      * @date 2018-08-11 12:56:39
      */
     List<String> queryApplyNo(String applyNoStatus);
-
+    /**
+     *  
+     * @param 
+     * @exception 
+     * @return 
+     * @author zhangkangjian
+     * @date 2018-08-13 17:42:46
+     */
+    void queryTransferStock(QueryTransferStockDTO queryTransferStockDTO);
 }

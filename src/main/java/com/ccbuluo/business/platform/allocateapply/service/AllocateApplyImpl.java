@@ -3,8 +3,8 @@ package com.ccbuluo.business.platform.allocateapply.service;
 import com.ccbuluo.business.constants.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
-import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateApply;
-import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateapplyDetail;
+import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.core.common.UserHolder;
@@ -14,13 +14,11 @@ import com.ccbuluo.core.entity.Organization;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
-import com.ccbuluo.http.StatusDto;
-import com.ccbuluo.http.StatusDtoThriftBean;
-import com.ccbuluo.http.StatusDtoThriftList;
-import com.ccbuluo.http.StatusDtoThriftUtils;
+import com.ccbuluo.http.*;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
-import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
+import com.ccbuluo.usercoreintf.dto.BasicOrganizationWorkplaceDTO;
+import com.ccbuluo.usercoreintf.dto.QueryServiceCenterDTO;
 import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
@@ -30,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -55,54 +54,59 @@ public class AllocateApplyImpl implements AllocateApply{
     private InnerUserInfoService innerUserInfoService;
     @ThriftRPCClient("BasicMerchandiseSer")
     private CarpartsProductService carpartsProductService;
+
     /**
      * 创建物料或者零配件申请
-     * @param bizAllocateApply 申请单实体
+     * @param allocateApplyDTO 申请单实体
      * @author zhangkangjian
      * @date 2018-08-07 20:54:24
      */
     @Override
-    public void createAllocateApply(BizAllocateApply bizAllocateApply) {
+    public void createAllocateApply(AllocateApplyDTO allocateApplyDTO) {
         String loggedUserId = userHolder.getLoggedUserId();
-        bizAllocateApply.setOperator(loggedUserId);
-        bizAllocateApply.setCreator(loggedUserId);
-        bizAllocateApply.setApplyer(loggedUserId);
+        allocateApplyDTO.setOperator(loggedUserId);
+        allocateApplyDTO.setCreator(loggedUserId);
+        allocateApplyDTO.setApplyer(loggedUserId);
+        allocateApplyDTO.setApplyerName(userHolder.getLoggedUser().getName());
         // 入库仓库查询入库组织机构
-        String orgCode = bizServiceStorehouseDao.getOrgCodeByStoreHouseCode(bizAllocateApply.getInRepositoryNo());
-        bizAllocateApply.setInstockOrgno(orgCode);
+        String orgCode = bizServiceStorehouseDao.getOrgCodeByStoreHouseCode(allocateApplyDTO.getInRepositoryNo());
+        allocateApplyDTO.setInstockOrgno(orgCode);
         // 生成申请单编号
         StatusDto<String> stringStatusDto = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.SW);
-        bizAllocateApply.setApplyNo(stringStatusDto.getData());
+        allocateApplyDTO.setApplyNo(stringStatusDto.getData());
         BusinessUser loggedUser = userHolder.getLoggedUser();
         if(loggedUser != null){
             Organization organization = loggedUser.getOrganization();
             if(organization != null){
                 String orgCodeUser = organization.getOrgCode();
                 if(orgCodeUser != null){
-                    bizAllocateApply.setApplyorgNo(orgCodeUser);
+                    allocateApplyDTO.setApplyorgNo(orgCodeUser);
                     if(orgCodeUser.equals(BusinessPropertyHolder.TOP_SERVICECENTER)){
                         // 等待付款状态
-                        bizAllocateApply.setApplyStatus("20");
+                        allocateApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
+                    }else {
+                        // 待处理
+                        allocateApplyDTO.setApplyStatus(ApplyStatusEnum.PENDING.name());
                     }
-                    // 待处理
-                    bizAllocateApply.setApplyStatus("10");
                 }
             }
         }
         // 查询组织架构类型
-        String orgTypeByCode = getOrgTypeByCode(bizAllocateApply.getOutstockOrgno());
-        bizAllocateApply.setOutstockOrgtype(orgTypeByCode);
+        String orgTypeByCode = getOrgTypeByCode(allocateApplyDTO.getOutstockOrgno());
+        allocateApplyDTO.setOutstockOrgtype(orgTypeByCode);
         // 如果是采购类型的，入库机构是平台
-        String processType = bizAllocateApply.getProcessType();
+        String processType = allocateApplyDTO.getProcessType();
         if(Constants.PROCESS_TYPE_PURCHASE.equals(processType)){
-            bizAllocateApply.setApplyorgNo(BusinessPropertyHolder.TOP_SERVICECENTER);
+            allocateApplyDTO.setApplyorgNo(BusinessPropertyHolder.TOP_SERVICECENTER);
         }
+        allocateApplyDTO.setProcessOrgtype(orgTypeByCode);
+        allocateApplyDTO.setProcessOrgno(allocateApplyDTO.getOutstockOrgno());
         // 保存申请单基础数据
-        bizAllocateApplyDao.saveEntity(bizAllocateApply);
+        bizAllocateApplyDao.saveEntity(allocateApplyDTO);
         // 保存申请单详情数据
-        List<BizAllocateapplyDetail> allocateapplyDetailList = bizAllocateApply.getAllocateapplyDetailList();
+        List<AllocateapplyDetailDTO> allocateapplyDetailList = allocateApplyDTO.getAllocateapplyDetailList();
         allocateapplyDetailList.stream().forEach(a -> {
-            a.setApplyNo(bizAllocateApply.getApplyNo());
+            a.setApplyNo(allocateApplyDTO.getApplyNo());
             a.setOperator(loggedUserId);
             a.setCreator(loggedUserId);
         });
@@ -264,12 +268,15 @@ public class AllocateApplyImpl implements AllocateApply{
             String orgTypeByCode = getOrgTypeByCode(outstockOrgno);
             processApplyDTO.setOutstockOrgType(orgTypeByCode);
         }
+
         // 查询版本号（数据库乐观锁）
         Long versionNo = bizAllocateApplyDao.findVersionNo(processApplyDTO.getApplyNo());
         processApplyDTO.setVersionNo(versionNo);
         // 处理通过，更新申请单状态
-        processApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.getKey());
+        processApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
         // 更新申请单的基础数据
+        processApplyDTO.setApplyProcessor(userHolder.getLoggedUserId());
+        processApplyDTO.setProcessTime(new Date());
         bizAllocateApplyDao.updateAllocateApply(processApplyDTO);
         // 更新申请单的详单数据
         bizAllocateApplyDao.batchUpdateForApplyDetail(processApplyDTO.getProcessApplyDetailDTO());
@@ -320,5 +327,32 @@ public class AllocateApplyImpl implements AllocateApply{
     @Override
     public List<String> queryApplyNo(String applyNoStatus) {
         return bizAllocateApplyDao.queryApplyNo(applyNoStatus);
+    }
+
+    /**
+     * @param queryTransferStockDTO
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-08-13 17:19:54
+     */
+    @Override
+    public void queryTransferStock(QueryTransferStockDTO queryTransferStockDTO) {
+        StatusDtoThriftPage<QueryServiceCenterDTO> queryList = basicUserOrganizationService.queryServiceCenterList(queryTransferStockDTO.getProvinceName(), queryTransferStockDTO.getCityName(), queryTransferStockDTO.getAreaName(), "0"," ", queryTransferStockDTO.getOffset(), queryTransferStockDTO.getPageSize());
+        StatusDto<Page<QueryServiceCenterDTO>> resolve = StatusDtoThriftUtils.resolve(queryList, QueryServiceCenterDTO.class);
+        Page<QueryServiceCenterDTO> data = resolve.getData();
+        List<QueryServiceCenterDTO> rows = data.getRows();
+        // 查询库存数量
+//        List<String> orgCode = rows.stream().map(QueryServiceCenterDTO::get).collect(Collectors.toList());
+//        Page<QueryTransferStockDTO> findStockListDTO = bizAllocateApplyDao.findStockNum(orgCode);
+//        // todo
+//        Map<String, BasicOrganizationWorkplaceDTO> orgMap = rows.stream().collect(Collectors.toMap(BasicOrganizationWorkplaceDTO::getAsstoreCode, a -> a,(k1,k2)->k1));
+//        List<QueryTransferStockDTO> stockList = findStockListDTO.getRows();
+//        stockList.stream().forEach(a -> {
+//            BasicOrganizationWorkplaceDTO orgDto = orgMap.get(a.getOrgCode());
+//
+//            a.setProvinceName(orgDto.get);
+//        });
+
     }
 }

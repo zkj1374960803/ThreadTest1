@@ -2,7 +2,7 @@ package com.ccbuluo.business.platform.allocateapply.dao;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
-import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateapplyDetail;
+import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -19,7 +19,7 @@ import java.util.Map;
  * @version V1.0.0
  */
 @Repository
-public class BizAllocateapplyDetailDao extends BaseDao<BizAllocateapplyDetail> {
+public class BizAllocateapplyDetailDao extends BaseDao<AllocateapplyDetailDTO> {
     @Resource
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
@@ -35,12 +35,12 @@ public class BizAllocateapplyDetailDao extends BaseDao<BizAllocateapplyDetail> {
      * @author liuduo
      * @date 2018-08-07 11:55:41
      */
-    public int saveEntity(BizAllocateapplyDetail entity) {
+    public int saveEntity(AllocateapplyDetailDTO entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO biz_allocateapply_detail ( apply_no,product_no,")
+        sql.append("INSERT INTO biz_allocateapply_detail ( product_name,apply_no,product_no,")
             .append("product_type,product_categoryname,apply_num,unit,sell_price,")
             .append("cost_price,supplier_no,creator,create_time,operator,operate_time,")
-            .append("delete_flag,remark ) VALUES (  :applyNo, :productNo, :productType,")
+            .append("delete_flag,remark ) VALUES (  :product_name,:applyNo, :productNo, :productType,")
             .append(" :productCategoryname, :applyNum, :unit, :sellPrice, :costPrice,")
             .append(" :supplierNo, :creator, :createTime, :operator, :operateTime,")
             .append(" :deleteFlag, :remark )");
@@ -54,7 +54,7 @@ public class BizAllocateapplyDetailDao extends BaseDao<BizAllocateapplyDetail> {
      * @author liuduo
      * @date 2018-08-07 11:55:41
      */
-    public int update(BizAllocateapplyDetail entity) {
+    public int update(AllocateapplyDetailDTO entity) {
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE biz_allocateapply_detail SET apply_no = :applyNo,")
             .append("product_no = :productNo,product_type = :productType,")
@@ -73,7 +73,7 @@ public class BizAllocateapplyDetailDao extends BaseDao<BizAllocateapplyDetail> {
      * @author liuduo
      * @date 2018-08-07 11:55:41
      */
-    public BizAllocateapplyDetail getById(long id) {
+    public AllocateapplyDetailDTO getById(long id) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,apply_no,product_no,product_type,product_categoryname,")
             .append("apply_num,unit,sell_price,cost_price,supplier_no,creator,create_time,")
@@ -81,7 +81,7 @@ public class BizAllocateapplyDetailDao extends BaseDao<BizAllocateapplyDetail> {
             .append(" FROM biz_allocateapply_detail WHERE id= :id");
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
-        return super.findForBean(BizAllocateapplyDetail.class, sql.toString(), params);
+        return super.findForBean(AllocateapplyDetailDTO.class, sql.toString(), params);
     }
 
     /**

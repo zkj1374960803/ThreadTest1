@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.allocateapply.entity;
+package com.ccbuluo.business.platform.allocateapply.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -13,7 +13,7 @@ import java.util.Date;
  * @version V1.0.0
  */
 @ApiModel(value = "BizAllocateapplyDetail", description = "申请详情")
-public class BizAllocateapplyDetail {
+public class AllocateapplyDetailDTO {
     /**
      * 
      */
@@ -29,6 +29,11 @@ public class BizAllocateapplyDetail {
      */
     @ApiModelProperty(name = "productNo", value = "商品的编号")
     private String productNo;
+    /**
+     * 商品的名称
+     */
+    @ApiModelProperty(name = "productName", value = "商品的名称")
+    private String productName;
     /**
      * 商品类型（注：FITTINGS零配件，EQUIPMENT物料）
      */
@@ -94,6 +99,14 @@ public class BizAllocateapplyDetail {
      */
     @ApiModelProperty(name = "remark", value = "备注", hidden = true)
     private String remark;
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
 
     public void setId(Long id) {
         this.id = id;

@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.allocateapply.entity;
+package com.ccbuluo.business.platform.allocateapply.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -13,12 +13,20 @@ import java.util.List;
  * @version V1.0.0
  */
 @ApiModel(value = "BizAllocateApply", description = "物料和零配件调拨的申请")
-public class BizAllocateApply {
+public class AllocateApplyDTO {
 
-    @ApiModelProperty(name = "inType", value = "入库类型(注:CUSTMANAGER客户经理,SERVICECENTER服务中心)")
-    private String inType;
-    @ApiModelProperty(name = "outType", value = "出库类型(注:CUSTMANAGER客户经理,SERVICECENTER服务中心)")
-    private String outType;
+    @ApiModelProperty(name = "processOrgtype", value = "申请处理机构类型", hidden = true)
+    private String processOrgtype;
+
+    @ApiModelProperty(name = "processOrgno", value = "申请处理机构编号", hidden = true)
+    private String processOrgno;
+
+    @ApiModelProperty(name = "applyType", value = "申请的类型：SAMELEVEL平级调拨、PLATFORM平台调拨", hidden = true)
+    private String applyType;
+
+    @ApiModelProperty(name = "applyerName", value = "申请人的姓名", hidden = true)
+    private String applyerName;
+
     /**
      * 
      */
@@ -113,30 +121,46 @@ public class BizAllocateApply {
      * 申请商品详情列表
      */
     @ApiModelProperty(name = "allocateapplyDetailList", value = "申请商品详情列表")
-    private List<BizAllocateapplyDetail> allocateapplyDetailList;
+    private List<AllocateapplyDetailDTO> allocateapplyDetailList;
 
-    public List<BizAllocateapplyDetail> getAllocateapplyDetailList() {
+    public List<AllocateapplyDetailDTO> getAllocateapplyDetailList() {
         return allocateapplyDetailList;
     }
 
-    public void setAllocateapplyDetailList(List<BizAllocateapplyDetail> allocateapplyDetailList) {
+    public String getApplyerName() {
+        return applyerName;
+    }
+
+    public void setApplyerName(String applyerName) {
+        this.applyerName = applyerName;
+    }
+
+    public void setAllocateapplyDetailList(List<AllocateapplyDetailDTO> allocateapplyDetailList) {
         this.allocateapplyDetailList = allocateapplyDetailList;
     }
 
-    public String getInType() {
-        return inType;
+    public String getProcessOrgtype() {
+        return processOrgtype;
     }
 
-    public void setInType(String inType) {
-        this.inType = inType;
+    public void setProcessOrgtype(String processOrgtype) {
+        this.processOrgtype = processOrgtype;
     }
 
-    public String getOutType() {
-        return outType;
+    public String getProcessOrgno() {
+        return processOrgno;
     }
 
-    public void setOutType(String outType) {
-        this.outType = outType;
+    public void setProcessOrgno(String processOrgno) {
+        this.processOrgno = processOrgno;
+    }
+
+    public String getApplyType() {
+        return applyType;
+    }
+
+    public void setApplyType(String applyType) {
+        this.applyType = applyType;
     }
 
     public void setId(Long id) {

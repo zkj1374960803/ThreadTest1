@@ -2,8 +2,8 @@ package com.ccbuluo.business.platform.allocateapply.dao;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
-import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateApply;
-import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateapplyDetail;
+import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
 import com.google.common.collect.Maps;
@@ -23,7 +23,7 @@ import java.util.Map;
  * @version V1.0.0
  */
 @Repository
-public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
+public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     @Resource
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
@@ -39,13 +39,13 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
      * @author liuduo
      * @date 2018-08-07 11:55:41
      */
-    public int saveEntity(BizAllocateApply entity) {
+    public int saveEntity(AllocateApplyDTO entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO biz_allocate_apply ( apply_no,applyorg_no,applyer,")
+        sql.append("INSERT INTO biz_allocate_apply ( applyer_name,apply_type,apply_no,applyorg_no,applyer,process_orgtype,process_orgno,")
             .append("instock_orgno,in_repository_no,outstock_orgtype,outstock_orgno,")
             .append("apply_processor,process_time,process_type,apply_status,creator,")
-            .append("create_time,operator,operate_time,delete_flag,remark ) VALUES ( ")
-            .append(" :applyNo, :applyorgNo, :applyer, :instockOrgno, :inRepositoryNo,")
+            .append("create_time,operator,operate_time,delete_flag,remark ) VALUES (:applyerName,:applyType,:applyNo, :applyorgNo, :applyer,:processOrgtype,:processOrgno, ")
+            .append(" :instockOrgno, :inRepositoryNo,")
             .append(" :outstockOrgtype, :outstockOrgno, :applyProcessor, :processTime,")
             .append(" :processType, :applyStatus, :creator, :createTime, :operator,")
             .append(" :operateTime, :deleteFlag, :remark )");
@@ -59,7 +59,7 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
      * @author liuduo
      * @date 2018-08-07 11:55:41
      */
-    public int update(BizAllocateApply entity) {
+    public int update(AllocateApplyDTO entity) {
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE biz_allocate_apply SET apply_no = :applyNo,")
             .append("applyorg_no = :applyorgNo,applyer = :applyer,")
@@ -79,7 +79,7 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
      * @author liuduo
      * @date 2018-08-07 11:55:41
      */
-    public BizAllocateApply getById(long id) {
+    public AllocateApplyDTO getById(long id) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,apply_no,applyorg_no,applyer,instock_orgno,")
             .append("in_repository_no,outstock_orgtype,outstock_orgno,apply_processor,")
@@ -87,7 +87,7 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
             .append("operate_time,delete_flag,remark FROM biz_allocate_apply WHERE id= :id");
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
-        return super.findForBean(BizAllocateApply.class, sql.toString(), params);
+        return super.findForBean(AllocateApplyDTO.class, sql.toString(), params);
     }
 
     /**
@@ -111,12 +111,12 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
      * @author zhangkangjian
      * @date 2018-08-08 10:45:24
      */
-    public void batchInsertForapplyDetailList(List<BizAllocateapplyDetail> allocateapplyDetailList) {
+    public void batchInsertForapplyDetailList(List<AllocateapplyDetailDTO> allocateapplyDetailList) {
         StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO biz_allocateapply_detail ( apply_no,product_no,")
+        sql.append("INSERT INTO biz_allocateapply_detail ( product_name,apply_no,product_no,")
             .append("product_type,product_categoryname,apply_num,unit,sell_price,")
             .append("cost_price,supplier_no,creator,create_time,operator,operate_time,")
-            .append("delete_flag,remark ) VALUES (  :applyNo, :productNo, :productType,")
+            .append("delete_flag,remark ) VALUES (  :productName,:applyNo, :productNo, :productType,")
             .append(" :productCategoryname, :applyNum, :unit, :sellPrice, :costPrice,")
             .append(" :supplierNo, :creator, :createTime, :operator, :operateTime,")
             .append(" :deleteFlag, :remark )");
@@ -153,8 +153,8 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
         sql.append(" SELECT a.id,a.apply_no,a.product_no,a.product_type,a.product_categoryname, ")
             .append("  a.apply_num,a.unit,a.sell_price,a.cost_price,a.supplier_no,b.supplier_name,c.equip_name as 'productName' ")
             .append("  FROM biz_allocateapply_detail a LEFT JOIN  biz_service_supplier b ON a.supplier_no = b.supplier_code ")
-            .append("  LEFT JOIN biz_service_equipment c ON a.product_no = c.equip_code AND a.product_type = 'EQUIPMENT' ")
-            .append(" WHERE a.delete_flag = :deleteFlag AND a.apply_no = :applyNo ");
+            .append("  LEFT JOIN biz_service_equipment c ON a.product_no = c.equip_code  ")
+            .append(" WHERE a.delete_flag = :deleteFlag AND a.apply_no = :applyNo");
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNo", applyNo);
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
@@ -222,7 +222,7 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
      * @date 2018-08-10 11:54:41
      */
     public Long findVersionNo(String applyNo) {
-        String sql = " SELECT a.version_no FROM biz_allocate_apply a WHERE a.applyorg_no = :applyNo ";
+        String sql = " SELECT a.version_no FROM biz_allocate_apply a WHERE a.apply_no = :applyNo ";
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("applyNo", applyNo);
         return namedParameterJdbcTemplate.queryForObject(sql, map, Long.class);
@@ -239,13 +239,19 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
         StringBuilder sql = new StringBuilder();
         sql.append(" UPDATE biz_allocate_apply SET apply_processor = :applyProcessor,process_time = :processTime ");
         if(StringUtils.isNotBlank(processApplyDTO.getOutstockOrgno())){
-            sql.append(" ,outstock_orgno = outstockOrgno ");
+            sql.append(" ,outstock_orgno = :outstockOrgno ");
         }
         if(StringUtils.isNotBlank(processApplyDTO.getProcessType())){
             sql.append(" ,process_type = :processType ");
         }
         if (StringUtils.isNotBlank(processApplyDTO.getOutstockOrgType())){
             sql.append(" ,outstock_orgtype = :outstockOrgType ");
+        }
+        if (StringUtils.isNotBlank(processApplyDTO.getApplyType())){
+            sql.append(" ,apply_type = :applyType ");
+        }
+        if (StringUtils.isNotBlank(processApplyDTO.getApplyStatus())){
+            sql.append(" ,apply_status = :applyStatus ");
         }
         sql.append(" WHERE version_no = :versionNo AND apply_no = :applyNo ");
         updateForBean(sql.toString(), processApplyDTO);
@@ -320,6 +326,20 @@ public class BizAllocateApplyDao extends BaseDao<BizAllocateApply> {
         String sql = "SELECT apply_no FROM biz_allocate_apply WHERE apply_status = :applyNoStatus";
 
         return querySingColum(String.class, sql, params);
+    }
+    /**
+     * 查询库存的数量
+     * @param orgCode 组织架构code
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-08-13 19:47:32
+     */
+    public Page<QueryTransferStockDTO> findStockNum(List<String> orgCode) {
+        String sql = "SELECT a.org_no,SUM(a.valid_stock) FROM biz_stock_detail a WHERE a.org_no IN (:org_no) GROUP BY a.org_no";
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("orgCode", orgCode);
+        return queryPageForBean(QueryTransferStockDTO.class, sql, map, 0, 10);
     }
 
     /**

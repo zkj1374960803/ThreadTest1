@@ -1,9 +1,8 @@
 package com.ccbuluo.business.platform.allocateapply.controller;
 
 import com.ccbuluo.business.platform.allocateapply.dto.*;
-import com.ccbuluo.business.platform.allocateapply.entity.BizAllocateApply;
+import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApply;
-import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
@@ -29,15 +28,15 @@ public class AllocateApplyController extends BaseController {
 
     /**
      * 创建物料或者零配件申请
-     * @param bizAllocateApply 申请单实体
+     * @param allocateApplyDTO 申请单实体
      * @return StatusDto<String>
      * @author zhangkangjian
      * @date 2018-08-07 20:54:24
      */
     @ApiOperation(value = "创建物料或者零配件申请", notes = "【张康健】")
     @PostMapping("/create")
-    public StatusDto<String> createAllocateApply(@ApiParam(name = "bizAllocateApply", value = "创建申请json", required = true) @RequestBody BizAllocateApply bizAllocateApply){
-        allocateApplyImpl.createAllocateApply(bizAllocateApply);
+    public StatusDto<String> createAllocateApply(@ApiParam(name = "bizAllocateApply", value = "创建申请json", required = true) @RequestBody AllocateApplyDTO allocateApplyDTO){
+        allocateApplyImpl.createAllocateApply(allocateApplyDTO);
         return StatusDto.buildSuccessStatusDto();
     }
 
@@ -127,7 +126,7 @@ public class AllocateApplyController extends BaseController {
      * @date 2018-08-10 11:24:53
      */
     @ApiOperation(value = "处理申请单（当选择采购时不显示调拨目标）", notes = "【张康健】")
-    @GetMapping("/processapply")
+    @PostMapping("/processapply")
     public StatusDto<String> processApply(@ApiParam(name = "processApplyDTO", value = "json数据格式", required = true) @RequestBody ProcessApplyDTO processApplyDTO){
         allocateApplyImpl.processApply(processApplyDTO);
         return StatusDto.buildSuccessStatusDto();
@@ -151,6 +150,20 @@ public class AllocateApplyController extends BaseController {
     public StatusDto<Page<FindStockListDTO>> findStockList(@ApiIgnore FindStockListDTO findStockListDTO){
         Page<FindStockListDTO> page = allocateApplyImpl.findStockList(findStockListDTO);
         return StatusDto.buildDataSuccessStatusDto(page);
+    }
+
+    /**
+     * 查询可调拨库存列表
+     * @param
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-08-13 16:50:05
+     */
+    @ApiOperation(value = "查询可调拨库存列表", notes = "【张康健】")
+    public StatusDto<Page<QueryTransferStockDTO>> queryTransferStock(@ApiIgnore QueryTransferStockDTO queryTransferStockDTO){
+        allocateApplyImpl.queryTransferStock(queryTransferStockDTO);
+        return null;
     }
 
 }

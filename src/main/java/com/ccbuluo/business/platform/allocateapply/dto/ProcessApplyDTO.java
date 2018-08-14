@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.allocateapply.dto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -13,6 +14,14 @@ import java.util.List;
 @ApiModel(value = "ProcessApplyDTO", description = "处理申请单")
 public class ProcessApplyDTO {
 
+//    applyProcessor,process_time = :processTime
+    @ApiModelProperty(name = "applyProcessor", value = "处理人", hidden = true)
+    private String applyProcessor;
+    @ApiModelProperty(name = "processTime", value = "处理时间", hidden = true)
+    private Date processTime;
+
+    @ApiModelProperty(name = "applyType", value = "申请的类型：SAMELEVEL平级调拨、PLATFORM平台调拨")
+    private String applyType;
     /**
      * 调拨申请单编号
      */
@@ -44,6 +53,30 @@ public class ProcessApplyDTO {
     private Long versionNo;
     @ApiModelProperty(name = "applyStatus", value = "申请单状态", hidden = true)
     private String applyStatus;
+
+    public String getApplyType() {
+        return applyType;
+    }
+
+    public void setApplyType(String applyType) {
+        this.applyType = applyType;
+    }
+
+    public String getApplyProcessor() {
+        return applyProcessor;
+    }
+
+    public void setApplyProcessor(String applyProcessor) {
+        this.applyProcessor = applyProcessor;
+    }
+
+    public Date getProcessTime() {
+        return processTime;
+    }
+
+    public void setProcessTime(Date processTime) {
+        this.processTime = processTime;
+    }
 
     public String getApplyStatus() {
         return applyStatus;
