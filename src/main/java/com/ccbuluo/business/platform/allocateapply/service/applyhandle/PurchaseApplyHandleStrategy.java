@@ -10,7 +10,6 @@ import com.ccbuluo.business.entity.BizOutstockplanDetail;
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
-import com.ccbuluo.business.platform.allocateapply.utils.ApplyHandleUtils;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.core.common.UserHolder;
@@ -40,8 +39,6 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
     private BizAllocateTradeorderDao bizAllocateTradeorderDao;
     @Resource
     private UserHolder userHolder;
-    @Resource
-    ApplyHandleUtils applyHandleUtils;
 
     Logger logger = LoggerFactory.getLogger(getClass());
     /**
@@ -60,14 +57,14 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
                 return 0;
             }
             // 构建生成订单（采购）
-            List<BizAllocateTradeorder> list = applyHandleUtils.buildOrderEntityList(details, applyType);
+            List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyType);
             // 查询库存列表(平台的库存列表)
-            List<BizStockDetail> stockDetails = applyHandleUtils.getStockDetailList(BusinessPropertyHolder.TOP_SERVICECENTER, details);
+            List<BizStockDetail> stockDetails = getStockDetailList(BusinessPropertyHolder.TOP_SERVICECENTER, details);
             if(null == stockDetails || stockDetails.size() == 0){
                 return 0;
             }
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
-            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = applyHandleUtils.buildOutAndInstockplanDetail(details, stockDetails, applyType);
+            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, applyType);
             bizInstockplanDetailDao.batchInsertInstockplanDetail(pir.getRight());
             // 保存生成订单
             bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);

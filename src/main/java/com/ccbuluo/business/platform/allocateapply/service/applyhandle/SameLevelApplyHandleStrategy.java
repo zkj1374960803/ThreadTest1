@@ -4,7 +4,6 @@ import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
-import com.ccbuluo.business.platform.allocateapply.utils.ApplyHandleUtils;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
@@ -36,8 +35,6 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
     private BizStockDetailDao bizStockDetailDao;
     @Resource
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
-    @Resource
-    ApplyHandleUtils applyHandleUtils;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -58,24 +55,24 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
                 return 0;
             }
             // 构建生成订单(调拨)
-            List<BizAllocateTradeorder> list = applyHandleUtils.buildOrderEntityList(details, applyType);
+            List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyType);
             // 构建占用库存和订单占用库存关系
             //获取卖方机构code
-            String sellerOrgNo = applyHandleUtils.getSellerOrgNo(list);
+            String sellerOrgNo = getSellerOrgNo(list);
             //查询库存列表
-            List<BizStockDetail> stockDetails = applyHandleUtils.getStockDetailList(sellerOrgNo, details);
+            List<BizStockDetail> stockDetails = getStockDetailList(sellerOrgNo, details);
             if(null == stockDetails || stockDetails.size() == 0){
                 return 0;
             }
             // 构建占用库存和订单占用库存关系
-            Pair<List<BizStockDetail>, List<RelOrdstockOccupy>> pair = applyHandleUtils.buildStockAndRelOrdEntity(details,stockDetails,applyType);
+            Pair<List<BizStockDetail>, List<RelOrdstockOccupy>> pair = buildStockAndRelOrdEntity(details,stockDetails,applyType);
             List<BizStockDetail> stockDetailList = pair.getLeft();
             // 构建订单占用库存关系
             List<RelOrdstockOccupy> relOrdstockOccupies = pair.getRight();
             // 保存生成订单
             bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
-            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = applyHandleUtils.buildOutAndInstockplanDetail(details, stockDetails, applyType);
+            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, applyType);
             // 保存占用库存
             flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
             if(flag == 0){// 更新失败

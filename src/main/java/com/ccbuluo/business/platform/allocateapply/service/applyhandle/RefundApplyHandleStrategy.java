@@ -14,11 +14,12 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
     /**
      *  退款申请处理
      * @param applyNo 申请单编号
+     * @applyType 申请类型
      * @author weijb
      * @date 2018-08-08 10:55:41
      */
     @Override
-    public int applyHandle(String applyNo){
+    public int applyHandle(String applyNo, String applyType){
         return 0;
     }
 
