@@ -1,7 +1,7 @@
 package com.ccbuluo.business.platform.equipment.controller;
 
 import com.ccbuluo.business.constants.Constants;
-import com.ccbuluo.business.constants.EquipUnitEnum;
+import com.ccbuluo.business.constants.ProductUnitEnum;
 import com.ccbuluo.business.platform.equipment.dto.DetailBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.equipment.dto.SaveBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.equipment.service.EquipmentService;

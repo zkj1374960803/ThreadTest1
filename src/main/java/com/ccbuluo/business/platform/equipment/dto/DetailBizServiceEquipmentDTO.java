@@ -1,6 +1,6 @@
 package com.ccbuluo.business.platform.equipment.dto;
 
-import com.ccbuluo.business.constants.EquipUnitEnum;
+import com.ccbuluo.business.constants.ProductUnitEnum;
 import com.ccbuluo.business.entity.AftersaleCommonEntity;
 import com.ccbuluo.business.entity.IdEntity;
 import io.swagger.annotations.ApiModel;
@@ -94,6 +94,6 @@ public class DetailBizServiceEquipmentDTO extends IdEntity {
     }
 
     public String getUnitName() {
-        return EquipUnitEnum.valueOf(equipUnit).getLabel();
+        return ProductUnitEnum.valueOf(equipUnit).getLabel();
     }
 }
