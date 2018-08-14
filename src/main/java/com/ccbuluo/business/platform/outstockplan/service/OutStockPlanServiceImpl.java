@@ -86,12 +86,13 @@ public class OutStockPlanServiceImpl implements OutStockPlanService {
     /**
      * 根据申请单号查询出库计划
      * @param applyNo 申请单号
+     * @param productType 商品类型
      * @return 出库计划
      * @author liuduo
      * @date 2018-08-11 13:17:42
      */
     @Override
-    public List<BizOutstockplanDetail> queryOutstockplanList(String applyNo) {
-        return bizOutstockplanDetailDao.queryOutstockplanList(applyNo);
+    public List<BizOutstockplanDetail> queryOutstockplanList(String applyNo, String productType) {
+        return bizOutstockplanDetailDao.queryOutstockplanList(applyNo, productType);
     }
 }

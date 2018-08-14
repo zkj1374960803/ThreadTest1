@@ -1,6 +1,8 @@
 package com.ccbuluo.business.platform.instock.service;
 
 import com.ccbuluo.business.entity.BizInstockorderDetail;
+import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
+import com.ccbuluo.business.platform.instock.dto.InstockorderDetailDTO;
 
 import java.util.List;
 
@@ -37,5 +39,14 @@ public interface InstockorderDetailService {
      * @date 2018-08-10 11:04:51
      */
     void updateInstockorderStockId(List<BizInstockorderDetail> bizInstockorderDetailList1);
+
+    /**
+     * 根据入库单号查询入库单详单
+     * @param instockNo 入库单号
+     * @return 入库单详单
+     * @author liuduo
+     * @date 2018-08-13 15:44:47
+     */
+    List<InstockorderDetailDTO> getByInstockNo(String instockNo);
 
 }

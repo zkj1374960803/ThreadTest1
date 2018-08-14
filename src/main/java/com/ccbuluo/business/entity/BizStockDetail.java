@@ -235,4 +235,22 @@ public class BizStockDetail extends AftersaleCommonEntity{
     public void setVersionNo(Long versionNo) {
         this.versionNo = versionNo;
     }
+
+    /**
+     * 库存枚举类
+     * @auther liuduo
+     * @date 2018-08-13 19:32:16
+     */
+    public enum StockEnum {
+        VALIDSTOCK("有效库存"),PROBLEMSTOCK("问题库存");
+        private String label;
+
+        StockEnum(String label) {
+            this.label = label;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+    }
 }
