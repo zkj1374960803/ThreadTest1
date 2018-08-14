@@ -95,6 +95,9 @@ public class GenerateProjectCodeService {
             case FH:    // 车型
                 resultDto = getCode(prefix.toString(), 4, 0,"#A##B#");
                 break;
+            case FJ:    // 车辆
+                resultDto = getCode(prefix.toString(), 3, 1,"#A##B##C#");
+                break;
             default:
                 resultDto = StatusDto.buildStatusDtoWithCode(BizErrorCodeEnum.CODE_UNKONEPREFIX.getErrorCode(),
                         BizErrorCodeEnum.CODE_UNKONEPREFIX.getMessage());
