@@ -56,6 +56,16 @@ public class BizOutstockplanDetail {
     @ApiModelProperty(name = "supplierNo", value = "供应商编号")
     private String supplierNo;
     /**
+     * 供应商名字
+     */
+    @ApiModelProperty(name = "supplierName", value = "供应商名字")
+    private String supplierName;
+    /**
+     * 仓库名字
+     */
+    @ApiModelProperty(name = "storehouseName", value = "仓库名字")
+    private String storehouseName;
+    /**
      * 
      */
     @ApiModelProperty(name = "applyDetailId", value = "")
@@ -344,5 +354,21 @@ public class BizOutstockplanDetail {
 
     public void setProductName(String productName) {
         this.productName = productName;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public String getStorehouseName() {
+        return storehouseName;
+    }
+
+    public void setStorehouseName(String storehouseName) {
+        this.storehouseName = storehouseName;
     }
 }

@@ -130,6 +130,11 @@ public class BizInstockplanDetail {
      */
     @ApiModelProperty(name = "productUnit", value = "商品计量单位")
     private String productUnit;
+    /**
+     * 供应商名字
+     */
+    @ApiModelProperty(name = "supplierName", value = "供应商名字")
+    private String supplierName;
 
     public void setId(Long id) {
         this.id = id;
@@ -300,7 +305,10 @@ public class BizInstockplanDetail {
     }
 
     public String getStatusName() {
-        return StockPlanEnum.valueOf(completeStatus).getLabel();
+        if (null != completeStatus) {
+            return StockPlanEnum.valueOf(completeStatus).getLabel();
+        }
+        return null;
     }
 
     public Long getVersionNo() {
@@ -318,4 +326,13 @@ public class BizInstockplanDetail {
     public void setProductUnit(String productUnit) {
         this.productUnit = productUnit;
     }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
 }

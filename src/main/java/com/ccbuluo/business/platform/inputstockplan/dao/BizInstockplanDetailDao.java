@@ -203,19 +203,21 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
     /**
      * 根据申请单号查询入库计划
      * @param applyNo 申请单号
+     * @param productType 商品类型
      * @return 入库计划
      * @author liuduo
      * @date 2018-08-11 13:17:42
      */
-    public List<BizInstockplanDetail> queryInstockplan(String applyNo) {
+    public List<BizInstockplanDetail> queryInstockplan(String applyNo, String productType) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNo", applyNo);
+        params.put("productType", productType);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,instock_type,product_no,product_type,product_categoryname,")
-            .append("trade_no,supplier_no,instock_repository_no,cost_price,")
-            .append("plan_instocknum,actual_instocknum,complete_status,complete_time,outstock_planid ")
-            .append(" FROM biz_instockplan_detail WHERE trade_no= :applyNo");
+        sql.append("SELECT bid.id,bid.instock_type,bid.product_no,bid.product_name,bid.product_type,bid.product_categoryname,bid.product_unit,")
+            .append(" bid.trade_no,bid.supplier_no,bid.cost_price,bid.plan_instocknum,bss.supplier_name FROM biz_instockplan_detail AS bid")
+            .append(" LEFT JOIN biz_service_supplier AS bss ON bss.supplier_code = bid.supplier_no")
+            .append("  WHERE bid.trade_no= :applyNo AND bid.product_type = :productType");
 
         return queryListBean(BizInstockplanDetail.class, sql.toString(), params);
     }

@@ -230,14 +230,26 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
     }
 
     /**
-     * 根据申请单号查询出库计划(创建出库单时的要出库商品)
+     * 根据申请单号查询出库计划
      * @param applyNo 申请单号
+     * @param productType 商品类型
      * @return 出库计划
      * @author liuduo
      * @date 2018-08-11 13:17:42
      */
-    public List<BizOutstockplanDetail> queryOutstockplanList(String applyNo) {
-        // todo 刘铎
-        return null;
+    public List<BizOutstockplanDetail> queryOutstockplanList(String applyNo, String productType) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("productType", productType);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT bod.outstock_type,bod.product_no,bod.product_name,bod.product_type,bod.product_categoryname,")
+            .append(" bod.supplier_no,bss.supplier_name,bod.plan_outstocknum,bod.cost_price,bod.product_unit,bod.out_repository_no,")
+            .append(" bsss.storehouse_name FROM biz_outstockplan_detail AS bod")
+            .append("  LEFT JOIN biz_service_supplier AS bss ON bss.supplier_code = bod.supplier_no")
+            .append("  LEFT JOIN biz_service_storehouseas bsss ON bsss.storehouse_code = bod.out_repository_no")
+            .append(" WHERE bod.trade_no = :applyNo AND bod.product_type = :productType");
+
+        return queryListBean(BizOutstockplanDetail.class, sql.toString(), params);
     }
 }

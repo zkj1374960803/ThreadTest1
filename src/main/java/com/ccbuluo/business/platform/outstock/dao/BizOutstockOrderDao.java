@@ -112,14 +112,15 @@ public class BizOutstockOrderDao extends BaseDao<BizOutstockOrder> {
      * @author liuduo
      * @date 2018-08-11 16:43:19
      */
-    public Page<BizOutstockOrder> queryOutstockList(String productType, String outstockType, String outstockNo, Integer offset, Integer pagesize) {
+    public Page<BizOutstockOrder> queryOutstockList(String productType, String outstockType, String outstockNo, String orgCode, Integer offset, Integer pagesize) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("productType", productType);
+        params.put("orgCode", orgCode);
 
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT boo.id,boo.outstockorder_no,boo.outstock_type,boo.outstock_time,boo.trade_docno,boo.outstock_operator")
-            .append("  FROM biz_outstock_order AS boo")
-            .append("  LEFT JOIN biz_outstockorder_detail AS bod ON bod.outstock_orderno = boo.outstockorder_no WHERE bod.product_type = :productType ");
+            .append("  FROM biz_outstock_order AS boo LEFT JOIN biz_outstockorder_detail AS bod ON bod.outstock_orderno = boo.outstockorder_no")
+            .append("   WHERE bod.product_type = :productType AND boo.outstock_orgno = :orgCode");
         if (StringUtils.isNotBlank(outstockType)) {
             params.put("outstockType", outstockType);
             sql.append(" AND  boo.outstock_type = :outstockType");
