@@ -116,6 +116,12 @@ public class AllocateapplyDetailBO {
     @ApiModelProperty(name = "processOrgtype", value = "处理机构类型")
     private String processOrgtype;
 
+    /**
+     * 申请类型
+     */
+    @ApiModelProperty(name = "applyType", value = "申请类型（PLATFORM，SAMELEVEL）")
+    private String applyType;
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -274,5 +280,13 @@ public class AllocateapplyDetailBO {
 
     public void setProcessOrgtype(String processOrgtype) {
         this.processOrgtype = processOrgtype;
+    }
+
+    public String getApplyType() {
+        return applyType;
+    }
+
+    public void setApplyType(String applyType) {
+        this.applyType = applyType;
     }
 }

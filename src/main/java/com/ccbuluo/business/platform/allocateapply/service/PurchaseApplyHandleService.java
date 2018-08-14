@@ -68,6 +68,9 @@ public class PurchaseApplyHandleService extends ApplyHandleServiceImpl {
             List<BizAllocateTradeorder> list = applyHandleUtils.buildOrderEntityList(details, Constants.PROCESS_TYPE_PURCHASE);
             // 查询库存列表(平台的库存列表)
             List<BizStockDetail> stockDetails = applyHandleUtils.getStockDetailList(BusinessPropertyHolder.TOP_SERVICECENTER, details);
+            if(null == stockDetails || stockDetails.size() == 0){
+                return 0;
+            }
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
             Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = applyHandleUtils.buildOutAndInstockplanDetail(details, stockDetails, Constants.PROCESS_TYPE_PURCHASE);
             bizInstockplanDetailDao.batchInsertInstockplanDetail(pir.getRight());

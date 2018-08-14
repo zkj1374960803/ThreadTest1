@@ -79,6 +79,10 @@ public class AllocateApplyHandleService extends ApplyHandleServiceImpl {
             String sellerOrgNo = getSellerOrgNo(list);
             //查询库存列表
             List<BizStockDetail> stockDetails = applyHandleUtils.getStockDetailList(sellerOrgNo, details);
+            if(null == stockDetails || stockDetails.size() == 0){
+                return 0;
+            }
+            // 构建占用库存和订单占用库存关系
             Pair<List<BizStockDetail>, List<RelOrdstockOccupy>> pair = buildStockAndRelOrdEntity(details,stockDetails);
             List<BizStockDetail> stockDetailList = pair.getLeft();
             // 构建订单占用库存关系
