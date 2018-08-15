@@ -1,7 +1,7 @@
-package com.ccbuluo.business.platform.problemstock.controller;
+package com.ccbuluo.business.platform.stockdetail.controller;
 
-import com.ccbuluo.business.platform.problemstock.dto.StockBizStockDetailDTO;
-import com.ccbuluo.business.platform.problemstock.service.ProblemStockDetailService;
+import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
+import com.ccbuluo.business.platform.stockdetail.service.ProblemStockDetailService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -26,7 +26,7 @@ import javax.annotation.Resource;
 @Api(tags = "问题库存")
 @RestController
 @RequestMapping("/platform/equipmentproblemstock")
-public class EquipmentProblemStockDetailController extends BaseController {
+public class ProblemStockDetailController extends BaseController {
     @Resource
     private ProblemStockDetailService problemStockDetailService;
 

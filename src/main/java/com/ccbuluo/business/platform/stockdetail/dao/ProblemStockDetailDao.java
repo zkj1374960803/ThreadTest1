@@ -1,8 +1,8 @@
-package com.ccbuluo.business.platform.problemstock.dao;
+package com.ccbuluo.business.platform.stockdetail.dao;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizStockDetail;
-import com.ccbuluo.business.platform.problemstock.dto.StockBizStockDetailDTO;
+import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
 import com.google.common.collect.Maps;

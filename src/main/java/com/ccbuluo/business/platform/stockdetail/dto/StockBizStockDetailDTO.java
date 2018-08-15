@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.problemstock.dto;
+package com.ccbuluo.business.platform.stockdetail.dto;
 
 import com.ccbuluo.business.constants.ProductUnitEnum;
 import com.ccbuluo.business.entity.IdEntity;

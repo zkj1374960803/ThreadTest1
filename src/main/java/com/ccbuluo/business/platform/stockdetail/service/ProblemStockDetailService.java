@@ -1,7 +1,7 @@
-package com.ccbuluo.business.platform.problemstock.service;
+package com.ccbuluo.business.platform.stockdetail.service;
 
 
-import com.ccbuluo.business.platform.problemstock.dto.StockBizStockDetailDTO;
+import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.db.Page;
 
 /**

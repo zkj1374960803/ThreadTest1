@@ -1,7 +1,7 @@
-package com.ccbuluo.business.platform.problemstock.service;
+package com.ccbuluo.business.platform.stockdetail.service;
 
-import com.ccbuluo.business.platform.problemstock.dao.ProblemStockDetailDao;
-import com.ccbuluo.business.platform.problemstock.dto.StockBizStockDetailDTO;
+import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
+import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.db.Page;
 import org.springframework.stereotype.Service;
 
