@@ -26,7 +26,7 @@ import javax.annotation.Resource;
 @Api(tags = "问题库存")
 @RestController
 @RequestMapping("/platform/equipmentproblemstock")
-public class ProblemStockDetailController extends BaseController {
+public class EquipmentProblemStockDetailController extends BaseController {
     @Resource
     private ProblemStockDetailService problemStockDetailService;
 
