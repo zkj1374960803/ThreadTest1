@@ -1,19 +1,16 @@
-package com.ccbuluo.business.platform.stockdetail.dao;
+package com.ccbuluo.business.platform.problemstock.dao;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizStockDetail;
-import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
-import com.ccbuluo.business.platform.stockdetail.dto.UpdateStockBizStockDetailDTO;
+import com.ccbuluo.business.platform.problemstock.dto.StockBizStockDetailDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -62,5 +59,16 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
         sql.append(" GROUP BY bsd.product_no ORDER BY bsd.create_time ");
         Page<StockBizStockDetailDTO> DTOS = super.queryPageForBean(StockBizStockDetailDTO.class, sql.toString(), param,offset,pageSize);
         return DTOS;
+    }
+
+    public StockBizStockDetailDTO getProdectStockBizStockDetailByCode(String productNo){
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT bsd.id,bsd.product_no,bsd.product_name,bsd.product_type,bse.equip_unit,SUM(bsd.problem_stock) as problem_stock")
+                .append(" FROM biz_stock_detail bsd LEFT JOIN biz_service_equipment bse on bse.equip_code=bsd.product_no ")
+                .append(" WHERE bsd.delete_flag = :deleteFlag and bsd.product_no = :productNo and bsd.problem_stock>0 ");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        params.put("productNo", productNo);
+        return super.findForBean(StockBizStockDetailDTO.class, sql.toString(), params);
     }
 }

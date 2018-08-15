@@ -1,7 +1,7 @@
-package com.ccbuluo.business.platform.stockdetail.service;
+package com.ccbuluo.business.platform.problemstock.service;
 
-import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
-import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
+import com.ccbuluo.business.platform.problemstock.dao.ProblemStockDetailDao;
+import com.ccbuluo.business.platform.problemstock.dto.StockBizStockDetailDTO;
 import com.ccbuluo.db.Page;
 import org.springframework.stereotype.Service;
 
@@ -30,5 +30,18 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
     @Override
     public Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(String productType, String keyword, Integer offset, Integer pageSize){
         return problemStockDetailDao.queryStockBizStockDetailDTOList(productType, keyword,offset, pageSize);
+    }
+
+    /**
+     * 根据物料code查询某个物料的问题件库存
+     * @param productNo 商品编号
+     * @return
+     * @exception
+     * @author weijb
+     * @date 2018-08-15 08:59:51
+     */
+    @Override
+    public StockBizStockDetailDTO getProdectStockBizStockDetailByCode(String productNo){
+        return problemStockDetailDao.getProdectStockBizStockDetailByCode(productNo);
     }
 }
