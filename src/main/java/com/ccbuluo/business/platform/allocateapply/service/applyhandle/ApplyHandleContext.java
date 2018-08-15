@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.annotation.Resource;
 
 /**
@@ -28,9 +27,13 @@ public class ApplyHandleContext {
     @Resource
     private PurchaseApplyHandleStrategy purchaseApplyHandleService;
     @Resource
-    SameLevelApplyHandleStrategy serviceAllocateApplyHandleService;
+    private SameLevelApplyHandleStrategy serviceAllocateApplyHandleService;
     @Resource
-    PlatformDirectApplyHandleStrategy directAllocateApplyHandleService;
+    private PlatformDirectApplyHandleStrategy directAllocateApplyHandleService;
+    @Resource
+    private RefundApplyHandleStrategy refundApplyHandleStrategy;
+    @Resource
+    private BarterApplyHandleStrategy barterApplyHandleStrategy;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -43,19 +46,27 @@ public class ApplyHandleContext {
             }
             // 采购
             if(AllocateApplyEnum.PURCHASE.toString().equals(ba.getApplyType())){
-                return purchaseApplyHandleService.applyHandle(applyNo,ba.getApplyType());
+                return purchaseApplyHandleService.applyHandle(ba);
             }
             // 平台调拨
             if(AllocateApplyEnum.PLATFORMALLOCATE.toString().equals(ba.getApplyType())){
-                return platformAllocateApplyHandleService.applyHandle(applyNo,ba.getApplyType());
+                return platformAllocateApplyHandleService.applyHandle(ba);
             }
             // 平级调拨（服务间的调拨）
             if(AllocateApplyEnum.SERVICEALLOCATE.toString().equals(ba.getApplyType())){
-                return serviceAllocateApplyHandleService.applyHandle(applyNo,ba.getApplyType());
+                return serviceAllocateApplyHandleService.applyHandle(ba);
             }
             // 平级直调
             if(AllocateApplyEnum.DIRECTALLOCATE.toString().equals(ba.getApplyType())){
-                directAllocateApplyHandleService.applyHandle(applyNo,ba.getApplyType());
+                directAllocateApplyHandleService.applyHandle(ba);
+            }
+            // 商品退换
+            if(AllocateApplyEnum.BARTER.toString().equals(ba.getApplyType())){
+                barterApplyHandleStrategy.applyHandle(ba);
+            }
+            // 退款
+            if(AllocateApplyEnum.REFUND.toString().equals(ba.getApplyType())){
+                refundApplyHandleStrategy.applyHandle(ba);
             }
             return 0;
         } catch (Exception e) {

@@ -41,14 +41,15 @@ public class PlatformDirectApplyHandleStrategy extends DefaultApplyHandleStrateg
 
     /**
      *  平台直接调拨申请处理
-     * @param applyNo 申请单编号
-     * @applyType 申请类型
+     * @param ba 申请单
      * @author weijb
      * @date 2018-08-08 10:55:41
      */
     @Override
-    public int applyHandle(String applyNo, String applyType){
+    public int applyHandle(BizAllocateApply ba){
         int flag = 0;
+        String applyNo = ba.getApplyNo();
+        String applyType = ba.getApplyType();
         try {
             // 根据申请单获取申请单详情
             List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
@@ -59,9 +60,9 @@ public class PlatformDirectApplyHandleStrategy extends DefaultApplyHandleStrateg
             List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyNo);
             // 构建占用库存和订单占用库存关系
             //获取卖方机构code
-            String sellerOrgNo = getSellerOrgNo(list);
+            String productOrgNo = getProductOrgNo(ba);
             //查询库存列表
-            List<BizStockDetail> stockDetails = getStockDetailList(sellerOrgNo, details);
+            List<BizStockDetail> stockDetails = getStockDetailList(productOrgNo, details);
             if(null == stockDetails || stockDetails.size() == 0){
                 return 0;
             }

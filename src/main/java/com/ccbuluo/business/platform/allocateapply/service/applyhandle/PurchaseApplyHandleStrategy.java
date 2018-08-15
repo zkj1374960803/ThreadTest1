@@ -4,10 +4,7 @@ import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.StockPlanEnum;
-import com.ccbuluo.business.entity.BizAllocateTradeorder;
-import com.ccbuluo.business.entity.BizInstockplanDetail;
-import com.ccbuluo.business.entity.BizOutstockplanDetail;
-import com.ccbuluo.business.entity.BizStockDetail;
+import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
@@ -43,13 +40,15 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
     Logger logger = LoggerFactory.getLogger(getClass());
     /**
      *  采购申请处理
-     * @param applyNo 申请单编号
-     * @applyType 申请类型
+     * @param ba 申请单
      * @author weijb
      * @date 2018-08-08 10:55:41
      */
-    public int applyHandle(String applyNo, String applyType){
+    @Override
+    public int applyHandle(BizAllocateApply ba){
         int flag = 0;
+        String applyNo = ba.getApplyNo();
+        String applyType = ba.getApplyType();
         try {
             // 根据申请单获取申请单详情
             List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
@@ -85,34 +84,5 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
     public int cancelApply(String applyNo){
         return 0;
     }
-
-    /**
-     * 构建入库计划
-     * @param ad 申请详情
-     * @return
-     */
-    private BizInstockplanDetail buildBizInstockplanDetail(AllocateapplyDetailBO ad, String processType){
-        BizInstockplanDetail inPlan = new BizInstockplanDetail();
-        inPlan.setInstockType(processType);// 交易类型
-        inPlan.setProductNo(ad.getProductNo());// 商品编号
-        inPlan.setProductType(ad.getProductType());// 商品类型
-        inPlan.setProductCategoryname(ad.getProductCategoryname());// 商品分类名称
-        inPlan.setProductName(ad.getProductName());// 商品名称
-        inPlan.setProductUnit(ad.getUnit());// 商品计量单位
-        inPlan.setTradeNo(String.valueOf(ad.getId()));// 交易批次号（申请单编号）
-        inPlan.setSupplierNo(ad.getSupplierNo());//供应商编号
-        inPlan.setCostPrice(ad.getCostPrice());// 成本价
-        inPlan.setPlanInstocknum(ad.getApplyNum());// 计划入库数量
-        inPlan.setActualInstocknum(ad.getApplyNum());// 实际入库数量
-        inPlan.setCompleteStatus(StockPlanEnum.DOING.toString());// 完成状态（计划执行中）
-        inPlan.setCreator(userHolder.getLoggedUserId());// 创建人
-        inPlan.setCreateTime(new Date());// 创建时间
-        inPlan.setDeleteFlag(Constants.DELETE_FLAG_NORMAL);//删除标识
-        return inPlan;
-    }
-
-
-
-
 
 }
