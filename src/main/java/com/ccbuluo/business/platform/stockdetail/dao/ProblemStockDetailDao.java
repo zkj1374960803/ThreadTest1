@@ -47,7 +47,7 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
         sql.append("SELECT id,product_no,product_name,product_type,product_unit,SUM(problem_stock) as problem_stock")
                 .append(" FROM biz_stock_detail  WHERE delete_flag = :deleteFlag and problem_stock>0 ");
         // 物料类型
-        if (null != productType) {
+        if (StringUtils.isNotBlank(productType)) {
             param.put("productType", productType);
             sql.append(" AND product_type = :productType ");
         }
@@ -63,7 +63,7 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
             sql.append(" AND (product_no LIKE CONCAT('%',:keyword,'%') OR product_name LIKE CONCAT('%',:keyword,'%'))");
         }
 
-        sql.append(" GROUP BY product_no ORDER BY create_time ");
+        sql.append(" GROUP BY product_no ORDER BY create_time DESC");
         Page<StockBizStockDetailDTO> DTOS = super.queryPageForBean(StockBizStockDetailDTO.class, sql.toString(), param,offset,pageSize);
         return DTOS;
     }

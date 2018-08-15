@@ -60,6 +60,11 @@ public class BizInstockplanDetail {
     @ApiModelProperty(name = "instockRepositoryNo", value = "入库仓库编号")
     private String instockRepositoryNo;
     /**
+     * 入库机构编号
+     */
+    @ApiModelProperty(name = "instockOrgno", value = "入库机构编号")
+    private String instockOrgno;
+    /**
      * 成本单价
      */
     @ApiModelProperty(name = "costPrice", value = "成本单价")
@@ -206,6 +211,14 @@ public class BizInstockplanDetail {
 
     public String getInstockRepositoryNo() {
         return this.instockRepositoryNo;
+    }
+
+    public String getInstockOrgno() {
+        return instockOrgno;
+    }
+
+    public void setInstockOrgno(String instockOrgno) {
+        this.instockOrgno = instockOrgno;
     }
 
     public void setCostPrice(BigDecimal costPrice) {

@@ -7,6 +7,8 @@ import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
+import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
+import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.http.StatusDto;
@@ -38,6 +40,8 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     private GenerateDocCodeService generateDocCodeService;
     @Resource
     private BizStockDetailDao bizStockDetailDao;
+    @Resource
+    private BizServiceStorehouseDao bizServiceStorehouseDao;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -298,7 +302,14 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     private void outstockplanDetail(BizOutstockplanDetail outstockplanDetail, AllocateapplyDetailBO ad,BizStockDetail bd, String applyType){
         // 平台出库计划
         outstockplanDetail = buildBizOutstockplanDetail(ad, applyType);
-        outstockplanDetail.setOutRepositoryNo(bd.getRepositoryNo());// 平台code
+        // 根据平台的no查询平台的仓库
+        List<QueryStorehouseDTO> list = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(BusinessPropertyHolder.TOP_SERVICECENTER);
+        String repositoryNo = "";
+        if(null != list && list.size() > 0){
+            repositoryNo = list.get(0).getStorehouseCode();
+        }
+        outstockplanDetail.setOutRepositoryNo(repositoryNo);// 平台仓库编号
+        outstockplanDetail.setOutOrgno(BusinessPropertyHolder.TOP_SERVICECENTER);// 平台code
     }
     /**
      * 买方出库
@@ -306,7 +317,8 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     private void outstockplanDetail1(BizOutstockplanDetail outstockplanDetail1, AllocateapplyDetailBO ad,BizStockDetail bd, String applyType){
         // 买方出库计划
         outstockplanDetail1 = buildBizOutstockplanDetail(ad, applyType);
-        outstockplanDetail1.setOutRepositoryNo(bd.getRepositoryNo());// 平台code
+        outstockplanDetail1.setOutRepositoryNo(bd.getRepositoryNo());// 仓库code
+        outstockplanDetail1.setOutOrgno(ad.getInstockOrgno());// 买方机构code
     }
     /**
      * 平台入库
@@ -314,7 +326,14 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     private void instockplanDetail(BizInstockplanDetail instockplanDetail, AllocateapplyDetailBO ad, String applyType){
         // 平台入库计划
         instockplanDetail = buildBizInstockplanDetail(ad, applyType);
-        instockplanDetail.setInstockRepositoryNo(ad.getInRepositoryNo());// 入库仓库编号
+        // 根据平台的no查询平台的仓库
+        List<QueryStorehouseDTO> list = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(BusinessPropertyHolder.TOP_SERVICECENTER);
+        String repositoryNo = "";
+        if(null != list && list.size() > 0){
+            repositoryNo = list.get(0).getStorehouseCode();
+        }
+        instockplanDetail.setInstockRepositoryNo(repositoryNo);// 平台仓库编号
+        instockplanDetail.setInstockOrgno(BusinessPropertyHolder.TOP_SERVICECENTER);// 平台机构编号
     }
     /**
      * 买方入库
@@ -323,6 +342,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         // 买入方入库计划
         instockplanDetail1 = buildBizInstockplanDetail(ad, applyType);
         instockplanDetail1.setInstockRepositoryNo(ad.getInRepositoryNo());// 入库仓库编号
+        instockplanDetail1.setInstockOrgno(ad.getInstockOrgno());// 买入机构编号
     }
 
     // 根据商品编号查找到某个商品的申请单详情信息

@@ -86,6 +86,11 @@ public class BizOutstockplanDetail {
     @ApiModelProperty(name = "outRepositoryNo", value = "出库仓库编号")
     private String outRepositoryNo;
     /**
+     * 出库机构编号
+     */
+    @ApiModelProperty(name = "outOrgno", value = "出库机构编号")
+    private String outOrgno;
+    /**
      * 计划出库数量
      */
     @ApiModelProperty(name = "planOutstocknum", value = "计划出库数量")
@@ -238,6 +243,14 @@ public class BizOutstockplanDetail {
 
     public String getOutRepositoryNo() {
         return this.outRepositoryNo;
+    }
+
+    public String getOutOrgno() {
+        return outOrgno;
+    }
+
+    public void setOutOrgno(String outOrgno) {
+        this.outOrgno = outOrgno;
     }
 
     public void setPlanOutstocknum(Long planOutstocknum) {
