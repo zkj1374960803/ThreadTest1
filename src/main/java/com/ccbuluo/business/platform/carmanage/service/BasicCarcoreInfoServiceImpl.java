@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.carmanage.service;
 
+import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarseriesManageDao;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarcoreInfo;
@@ -8,6 +9,7 @@ import com.ccbuluo.business.platform.carconfiguration.utils.RegularCodeProductor
 import com.ccbuluo.business.platform.carmanage.dao.BasicCarcoreInfoDao;
 import com.ccbuluo.business.platform.carmanage.dto.*;
 import com.ccbuluo.business.platform.maintaincar.dto.ListServiceMaintaincarDTO;
+import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.constants.SystemPropertyHolder;
 import com.ccbuluo.db.Page;
@@ -51,6 +53,8 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
     BasicCarseriesManageDao basicCarseriesManageDao;
     @Resource
     private InnerUserInfoService innerUserInfoService;
+    @Resource
+    private GenerateProjectCodeService generateProjectCodeService;
 
     /**
      * 存储redis时当前模块的名字
@@ -111,6 +115,13 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
             if (Constants.ERROR_CODE.equals(statusDto.getCode())) {
                 return statusDto;
             }
+            // 1.车辆编码(新增）
+            StatusDto<String> codeDto = generateProjectCodeService.grantCode(CodePrefixEnum.FJ);
+            // 获取code失败
+            if(!codeDto.isSuccess()){
+                return statusDto;
+            }
+            carcoreInfo.setCarNumber(codeDto.getData());
             // 1.保存车辆基本信息
             buildCarcoreInfo(carcoreInfo);
             long carcoreInfoId = basicCarcoreInfoDao.saveCarcoreInfo(carcoreInfo);
@@ -155,10 +166,7 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
      * @date 2018-05-10 18:38:06
      */
     private void buildCarcoreInfo(CarcoreInfo carcoreInfo) {
-        // 1.车辆编码(新增）
-        if (null == carcoreInfo.getId()) {
-            carcoreInfo.setCarNumber(findCarNumber());
-        }
+
         // 新增默认未分配：0
         carcoreInfo.setCarStatus(Constants.STATUS_FLAG_ZERO);
         carcoreInfo.setStoreAssigned(Constants.STATUS_FLAG_ZERO);

@@ -206,7 +206,7 @@ public class BasicCarseriesManageDao extends BaseDao<CarseriesManage> {
         if (StringUtils.isNotBlank(carseriesName)) {
             sql.append(" AND carseries_name LIKE CONCAT('%',:carseriesName, '%') ");
         }
-        sql.append(" ORDER BY id DESC");
+        sql.append(" ORDER BY sort_number,id");
 
         Map<String, Object> params = Maps.newHashMap();
         params.put("carbrandId", carbrandId);

@@ -89,6 +89,11 @@ public class AllocateapplyDetailBO {
     @ApiModelProperty(name = "instockOrgno", value = "买方机构的编号", hidden = true)
     private String instockOrgno;
     /**
+     * 入库仓库编号(买方仓库)
+     */
+    @ApiModelProperty(name = "instockOrgno", value = "入库仓库编号", hidden = true)
+    private String inRepositoryNo;
+    /**
      * 卖方机构的编号
      */
     @ApiModelProperty(name = "outstockOrgno", value = "卖方机构的编号", hidden = true)
@@ -115,6 +120,17 @@ public class AllocateapplyDetailBO {
      */
     @ApiModelProperty(name = "processOrgtype", value = "处理机构类型")
     private String processOrgtype;
+
+    /**
+     * 申请类型
+     */
+    @ApiModelProperty(name = "applyType", value = "申请类型（PLATFORM，SAMELEVEL）")
+    private String applyType;
+    /**
+     *  库存类型
+     */
+    @ApiModelProperty(name = "stockType", value = "库存类型（正常库存、问题库存、报损件库存，等等）")
+    private String stockType;
 
     public void setId(Long id) {
         this.id = id;
@@ -236,6 +252,14 @@ public class AllocateapplyDetailBO {
         this.instockOrgno = instockOrgno;
     }
 
+    public String getInRepositoryNo() {
+        return inRepositoryNo;
+    }
+
+    public void setInRepositoryNo(String inRepositoryNo) {
+        this.inRepositoryNo = inRepositoryNo;
+    }
+
     public String getOutstockOrgno() {
         return outstockOrgno;
     }
@@ -274,5 +298,21 @@ public class AllocateapplyDetailBO {
 
     public void setProcessOrgtype(String processOrgtype) {
         this.processOrgtype = processOrgtype;
+    }
+
+    public String getApplyType() {
+        return applyType;
+    }
+
+    public void setApplyType(String applyType) {
+        this.applyType = applyType;
+    }
+
+    public String getStockType() {
+        return stockType;
+    }
+
+    public void setStockType(String stockType) {
+        this.stockType = stockType;
     }
 }
