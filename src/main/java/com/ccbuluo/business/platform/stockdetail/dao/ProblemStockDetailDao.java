@@ -32,6 +32,7 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
 
     /**
      * 带条件分页查询本机构所有零配件的问题库存
+     * @param orgCode 组织机构code
      * @param productType 物料类型
      * @param codes 零配件codes
      * @param offset 起始数
@@ -39,7 +40,7 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
      * @author weijb
      * @date 2018-08-14 21:59:51
      */
-    public Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(String productType, List<String> codes, String keyword, Integer offset, Integer pageSize){
+    public Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(String orgCode, String productType, List<String> codes, String keyword, Integer offset, Integer pageSize){
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
@@ -62,20 +63,42 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
             //根据编号或名称查询
             sql.append(" AND (product_no LIKE CONCAT('%',:keyword,'%') OR product_name LIKE CONCAT('%',:keyword,'%'))");
         }
+        // 组织机构code
+        if (StringUtils.isNotBlank(orgCode)) {
+            param.put("orgCode", orgCode);
+            sql.append(" AND org_no = :orgCode ");
+        }
 
         sql.append(" GROUP BY product_no ORDER BY create_time DESC");
         Page<StockBizStockDetailDTO> DTOS = super.queryPageForBean(StockBizStockDetailDTO.class, sql.toString(), param,offset,pageSize);
         return DTOS;
     }
 
-    public StockBizStockDetailDTO getProdectStockBizStockDetailByCode(String productNo){
+    /**
+     * 根据物料code查询某个物料在当前登录机构的问题件库存
+     * @param orgCode 当前机构编号
+     * @param productNo 商品编号
+     * @param offset 起始数
+     * @param pageSize 每页数量
+     * @return
+     * @exception
+     * @author weijb
+     * @date 2018-08-15 08:59:51
+     */
+    public Page<StockBizStockDetailDTO> getProdectStockBizStockDetailByCode(String orgCode, String productNo, Integer offset, Integer pageSize){
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,product_no,product_name,product_type,product_unit,SUM(problem_stock) as problem_stock")
                 .append(" FROM biz_stock_detail LEFT WHERE delete_flag = :deleteFlag and product_no = :productNo and problem_stock>0 ")
                 .append(" ");
         Map<String, Object> params = Maps.newHashMap();
+        // 组织机构code
+        if (StringUtils.isNotBlank(orgCode)) {
+            params.put("orgCode", orgCode);
+            sql.append(" AND org_no = :orgCode ");
+        }
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         params.put("productNo", productNo);
-        return super.findForBean(StockBizStockDetailDTO.class, sql.toString(), params);
+        Page<StockBizStockDetailDTO> DTOS = super.queryPageForBean(StockBizStockDetailDTO.class, sql.toString(), params,offset,pageSize);
+        return DTOS;
     }
 }
