@@ -295,6 +295,8 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         // 卖方机构出库计划
         outstockplanDetail2 = buildBizOutstockplanDetail(ad, applyType);
         outstockplanDetail2.setOutRepositoryNo(bd.getRepositoryNo());// 卖方仓库编号（根据机构和商品编号查询的库存）
+        outstockplanDetail2.setStockId(bd.getId());// 库存编号id
+        outstockplanDetail2.setCostPrice(bd.getCostPrice());// 成本价
     }
     /**
      * 平台出库
@@ -310,6 +312,8 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         }
         outstockplanDetail.setOutRepositoryNo(repositoryNo);// 平台仓库编号
         outstockplanDetail.setOutOrgno(BusinessPropertyHolder.TOP_SERVICECENTER);// 平台code
+        outstockplanDetail.setStockId(bd.getId());// 库存编号id
+        outstockplanDetail.setCostPrice(bd.getCostPrice());// 成本价
     }
     /**
      * 买方出库
@@ -319,6 +323,8 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         outstockplanDetail1 = buildBizOutstockplanDetail(ad, applyType);
         outstockplanDetail1.setOutRepositoryNo(bd.getRepositoryNo());// 仓库code
         outstockplanDetail1.setOutOrgno(ad.getInstockOrgno());// 买方机构code
+        outstockplanDetail1.setStockId(bd.getId());// 库存编号id
+        outstockplanDetail1.setCostPrice(bd.getCostPrice());// 成本价
     }
     /**
      * 平台入库
@@ -385,7 +391,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         outPlan.setTradeNo(String.valueOf(ad.getApplyNo()));// 交易批次号（申请单编号）
         outPlan.setSupplierNo(ad.getSupplierNo());//供应商编号
         outPlan.setApplyDetailId(ad.getId());//申请单详单id
-        outPlan.setCostPrice(ad.getCostPrice());// 成本价
+//        outPlan.setCostPrice(ad.getCostPrice());// 成本价
         outPlan.setSalesPrice(ad.getSellPrice());// 销售价
         outPlan.setPlanOutstocknum(ad.getApplyNum());// 计划出库数量applyNum
 //        outPlan.setActualOutstocknum(ad.getApplyNum());// 实际出库数量
