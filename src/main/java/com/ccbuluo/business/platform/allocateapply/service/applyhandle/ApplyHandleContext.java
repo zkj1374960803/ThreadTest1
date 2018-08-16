@@ -1,7 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
-import com.ccbuluo.business.constants.AllocateApplyEnum;
 import com.ccbuluo.business.entity.BizAllocateApply;
+import com.ccbuluo.business.entity.BizAllocateApply.AllocateApplyEnum;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

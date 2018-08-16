@@ -1,7 +1,7 @@
 package com.ccbuluo.business.platform.outstock.service;
 
-import com.ccbuluo.business.constants.ApplyStatusEnum;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.entity.BizAllocateApply.ApplyStatusEnum;
 import com.ccbuluo.business.constants.DocCodePrefixEnum;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;

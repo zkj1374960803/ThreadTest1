@@ -1,12 +1,9 @@
 package com.ccbuluo.business.platform.instock.service;
 
-import com.ccbuluo.business.constants.ApplyStatusEnum;
+import com.ccbuluo.business.entity.BizAllocateApply.ApplyStatusEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.DocCodePrefixEnum;
-import com.ccbuluo.business.entity.BizInstockOrder;
-import com.ccbuluo.business.entity.BizInstockorderDetail;
-import com.ccbuluo.business.entity.BizInstockplanDetail;
-import com.ccbuluo.business.entity.BizStockDetail;
+import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApply;
 import com.ccbuluo.business.platform.inputstockplan.service.InputStockPlanService;

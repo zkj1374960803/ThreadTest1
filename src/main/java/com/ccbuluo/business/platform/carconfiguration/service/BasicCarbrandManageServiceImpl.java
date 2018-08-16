@@ -1,7 +1,7 @@
 package com.ccbuluo.business.platform.carconfiguration.service;
 
-import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarbrandManageDao;
 import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarseriesManageDao;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarbrandManage;
@@ -65,7 +65,7 @@ public class BasicCarbrandManageServiceImpl implements BasicCarbrandManageServic
             return StatusDto.buildFailureStatusDto("该品牌已经存在！");
         }
         // 2.品牌编码
-        StatusDto<String> statusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FB);
+        StatusDto<String> statusDto = generateProjectCodeService.grantCode(BizServiceProjectcode.CodePrefixEnum.FB);
         //获取code失败
         if(!statusDto.isSuccess()){
             return statusDto;

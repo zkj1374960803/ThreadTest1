@@ -1,8 +1,8 @@
 package com.ccbuluo.business.platform.custmanager.service;
 
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
-import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryCustManagerListDTO;
 import com.ccbuluo.business.platform.carmanage.dto.CusmanagerCarCountDTO;
 import com.ccbuluo.business.platform.carmanage.service.BasicCarcoreInfoService;
@@ -199,7 +199,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         buo.setOrgName(userInfoDTO.getName() + "经理");
         buo.setOrgType(Constants.ORG_TYPE);
         // 生成客户经理组织架构的code
-        StatusDto<String> custManagerCode = generateProjectCodeService.grantCode(CodePrefixEnum.FO);
+        StatusDto<String> custManagerCode = generateProjectCodeService.grantCode(BizServiceProjectcode.CodePrefixEnum.FO);
         if(!custManagerCode.isSuccess()){
             throw new CommonException(custManagerCode.getCode(), "生成客户经理组织架构编号失败！");
         }

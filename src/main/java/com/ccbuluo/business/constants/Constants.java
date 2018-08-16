@@ -152,17 +152,5 @@ public class Constants {
      */
     public static final String CHECKED = "COMPLETE";
 
-    /**
-     * 平台调拨
-     */
-    public static final String PLATFORM_TRANSFER = "COMPLETE";
-    /**
-     * 平级调拨
-     */
-    public static final String SAME_LEVEL_TRANSFER = "COMPLETE";
 
-    /**
-     * 平级调拨
-     */
-    public static final String PLATFORM = "SC000001";
 }

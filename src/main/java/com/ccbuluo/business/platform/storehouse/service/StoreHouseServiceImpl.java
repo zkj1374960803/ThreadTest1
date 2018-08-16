@@ -1,7 +1,7 @@
 package com.ccbuluo.business.platform.storehouse.service;
 
-import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.entity.BizServiceStorehouse;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
@@ -65,7 +65,7 @@ public class StoreHouseServiceImpl implements StoreHouseService{
             }
             // 生成编码
             String code = null;
-            StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FC);
+            StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(BizServiceProjectcode.CodePrefixEnum.FC);
             if (stringStatusDto.getCode().equals(Constants.SUCCESS_CODE)) {
                 code = stringStatusDto.getData();
             } else {
