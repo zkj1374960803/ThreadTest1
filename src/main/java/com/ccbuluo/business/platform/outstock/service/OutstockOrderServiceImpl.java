@@ -81,7 +81,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         try {
             Map<String, List<BizOutstockplanDetail>> collect = bizOutstockplanDetailList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getOutRepositoryNo));
             // 根据申请单号查询基本信息
-            FindAllocateApplyDTO detail = allocateApply.findDetail(applyNo);
+            FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
             List<BizOutstockOrder> bizOutstockOrderList = Lists.newArrayList();
             List<BizOutstockorderDetail> bizOutstockorderDetailList = Lists.newArrayList();
             List<BizOutstockorderDetail> bizOutstockorderDetailList1 = Lists.newArrayList();
