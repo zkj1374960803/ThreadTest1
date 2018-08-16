@@ -1,7 +1,5 @@
 package com.ccbuluo.business.platform.servicecenter.service;
 
-import com.auth0.jwt.internal.com.fasterxml.jackson.core.type.TypeReference;
-import com.auth0.jwt.internal.com.fasterxml.jackson.databind.ObjectMapper;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
@@ -338,7 +336,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
         basicUserOrganization.setOrgType(ServiceCenterEnum.SERVICECENTER.toString());
         basicUserOrganization.setCreator(userHolder.getLoggedUserId());
         basicUserOrganization.setOperator(userHolder.getLoggedUserId());
-        basicUserOrganization.setTopOrgCode(BusinessPropertyHolder.TOP_SERVICECENTER);
+        basicUserOrganization.setTopOrgCode(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER);
         StatusDtoThriftLong<Long> id = orgService.save(basicUserOrganization);
         return id;
     }

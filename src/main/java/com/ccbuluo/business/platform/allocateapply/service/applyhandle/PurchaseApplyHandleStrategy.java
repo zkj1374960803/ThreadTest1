@@ -57,11 +57,7 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
             }
             // 构建生成订单（采购）
             List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyType);
-            // 查询库存列表(平台的库存列表)
-//            List<BizStockDetail> stockDetails = getStockDetailList(BusinessPropertyHolder.TOP_SERVICECENTER, details);
-//            if(null == stockDetails || stockDetails.size() == 0){
-//                return 0;
-//            }
+
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
             Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, null, applyType);
             bizInstockplanDetailDao.batchInsertInstockplanDetail(pir.getRight());

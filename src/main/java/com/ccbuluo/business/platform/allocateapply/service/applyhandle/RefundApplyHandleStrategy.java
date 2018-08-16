@@ -6,9 +6,7 @@ import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
-import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
-import com.ccbuluo.core.common.UserHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -53,7 +51,7 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
                 return 0;
             }
             // 查询库存列表(平台的库存列表)
-            List<BizStockDetail> stockDetails = getStockDetailList(BusinessPropertyHolder.TOP_SERVICECENTER, details);
+            List<BizStockDetail> stockDetails = getStockDetailList(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER, details);
             if(null == stockDetails || stockDetails.size() == 0){
                 return 0;
             }

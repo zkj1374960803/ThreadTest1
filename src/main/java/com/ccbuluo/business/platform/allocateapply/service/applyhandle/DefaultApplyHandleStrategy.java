@@ -1,6 +1,5 @@
 package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
-import com.auth0.jwt.internal.org.apache.commons.lang3.StringUtils;
 import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
 import com.ccbuluo.business.constants.*;
 import com.ccbuluo.business.entity.*;
@@ -77,8 +76,8 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         // 构建生成订单（机构1对平台）
         BizAllocateTradeorder bizAllocateTradeorder1 = buildOrderEntity(details);
         BizAllocateTradeorder bizAllocateTradeorder2 = buildOrderEntity(details);
-        bizAllocateTradeorder1.setSellerOrgno(BusinessPropertyHolder.TOP_SERVICECENTER);// 从买方到平台"平台code"
-        bizAllocateTradeorder2.setPurchaserOrgno(BusinessPropertyHolder.TOP_SERVICECENTER);// 从平台到卖方"平台code"
+        bizAllocateTradeorder1.setSellerOrgno(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER);// 从买方到平台"平台code"
+        bizAllocateTradeorder2.setPurchaserOrgno(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER);// 从平台到卖方"平台code"
 
         // 特殊情况处理
         // 采购
@@ -208,10 +207,6 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         for(AllocateapplyDetailBO ad : details){
             // 采购
             if(AllocateApplyEnum.PURCHASE.toString().equals(applyType)){
-                // 平台出库计划
-//                BizOutstockplanDetail outstockplanDetail1 = buildBizOutstockplanDetail(ad, processType);
-//                outstockplanDetail1.setStockId("这个批次库存id从哪里来TODO");// 批次库存id(平台的库存)
-//                outstockplanDetail1.setOutRepositoryNo(BusinessPropertyHolder.TOP_SERVICECENTER);// 出库仓库编号（平台code）
                 // 平台入库计划
                 instockplanDetail = instockplanDetail(instockplanDetail,ad, applyType);
                 // 买入方入库计划
@@ -306,13 +301,13 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         // 平台出库计划
         outstockplanDetail = buildBizOutstockplanDetail(ad, applyType);
         // 根据平台的no查询平台的仓库
-        List<QueryStorehouseDTO> list = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(BusinessPropertyHolder.TOP_SERVICECENTER);
+        List<QueryStorehouseDTO> list = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER);
         String repositoryNo = "";
         if(null != list && list.size() > 0){
             repositoryNo = list.get(0).getStorehouseCode();
         }
         outstockplanDetail.setOutRepositoryNo(repositoryNo);// 平台仓库编号
-        outstockplanDetail.setOutOrgno(BusinessPropertyHolder.TOP_SERVICECENTER);// 平台code
+        outstockplanDetail.setOutOrgno(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER);// 平台code
         outstockplanDetail.setStockId(bd.getId());// 库存编号id
         outstockplanDetail.setCostPrice(bd.getCostPrice());// 成本价
         return outstockplanDetail;
@@ -336,13 +331,13 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         // 平台入库计划
         instockplanDetail = buildBizInstockplanDetail(ad, applyType);
         // 根据平台的no查询平台的仓库
-        List<QueryStorehouseDTO> list = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(BusinessPropertyHolder.TOP_SERVICECENTER);
+        List<QueryStorehouseDTO> list = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER);
         String repositoryNo = "";
         if(null != list && list.size() > 0){
             repositoryNo = list.get(0).getStorehouseCode();
         }
         instockplanDetail.setInstockRepositoryNo(repositoryNo);// 平台仓库编号
-        instockplanDetail.setInstockOrgno(BusinessPropertyHolder.TOP_SERVICECENTER);// 平台机构编号
+        instockplanDetail.setInstockOrgno(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER);// 平台机构编号
         return instockplanDetail;
     }
     /**
@@ -553,7 +548,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         }
         // 平级直调
         if(AllocateApplyEnum.DIRECTALLOCATE.toString().equals(ba.getApplyType())){
-            sellerOrgno = BusinessPropertyHolder.TOP_SERVICECENTER;//  平台的机构编号
+            sellerOrgno = BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER;//  平台的机构编号
         }
         // 商品退换
         if(AllocateApplyEnum.BARTER.toString().equals(ba.getApplyType())){
