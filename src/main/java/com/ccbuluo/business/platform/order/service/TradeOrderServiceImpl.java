@@ -125,7 +125,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
                 BizOutstockplanDetail outstockplanDetail1 = new BizOutstockplanDetail();
                 outstockplanDetail1 = buildBizOutstockplanDetail(ad, processType);
                 outstockplanDetail1.setOutRepositoryNo(bd.getRepositoryNo());// 卖方仓库编号（根据机构和商品编号查询的库存）
-                if(null != ad.getProcessOrgno() && Constants.PLATFORM.equals(ad.getProcessOrgno())){// 如果是平台参与
+                if(null != ad.getProcessOrgno() && BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(ad.getProcessOrgno())){// 如果是平台参与
                     // 平台入库计划
                     BizInstockplanDetail instockplanDetail1 = new BizInstockplanDetail();
                     instockplanDetail1 = buildBizInstockplanDetail(ad, processType);

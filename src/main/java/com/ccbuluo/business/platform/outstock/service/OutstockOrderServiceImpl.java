@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.outstock.service;
 
+import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizAllocateApply.ApplyStatusEnum;
 import com.ccbuluo.business.constants.DocCodePrefixEnum;
@@ -236,7 +237,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     private void updateApplyOrderStatus(String applyNo, FindAllocateApplyDTO detail, List<BizOutstockplanDetail> bizOutstockplanDetailList) {
         List<BizOutstockplanDetail> collect = bizOutstockplanDetailList.stream().filter(item -> item.getPlanStatus().equals(Constants.CHECKED)).collect(Collectors.toList());
         if (detail.getApplyType().equals(Constants.PLATFORM_TRANSFER)) {
-            if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(Constants.PLATFORM)) {
+            if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
                 updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.WAITINGRECEIPT.toString());
             } else {
                 updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.INSTORE.toString());
@@ -272,7 +273,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     @Override
     public List<String> queryApplyNo() {
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
-        if (orgCode.equals(Constants.PLATFORM)) {
+        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
             return allocateApply.queryApplyNo(ApplyStatusEnum.OUTSTORE.toString(), orgCode);
         }
         return allocateApply.queryApplyNo(ApplyStatusEnum.WAITDELIVERY.toString(), orgCode);
@@ -507,7 +508,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         bizOutstockOrder.setOutstockOrgno(detail.getOutstockOrgno());
         bizOutstockOrder.setOutstockOperator(userHolder.getLoggedUserId());
         bizOutstockOrder.setTradeDocno(applyNo);
-        if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(Constants.PLATFORM)) {
+        if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
             bizOutstockOrder.setOutstockType(detail.getProcessType());
         } else {
             bizOutstockOrder.setOutstockType(Constants.PROCESS_TYPE_TRANSFER);
