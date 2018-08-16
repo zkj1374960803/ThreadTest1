@@ -156,6 +156,11 @@ public class BizOutstockplanDetail {
      */
     @ApiModelProperty(name = "productUnit", value = "商品计量单位")
     private String productUnit;
+    /**
+     *  库存类型
+     */
+    @ApiModelProperty(name = "stockType", value = "库存类型（正常库存、问题库存、报损件库存，等等）")
+    private String stockType;
 
     public void setId(Long id) {
         this.id = id;
@@ -383,5 +388,13 @@ public class BizOutstockplanDetail {
 
     public void setStorehouseName(String storehouseName) {
         this.storehouseName = storehouseName;
+    }
+
+    public String getStockType() {
+        return stockType;
+    }
+
+    public void setStockType(String stockType) {
+        this.stockType = stockType;
     }
 }

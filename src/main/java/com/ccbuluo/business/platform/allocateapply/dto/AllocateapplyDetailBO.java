@@ -132,6 +132,12 @@ public class AllocateapplyDetailBO {
     @ApiModelProperty(name = "stockType", value = "库存类型（正常库存、问题库存、报损件库存，等等）")
     private String stockType;
 
+    /**
+     * 备注
+     */
+    @ApiModelProperty(name = "remark", value = "备注")
+    private String remark;
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -314,5 +320,13 @@ public class AllocateapplyDetailBO {
 
     public void setStockType(String stockType) {
         this.stockType = stockType;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

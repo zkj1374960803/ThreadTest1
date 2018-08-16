@@ -351,7 +351,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      */
     public BizAllocateApply getByNo(String applyNo) {
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,apply_no,applyorg_no,applyer,instock_orgno,")
+        sql.append("SELECT id,apply_no,applyorg_no,applyer,instock_orgno,apply_type,")
                 .append("in_repository_no,outstock_orgtype,outstock_orgno,apply_processor,")
                 .append("process_time,process_type,apply_status,creator,create_time,operator,")
                 .append("operate_time,delete_flag,remark FROM biz_allocate_apply WHERE apply_no= :applyNo");

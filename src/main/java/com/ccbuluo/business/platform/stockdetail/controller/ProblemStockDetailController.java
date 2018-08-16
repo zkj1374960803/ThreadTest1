@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.stockdetail.controller;
 
+import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleContext;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.service.ProblemStockDetailService;
 import com.ccbuluo.core.controller.BaseController;
@@ -36,6 +37,8 @@ public class ProblemStockDetailController extends BaseController {
     private ProblemStockDetailService problemStockDetailService;
     @ThriftRPCClient("BasicMerchandiseSer")
     CarpartsProductService carpartsProductService;
+    @Resource
+    ApplyHandleContext applyHandleContext;
 
 
     /**
@@ -139,5 +142,17 @@ public class ProblemStockDetailController extends BaseController {
                                                              @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                              @RequestParam(required = false, defaultValue = "20") Integer pageSize){
         return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.getSelfProdectStockBizStockDetailByCode(productNo, offset, pageSize));
+    }
+    /**
+     * 缓存列表
+     * @author weijb
+     * @date 2018-07-11 15:52:33
+     */
+    @ApiOperation(value = "测试申请单处理",notes = "【魏俊标】")
+    @ApiImplicitParam(name = "applyNo", value = "申请单编号",  required = true, paramType = "query")
+    @GetMapping("/applyhandle")
+    public StatusDto redisList(@RequestParam String applyNo) {
+        applyHandleContext.applyHandle(applyNo);
+        return StatusDto.buildSuccessStatusDto();
     }
 }

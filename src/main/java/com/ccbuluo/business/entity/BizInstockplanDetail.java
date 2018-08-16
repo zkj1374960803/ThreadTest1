@@ -140,6 +140,11 @@ public class BizInstockplanDetail {
      */
     @ApiModelProperty(name = "supplierName", value = "供应商名字")
     private String supplierName;
+    /**
+     *  库存类型
+     */
+    @ApiModelProperty(name = "stockType", value = "库存类型（正常库存、问题库存、报损件库存，等等）")
+    private String stockType;
 
     public void setId(Long id) {
         this.id = id;
@@ -348,4 +353,11 @@ public class BizInstockplanDetail {
         this.supplierName = supplierName;
     }
 
+    public String getStockType() {
+        return stockType;
+    }
+
+    public void setStockType(String stockType) {
+        this.stockType = stockType;
+    }
 }
