@@ -8,7 +8,6 @@ import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.core.common.UserHolder;
-import com.ccbuluo.core.constants.SystemPropertyHolder;
 import com.ccbuluo.core.entity.BusinessUser;
 import com.ccbuluo.core.entity.Organization;
 import com.ccbuluo.core.exception.CommonException;
@@ -17,7 +16,6 @@ import com.ccbuluo.db.Page;
 import com.ccbuluo.http.*;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
-import com.ccbuluo.usercoreintf.dto.BasicOrganizationWorkplaceDTO;
 import com.ccbuluo.usercoreintf.dto.QueryServiceCenterDTO;
 import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
@@ -81,7 +79,7 @@ public class AllocateApplyImpl implements AllocateApply{
                 String orgCodeUser = organization.getOrgCode();
                 if(orgCodeUser != null){
                     allocateApplyDTO.setApplyorgNo(orgCodeUser);
-                    if(orgCodeUser.equals(BusinessPropertyHolder.TOP_SERVICECENTER)){
+                    if(orgCodeUser.equals(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER)){
                         // 等待付款状态
                         allocateApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
                     }else {
@@ -97,7 +95,7 @@ public class AllocateApplyImpl implements AllocateApply{
         // 如果是采购类型的，入库机构是平台
         String processType = allocateApplyDTO.getProcessType();
         if(Constants.PROCESS_TYPE_PURCHASE.equals(processType)){
-            allocateApplyDTO.setApplyorgNo(BusinessPropertyHolder.TOP_SERVICECENTER);
+            allocateApplyDTO.setApplyorgNo(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER);
         }
         allocateApplyDTO.setProcessOrgtype(orgTypeByCode);
         allocateApplyDTO.setProcessOrgno(allocateApplyDTO.getOutstockOrgno());
