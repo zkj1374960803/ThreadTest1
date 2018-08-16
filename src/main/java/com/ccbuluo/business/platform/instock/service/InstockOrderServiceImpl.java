@@ -124,7 +124,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
     @Transactional(rollbackFor = Exception.class)
     public StatusDto<String> saveInstockOrder(String applyNo, List<BizInstockorderDetail> bizInstockorderDetailList) {
         try {
-            // 根据申请单号查询基本信息
+            // 根据申请单号查询申请单基本信息
             FindAllocateApplyDTO detail = allocateApply.findDetail(applyNo);
             // 查询入库计划
             List<BizInstockplanDetail> bizInstockplanDetails = inputStockPlanService.queryListByApplyNo(applyNo, detail.getInRepositoryNo());
