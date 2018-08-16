@@ -18,6 +18,7 @@ import com.ccbuluo.http.*;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
+import com.ccbuluo.usercoreintf.dto.QueryServiceCenterDTO;
 import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
@@ -84,7 +85,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                 String orgCodeUser = organization.getOrgCode();
                 if(orgCodeUser != null){
                     allocateApplyDTO.setApplyorgNo(orgCodeUser);
-                    if(orgCodeUser.equals(Constants.PLATFORM)){
+                    if(orgCodeUser.equals(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER)){
                         // 等待付款状态
                         allocateApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
                     }else {
@@ -99,7 +100,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         allocateApplyDTO.setOutstockOrgtype(orgTypeByCode);
         // 如果是采购类型的，入库机构是平台
         String applyType = allocateApplyDTO.getApplyType();
-
         if(Constants.PROCESS_TYPE_PURCHASE.equals(applyType)){
             allocateApplyDTO.setApplyorgNo(Constants.PLATFORM);
             allocateApplyDTO.setOutstockOrgno(Constants.PLATFORM);
@@ -361,8 +361,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      * @date 2018-08-11 12:56:39
      */
     @Override
-    public List<String> queryApplyNo(String applyNoStatus) {
-        return bizAllocateApplyDao.queryApplyNo(applyNoStatus);
+    public List<String> queryApplyNo(String applyNoStatus, String orgCode) {
+        return bizAllocateApplyDao.queryApplyNo(applyNoStatus, orgCode);
     }
 
     /**

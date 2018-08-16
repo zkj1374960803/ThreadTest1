@@ -31,8 +31,8 @@ public class InputStockPlanServiceImpl implements InputStockPlanService {
      * @date 2018-08-08 11:14:56
      */
     @Override
-    public List<BizInstockplanDetail> queryListByApplyNo(String applyNo) {
-        return bizInstockplanDetailDao.queryListByApplyNo(applyNo);
+    public List<BizInstockplanDetail> queryListByApplyNo(String applyNo, String inRepositoryNo) {
+        return bizInstockplanDetailDao.queryListByApplyNo(applyNo, inRepositoryNo);
     }
 
     /**

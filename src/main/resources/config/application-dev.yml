@@ -44,9 +44,11 @@ base:
   appid: c873890d60ad4e8c92705d4872ccac90
   #本系统的secret
   secret: 883c12f76921465aa5bfb74e9d9ac9cc
+  #售后系统顶级机构编号
+  topplatform: "SC000001"
   #顶级服务中心code
   topservicecenter: "SC000002"
-  #客户经理组织机构
+  #顶级客户经理组织机构
   custmanager: "SC000003"
   #客户经理角色code
   custmanagerrolecode: "JS024"

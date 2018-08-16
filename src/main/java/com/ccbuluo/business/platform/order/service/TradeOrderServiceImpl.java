@@ -76,7 +76,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             // 构建生成订单（采购）
             List<BizAllocateTradeorder> list = buildOrderEntityList(details, Constants.PROCESS_TYPE_PURCHASE);
             // 查询库存列表(平台的库存列表)
-            List<BizStockDetail> stockDetails = getStockDetailList(BusinessPropertyHolder.TOP_SERVICECENTER, details);
+            List<BizStockDetail> stockDetails = getStockDetailList(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER, details);
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
             Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, Constants.PROCESS_TYPE_PURCHASE);
             bizInstockplanDetailDao.batchInsertInstockplanDetail(pir.getRight());
@@ -103,14 +103,11 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // 采购
         if(Constants.PROCESS_TYPE_PURCHASE.equals(processType)){
             for(AllocateapplyDetailBO ad : details){// 采购的时候不生成出库计划，因为没有库存信息
-                // 平台出库计划
-//                BizOutstockplanDetail outstockplanDetail1 = buildBizOutstockplanDetail(ad, processType);
-//                outstockplanDetail1.setStockId("这个批次库存id从哪里来TODO");// 批次库存id(平台的库存)
-//                outstockplanDetail1.setOutRepositoryNo(BusinessPropertyHolder.TOP_SERVICECENTER);// 出库仓库编号（平台code）
+
                 // 平台入库计划+
                 BizInstockplanDetail instockplanDetail1 = new BizInstockplanDetail();
                 instockplanDetail1 = buildBizInstockplanDetail(ad, processType);
-                instockplanDetail1.setInstockRepositoryNo(BusinessPropertyHolder.TOP_SERVICECENTER);// 入库仓库编号
+                instockplanDetail1.setInstockRepositoryNo(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER);// 入库仓库编号
                 // 买入方入库计划
                 BizInstockplanDetail instockplanDetail2 = new BizInstockplanDetail();
                 instockplanDetail2 = buildBizInstockplanDetail(ad, processType);
@@ -132,11 +129,11 @@ public class TradeOrderServiceImpl implements TradeOrderService {
                     // 平台入库计划
                     BizInstockplanDetail instockplanDetail1 = new BizInstockplanDetail();
                     instockplanDetail1 = buildBizInstockplanDetail(ad, processType);
-                    instockplanDetail1.setInstockRepositoryNo(BusinessPropertyHolder.TOP_SERVICECENTER);// 平台code
+                    instockplanDetail1.setInstockRepositoryNo(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER);// 平台code
                     // 平台出库计划
                     BizOutstockplanDetail outstockplanDetail2 = new BizOutstockplanDetail();
                     outstockplanDetail2 = buildBizOutstockplanDetail(ad, processType);
-                    outstockplanDetail2.setOutRepositoryNo(BusinessPropertyHolder.TOP_SERVICECENTER);// 平台code
+                    outstockplanDetail2.setOutRepositoryNo(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER);// 平台code
                     outList.add(outstockplanDetail2);
                     inList.add(instockplanDetail1);
                 }
@@ -267,7 +264,7 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         String sellerOrgno = "";
         for(BizAllocateTradeorder bt : list){
             //卖方机构：不能为平台或供应商（为空）
-            if(StringUtils.isNotBlank(bt.getSellerOrgno()) && !BusinessPropertyHolder.TOP_SERVICECENTER.equals(bt.getSellerOrgno())){
+            if(StringUtils.isNotBlank(bt.getSellerOrgno()) && !BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER.equals(bt.getSellerOrgno())){
                 sellerOrgno = bt.getSellerOrgno();
             }
         }
@@ -284,8 +281,8 @@ public class TradeOrderServiceImpl implements TradeOrderService {
         // 构建生成订单（机构1对平台）
         BizAllocateTradeorder bizAllocateTradeorder1 = buildOrderEntity(details);
         BizAllocateTradeorder bizAllocateTradeorder2 = buildOrderEntity(details);
-        bizAllocateTradeorder1.setSellerOrgno(BusinessPropertyHolder.TOP_SERVICECENTER);// 从买方到平台"平台code"
-        bizAllocateTradeorder2.setPurchaserOrgno(BusinessPropertyHolder.TOP_SERVICECENTER);// 从平台到卖方"平台code"
+        bizAllocateTradeorder1.setSellerOrgno(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER);// 从买方到平台"平台code"
+        bizAllocateTradeorder2.setPurchaserOrgno(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER);// 从平台到卖方"平台code"
         List<BizAllocateTradeorder> list = new ArrayList<BizAllocateTradeorder>();
         if(Constants.PROCESS_TYPE_PURCHASE.equals(processType)){// 采购的时候卖方为供应商（此时为空）
             bizAllocateTradeorder2.setSellerOrgno("");// (供应商不填为空)

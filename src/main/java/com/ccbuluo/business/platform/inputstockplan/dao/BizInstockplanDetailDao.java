@@ -117,14 +117,14 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
     public List<Long> batchInsertInstockplanDetail(List<BizInstockplanDetail> list){
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO biz_instockplan_detail ( instock_type,product_no,")
-                .append("product_type,product_categoryname,trade_no,supplier_no,")
+                .append("product_type,product_categoryname,trade_no,supplier_no,instock_orgno,")
                 .append("instock_repository_no,cost_price,plan_instocknum,actual_instocknum,")
                 .append("complete_status,complete_time,outstock_planid,creator,create_time,")
-                .append("operator,operate_time,delete_flag,remark,product_unit,product_name ) VALUES (  :instockType,")
+                .append("operator,operate_time,delete_flag,remark,product_unit,product_name,stock_type ) VALUES (  :instockType,")
                 .append(" :productNo, :productType, :productCategoryname, :tradeNo,")
-                .append(" :supplierNo, :instockRepositoryNo, :costPrice, :planInstocknum,")
+                .append(" :supplierNo, :instockOrgno, :instockRepositoryNo, :costPrice, :planInstocknum,")
                 .append(" :actualInstocknum, :completeStatus, :completeTime, :outstockPlanid,")
-                .append(" :creator, :createTime, :operator, :operateTime, :deleteFlag, :remark, :productUnit, :productName")
+                .append(" :creator, :createTime, :operator, :operateTime, :deleteFlag, :remark, :productUnit, :productName, :stockType")
                 .append(" )");
         List<Long> longs = super.batchInsertForListBean(sql.toString(), list);
         return longs;
@@ -137,16 +137,20 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
      * @author liuduo
      * @date 2018-08-08 11:14:56
      */
-    public List<BizInstockplanDetail> queryListByApplyNo(String applyNo) {
+    public List<BizInstockplanDetail> queryListByApplyNo(String applyNo, String inRepositoryNo) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("completeStatus", Constants.CHECKED);
+        params.put("inRepositoryNo", inRepositoryNo);
+
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,instock_type,product_no,product_type,product_categoryname,")
             .append("trade_no,supplier_no,instock_repository_no,cost_price,")
             .append("plan_instocknum,actual_instocknum,complete_status,complete_time,")
             .append("outstock_planid,creator,create_time,operator,operate_time,")
-            .append("delete_flag,remark FROM biz_instockplan_detail WHERE trade_no= :applyNo AND complete_status = :completeStatus");
-        Map<String, Object> params = Maps.newHashMap();
-        params.put("applyNo", applyNo);
-        params.put("completeStatus", Constants.CHECKED);
+            .append("delete_flag,remark FROM biz_instockplan_detail WHERE trade_no= :applyNo")
+            .append(" AND complete_status = :completeStatus AND instock_repository_no = :inRepositoryNo");
+
         return super.queryListBean(BizInstockplanDetail.class, sql.toString(), params);
     }
 

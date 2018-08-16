@@ -86,6 +86,11 @@ public class BizOutstockplanDetail {
     @ApiModelProperty(name = "outRepositoryNo", value = "出库仓库编号")
     private String outRepositoryNo;
     /**
+     * 出库机构编号
+     */
+    @ApiModelProperty(name = "outOrgno", value = "出库机构编号")
+    private String outOrgno;
+    /**
      * 计划出库数量
      */
     @ApiModelProperty(name = "planOutstocknum", value = "计划出库数量")
@@ -151,6 +156,11 @@ public class BizOutstockplanDetail {
      */
     @ApiModelProperty(name = "productUnit", value = "商品计量单位")
     private String productUnit;
+    /**
+     *  库存类型
+     */
+    @ApiModelProperty(name = "stockType", value = "库存类型（正常库存、问题库存、报损件库存，等等）")
+    private String stockType;
 
     public void setId(Long id) {
         this.id = id;
@@ -238,6 +248,14 @@ public class BizOutstockplanDetail {
 
     public String getOutRepositoryNo() {
         return this.outRepositoryNo;
+    }
+
+    public String getOutOrgno() {
+        return outOrgno;
+    }
+
+    public void setOutOrgno(String outOrgno) {
+        this.outOrgno = outOrgno;
     }
 
     public void setPlanOutstocknum(Long planOutstocknum) {
@@ -370,5 +388,13 @@ public class BizOutstockplanDetail {
 
     public void setStorehouseName(String storehouseName) {
         this.storehouseName = storehouseName;
+    }
+
+    public String getStockType() {
+        return stockType;
+    }
+
+    public void setStockType(String stockType) {
+        this.stockType = stockType;
     }
 }

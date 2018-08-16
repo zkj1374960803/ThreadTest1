@@ -20,22 +20,31 @@ public class BusinessPropertyHolder {
     }
 
     // 顶级服务中心code
-    public static String TOP_SERVICECENTER;
+    public static String ORGCODE_TOP_SERVICECENTER;
     @Value("${base.topservicecenter}")
     public void setTopStore(String topservicecenter) {
-        TOP_SERVICECENTER = topservicecenter;
+        ORGCODE_TOP_SERVICECENTER = topservicecenter;
     }
 
     // 客户经理组织机构
-    public static String custManager;
+    public static String ORGCODE_TOP_CUSMANAGER;
     @Value("${base.custmanager}")
     public void setCustManager(String custManager) {
-        BusinessPropertyHolder.custManager = custManager;
+        BusinessPropertyHolder.ORGCODE_TOP_CUSMANAGER = custManager;
     }
-    //custmanagerrolecode 客户经理角色
-    public static String custManagerRoleCode;
+
+    // custmanagerrolecode 客户经理角色
+    public static String ROLECODE_CUSMANAGER;
     @Value("${base.custmanagerrolecode}")
     public void setCustManagerRoleCode(String custManagerRoleCode) {
-        BusinessPropertyHolder.custManagerRoleCode = custManagerRoleCode;
+        BusinessPropertyHolder.ROLECODE_CUSMANAGER = custManagerRoleCode;
+    }
+
+
+    // 售后顶级机构的编号
+    public static String ORGCODE_AFTERSALE_PLATFORM;
+    @Value("${base.topplatform}")
+    public void setOrgcodeAftersalePlatform(String orgcodeAftersalePlatform) {
+        ORGCODE_AFTERSALE_PLATFORM = orgcodeAftersalePlatform;
     }
 }

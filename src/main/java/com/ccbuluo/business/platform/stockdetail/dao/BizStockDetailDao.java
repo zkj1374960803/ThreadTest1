@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.stockdetail.dao;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizStockDetail;
+import com.ccbuluo.business.platform.adjust.dto.StockAdjustListDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.UpdateStockBizStockDetailDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
@@ -39,12 +40,12 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      */
     public Long saveEntity(BizStockDetail entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO biz_stock_detail ( repository_no,org_no,product_no,")
+        sql.append("INSERT INTO biz_stock_detail ( repository_no,org_no,product_no,product_categoryname")
             .append("product_type,trade_no,supplier_no,valid_stock,occupy_stock,")
             .append("problem_stock,damaged_stock,transit_stock,freeze_stock,seller_orgno,")
             .append("cost_price,instock_planid,latest_correct_time,creator,create_time,")
             .append("operator,operate_time,delete_flag,remark ) VALUES (  :repositoryNo,")
-            .append(" :orgNo, :productNo, :productType, :tradeNo, :supplierNo,")
+            .append(" :orgNo, :productNo, :productCategoryname, :productType, :tradeNo, :supplierNo,")
             .append(" :validStock, :occupyStock, :problemStock, :damagedStock,")
             .append(" :transitStock, :freezeStock, :sellerOrgno, :costPrice,")
             .append(" :instockPlanid, :latestCorrectTime, :creator, :createTime,")
@@ -304,5 +305,55 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
             .append(" WHERE id = :id AND :versionNo > version_no");
 
         batchUpdateForListBean(sql.toString(), bizStockDetails);
+    }
+
+    /**
+     * 查询新增物料盘库时用的列表
+     * @param equipmentCodes 物料code
+     * @return 新增物料盘库时用的列表
+     * @author liuduo
+     * @date 2018-08-14 17:43:53
+     */
+    public List<StockAdjustListDTO> queryAdjustList(List<String> equipmentCodes) {
+        Map<String, Object> param = Maps.newHashMap();
+
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT id,product_no,product_type,product_categoryname,product_name,IFNULL(SUM(valid_stock + occupy_stock),0) AS dueNum")
+            .append("  FROM biz_stock_detail WHERE 1=1");
+        if (null != equipmentCodes && equipmentCodes.size() > 0) {
+            param.put("equipmentCodes", equipmentCodes);
+            sql.append(" AND product_no IN(:equipmentCodes)");
+        }
+        sql.append(" GROUP BY product_no");
+
+        return queryListBean(StockAdjustListDTO.class, sql.toString(), param);
+    }
+
+    /**
+     * 根据商品编码查询库存
+     * @param productNo 商品编码
+     * @return 库存集合
+     * @author liuduo
+     * @date 2018-08-14 20:22:08
+     */
+    public List<BizStockDetail> queryStockDetailByProductNo(String productNo) {
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("productNo", productNo);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,product_no,product_type,valid_stock,version_no FROM biz_stock_detail WHERE product_no = :productNo ORDER BY create_time DESC");
+
+        return queryListBean(BizStockDetail.class, sql.toString(), param);
+    }
+
+    /**
+     * 更改盘库后的库存的有效库存
+     * @param bizStockDetailList1 库存集合
+     * @return
+     * @author liuduo
+     * @date 2018-08-14 21:38:16
+     */
+    public void updateAdjustValidStock(List<BizStockDetail> bizStockDetailList1) {
+        String sql = "UPDATE biz_stock_detail SET valid_stock = :validStock, version_no = version_no+1 WHERE version_no > :versionNo AND id = :id";
     }
 }

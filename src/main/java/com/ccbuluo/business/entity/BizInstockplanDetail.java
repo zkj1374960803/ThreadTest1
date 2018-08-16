@@ -60,6 +60,11 @@ public class BizInstockplanDetail {
     @ApiModelProperty(name = "instockRepositoryNo", value = "入库仓库编号")
     private String instockRepositoryNo;
     /**
+     * 入库机构编号
+     */
+    @ApiModelProperty(name = "instockOrgno", value = "入库机构编号")
+    private String instockOrgno;
+    /**
      * 成本单价
      */
     @ApiModelProperty(name = "costPrice", value = "成本单价")
@@ -135,6 +140,11 @@ public class BizInstockplanDetail {
      */
     @ApiModelProperty(name = "supplierName", value = "供应商名字")
     private String supplierName;
+    /**
+     *  库存类型
+     */
+    @ApiModelProperty(name = "stockType", value = "库存类型（正常库存、问题库存、报损件库存，等等）")
+    private String stockType;
 
     public void setId(Long id) {
         this.id = id;
@@ -206,6 +216,14 @@ public class BizInstockplanDetail {
 
     public String getInstockRepositoryNo() {
         return this.instockRepositoryNo;
+    }
+
+    public String getInstockOrgno() {
+        return instockOrgno;
+    }
+
+    public void setInstockOrgno(String instockOrgno) {
+        this.instockOrgno = instockOrgno;
     }
 
     public void setCostPrice(BigDecimal costPrice) {
@@ -335,4 +353,11 @@ public class BizInstockplanDetail {
         this.supplierName = supplierName;
     }
 
+    public String getStockType() {
+        return stockType;
+    }
+
+    public void setStockType(String stockType) {
+        this.stockType = stockType;
+    }
 }

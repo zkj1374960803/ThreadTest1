@@ -1,9 +1,10 @@
-package com.ccbuluo.business.platform.problemstock.dto;
+package com.ccbuluo.business.platform.stockdetail.dto;
 
 import com.ccbuluo.business.constants.ProductUnitEnum;
 import com.ccbuluo.business.entity.IdEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 商品库存列表展示用
@@ -37,8 +38,8 @@ public class StockBizStockDetailDTO extends IdEntity {
     /**
      * 计量单位
      */
-    @ApiModelProperty(name = "equipUnit", value = "计量单位")
-    private String equipUnit;
+    @ApiModelProperty(name = "productUnit", value = "计量单位")
+    private String productUnit;
 
     public String getProductNo() {
         return productNo;
@@ -72,14 +73,19 @@ public class StockBizStockDetailDTO extends IdEntity {
         this.problemStock = problemStock;
     }
 
-    public String getEquipUnit() {
-        return equipUnit;
+    public String getProductUnit() {
+        return productUnit;
     }
 
-    public void setEquipUnit(String equipUnit) {
-        this.equipUnit = equipUnit;
+    public void setProductUnit(String productUnit) {
+        this.productUnit = productUnit;
     }
+
     public String getUnitName() {
-        return ProductUnitEnum.valueOf(equipUnit).getLabel();
+        String unitName = "";
+        if(StringUtils.isNotBlank(productUnit)){
+            unitName = ProductUnitEnum.valueOf(productUnit).getLabel();
+        }
+        return unitName;
     }
 }
