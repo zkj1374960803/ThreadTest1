@@ -22,6 +22,10 @@ public class FindStockListDTO{
      */
     @ApiModelProperty(name = "supplierNo", value = "供应商code", hidden = true)
     private String supplierNo;
+    @ApiModelProperty(name = "equiptypeId", value = "分类的id", hidden = true)
+    private Integer equiptypeId;
+    @ApiModelProperty(name = "orgNo", value = "机构的编号", hidden = true)
+    private String orgNo;
     /**
      * 商品编号
      */
@@ -68,6 +72,22 @@ public class FindStockListDTO{
      */
     @ApiModelProperty(name = "pageSize", value = "每页显示的数量", hidden = true)
     private Integer pageSize;
+
+    public Integer getEquiptypeId() {
+        return equiptypeId;
+    }
+
+    public void setEquiptypeId(Integer equiptypeId) {
+        this.equiptypeId = equiptypeId;
+    }
+
+    public String getOrgNo() {
+        return orgNo;
+    }
+
+    public void setOrgNo(String orgNo) {
+        this.orgNo = orgNo;
+    }
 
     public Long getId() {
         return id;

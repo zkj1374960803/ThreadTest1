@@ -8,7 +8,7 @@ import com.ccbuluo.business.entity.BizInstockorderDetail;
 import com.ccbuluo.business.entity.BizInstockplanDetail;
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
-import com.ccbuluo.business.platform.allocateapply.service.AllocateApply;
+import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.inputstockplan.service.InputStockPlanService;
 import com.ccbuluo.business.platform.instock.dao.BizInstockOrderDao;
 import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
@@ -63,7 +63,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
     @Autowired
     private StockDetailService stockDetailService;
     @Autowired
-    private AllocateApply allocateApply;
+    private AllocateApplyService allocateApplyService;
     @ThriftRPCClient("UserCoreSerService")
     private InnerUserInfoService innerUserInfoService;
     @Autowired
@@ -77,7 +77,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
      */
     @Override
     public List<String> queryApplyNo() {
-        return allocateApply.queryApplyNo(ApplyStatusEnum.WAITINGRECEIPT.toString());
+        return allocateApplyService.queryApplyNo(ApplyStatusEnum.WAITINGRECEIPT.toString());
     }
 
     /**
@@ -105,7 +105,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
             }
             // 1、保存入库单
             // 根据申请单号查询基本信息
-            FindAllocateApplyDTO detail = allocateApply.findDetail(applyNo);
+            FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
             // 生成入库单编号
             String instockNo = null;
             StatusDto<String> instockOrderCode = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.R);
@@ -247,12 +247,12 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(Constants.PLATFORM)) {
             List<BizInstockplanDetail> collect = bizInstockplanDetails.stream().filter(item -> item.getCompleteStatus().equals(Constants.CHECKED)).collect(Collectors.toList());
             if (collect.size() == bizInstockplanDetails.size()) {
-                allocateApply.updateApplyOrderStatus(applyNo, ApplyStatusEnum.OUTSTORE.toString());
+                allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.OUTSTORE.toString());
             }
         } else {
             List<BizInstockplanDetail> collect = bizInstockplanDetails.stream().filter(item -> item.getCompleteStatus().equals(Constants.CHECKED)).collect(Collectors.toList());
             if (collect.size() == bizInstockplanDetails.size()) {
-                allocateApply.updateApplyOrderStatus(applyNo, ApplyStatusEnum.CONFIRMRECEIPT.toString());
+                allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.CONFIRMRECEIPT.toString());
             }
         }
     }

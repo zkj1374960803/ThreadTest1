@@ -165,4 +165,7 @@ public class Constants {
      * 平级调拨
      */
     public static final String PLATFORM = "SC000001";
+
+
+    public static final String SERVICECENTER = "SERVICECENTER";
 }

@@ -110,7 +110,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             // 手机号校验
             compareRepeat(bizServiceCustmanager.getUserUuid(), bizServiceCustmanager.getOfficePhone(), "office_phone", "biz_service_custmanager", "客户经理办公SIM卡手机号重复！");
             bizServiceCustmanagerDao.saveBizServiceCustmanager(bizServiceCustmanager);
-        }catch (Exception e){
+        }catch (CommonException e){
             // 删除用户信息
             e.printStackTrace();
             innerUserInfoService.deleteUserInfoByUseruuid(useruuid);
