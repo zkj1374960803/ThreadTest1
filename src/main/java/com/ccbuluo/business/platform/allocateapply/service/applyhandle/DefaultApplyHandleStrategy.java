@@ -76,8 +76,8 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         // 构建生成订单（机构1对平台）
         BizAllocateTradeorder bizAllocateTradeorder1 = buildOrderEntity(details);
         BizAllocateTradeorder bizAllocateTradeorder2 = buildOrderEntity(details);
-        bizAllocateTradeorder1.setSellerOrgno(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER);// 从买方到平台"平台code"
-        bizAllocateTradeorder2.setPurchaserOrgno(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER);// 从平台到卖方"平台code"
+        bizAllocateTradeorder1.setSellerOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 从买方到平台"平台code"
+        bizAllocateTradeorder2.setPurchaserOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 从平台到卖方"平台code"
 
         // 特殊情况处理
         // 采购
@@ -301,13 +301,13 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         // 平台出库计划
         outstockplanDetail = buildBizOutstockplanDetail(ad, applyType);
         // 根据平台的no查询平台的仓库
-        List<QueryStorehouseDTO> list = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER);
+        List<QueryStorehouseDTO> list = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
         String repositoryNo = "";
         if(null != list && list.size() > 0){
             repositoryNo = list.get(0).getStorehouseCode();
         }
         outstockplanDetail.setOutRepositoryNo(repositoryNo);// 平台仓库编号
-        outstockplanDetail.setOutOrgno(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER);// 平台code
+        outstockplanDetail.setOutOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 平台code
         outstockplanDetail.setStockId(bd.getId());// 库存编号id
         outstockplanDetail.setCostPrice(bd.getCostPrice());// 成本价
         return outstockplanDetail;
@@ -331,13 +331,13 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         // 平台入库计划
         instockplanDetail = buildBizInstockplanDetail(ad, applyType);
         // 根据平台的no查询平台的仓库
-        List<QueryStorehouseDTO> list = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER);
+        List<QueryStorehouseDTO> list = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
         String repositoryNo = "";
         if(null != list && list.size() > 0){
             repositoryNo = list.get(0).getStorehouseCode();
         }
         instockplanDetail.setInstockRepositoryNo(repositoryNo);// 平台仓库编号
-        instockplanDetail.setInstockOrgno(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER);// 平台机构编号
+        instockplanDetail.setInstockOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 平台机构编号
         return instockplanDetail;
     }
     /**
@@ -447,11 +447,11 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
      * 构建占用库存和订单占用库存关系
      * @param details 申请单详情
      * @param stockDetails 库存列表
-     * @param applyNo 申请类型
+     * @param applyType 申请类型
      * @author weijb
      * @date 2018-08-08 17:55:41
      */
-    public Pair<List<BizStockDetail>, List<RelOrdstockOccupy>>  buildStockAndRelOrdEntity(List<AllocateapplyDetailBO> details, List<BizStockDetail> stockDetails, String applyNo){
+    public Pair<List<BizStockDetail>, List<RelOrdstockOccupy>>  buildStockAndRelOrdEntity(List<AllocateapplyDetailBO> details, List<BizStockDetail> stockDetails, String applyType){
         //订单占用库存关系
         List<RelOrdstockOccupy> relOrdstockOccupies = new ArrayList<RelOrdstockOccupy>();
         List<AllocateapplyDetailBO> detailBOS = copyList(details);
@@ -460,7 +460,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             Long occupyStockNum = convertStockDetail(detailBOS, ad);
             //构建订单占用库存关系
             RelOrdstockOccupy ro = new RelOrdstockOccupy();
-            ro.setOrderType(applyNo);//订单类型(调拨，采购不占用库存)
+            ro.setOrderType(applyType);//订单类型(调拨，采购不占用库存)
             ro.setDocNo(ad.getTradeNo());//申请单号
             ro.setStockId(ad.getId());//库存id
             ro.setOccupyNum(occupyStockNum);//占用数量
@@ -548,7 +548,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         }
         // 平级直调
         if(AllocateApplyEnum.DIRECTALLOCATE.toString().equals(ba.getApplyType())){
-            sellerOrgno = BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER;//  平台的机构编号
+            sellerOrgno = BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM;//  平台的机构编号
         }
         // 商品退换
         if(AllocateApplyEnum.BARTER.toString().equals(ba.getApplyType())){
