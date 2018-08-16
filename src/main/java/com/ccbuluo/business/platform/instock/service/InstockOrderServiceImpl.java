@@ -124,8 +124,10 @@ public class InstockOrderServiceImpl implements InstockOrderService {
     @Transactional(rollbackFor = Exception.class)
     public StatusDto<String> saveInstockOrder(String applyNo, List<BizInstockorderDetail> bizInstockorderDetailList) {
         try {
+            // 根据申请单号查询申请单基本信息
+            FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
             // 查询入库计划
-            List<BizInstockplanDetail> bizInstockplanDetails = inputStockPlanService.queryListByApplyNo(applyNo);
+            List<BizInstockplanDetail> bizInstockplanDetails = inputStockPlanService.queryListByApplyNo(applyNo, detail.getInRepositoryNo());
             if (null == bizInstockplanDetails && bizInstockplanDetails.size() == 0) {
                 throw new CommonException("10001", "入库数量与计划不符！");
             }
@@ -136,8 +138,6 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                 throw new CommonException("10001", "入库数量与计划不符！");
             }
             // 1、保存入库单
-            // 根据申请单号查询基本信息
-            FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
             // 生成入库单编号
             String instockNo = null;
             StatusDto<String> instockOrderCode = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.R);
