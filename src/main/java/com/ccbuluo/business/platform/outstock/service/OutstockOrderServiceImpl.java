@@ -411,38 +411,11 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     /**
      * 更改占用库存
      *
-     * @param applyNo                    申请单号
-     * @param outRepositoryNo            出库仓库
+     * @param bizOutstockplanDetailList   出库计划
      * @param bizOutstockorderDetailList 出库单详单
      * @author liuduo
      * @date 2018-08-09 19:25:36
      */
-//    private void updateOccupyStock(String applyNo, String outRepositoryNo, List<BizOutstockorderDetail> bizOutstockorderDetailList, List<BizOutstockplanDetail> bizOutstockplanDetailList) {
-//        List<BizStockDetail> bizStockDetails = new ArrayList<>();
-//        bizOutstockorderDetailList.forEach(item -> {
-//            BizStockDetail bizStockDetail = new BizStockDetail();
-//            UpdateStockBizStockDetailDTO updateStockBizStockDetailDTO = stockDetailService.getOutstockDetail(item.getSupplierNo(), item.getProductNo(), outRepositoryNo, applyNo);
-//            // 乐观锁版本号
-//            Integer versionNo = stockDetailService.getVersionNoById(updateStockBizStockDetailDTO.getId());
-//            // 拿出出库数量，与库存明细进行计算，并更新出库单的实际出库数量
-//            Long outstockNum = item.getOutstockNum();// 出库单上的出库数量
-//            Long occupyStock = updateStockBizStockDetailDTO.getOccupyStock();// 库存明细中的占用库存数量
-//            // 若库存明细中的库存小于要出的数量，修改库存明细中的数量为0
-//            if (occupyStock <= outstockNum) {
-//                bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
-//                bizStockDetail.setOccupyStock(Constants.LONG_FLAG_ZERO);
-//                bizStockDetail.setVersionNo(versionNo + Constants.FLAG_ONE);
-//                bizStockDetails.add(bizStockDetail);
-//            } else {
-//                bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
-//                bizStockDetail.setOccupyStock(occupyStock - outstockNum);
-//                bizStockDetail.setVersionNo(versionNo + Constants.FLAG_ONE);
-//                bizStockDetails.add(bizStockDetail);
-//            }
-//        });
-//        // 更新库存明细中的占用库存
-//        stockDetailService.updateOccupyStock(bizStockDetails);
-//    }
     private void updateOccupyStock(List<BizOutstockorderDetail> bizOutstockorderDetailList, List<BizOutstockplanDetail> bizOutstockplanDetailList) {
         List<BizStockDetail> bizStockDetails = new ArrayList<>();
         // 获取出库计划的id和出库计划

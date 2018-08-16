@@ -67,14 +67,14 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
                 return 0;
             }
             // 构建占用库存和订单占用库存关系
-            Pair<List<BizStockDetail>, List<RelOrdstockOccupy>> pair = buildStockAndRelOrdEntity(details,stockDetails,applyNo);
+            Pair<List<BizStockDetail>, List<RelOrdstockOccupy>> pair = buildStockAndRelOrdEntity(details,stockDetails,applyType);
             List<BizStockDetail> stockDetailList = pair.getLeft();
             // 构建订单占用库存关系
             List<RelOrdstockOccupy> relOrdstockOccupies = pair.getRight();
             // 保存生成订单
             bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
-            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, applyNo);
+            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, applyType);
             // 保存占用库存
             flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
             if(flag == 0){// 更新失败
@@ -117,7 +117,8 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
                 outstockplanDetails.add(outSDtockPlan);
             }
             for(BizOutstockplanDetail bd : outstockplanDetails){
-                if(ro.getStockId().intValue() == bd.getStockId()){// 如果库存批次id相同
+                System.out.println(ro.getStockId().intValue()+"================="+bd.getStockId().intValue());
+                if(ro.getStockId().intValue() == bd.getStockId().intValue()){// 如果库存批次id相同
                     i ++;
                     // 如果本库存批次的出货数量不相等，那么就设置出库计划的数量为，占用库存数量
                     if(ro.getOccupyNum().intValue() != bd.getPlanOutstocknum()){
