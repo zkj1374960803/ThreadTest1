@@ -320,11 +320,12 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @author liuduo
      * @date 2018-08-11 12:56:39
      */
-    public List<String> queryApplyNo(String applyNoStatus) {
+    public List<String> queryApplyNo(String applyNoStatus, String orgCode) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNoStatus", applyNoStatus);
+        params.put("orgCode", orgCode);
 
-        String sql = "SELECT apply_no FROM biz_allocate_apply WHERE apply_status = :applyNoStatus";
+        String sql = "SELECT apply_no FROM biz_allocate_apply WHERE apply_status = :applyNoStatus AND process_orgno = :orgCode";
 
         return querySingColum(String.class, sql, params);
     }

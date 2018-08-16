@@ -17,6 +17,17 @@ import java.util.List;
  */
 public interface OutstockOrderService {
 
+
+    /**
+     * 自动出库
+     * @param applyNo                    申请单号
+     * @param bizOutstockplanDetailList 出库计划
+     * @return 是否保存成功
+     * @author liuduo
+     * @date 2018-08-07 15:15:07
+     */
+    StatusDto<String> autoSaveOutstockOrder(String applyNo, List<BizOutstockplanDetail> bizOutstockplanDetailList);
+
     /**
      * 保存出库单
      * @param applyNo 申请单号

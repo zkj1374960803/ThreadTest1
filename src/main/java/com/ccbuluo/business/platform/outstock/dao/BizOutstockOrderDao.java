@@ -129,6 +129,7 @@ public class BizOutstockOrderDao extends BaseDao<BizOutstockOrder> {
             params.put("outstockNo", outstockNo);
             sql.append(" AND  boo.outstockorder_no = :outstockNo");
         }
+        sql.append(" ORDER BY operate_time DESC");
 
         return queryPageForBean(BizOutstockOrder.class, sql.toString(), params, offset, pagesize);
 
@@ -150,5 +151,25 @@ public class BizOutstockOrderDao extends BaseDao<BizOutstockOrder> {
             .append(" FROM biz_outstock_order WHERE outstockorder_no = :outstockNo");
 
         return findForBean(BizOutstockOrderDTO.class, sql.toString(), params);
+    }
+
+    /**
+     * 保存出库单集合
+     * @param bizOutstockOrderList 出库单集合
+     * @return
+     * @author liuduo
+     * @date 2018-08-15 20:15:50
+     */
+    public List<Long> batchBizOutstockOrder(List<BizOutstockOrder> bizOutstockOrderList) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO biz_outstock_order ( outstockorder_no,out_repository_no,outstock_orgno,")
+            .append("outstock_operator,trade_docno,outstock_type,outstock_time,")
+            .append("transportorder_no,checked,checked_time,creator,create_time,operator,")
+            .append("operate_time,delete_flag,remark ) VALUES (  :outstockorderNo,")
+            .append(" :outRepositoryNo, :outstockOrgno, :outstockOperator, :tradeDocno, :outstockType,")
+            .append(" :outstockTime, :transportorderNo, :checked, :checkedTime, :creator,")
+            .append(" :createTime, :operator, :operateTime, :deleteFlag, :remark )");
+
+        return batchInsertForListBean(sql.toString(), bizOutstockOrderList);
     }
 }

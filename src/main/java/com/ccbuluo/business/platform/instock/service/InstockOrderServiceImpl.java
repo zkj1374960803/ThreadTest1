@@ -77,7 +77,39 @@ public class InstockOrderServiceImpl implements InstockOrderService {
      */
     @Override
     public List<String> queryApplyNo() {
-        return allocateApply.queryApplyNo(ApplyStatusEnum.WAITINGRECEIPT.toString());
+        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+        if (orgCode.equals(Constants.PLATFORM)) {
+            return allocateApply.queryApplyNo(ApplyStatusEnum.INSTORE.toString(), orgCode);
+        }
+        return allocateApply.queryApplyNo(ApplyStatusEnum.WAITINGRECEIPT.toString(), orgCode);
+    }
+
+    /**
+     * 自动入库
+     * @param applyNo 申请单编号
+     * @param bizInstockplanDetails 入库计划集合
+     * @return 是否保存成功
+     * @author liuduo
+     * @date 2018-08-15 16:14:04
+     */
+    @Override
+    public StatusDto<String> autoSaveInstockOrder(String applyNo, List<BizInstockplanDetail> bizInstockplanDetails) {
+        List<BizInstockorderDetail> bizInstockorderDetailList1 = Lists.newArrayList();
+        bizInstockplanDetails.forEach(item -> {
+            BizInstockorderDetail bizInstockorderDetail = new BizInstockorderDetail();
+            bizInstockorderDetail.setInstockPlanid(item.getId());
+            bizInstockorderDetail.setProductNo(item.getProductNo());
+            bizInstockorderDetail.setProductName(item.getProductName());
+            bizInstockorderDetail.setProductType(item.getProductType());
+            bizInstockorderDetail.setProductCategoryname(item.getProductCategoryname());
+            bizInstockorderDetail.setSupplierNo(item.getSupplierNo());
+            bizInstockorderDetail.setInstockNum(item.getActualInstocknum());
+            bizInstockorderDetail.setStockType(item.getInstockType());
+            bizInstockorderDetail.setUnit(item.getProductUnit());
+            bizInstockorderDetail.setCostPrice(item.getCostPrice());
+            bizInstockorderDetailList1.add(bizInstockorderDetail);
+        });
+        return saveInstockOrder(applyNo, bizInstockorderDetailList1);
     }
 
     /**
@@ -92,8 +124,10 @@ public class InstockOrderServiceImpl implements InstockOrderService {
     @Transactional(rollbackFor = Exception.class)
     public StatusDto<String> saveInstockOrder(String applyNo, List<BizInstockorderDetail> bizInstockorderDetailList) {
         try {
+            // 根据申请单号查询基本信息
+            FindAllocateApplyDTO detail = allocateApply.findDetail(applyNo);
             // 查询入库计划
-            List<BizInstockplanDetail> bizInstockplanDetails = inputStockPlanService.queryListByApplyNo(applyNo);
+            List<BizInstockplanDetail> bizInstockplanDetails = inputStockPlanService.queryListByApplyNo(applyNo, detail.getInRepositoryNo());
             if (null == bizInstockplanDetails && bizInstockplanDetails.size() == 0) {
                 throw new CommonException("10001", "入库数量与计划不符！");
             }
@@ -104,8 +138,6 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                 throw new CommonException("10001", "入库数量与计划不符！");
             }
             // 1、保存入库单
-            // 根据申请单号查询基本信息
-            FindAllocateApplyDTO detail = allocateApply.findDetail(applyNo);
             // 生成入库单编号
             String instockNo = null;
             StatusDto<String> instockOrderCode = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.R);
@@ -367,6 +399,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                 bizStockDetail.setRepositoryNo(bizAllocateApply.getInRepositoryNo());
                 bizStockDetail.setOrgNo(bizAllocateApply.getInstockOrgno());
                 bizStockDetail.setProductNo(item.getProductNo());
+                bizStockDetail.setProductName(item.getProductName());
                 bizStockDetail.setProductType(item.getProductType());
                 bizStockDetail.setTradeNo(applyNo);
                 bizStockDetail.setSupplierNo(item.getSupplierNo());
