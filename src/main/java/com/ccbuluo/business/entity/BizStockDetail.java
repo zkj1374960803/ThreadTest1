@@ -27,8 +27,18 @@ public class BizStockDetail extends AftersaleCommonEntity{
     /**
      * 商品编号
      */
-    @ApiModelProperty(name = "productNo", value = "")
+    @ApiModelProperty(name = "productNo", value = "商品编号")
     private String productNo;
+    /**
+     * 商品名称
+     */
+    @ApiModelProperty(name = "productName", value = "商品名称")
+    private String productName;
+    /**
+     * 商品分类名称
+     */
+    @ApiModelProperty(name = "productCategoryname", value = "商品分类名称")
+    private String productCategoryname;
     /**
      * 商品类型(物料、零配件)
      */
@@ -234,6 +244,22 @@ public class BizStockDetail extends AftersaleCommonEntity{
 
     public void setVersionNo(Long versionNo) {
         this.versionNo = versionNo;
+    }
+
+    public String getProductCategoryname() {
+        return productCategoryname;
+    }
+
+    public void setProductCategoryname(String productCategoryname) {
+        this.productCategoryname = productCategoryname;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     /**

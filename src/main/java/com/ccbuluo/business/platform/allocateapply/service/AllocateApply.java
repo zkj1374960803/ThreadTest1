@@ -78,7 +78,7 @@ public interface AllocateApply {
      * @author liuduo
      * @date 2018-08-11 12:56:39
      */
-    List<String> queryApplyNo(String applyNoStatus);
+    List<String> queryApplyNo(String applyNoStatus, String orgCode);
     /**
      *  
      * @param 

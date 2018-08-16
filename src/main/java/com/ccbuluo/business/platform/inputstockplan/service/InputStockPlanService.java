@@ -23,7 +23,7 @@ public interface InputStockPlanService {
      * @author liuduo
      * @date 2018-08-08 11:14:56
      */
-    List<BizInstockplanDetail> queryListByApplyNo(String applyNo);
+    List<BizInstockplanDetail> queryListByApplyNo(String applyNo, String inRepositoryNo);
 
     /**
      * 根据入库计划id查询版本号

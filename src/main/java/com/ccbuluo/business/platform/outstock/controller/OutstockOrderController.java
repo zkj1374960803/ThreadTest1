@@ -8,10 +8,7 @@ import com.ccbuluo.business.platform.outstock.service.OutstockOrderService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,13 +41,12 @@ public class OutstockOrderController extends BaseController {
     @ApiOperation(value = "出库单新增", notes = "【刘铎】")
     @ApiImplicitParams({@ApiImplicitParam(name = "applyNo", value = "申请单号",  required = true, paramType = "query"),
         @ApiImplicitParam(name = "outRepositoryNo", value = "出库仓库编号",  required = true, paramType = "query"),
-        @ApiImplicitParam(name = "transportorderNo", value = "物流单号",  required = false, paramType = "query"),
-        @ApiImplicitParam(name = "bizOutstockorderDetailList", value = "出库单详单集合",  required = true, paramType = "query")})
+        @ApiImplicitParam(name = "transportorderNo", value = "物流单号",  required = false, paramType = "query")})
     @PostMapping("/save")
     public StatusDto<String> saveOutstockOrder(@RequestParam String applyNo,
                                                @RequestParam String outRepositoryNo,
                                                @RequestParam(required = false) String transportorderNo,
-                                               @RequestBody List<BizOutstockorderDetail> bizOutstockorderDetailList) {
+                                               @ApiParam(name = "出库单详单集合", value = "传入json格式", required = true)@RequestBody List<BizOutstockorderDetail> bizOutstockorderDetailList) {
         return outstockOrderService.saveOutstockOrder(applyNo, outRepositoryNo, transportorderNo, bizOutstockorderDetailList);
     }
 

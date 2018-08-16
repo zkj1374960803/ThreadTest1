@@ -16,6 +16,17 @@ import java.util.List;
  * @date 2018-08-07 14:04:39
  */
 public interface InstockOrderService {
+
+
+    /**
+     * 自动入库
+     * @param applyNo 申请单编号
+     * @param bizInstockplanDetails 入库计划集合
+     * @return 是否保存成功
+     * @author liuduo
+     * @date 2018-08-15 16:14:04
+     */
+    StatusDto<String> autoSaveInstockOrder(String applyNo, List<BizInstockplanDetail> bizInstockplanDetails);
     /**
      * 根据申请单号状态查询申请单号集合
      * @return 申请单号

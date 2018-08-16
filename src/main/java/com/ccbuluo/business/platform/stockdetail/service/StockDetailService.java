@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.stockdetail.service;
 
 import com.ccbuluo.business.entity.BizStockDetail;
+import com.ccbuluo.business.platform.adjust.dto.StockAdjustListDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.UpdateStockBizStockDetailDTO;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -86,5 +87,32 @@ public interface StockDetailService {
     * @date 2018-08-10 15:02:51
     */
     List<Pair<Long,Long>> queryVersionNoById(List<Long> stockIds);
+
+    /**
+     * 查询新增物料盘库时用的列表
+     * @param equipmentCodes 物料code
+     * @return 新增物料盘库时用的列表
+     * @author liuduo
+     * @date 2018-08-14 17:43:53
+     */
+    List<StockAdjustListDTO> queryAdjustList(List<String> equipmentCodes);
+
+    /**
+     * 根据商品编码查询库存
+     * @param productNo 商品编码
+     * @return 库存集合
+     * @author liuduo
+     * @date 2018-08-14 20:22:08
+     */
+    List<BizStockDetail> queryStockDetailByProductNo(String productNo);
+
+    /**
+     * 更改盘库后的库存的有效库存
+     * @param bizStockDetailList1 库存集合
+     * @return
+     * @author liuduo
+     * @date 2018-08-14 21:38:16
+     */
+    void updateAdjustValidStock(List<BizStockDetail> bizStockDetailList1);
 
 }

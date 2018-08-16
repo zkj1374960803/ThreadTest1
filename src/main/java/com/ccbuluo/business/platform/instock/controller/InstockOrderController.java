@@ -8,10 +8,7 @@ import com.ccbuluo.business.platform.instock.service.InstockOrderService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.*;
 import org.apache.zookeeper.data.Stat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -54,10 +51,9 @@ public class InstockOrderController extends BaseController {
      * @date 2018-08-07 15:15:07
      */
     @ApiOperation(value = "入库单新增", notes = "【刘铎】")
-    @ApiImplicitParams({@ApiImplicitParam(name = "applyNo", value = "申请单号",  required = true, paramType = "query"),
-        @ApiImplicitParam(name = "bizInstockorderDetailList", value = "入库单详单集合",  required = true, paramType = "query")})
+    @ApiImplicitParam(name = "applyNo", value = "申请单号",  required = true, paramType = "query")
     @PostMapping("/save")
-    public StatusDto<String> saveInstockOrder(@RequestParam String applyNo, @RequestBody List<BizInstockorderDetail> bizInstockorderDetailList) {
+    public StatusDto<String> saveInstockOrder(@RequestParam String applyNo, @ApiParam(name = "入库单详单集合", value = "传入json格式", required = true)@RequestBody List<BizInstockorderDetail> bizInstockorderDetailList) {
         return instockOrderService.saveInstockOrder(applyNo, bizInstockorderDetailList);
     }
 

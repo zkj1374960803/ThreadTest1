@@ -137,16 +137,20 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
      * @author liuduo
      * @date 2018-08-08 11:14:56
      */
-    public List<BizInstockplanDetail> queryListByApplyNo(String applyNo) {
+    public List<BizInstockplanDetail> queryListByApplyNo(String applyNo, String inRepositoryNo) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("completeStatus", Constants.CHECKED);
+        params.put("inRepositoryNo", inRepositoryNo);
+
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,instock_type,product_no,product_type,product_categoryname,")
             .append("trade_no,supplier_no,instock_repository_no,cost_price,")
             .append("plan_instocknum,actual_instocknum,complete_status,complete_time,")
             .append("outstock_planid,creator,create_time,operator,operate_time,")
-            .append("delete_flag,remark FROM biz_instockplan_detail WHERE trade_no= :applyNo AND complete_status = :completeStatus");
-        Map<String, Object> params = Maps.newHashMap();
-        params.put("applyNo", applyNo);
-        params.put("completeStatus", Constants.CHECKED);
+            .append("delete_flag,remark FROM biz_instockplan_detail WHERE trade_no= :applyNo")
+            .append(" AND complete_status = :completeStatus AND instock_repository_no = :inRepositoryNo");
+
         return super.queryListBean(BizInstockplanDetail.class, sql.toString(), params);
     }
 
