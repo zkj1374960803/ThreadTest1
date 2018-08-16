@@ -131,7 +131,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             bt.setApplyNo(bd.getApplyNo());// 申请单编号
             bt.setPurchaserOrgno(bd.getInstockOrgno());//买方机构
             bt.setSellerOrgno(bd.getOutstockOrgno());//卖方机构
-            bt.setTradeType(bd.getProcessType());//交易类型
+            bt.setTradeType(bd.getApplyType());//交易类型
             break;
         }
         // 计算订单总价
