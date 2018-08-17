@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration  scan="true" scanPeriod="60 seconds" debug="false">
+    <property name="appName" value="aftersale-repairing-platform"></property>
+    <property name="logBasePath" value="/data/apps/logs" />
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <!-- 在IDE中运行, 控制台输出全部日志 -->
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -14,18 +16,36 @@
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>DEBUG</level>
         </filter>
-        <File>logs/logback.log</File>
+        <File>${logBasePath}/${appName}.log</File>
         <!-- 按每小时滚动文件，如果一个小时内达到10M也会滚动文件, 滚动文件将会压缩成zip格式, 最多保留672个滚动文件 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logs/aftersale-repairing-platform-%d{yyyy-MM-dd-HH}.%i.zip</fileNamePattern>
+            <fileNamePattern>${logBasePath}/${appName}-%d{yyyy-MM-dd-HH}.%i.zip</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>10MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
             <maxHistory>672</maxHistory>
         </rollingPolicy>
-        <encoder>
-            <pattern>%d{MM:dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <pattern>
+                    <pattern>
+                        {
+                        "app_name": "${appName}",
+                        "timestamp": "%date{\"yyyy-MM-dd'T'HH:mm:ss,SSSZ\"}",
+                        "log_level": "%level",
+                        "thread": "%thread",
+                        "class_name": "%logger{60}",
+                        "line_number":"%line",
+                        "message": "%message",
+                        "stack_trace": "%exception{10}"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
         </encoder>
+        <!--<encoder>
+            <pattern>%d{MM:dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>-->
     </appender>
 
     <appender name="ErrorConsole" class="ch.qos.logback.core.ConsoleAppender">

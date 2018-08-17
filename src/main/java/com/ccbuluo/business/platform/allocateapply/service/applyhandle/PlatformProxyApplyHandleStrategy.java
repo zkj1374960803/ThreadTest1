@@ -74,7 +74,7 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
             // 保存生成订单
             bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
-            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, applyType);
+            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, applyType, relOrdstockOccupies);
             // 保存占用库存
             flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
             if(flag == 0){// 更新失败
@@ -82,7 +82,6 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
             }
             // 对出库详情处理，因为出库计划要记录到具体的库存批次id对应的出库数量
             List<BizOutstockplanDetail> outstockplanDetails = pir.getLeft();
-            convertOutstockplan(outstockplanDetails, relOrdstockOccupies, stockDetails);
             // 批量保存出库计划详情
             bizOutstockplanDetailDao.batchOutstockplanDetail(outstockplanDetails);
             // 批量保存入库计划详情
@@ -96,39 +95,7 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
         }
         return flag;
     }
-    /**
-     * 对出库详情处理，因为出库计划要记录到具体的库存批次id对应的出库数量
-     */
-    private void convertOutstockplan(List<BizOutstockplanDetail> outstockplanDetails, List<RelOrdstockOccupy> relOrdstockOccupies, List<BizStockDetail> stockDetails){
-        if(outstockplanDetails.size() == relOrdstockOccupies.size()){
-            return;
-        }
-        for(RelOrdstockOccupy ro : relOrdstockOccupies){
-            int i = 0;
-            // 说明有不同批次的库存，然后出库计划没有记录到
-            if(i != 0){
-                BizOutstockplanDetail outSDtockPlan = new BizOutstockplanDetail();
-                outSDtockPlan = outstockplanDetails.get(0);
-                // 库存id
-                outSDtockPlan.setStockId(ro.getStockId());
-                // 出库数量
-                outSDtockPlan.setPlanOutstocknum(ro.getOccupyNum());
-                outSDtockPlan.setCostPrice(getCostPrice(stockDetails, ro.getStockId()));// 成本价
-                outstockplanDetails.add(outSDtockPlan);
-            }
-            for(BizOutstockplanDetail bd : outstockplanDetails){
-                System.out.println(ro.getStockId().intValue()+"================="+bd.getStockId().intValue());
-                if(ro.getStockId().intValue() == bd.getStockId().intValue()){// 如果库存批次id相同
-                    i ++;
-                    // 如果本库存批次的出货数量不相等，那么就设置出库计划的数量为，占用库存数量
-                    if(ro.getOccupyNum().intValue() != bd.getPlanOutstocknum()){
-                        bd.setPlanOutstocknum(ro.getOccupyNum());
-                        continue;
-                    }
-                }
-            }
-        }
-    }
+
     /**
      *  获取成本价
      */

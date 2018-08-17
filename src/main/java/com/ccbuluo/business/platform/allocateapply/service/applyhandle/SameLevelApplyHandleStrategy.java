@@ -73,7 +73,7 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 保存生成订单
             bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
-            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, applyType);
+            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, applyType, relOrdstockOccupies);
             // 保存占用库存
             flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
             if(flag == 0){// 更新失败

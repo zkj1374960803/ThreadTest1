@@ -64,8 +64,13 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
             if(null == stockDetails || stockDetails.size() == 0){
                 return 0;
             }
+            // 构建占用库存和订单占用库存关系
+            Pair<List<BizStockDetail>, List<RelOrdstockOccupy>> pair = buildStockAndRelOrdEntity(details,stockDetails,applyType);
+            List<BizStockDetail> stockDetailList = pair.getLeft();
+            // 构建订单占用库存关系
+            List<RelOrdstockOccupy> relOrdstockOccupies = pair.getRight();
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
-            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, applyType);
+            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, applyType, relOrdstockOccupies);
             // 调用自动出库
             // TODO 刘铎提供：入参：pir.getLeft()（出库计划）
             // 批量保存出库计划详情
