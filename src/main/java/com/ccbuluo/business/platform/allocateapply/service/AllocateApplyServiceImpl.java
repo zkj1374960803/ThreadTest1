@@ -326,7 +326,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             List<BasicCarpartsProductDTO> carpartsProductDTOList;
             if(Constants.PRODUCT_TYPE_EQUIPMENT.equals(findStockListDTO.getProductType())){
                 // 查询类型下所有的code
-                carpartsProductDTOList  = bizAllocateApplyDao.findEquipmentCode(findStockListDTO.getId());
+                carpartsProductDTOList  = bizAllocateApplyDao.findEquipmentCode(findStockListDTO.getEquiptypeId());
             }else {
                 // 查询分类下所有商品的code
                 carpartsProductDTOList = carpartsProductService.queryCarpartsProductListByCategoryCode(findStockListDTO.getCategoryCode());
