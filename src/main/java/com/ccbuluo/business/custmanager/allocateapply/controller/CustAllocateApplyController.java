@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.allocateapply.controller;
+package com.ccbuluo.business.custmanager.allocateapply.controller;
 
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
@@ -19,9 +19,9 @@ import java.util.List;
  * @date 2018-08-07 14:10:24
  */
 @RestController
-@RequestMapping("/platform/allocateapply")
-@Api(tags = "申请管理")
-public class AllocateApplyController extends BaseController {
+@RequestMapping("/custmanager/allocateapply")
+@Api(tags = "客户经理申请管理")
+public class CustAllocateApplyController extends BaseController {
     @Resource(name = "allocateApplyServiceImpl")
     private AllocateApplyService allocateApplyServiceImpl;
     @Resource(name = "custmanagerServiceImpl")
@@ -145,7 +145,6 @@ public class AllocateApplyController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "categoryCode", value = "分类的code", required = false, paramType = "query"),
         @ApiImplicitParam(name = "productNo", value = "商品的编号", required = false, paramType = "query"),
-        @ApiImplicitParam(name = "productType", value = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）", required = false, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query")
     })
@@ -170,19 +169,6 @@ public class AllocateApplyController extends BaseController {
         return StatusDto.buildDataSuccessStatusDto(queryOrgDTOPage);
     }
 
-    /**
-     * 检查库存
-     * @param
-     * @exception
-     * @return
-     * @author zhangkangjian
-     * @date 2018-08-15 13:51:06
-     */
-    @ApiOperation(value = "检查库存", notes = "【张康健】")
-    @PostMapping("/checkStockQuantity")
-    public StatusDto<List<ProductStockInfoDTO>> checkStockQuantity(@ApiParam(name = "CheckStockQuantityDTO", value = "Json数据", required = true) @RequestBody CheckStockQuantityDTO checkStockQuantityDTO){
-        return allocateApplyServiceImpl.checkStockQuantity(checkStockQuantityDTO);
-    }
 
 
 }

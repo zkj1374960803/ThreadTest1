@@ -6,7 +6,7 @@ import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.DocCodePrefixEnum;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
-import com.ccbuluo.business.platform.allocateapply.service.AllocateApply;
+import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.inputstockplan.service.InputStockPlanService;
 import com.ccbuluo.business.platform.instock.dao.BizInstockOrderDao;
 import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
@@ -61,7 +61,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
     @Autowired
     private StockDetailService stockDetailService;
     @Autowired
-    private AllocateApply allocateApply;
+    private AllocateApplyService allocateApplyService;
     @ThriftRPCClient("UserCoreSerService")
     private InnerUserInfoService innerUserInfoService;
     @Autowired
@@ -77,9 +77,9 @@ public class InstockOrderServiceImpl implements InstockOrderService {
     public List<String> queryApplyNo() {
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-            return allocateApply.queryApplyNo(ApplyStatusEnum.INSTORE.toString(), orgCode);
+            return allocateApplyService.queryApplyNo(ApplyStatusEnum.INSTORE.toString(), orgCode);
         }
-        return allocateApply.queryApplyNo(ApplyStatusEnum.WAITINGRECEIPT.toString(), orgCode);
+        return allocateApplyService.queryApplyNo(ApplyStatusEnum.WAITINGRECEIPT.toString(), orgCode);
     }
 
     /**
@@ -122,8 +122,8 @@ public class InstockOrderServiceImpl implements InstockOrderService {
     @Transactional(rollbackFor = Exception.class)
     public StatusDto<String> saveInstockOrder(String applyNo, List<BizInstockorderDetail> bizInstockorderDetailList) {
         try {
-            // 根据申请单号查询基本信息
-            FindAllocateApplyDTO detail = allocateApply.findDetail(applyNo);
+            // 根据申请单号查询申请单基本信息
+            FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
             // 查询入库计划
             List<BizInstockplanDetail> bizInstockplanDetails = inputStockPlanService.queryListByApplyNo(applyNo, detail.getInRepositoryNo());
             if (null == bizInstockplanDetails && bizInstockplanDetails.size() == 0) {
@@ -277,12 +277,12 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
             List<BizInstockplanDetail> collect = bizInstockplanDetails.stream().filter(item -> item.getCompleteStatus().equals(Constants.CHECKED)).collect(Collectors.toList());
             if (collect.size() == bizInstockplanDetails.size()) {
-                allocateApply.updateApplyOrderStatus(applyNo, ApplyStatusEnum.OUTSTORE.toString());
+                allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.OUTSTORE.toString());
             }
         } else {
             List<BizInstockplanDetail> collect = bizInstockplanDetails.stream().filter(item -> item.getCompleteStatus().equals(Constants.CHECKED)).collect(Collectors.toList());
             if (collect.size() == bizInstockplanDetails.size()) {
-                allocateApply.updateApplyOrderStatus(applyNo, ApplyStatusEnum.CONFIRMRECEIPT.toString());
+                allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.CONFIRMRECEIPT.toString());
             }
         }
     }

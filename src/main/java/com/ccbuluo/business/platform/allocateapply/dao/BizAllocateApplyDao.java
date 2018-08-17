@@ -7,12 +7,15 @@ import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
+import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
+import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,10 +120,10 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         sql.append("INSERT INTO biz_allocateapply_detail ( product_name,apply_no,product_no,")
             .append("product_type,product_categoryname,apply_num,unit,sell_price,")
             .append("cost_price,supplier_no,creator,create_time,operator,operate_time,")
-            .append("delete_flag,remark ) VALUES (  :productName,:applyNo, :productNo, :productType,")
+            .append("delete_flag,remark,stock_type ) VALUES (  :productName,:applyNo, :productNo, :productType,")
             .append(" :productCategoryname, :applyNum, :unit, :sellPrice, :costPrice,")
             .append(" :supplierNo, :creator, :createTime, :operator, :operateTime,")
-            .append(" :deleteFlag, :remark )");
+            .append(" :deleteFlag, :remark,:stockType )");
         batchInsertForListBean(sql.toString(), allocateapplyDetailList);
 
     }
@@ -280,7 +283,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     public Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO, List<String> productCode) {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.id,a.product_no,sum(a.valid_stock) as 'total',b.product_name,b.product_categoryname,b.unit ")
+        sql.append(" SELECT a.id,a.product_no,sum(a.valid_stock + a.occupy_stock + a.problem_stock + a.damaged_stock + a.transit_stock + a.freeze_stock) as 'total',b.product_name as 'productName',b.product_categoryname as 'productCategoryname',b.unit as 'unit'")
             .append(" FROM biz_stock_detail a ")
             .append(" LEFT JOIN (SELECT product_no,unit,product_name,product_categoryname FROM biz_instockorder_detail GROUP BY product_no) b ON a.product_no = b.product_no ")
             .append(" WHERE 1 = 1 ");
@@ -293,6 +296,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             map.put("productNo", productNo);
             sql.append(" AND  a.product_no = :productNo ");
         }
+
         sql.append(" GROUP BY a.product_no ");
         return queryPageForBean(FindStockListDTO.class, sql.toString(), findStockListDTO, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
     }
@@ -337,11 +341,11 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @author zhangkangjian
      * @date 2018-08-13 19:47:32
      */
-    public Page<QueryTransferStockDTO> findStockNum(List<String> orgCode) {
+    public Page<QueryOrgDTO> findStockNum(List<String> orgCode, Integer offset, Integer pageSize) {
         String sql = "SELECT a.org_no,SUM(a.valid_stock) FROM biz_stock_detail a WHERE a.org_no IN (:org_no) GROUP BY a.org_no";
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("orgCode", orgCode);
-        return queryPageForBean(QueryTransferStockDTO.class, sql, map, 0, 10);
+        return queryPageForBean(QueryOrgDTO.class, sql, map, offset, pageSize);
     }
 
     /**
@@ -359,5 +363,51 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNo", applyNo);
         return super.findForBean(BizAllocateApply.class, sql.toString(), params);
+    }
+    /**
+     * 查询库存的数量
+     * @param
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-08-15 14:30:27
+     */
+    public Map<String,Object> queryStockQuantity(String outstockOrgno, String sellerOrgno) {
+        HashMap<String, Object> map = Maps.newHashMap();
+        StringBuffer sql = new StringBuffer();
+        sql.append(" SELECT a.product_no as productNo, SUM(a.valid_stock) as validStock ")
+            .append(" FROM biz_stock_detail a ")
+            .append(" WHERE 1 = 1 ");
+        if(StringUtils.isNotBlank(outstockOrgno)){
+            map.put("outstockOrgno", outstockOrgno);
+            sql.append( "AND a.org_no = :outstockOrgno ");
+        }
+        if(StringUtils.isNotBlank(sellerOrgno)){
+            map.put("sellerOrgno", sellerOrgno);
+            sql.append( "AND a.seller_orgno = :sellerOrgno");
+        }
+        sql.append(" GROUP BY a.product_no ");
+        List<Map<String, Object>> maps = queryListMap(sql.toString(), map);
+        map.clear();
+        maps.stream().forEach(a ->{
+            String productNo = (String) a.get("productNo");
+            Object validStock =  a.get("validStock");
+            map.put(productNo,validStock);
+        });
+        return map;
+    }
+
+    /**
+     * 根据类型查询物料的code
+     * @param equiptypeId 物料的类型
+     * @return List<BasicCarpartsProductDTO>
+     * @author zhangkangjian
+     * @date 2018-08-16 14:01:23
+     */
+    public List<BasicCarpartsProductDTO> findEquipmentCode(Long equiptypeId) {
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("equiptypeId", equiptypeId);
+        String sql = "  SELECT a.equip_code AS 'carpartsCode' FROM biz_service_equipment a WHERE a.equiptype_id = :equiptypeId ";
+        return queryListBean(BasicCarpartsProductDTO.class, sql, map);
     }
 }
