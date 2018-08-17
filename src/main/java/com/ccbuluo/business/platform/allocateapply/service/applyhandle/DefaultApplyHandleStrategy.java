@@ -240,7 +240,6 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         }
         // 商品退换
         if(AllocateApplyEnum.BARTER.toString().equals(applyType)){
-//            BizStockDetail bd = getBizStockDetailByProductNo(stockDetails, ad.getProductNo());
             // 买方出库
             outstockplanDetail1(outList,relOrdstockOccupies,stockDetails,details, applyType);
             // 平台入库
