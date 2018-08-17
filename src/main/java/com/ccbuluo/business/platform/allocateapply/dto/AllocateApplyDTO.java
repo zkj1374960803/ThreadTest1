@@ -21,7 +21,7 @@ public class AllocateApplyDTO {
     @ApiModelProperty(name = "processOrgno", value = "申请处理机构编号", hidden = true)
     private String processOrgno;
 
-    @ApiModelProperty(name = "applyType", value = "申请的类型：SAMELEVEL平级调拨、PLATFORM平台调拨")
+    @ApiModelProperty(name = "applyType", value = "申请的类型注：TRANSFER调拨、PURCHASE采购")
     private String applyType;
 
     @ApiModelProperty(name = "applyerName", value = "申请人的姓名", hidden = true)
@@ -85,7 +85,7 @@ public class AllocateApplyDTO {
     /**
      * 待处理、申请撤销、等待付款、等待发货、（平台待出入库只用在平台端）、等待收货、确认收货、申请完成
      */
-    @ApiModelProperty(name = "applyStatus", value = "10待处理、15申请撤销、20等待付款、30等待发货、40 50（平台待出入库只用在平台端）、60等待收货、70确认收货、80申请完成", hidden = true)
+    @ApiModelProperty(name = "applyStatus", value = "", hidden = true)
     private String applyStatus;
     /**
      * 创建人
