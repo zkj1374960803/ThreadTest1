@@ -307,6 +307,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             for(BizStockDetail bd : stockDetails){
                 if(ro.getStockId().intValue() == bd.getId().intValue()){// 关系库存批次id和库存批次id相等
                     AllocateapplyDetailBO ad = getAllocateapplyDetailBO(details, bd.getProductNo());
+                    outstockplanDetail = buildBizOutstockplanDetail(ad, applyType);
                     outstockplanDetail.setOutRepositoryNo(repositoryNo);// 平台仓库编号
                     outstockplanDetail.setOutOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 平台code
                     outstockplanDetail.setStockId(bd.getId());// 库存编号id
@@ -578,5 +579,35 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             sellerOrgno =  ba.getApplyorgNo();//  发起申请的机构编号
         }
         return sellerOrgno;
+    }
+
+    // 根据申请单编号查询订单占用库存关系表
+    public List<BizStockDetail> buildBizStockDetail(List<RelOrdstockOccupy> list){
+        List<BizStockDetail> stockDetails =  new ArrayList<BizStockDetail>();
+        List<Long> sList = getStockDtailIds(list);
+        if(null == sList || sList.size() == 0){
+            return null;
+        }
+        stockDetails = bizStockDetailDao.getStockDetailListByIds(sList);
+        for(BizStockDetail bd : stockDetails){
+            for(RelOrdstockOccupy roo : list){
+                if(bd.getId().intValue() == roo.getStockId().intValue()){
+                    if(bd.getValidStock() != null && roo.getOccupyNum() != null && bd.getOccupyStock() != null){
+                        bd.setValidStock(bd.getValidStock() + roo.getOccupyNum());//具体到某一条库存明细id，所被占用的数量（更新的时候要加上原来的数量）
+                        bd.setOccupyStock(bd.getOccupyStock() - roo.getOccupyNum());// 占用的库存也要减去当时的占用记录
+                    }
+                }
+            }
+        }
+        return stockDetails;
+    }
+
+    // 获取库存详情的ids
+    private List<Long> getStockDtailIds(List<RelOrdstockOccupy> list){
+        List<Long> slist = new ArrayList<Long>();
+        for(RelOrdstockOccupy r : list){
+            slist.add(r.getStockId());
+        }
+        return slist;
     }
 }
