@@ -50,10 +50,16 @@ public class SearchBizServiceMaintaincarDTO extends IdEntity {
     @ApiModelProperty(name = "carseriesName", value = "所属车系名字")
     private String carseriesName;
     /**
-     * 所属车型id
+     * 所属车型名称
      */
     @ApiModelProperty(name = "carmodelName", value = "所属车型名字")
     private String carmodelName;
+
+    /**
+     * 所属车型id
+     */
+    @ApiModelProperty(name = "carmodelId", value = "所属车型id")
+    private Long carmodelId;
 
     public void setMendCode(String mendCode) {
         this.mendCode = mendCode;
@@ -117,5 +123,13 @@ public class SearchBizServiceMaintaincarDTO extends IdEntity {
 
     public void setCarmodelName(String carmodelName) {
         this.carmodelName = carmodelName;
+    }
+
+    public Long getCarmodelId() {
+        return carmodelId;
+    }
+
+    public void setCarmodelId(Long carmodelId) {
+        this.carmodelId = carmodelId;
     }
 }

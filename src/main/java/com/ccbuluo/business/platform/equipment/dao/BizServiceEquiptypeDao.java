@@ -102,8 +102,9 @@ public class BizServiceEquiptypeDao extends BaseDao<BizServiceEquiptype> {
     public Boolean checkName(String typeName) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("typeName", typeName);
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
 
-        String sql = "SELECT COUNT(id) > 0 FROM biz_service_equiptype WHERE type_name = :typeName";
+        String sql = "SELECT COUNT(id) > 0 FROM biz_service_equiptype WHERE type_name = :typeName AND delete_flag = :deleteFlag";
 
         return findForObject(sql, params, Boolean.class);
     }

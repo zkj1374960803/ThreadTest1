@@ -164,7 +164,7 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT bci.id,bci.mend_code,bci.vin_number,bci.car_status,bci.cusmanager_uuid,bci.cusmanager_name,")
-                .append("bcm.carbrand_name,bcmm.carseries_name,bcmmm.carmodel_name")
+                .append("bcm.carbrand_name,bcmm.carseries_name,bcmmm.carmodel_name,bcmmm.id as carmodel_id")
                 .append(" FROM biz_service_maintaincar bci LEFT JOIN basic_carbrand_manage bcm on bci.carbrand_id=bcm.id ")
                 .append(" LEFT JOIN basic_carseries_manage bcmm on bci.carseries_id=bcmm.id ")
                 .append(" LEFT JOIN basic_carmodel_manage bcmmm ON bci.carmodel_id=bcmmm.id ")
