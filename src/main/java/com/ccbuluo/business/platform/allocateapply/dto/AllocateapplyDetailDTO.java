@@ -100,6 +100,20 @@ public class AllocateapplyDetailDTO {
     @ApiModelProperty(name = "remark", value = "备注", hidden = true)
     private String remark;
 
+    /**
+     * 库存类型
+     */
+    @ApiModelProperty(name = "stockType", value = "库存类型", hidden = true)
+    private String stockType;
+
+    public String getStockType() {
+        return stockType;
+    }
+
+    public void setStockType(String stockType) {
+        this.stockType = stockType;
+    }
+
     public String getProductName() {
         return productName;
     }

@@ -5,7 +5,7 @@ import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.DocCodePrefixEnum;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
-import com.ccbuluo.business.platform.allocateapply.service.AllocateApply;
+import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
 import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.business.platform.outstock.dto.OutstockorderDetailDTO;
@@ -53,7 +53,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     @Autowired
     private GenerateDocCodeService generateDocCodeService;
     @Autowired
-    private AllocateApply allocateApply;
+    private AllocateApplyService allocateApplyService;
     @Autowired
     private OutStockPlanService outStockPlanService;
     @Autowired
@@ -81,7 +81,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         try {
             Map<String, List<BizOutstockplanDetail>> collect = bizOutstockplanDetailList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getOutRepositoryNo));
             // 根据申请单号查询基本信息
-            FindAllocateApplyDTO detail = allocateApply.findDetail(applyNo);
+            FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
             List<BizOutstockOrder> bizOutstockOrderList = Lists.newArrayList();
             List<BizOutstockorderDetail> bizOutstockorderDetailList = Lists.newArrayList();
             List<BizOutstockorderDetail> bizOutstockorderDetailList1 = Lists.newArrayList();
@@ -193,7 +193,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
             }
             // 1、保存出库单
             // 根据申请单号查询基本信息
-            FindAllocateApplyDTO detail = allocateApply.findDetail(applyNo);
+            FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
             // 查询出库计划
             List<BizOutstockplanDetail> bizOutstockplanDetailList = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
             int outstockorderStatus = saveOutstockOrder(outstockNo, applyNo, transportorderNo, detail, outRepositoryNo);
@@ -258,7 +258,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      */
     private void updateApplyOrderStatus(String applyNo, List<BizOutstockplanDetail> bizOutstockplanDetailList, List<BizOutstockplanDetail> collect, String status) {
         if (bizOutstockplanDetailList.size() == collect.size()) {
-            allocateApply.updateApplyOrderStatus(applyNo, status);
+            allocateApplyService.updateApplyOrderStatus(applyNo, status);
         }
     }
 
@@ -273,9 +273,9 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     public List<String> queryApplyNo() {
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         if (orgCode.equals(Constants.PLATFORM)) {
-            return allocateApply.queryApplyNo(ApplyStatusEnum.OUTSTORE.toString(), orgCode);
+            return allocateApplyService.queryApplyNo(ApplyStatusEnum.OUTSTORE.toString(), orgCode);
         }
-        return allocateApply.queryApplyNo(ApplyStatusEnum.WAITDELIVERY.toString(), orgCode);
+        return allocateApplyService.queryApplyNo(ApplyStatusEnum.WAITDELIVERY.toString(), orgCode);
     }
 
     /**

@@ -3,14 +3,18 @@ package com.ccbuluo.business.platform.allocateapply.service;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
 import com.ccbuluo.db.Page;
+import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftPage;
+import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * @author zhangkangjian
  * @date 2018-08-07 14:29:38
  */
-public interface AllocateApply {
+public interface AllocateApplyService {
     /**
      * 创建物料或者零配件申请
      * @param allocateApplyDTO 申请单实体
@@ -80,12 +84,20 @@ public interface AllocateApply {
      */
     List<String> queryApplyNo(String applyNoStatus, String orgCode);
     /**
+     * 查询可调拨库存列表
+     * @param orgDTO 查询条件
+     * @return StatusDtoThriftPage<QueryOrgDTO>
+     * @author zhangkangjian
+     * @date 2018-08-13 17:19:54
+     */
+    Page<QueryOrgDTO> queryTransferStock(QueryOrgDTO orgDTO,Integer offset,Integer pageSize);
+    /**
      *  
      * @param 
      * @exception 
      * @return 
      * @author zhangkangjian
-     * @date 2018-08-13 17:42:46
+     * @date 2018-08-15 14:10:42
      */
-    void queryTransferStock(QueryTransferStockDTO queryTransferStockDTO);
+    StatusDto<List<ProductStockInfoDTO>> checkStockQuantity(CheckStockQuantityDTO checkStockQuantityDTO);
 }
