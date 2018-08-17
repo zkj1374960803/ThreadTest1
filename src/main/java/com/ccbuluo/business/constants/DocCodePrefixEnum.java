@@ -5,10 +5,15 @@ package com.ccbuluo.business.constants;
  * @author liupengfei
  * @date 2018-07-03 17:27:05
  */
-public enum EquipUnitEnum {
-    ITEM("件"),SET("套"),BOX("箱"),TYPE("类"),BATCH("批"),PIECE("个");
+public enum DocCodePrefixEnum {
+    SW("申请单号"),
+    R("入库单号"),
+    C("出库单号"),
+    PK("盘库单号"),
+    TH("退换单号");
 
-    EquipUnitEnum(String label){
+
+    DocCodePrefixEnum(String label){
         this.label = label;
     }
 

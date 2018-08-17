@@ -7,7 +7,6 @@ import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.*;
-import org.apache.thrift.TException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -120,7 +119,7 @@ public class SupplierController extends BaseController {
 
     /**
      * 查询供应商的商品（零配件，物料）
-     * @param queryRelSupplierProduct 查询条件
+     * @param queryRelSupplierProductDTO 查询条件
      * @return StatusDto<Page<RelSupplierProduct>> 分页信息
      * @author zhangkangjian
      * @date 2018-08-01 11:46:53
@@ -133,16 +132,15 @@ public class SupplierController extends BaseController {
         @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query",dataType = "int"),
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query", dataType = "int")
     })
-    public StatusDto<Page<QueryRelSupplierProduct>> findSupplierProduct(@ApiIgnore QueryRelSupplierProduct queryRelSupplierProduct){
-        Page<QueryRelSupplierProduct> page = supplierServiceImpl.findSupplierProduct(queryRelSupplierProduct);
+    public StatusDto<Page<QueryRelSupplierProductDTO>> findSupplierProduct(@ApiIgnore QueryRelSupplierProductDTO queryRelSupplierProductDTO){
+        Page<QueryRelSupplierProductDTO> page = supplierServiceImpl.findSupplierProduct(queryRelSupplierProductDTO);
         return StatusDto.buildDataSuccessStatusDto(page);
     }
 
     /**
      * 删除供应商关联关系
-     * @param
-     * @exception
-     * @return
+     * @param id 关联id
+     * @return StatusDto<String>
      * @author zhangkangjian
      * @date 2018-08-01 20:09:52
      */
@@ -152,6 +150,24 @@ public class SupplierController extends BaseController {
     public StatusDto<String> deleteSupplierProduct(@ApiIgnore @PathVariable Long id){
          supplierServiceImpl.deleteSupplierProduct(id);
         return StatusDto.buildSuccessStatusDto();
+    }
+    
+    /**
+     * 根据商品的code查询供应商的信息（下拉框）
+     * @param code 商品的code
+     * @return StatusDto<List<RelSupplierProduct>>
+     * @author zhangkangjian
+     * @date 2018-08-07 15:32:17
+     */
+    @ApiOperation(value = "根据商品的code查询供应商的信息（下拉框）",notes = "【张康健】")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "code", value = "商品的code", required = true, paramType = "query",dataType = "String"),
+        @ApiImplicitParam(name = "type", value = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）", required = true, paramType = "query",dataType = "String")
+    })
+    @GetMapping("/querysupplierinfo")
+    public StatusDto<List<QuerySupplierInfoDTO>> querySupplierInfo(String code, String type){
+        List<QuerySupplierInfoDTO> list = supplierServiceImpl.querySupplierInfo(code, type);
+        return StatusDto.buildDataSuccessStatusDto(list);
     }
 
 
