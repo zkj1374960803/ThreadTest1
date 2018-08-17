@@ -19,6 +19,7 @@ import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 import com.ccbuluo.usercoreintf.dto.QueryServiceCenterDTO;
+import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
 import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
@@ -337,6 +338,14 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                 return new Page<FindStockListDTO>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
             }
         }
+        // 根据类型查询服务中心的code
+        QueryOrgDTO orgDTO = new QueryOrgDTO();
+        orgDTO.setOrgType(findStockListDTO.getType());
+        orgDTO.setStatus(Constants.FREEZE_STATUS_YES);
+        StatusDtoThriftList<QueryOrgDTO> queryOrgDTO = basicUserOrganizationService.queryOrgAndWorkInfo(orgDTO);
+        StatusDto<List<QueryOrgDTO>> queryOrgDTOResolve = StatusDtoThriftUtils.resolve(queryOrgDTO, QueryOrgDTO.class);
+        List<QueryOrgDTO> data = queryOrgDTOResolve.getData();
+        List<String> orgCode = data.stream().map(QueryOrgDTO::getOrgCode).collect(Collectors.toList());
         Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode);
         return page;
     }
