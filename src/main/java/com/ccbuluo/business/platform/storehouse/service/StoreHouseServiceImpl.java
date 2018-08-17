@@ -56,7 +56,7 @@ public class StoreHouseServiceImpl implements StoreHouseService{
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public int saveStoreHouse(SaveBizServiceStorehouseDTO saveBizServiceStorehouseDTO) throws TException {
+    public int saveStoreHouse(SaveBizServiceStorehouseDTO saveBizServiceStorehouseDTO) {
         try {
             // 名字验重
             Boolean aboolean = bizServiceStorehouseDao.storeHouseNameCheck(saveBizServiceStorehouseDTO.getStorehouseName());
@@ -166,7 +166,7 @@ public class StoreHouseServiceImpl implements StoreHouseService{
         return storehouseList;
     }
 
-    private BizServiceStorehouse create(SaveBizServiceStorehouseDTO saveBizServiceStorehouseDTO) {
+    public BizServiceStorehouse create(SaveBizServiceStorehouseDTO saveBizServiceStorehouseDTO) {
         BizServiceStorehouse bizServiceStorehouse = new BizServiceStorehouse();
         bizServiceStorehouse.setStorehouseName(saveBizServiceStorehouseDTO.getStorehouseName());
         bizServiceStorehouse.setStorehouseAcreage(saveBizServiceStorehouseDTO.getStorehouseAcreage());

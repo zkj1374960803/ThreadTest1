@@ -62,7 +62,7 @@ public class StockManagementController extends BaseController {
      * @date 2018-08-10 15:45:56
      */
     @ApiOperation(value = "查看零配件调拨库存", notes = "【张康健】")
-    @GetMapping("/findequipmentstocklist")
+    @GetMapping("/findfittingsstocklist")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "categoryCode", value = "零配件类型的code", required = false, paramType = "query"),
         @ApiImplicitParam(name = "productNo", value = "商品的编号", required = false, paramType = "query"),
