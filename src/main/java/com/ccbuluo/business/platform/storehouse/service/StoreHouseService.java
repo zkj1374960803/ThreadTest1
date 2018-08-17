@@ -25,7 +25,7 @@ public interface StoreHouseService {
      * @author liuduo
      * @date 2018-07-03 10:20:14
      */
-    int saveStoreHouse(SaveBizServiceStorehouseDTO saveBizServiceStorehouseDTO)  throws TException;
+    int saveStoreHouse(SaveBizServiceStorehouseDTO saveBizServiceStorehouseDTO);
 
     /**
      * 启停仓库

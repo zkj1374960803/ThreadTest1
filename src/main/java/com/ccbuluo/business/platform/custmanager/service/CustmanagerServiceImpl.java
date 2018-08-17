@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.custmanager.service;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.entity.BizServiceStorehouse;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryCustManagerListDTO;
 import com.ccbuluo.business.platform.carmanage.dto.CusmanagerCarCountDTO;
 import com.ccbuluo.business.platform.carmanage.service.BasicCarcoreInfoService;
@@ -12,6 +13,8 @@ import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
 import com.ccbuluo.business.platform.maintaincar.dao.BizServiceMaintaincarDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
+import com.ccbuluo.business.platform.storehouse.dto.SaveBizServiceStorehouseDTO;
+import com.ccbuluo.business.platform.storehouse.service.StoreHouseService;
 import com.ccbuluo.business.platform.supplier.service.SupplierServiceImpl;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.constants.SystemPropertyHolder;
@@ -72,6 +75,8 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     private BizServiceMaintaincarDao bizServiceMaintaincarDao;
     @Resource
     BasicCarcoreInfoService basicCarcoreInfoService;
+    @Resource
+    private StoreHouseService storeHouseService;
 
     /**
      * 创建客户经理
@@ -86,7 +91,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         // 参数校验
         checkedRoleCodeAndOrgCode(userInfoDTO);
         // 保存基础用户
-        String useruuid = saveUserAndOrg(userInfoDTO);
+        String useruuid = saveUserAndOrg(userInfoDTO, bizServiceCustmanager.getReceivingAddress());
         // 保存客户经理信息
         saveCustManager(bizServiceCustmanager, useruuid);
         return StatusDto.buildSuccessStatusDto();
@@ -174,7 +179,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
      * @author zhangkangjian
      * @date 2018-07-21 12:02:26
      */
-    private String saveUserAndOrg(UserInfoDTO userInfoDTO) {
+    private String saveUserAndOrg(UserInfoDTO userInfoDTO, String address) {
         // 填充用户的默认信息
         String loggedUserId = userHolder.getLoggedUserId();
         userInfoDTO.setUserType(Constants.USER_TYPE_INNER);
@@ -222,6 +227,15 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         if(!updateUser.isSuccess()){
             throw new CommonException(updateUser.getCode(), updateUser.getMessage());
         }
+        SaveBizServiceStorehouseDTO save = new SaveBizServiceStorehouseDTO();
+        StatusDtoThriftBean<UserInfoDTO> userInfo = innerUserInfoService.findUserDetail(orgAndUser.getData());
+        StatusDto<UserInfoDTO> userInfoDTOResolve = StatusDtoThriftUtils.resolve(userInfo, UserInfoDTO.class);
+        UserInfoDTO data = userInfoDTOResolve.getData();
+        save.setStorehouseName(userInfoDTO.getName() + "仓库");
+        save.setServicecenterCode(data.getOrgCode());
+        save.setStorehouseAddress(address);
+        save.setStorehouseStatus(Constants.LONG_FLAG_ONE);
+        int status = storeHouseService.saveStoreHouse(save);
         return useruuid;
     }
 
