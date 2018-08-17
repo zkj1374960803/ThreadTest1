@@ -51,10 +51,14 @@ public class InstockOrderController extends BaseController {
      * @date 2018-08-07 15:15:07
      */
     @ApiOperation(value = "入库单新增", notes = "【刘铎】")
-    @ApiImplicitParam(name = "applyNo", value = "申请单号",  required = true, paramType = "query")
+    @ApiImplicitParams({@ApiImplicitParam(name = "applyNo", value = "申请单号",  required = true, paramType = "query"),
+        @ApiImplicitParam(name = "inRepositoryNo", value = "入库仓库编号",  required = true, paramType = "query")})
+
     @PostMapping("/save")
-    public StatusDto<String> saveInstockOrder(@RequestParam String applyNo, @ApiParam(name = "入库单详单集合", value = "传入json格式", required = true)@RequestBody List<BizInstockorderDetail> bizInstockorderDetailList) {
-        return instockOrderService.saveInstockOrder(applyNo, bizInstockorderDetailList);
+    public StatusDto<String> saveInstockOrder(@RequestParam String applyNo,
+                                              @RequestParam String inRepositoryNo,
+                                              @ApiParam(name = "入库单详单集合", value = "传入json格式", required = true)@RequestBody List<BizInstockorderDetail> bizInstockorderDetailList) {
+        return instockOrderService.saveInstockOrder(applyNo, inRepositoryNo, bizInstockorderDetailList);
     }
 
 
@@ -68,11 +72,13 @@ public class InstockOrderController extends BaseController {
      */
     @ApiOperation(value = "根据申请单号查询入库计划", notes = "【刘铎】")
     @ApiImplicitParams({@ApiImplicitParam(name = "applyNo", value = "申请单号",  required = true, paramType = "query"),
+        @ApiImplicitParam(name = "inRepositoryNo", value = "仓库编号",  required = true, paramType = "query"),
         @ApiImplicitParam(name = "productType", value = "商品类型（物料或者备件）",  required = true, paramType = "query")})
     @GetMapping("/queryinstockplan")
     public StatusDto<List<BizInstockplanDetail>> queryInstockplan(@RequestParam String applyNo,
+                                                                  @RequestParam String inRepositoryNo,
                                                                   @RequestParam String productType) {
-        return StatusDto.buildDataSuccessStatusDto(instockOrderService.queryInstockplan(applyNo, productType));
+        return StatusDto.buildDataSuccessStatusDto(instockOrderService.queryInstockplan(applyNo, inRepositoryNo, productType));
     }
 
     /**
@@ -114,5 +120,19 @@ public class InstockOrderController extends BaseController {
     @GetMapping("/getbyinstockno")
     public StatusDto<BizInstockOrderDTO> getByInstockNo(@RequestParam String instockNo) {
         return StatusDto.buildDataSuccessStatusDto(instockOrderService.getByInstockNo(instockNo));
+    }
+
+    /**
+     * 根据入库单号查询入库仓库
+     * @param applyNo 入库单号
+     * @return 入库仓库
+     * @author liuduo
+     * @date 2018-08-13 15:20:27
+     */
+    @ApiOperation(value = "入库仓库", notes = "【刘铎】")
+    @ApiImplicitParam(name = "applyNo", value = "申请单号",  required = true, paramType = "query")
+    @GetMapping("/getbyapplyno")
+    public StatusDto<List<String>> getByApplyNo(@RequestParam String applyNo) {
+        return StatusDto.buildDataSuccessStatusDto(instockOrderService.getByApplyNo(applyNo));
     }
 }

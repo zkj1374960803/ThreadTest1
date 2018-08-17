@@ -23,7 +23,7 @@ public interface InputStockPlanService {
      * @author liuduo
      * @date 2018-08-08 11:14:56
      */
-    List<BizInstockplanDetail> queryListByApplyNo(String applyNo, String inRepositoryNo);
+    List<BizInstockplanDetail> queryListByApplyNo(String applyNo, String status, String inRepositoryNo);
 
     /**
      * 根据入库计划id查询版本号
@@ -58,7 +58,7 @@ public interface InputStockPlanService {
      * @author liuduo
      * @date 2018-08-11 13:17:42
      */
-    List<BizInstockplanDetail> queryInstockplan(String applyNo, String productType);
+    List<BizInstockplanDetail> queryInstockplan(String applyNo,  String inRepositoryNo, String productType);
     /**
      *  更入出库计划状态
      * @param applyNo 申请单编号
@@ -69,4 +69,13 @@ public interface InputStockPlanService {
      */
     int updateInStockPlanStatus(String applyNo, String completeStatus, String instockRepositoryNo);
 
+    /**
+     * 根据入库单号查询入库仓库
+     * @param applyNo 入库单号
+     * @param orgCode 当前登录人机构号
+     * @return 入库仓库
+     * @author liuduo
+     * @date 2018-08-13 15:20:27
+     */
+    List<String> getByApplyNo(String applyNo, String orgCode);
 }

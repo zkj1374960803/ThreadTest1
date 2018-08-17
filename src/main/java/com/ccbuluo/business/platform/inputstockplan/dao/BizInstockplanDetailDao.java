@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.inputstockplan.dao;
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.constants.StockPlanEnum;
 import com.ccbuluo.business.entity.BizInstockplanDetail;
 import com.ccbuluo.business.platform.outstock.dto.updatePlanStatusDTO;
 import com.ccbuluo.dao.BaseDao;
@@ -137,18 +138,18 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
      * @author liuduo
      * @date 2018-08-08 11:14:56
      */
-    public List<BizInstockplanDetail> queryListByApplyNo(String applyNo, String inRepositoryNo) {
+    public List<BizInstockplanDetail> queryListByApplyNo(String applyNo, String status,  String inRepositoryNo) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNo", applyNo);
-        params.put("completeStatus", Constants.CHECKED);
+        params.put("completeStatus", status);
         params.put("inRepositoryNo", inRepositoryNo);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,instock_type,product_no,product_type,product_categoryname,")
+        sql.append("SELECT id,instock_type,product_no,product_name,product_type,product_categoryname,")
             .append("trade_no,supplier_no,instock_repository_no,cost_price,")
-            .append("plan_instocknum,actual_instocknum,complete_status,complete_time,")
-            .append("outstock_planid,creator,create_time,operator,operate_time,")
-            .append("delete_flag,remark FROM biz_instockplan_detail WHERE trade_no= :applyNo")
+            .append("IFNULL(plan_instocknum,0) AS planInstocknum,IFNULL(actual_instocknum,0) AS actualInstocknum,complete_status,complete_time,")
+            .append("outstock_planid")
+            .append(" FROM biz_instockplan_detail WHERE trade_no= :applyNo")
             .append(" AND complete_status = :completeStatus AND instock_repository_no = :inRepositoryNo");
 
         return super.queryListBean(BizInstockplanDetail.class, sql.toString(), params);
@@ -181,7 +182,7 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
         params.put("bizInstockplanDetailList", bizInstockplanDetailList);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_instockplan_detail SET actual_instocknum = :actualInstocknum + actual_instocknum,version_no = version_no+1")
+        sql.append("UPDATE biz_instockplan_detail SET actual_instocknum = :actualInstocknum + IFNULL(actual_instocknum,0),version_no = version_no+1")
             .append(" WHERE id = :id AND :versionNo > version_no");
 
         batchUpdateForListBean(sql.toString(), bizInstockplanDetailList);
@@ -212,16 +213,17 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
      * @author liuduo
      * @date 2018-08-11 13:17:42
      */
-    public List<BizInstockplanDetail> queryInstockplan(String applyNo, String productType) {
+    public List<BizInstockplanDetail> queryInstockplan(String applyNo, String inRepositoryNo, String productType) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNo", applyNo);
+        params.put("inRepositoryNo", inRepositoryNo);
         params.put("productType", productType);
 
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT bid.id,bid.instock_type,bid.product_no,bid.product_name,bid.product_type,bid.product_categoryname,bid.product_unit,")
-            .append(" bid.trade_no,bid.supplier_no,bid.cost_price,bid.plan_instocknum,bss.supplier_name FROM biz_instockplan_detail AS bid")
+            .append(" bid.trade_no,bid.supplier_no,bid.cost_price,bid.stock_type,bid.plan_instocknum,bss.supplier_name FROM biz_instockplan_detail AS bid")
             .append(" LEFT JOIN biz_service_supplier AS bss ON bss.supplier_code = bid.supplier_no")
-            .append("  WHERE bid.trade_no= :applyNo AND bid.product_type = :productType");
+            .append("  WHERE bid.trade_no= :applyNo AND bid.product_type = :productType AND instock_repository_no = :inRepositoryNo");
 
         return queryListBean(BizInstockplanDetail.class, sql.toString(), params);
     }
@@ -257,5 +259,25 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
         params.put("applyNo", applyNo);
         params.put("deleteFlag", Constants.DELETE_FLAG_DELETE);
         return super.updateForMap(sql.toString(), params);
+    }
+
+    /**
+     * 根据入库单号查询入库仓库
+     * @param applyNo 入库单号
+     * @param orgCode 当前登录人机构号
+     * @return 入库仓库
+     * @author liuduo
+     * @date 2018-08-13 15:20:27
+     */
+    public List<String> getByApplyNo(String applyNo, String orgCode) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("orgCode", orgCode);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT DISTINCT instock_repository_no FROM biz_instockplan_detail")
+            .append("  WHERE trade_no = :applyNo AND instock_orgno = :orgCode");
+
+        return querySingColum(String.class, sql.toString(), params);
     }
 }

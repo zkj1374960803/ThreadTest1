@@ -12,6 +12,8 @@ import com.ccbuluo.core.exception.CommonException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
@@ -116,8 +118,33 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
      * @author weijb
      * @date 2018-08-11 13:35:41
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public int cancelApply(String applyNo){
-        return 0;
+        int flag = 0;
+        try {
+            // 根据申请单编号查询订单占用库存关系表
+            List<RelOrdstockOccupy> list = bizAllocateTradeorderDao.getRelOrdstockOccupyByApplyNo(applyNo);
+            //根据订单占用库存关系构建库存list
+            List<BizStockDetail> stockDetails = buildBizStockDetail(list);
+            // 还原被占用的库存
+            flag = bizStockDetailDao.batchUpdateStockDetil(stockDetails);
+            if(flag == 0){// 更新失败
+                throw new CommonException("0", "更新占用库存失败！");
+            }
+            //删除订单占用关系
+            bizAllocateTradeorderDao.deleteRelOrdstockOccupyByApplyNo(applyNo);
+            // 删除订单
+            bizAllocateTradeorderDao.deleteAllocateTradeorderByApplyNo(applyNo);
+            // 删除出库计划
+            bizOutstockplanDetailDao.deleteOutstockplanDetailByApplyNo(applyNo);
+            // 删除入库计划
+            bizInstockplanDetailDao.batchInsertInstockplanDetail(applyNo);
+            flag =1;
+        } catch (Exception e) {
+            logger.error("撤销失败！", e);
+            throw e;
+        }
+        return flag;
     }
 }

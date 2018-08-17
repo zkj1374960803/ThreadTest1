@@ -212,9 +212,11 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
             // 4、更新出库计划中的实际出库数量
             updateActualOutstocknum(bizOutstockorderDetailList1);
             // 5、更新出库计划中的状态和完成时间
-            updatePlanStatus(bizOutstockplanDetailList);
+            List<BizOutstockplanDetail> bizOutstockplanDetailList2 = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
+            updatePlanStatus(bizOutstockplanDetailList2);
             // 6、更改申请单状态
-            updateApplyOrderStatus(applyNo, detail, bizOutstockplanDetailList);
+            List<BizOutstockplanDetail> bizOutstockplanDetailList3 = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
+            updateApplyOrderStatus(applyNo, detail, bizOutstockplanDetailList3);
             return StatusDto.buildSuccessStatusDto("保存成功！");
         } catch (Exception e) {
             logger.error("生成出库单失败！", e.getMessage());

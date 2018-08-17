@@ -102,11 +102,11 @@ public class BizInstockorderDetailDao extends BaseDao<BizInstockorderDetail> {
     public List<Long> saveInstockorderDetail(List<BizInstockorderDetail> bizInstockorderDetailList) {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO biz_instockorder_detail ( instock_orderno,instock_planid,")
-            .append("product_no,product_name,product_type,product_categoryname,instock_problem_num,")
+            .append("product_no,product_name,product_type,product_categoryname,")
             .append("supplier_no,instock_num,stock_type,unit,cost_price,creator,create_time,operator,")
             .append("operate_time,delete_flag,remark ) VALUES (  :instockOrderno,")
             .append(" :instockPlanid, :productNo, :productName, :productType,")
-            .append(" :productCategoryname, :instockProblemNum, :supplierNo, :instockNum, :stockType, :unit, :costPrice,")
+            .append(" :productCategoryname, :supplierNo, :instockNum, :stockType, :unit, :costPrice,")
             .append(" :creator, :createTime, :operator, :operateTime, :deleteFlag, :remark")
             .append(" )");
         return super.batchInsertForListBean(sql.toString(), bizInstockorderDetailList);
@@ -137,7 +137,7 @@ public class BizInstockorderDetailDao extends BaseDao<BizInstockorderDetail> {
      * @date 2018-08-10 11:04:51
      */
     public void updateInstockorderStockId(List<BizInstockorderDetail> bizInstockorderDetailList1) {
-        String sql = "UPDATE biz_instockorder_detail SET stock_id = stockId WHERE id = :id";
+        String sql = "UPDATE biz_instockorder_detail SET stock_id = :stockId WHERE id = :id";
 
         batchUpdateForListBean(sql, bizInstockorderDetailList1);
     }
