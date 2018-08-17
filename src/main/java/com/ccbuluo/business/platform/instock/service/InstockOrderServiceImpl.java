@@ -401,9 +401,9 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                 bizStockDetail.setProductType(item.getProductType());
                 bizStockDetail.setTradeNo(applyNo);
                 bizStockDetail.setSupplierNo(item.getSupplierNo());
-                if (item.getStockType().equals(BizStockDetail.StockEnum.VALIDSTOCK.toString())) {
+                if (item.getStockType().equals(BizStockDetail.StockTypeEnum.VALIDSTOCK.toString())) {
                     bizStockDetail.setValidStock(item.getInstockNum());
-                } else if (item.getStockType().equals(BizStockDetail.StockEnum.PROBLEMSTOCK.toString())) {
+                } else if (item.getStockType().equals(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.toString())) {
                     bizStockDetail.setProblemStock(item.getInstockNum());
                 }
                 bizStockDetail.setSellerOrgno(bizAllocateApply.getOutstockOrgno());

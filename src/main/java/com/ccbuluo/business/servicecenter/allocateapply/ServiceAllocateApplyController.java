@@ -1,7 +1,5 @@
 package com.ccbuluo.business.servicecenter.allocateapply;
 
-import com.ccbuluo.business.constants.AllocateApplyEnum;
-import com.ccbuluo.business.constants.ApplyStatusEnum;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;

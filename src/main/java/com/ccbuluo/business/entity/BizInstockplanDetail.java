@@ -1,6 +1,6 @@
 package com.ccbuluo.business.entity;
 
-import com.ccbuluo.business.constants.StockPlanEnum;
+import com.ccbuluo.business.constants.StockPlanStatusEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -324,7 +324,7 @@ public class BizInstockplanDetail {
 
     public String getStatusName() {
         if (null != completeStatus) {
-            return StockPlanEnum.valueOf(completeStatus).getLabel();
+            return StockPlanStatusEnum.valueOf(completeStatus).getLabel();
         }
         return null;
     }

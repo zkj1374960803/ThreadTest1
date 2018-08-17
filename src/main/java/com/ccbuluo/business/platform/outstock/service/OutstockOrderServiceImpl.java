@@ -437,7 +437,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 Long occupyStock;
                 if (updateStockBizStockDetailDTO != null) {
                     BizStockDetail bizStockDetail = new BizStockDetail();
-                    if (item.getStockType().equals(BizStockDetail.StockEnum.VALIDSTOCK.toString())) {
+                    if (item.getStockType().equals(BizStockDetail.StockTypeEnum.VALIDSTOCK.toString())) {
                         occupyStock = updateStockBizStockDetailDTO.getOccupyStock();// 库存明细中的占用库存数量
                         if (occupyStock <= outstockNum) {
                             bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
@@ -450,7 +450,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                             bizStockDetail.setVersionNo(updateStockBizStockDetailDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
                             bizStockDetails.add(bizStockDetail);
                         }
-                    } else if (item.getStockType().equals(BizStockDetail.StockEnum.PROBLEMSTOCK.toString())) {
+                    } else if (item.getStockType().equals(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.toString())) {
                         occupyStock = updateStockBizStockDetailDTO.getProblemStock();// 库存明细中的问题件库存数量
                         if (occupyStock <= outstockNum) {
                             bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
