@@ -162,7 +162,7 @@ public class BasicCarbrandManageDao extends BaseDao<CarbrandManage> {
         if (StringUtils.isNotBlank(carbrandName)) {
             sql.append(" AND cbm.carbrand_name LIKE CONCAT('%',:carbrandName, '%') ");
         }
-        sql.append(" ORDER BY cbm.initial ASC, cbm.sort_number ASC ");
+        sql.append(" ORDER BY cbm.operate_time DESC ");
         Map<String, Object> params = Maps.newHashMap();
         params.put("carbrandName", carbrandName);
         params.put("initial", initial);
