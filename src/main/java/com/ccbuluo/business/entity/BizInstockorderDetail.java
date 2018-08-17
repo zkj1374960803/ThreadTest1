@@ -179,4 +179,5 @@ public class BizInstockorderDetail extends AftersaleCommonEntity{
     public void setStockId(Long stockId) {
         this.stockId = stockId;
     }
+
 }

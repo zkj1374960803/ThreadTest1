@@ -316,6 +316,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     public void updateApplyOrderStatus(String applyNo, String status) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("status", status);
+        params.put("applyNo", applyNo);
 
         String sql = "UPDATE biz_allocate_apply SET apply_status = :status WHERE apply_no = :applyNo";
 

@@ -209,7 +209,7 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
      */
     public void updateActualOutstocknum(List<BizOutstockplanDetail> bizOutstockplanDetails) {
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_outstockplan_detail SET actual_outstocknum = :actualOutstocknum + actual_outstocknum,version_no = version_no+1")
+        sql.append("UPDATE biz_outstockplan_detail SET actual_outstocknum = :actualOutstocknum + IFNULL(actual_outstocknum,0),version_no = version_no+1")
             .append(" WHERE id = :id AND :versionNo > version_no");
 
         batchUpdateForListBean(sql.toString(), bizOutstockplanDetails);
