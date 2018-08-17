@@ -297,6 +297,11 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             sql.append(" AND  a.product_no = :productNo ");
         }
 
+        if(StringUtils.isNotBlank(findStockListDTO.getOrgNo())){
+            map.put("orgNo", productNo);
+            sql.append(" AND  a.product_no = :productNo ");
+        }
+
         sql.append(" GROUP BY a.product_no ");
         return queryPageForBean(FindStockListDTO.class, sql.toString(), findStockListDTO, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
     }

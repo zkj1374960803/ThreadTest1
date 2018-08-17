@@ -164,7 +164,7 @@ public class SupplierController extends BaseController {
         @ApiImplicitParam(name = "code", value = "商品的code", required = true, paramType = "query",dataType = "String"),
         @ApiImplicitParam(name = "type", value = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）", required = true, paramType = "query",dataType = "String")
     })
-    @PostMapping("/querysupplierinfo")
+    @GetMapping("/querysupplierinfo")
     public StatusDto<List<QuerySupplierInfoDTO>> querySupplierInfo(String code, String type){
         List<QuerySupplierInfoDTO> list = supplierServiceImpl.querySupplierInfo(code, type);
         return StatusDto.buildDataSuccessStatusDto(list);
