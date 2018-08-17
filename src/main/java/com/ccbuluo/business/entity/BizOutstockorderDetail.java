@@ -74,6 +74,11 @@ public class BizOutstockorderDetail extends AftersaleCommonEntity{
      */
     @ApiModelProperty(name = "actualPrice", value = "销售单价")
     private BigDecimal actualPrice;
+    /**
+     * 备注
+     */
+    @ApiModelProperty(name = "remark", value = "备注")
+    private String remark;
 
     public void setOutstockOrderno(String outstockOrderno) {
         this.outstockOrderno = outstockOrderno;
@@ -169,5 +174,13 @@ public class BizOutstockorderDetail extends AftersaleCommonEntity{
 
     public void setStockType(String stockType) {
         this.stockType = stockType;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

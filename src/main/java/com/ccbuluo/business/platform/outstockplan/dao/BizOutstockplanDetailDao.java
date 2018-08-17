@@ -120,12 +120,12 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
                 .append("product_no,product_type,trade_no,supplier_no,apply_detail_id,")
                 .append("cost_price,sales_price,out_repository_no,plan_outstocknum,")
                 .append("actual_outstocknum,plan_status,complete_time,creator,create_time,")
-                .append("operator,operate_time,delete_flag,remark,product_categoryname,product_unit,product_name,stock_type")
+                .append("operator,operate_time,delete_flag,remark,product_categoryname,product_unit,product_name,stock_type,out_orgno")
                 .append(" ) VALUES (  :outstockType, :stockId, :productNo, :productType,")
                 .append(" :tradeNo, :supplierNo, :applyDetailId, :costPrice, :salesPrice,")
                 .append(" :outRepositoryNo, :planOutstocknum, :actualOutstocknum, :planStatus,")
                 .append(" :completeTime, :creator, :createTime, :operator, :operateTime,")
-                .append(" :deleteFlag, :remark, :productCategoryname, :productUnit, :productName, :stockType )");
+                .append(" :deleteFlag, :remark, :productCategoryname, :productUnit, :productName, :stockType, :outOrgno )");
         List<Long> longs = super.batchInsertForListBean(sql.toString(), list);
         return longs;
     }
@@ -209,7 +209,7 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
      */
     public void updateActualOutstocknum(List<BizOutstockplanDetail> bizOutstockplanDetails) {
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_outstockplan_detail SET actual_outstocknum = :actualOutstocknum + actual_outstocknum,version_no = version_no+1")
+        sql.append("UPDATE biz_outstockplan_detail SET actual_outstocknum = :actualOutstocknum + IFNULL(actual_outstocknum,0),version_no = version_no+1")
             .append(" WHERE id = :id AND :versionNo > version_no");
 
         batchUpdateForListBean(sql.toString(), bizOutstockplanDetails);

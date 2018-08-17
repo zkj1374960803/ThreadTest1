@@ -69,6 +69,11 @@ public class BizInstockOrder extends AftersaleCommonEntity{
      */
     @ApiModelProperty(name = "instockOperatorName", value = "入库人")
     private String instockOperatorName;
+    /**
+     * 备注
+     */
+    @ApiModelProperty(name = "remark", value = "备注")
+    private String remark;
 
     public void setInstockOrderno(String instockOrderno) {
         this.instockOrderno = instockOrderno;
@@ -156,5 +161,13 @@ public class BizInstockOrder extends AftersaleCommonEntity{
 
     public void setInstockOperatorName(String instockOperatorName) {
         this.instockOperatorName = instockOperatorName;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }
