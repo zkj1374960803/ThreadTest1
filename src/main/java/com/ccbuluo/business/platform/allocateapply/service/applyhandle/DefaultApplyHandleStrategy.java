@@ -86,7 +86,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             // 采购的时候卖方为供应商（供应商不填为空）
             bizAllocateTradeorder2.setSellerOrgno("");
         }
-        // 平级直调
+        // 平台直发
         if(AllocateApplyEnum.DIRECTALLOCATE.toString().equals(applyType)){
             // 直调是没有采购订单的
             bizAllocateTradeorder2 = null;
@@ -126,6 +126,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         bt.setCreator(userHolder.getLoggedUserId());//处理人
         bt.setCreateTime(new Date());
         bt.setDeleteFlag(Constants.DELETE_FLAG_NORMAL);
+        // todo 标哥 把交易单 状态抽到枚举类里，枚举交易单实体里
         bt.setOrderStatus("PAYMENTWAITING");//默认待支付
         for(AllocateapplyDetailBO bd : details){
             bt.setApplyNo(bd.getApplyNo());// 申请单编号
@@ -170,20 +171,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         return list;
     }
 
-    /**
-     *  入库计划去重
-     * @param
-     * @return
-     */
-    private void distinctInstockplan(List<BizInstockplanDetail> inList){
-        for  ( int  i  =   0 ; i  <  inList.size()  -   1 ; i ++ )  {
-            for  ( int  j  =  inList.size()  -   1 ; j  >  i; j -- )  {
-                if  (inList.get(j).getProductNo().equals(inList.get(i).getProductNo()))  {
-                    inList.remove(j);
-                }
-            }
-        }
-    }
+
 
     /**
      *  构建出库和入库计划并保存
@@ -195,14 +183,6 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     public Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> buildOutAndInstockplanDetail(List<AllocateapplyDetailBO> details, List<BizStockDetail> stockDetails, String applyType, List<RelOrdstockOccupy> relOrdstockOccupies){
         List<BizOutstockplanDetail> outList = new ArrayList<BizOutstockplanDetail>();
         List<BizInstockplanDetail> inList = new ArrayList<BizInstockplanDetail>();
-        // 卖方机构出库（机构2）
-//        BizOutstockplanDetail outstockplanDetail2 = new BizOutstockplanDetail();
-        // 平台出库
-//        BizOutstockplanDetail outstockplanDetail = new BizOutstockplanDetail();
-        // 买方出库
-//        BizOutstockplanDetail outstockplanDetail1 = new BizOutstockplanDetail();
-        // 平台入库
-//        BizInstockplanDetail instockplanDetail = new BizInstockplanDetail();
 
         // 采购
         if(AllocateApplyEnum.PURCHASE.toString().equals(applyType)){
@@ -297,7 +277,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
      */
     private void outstockplanDetail(List<BizOutstockplanDetail> outList, List<RelOrdstockOccupy> relOrdstockOccupies, List<BizStockDetail> stockDetails,List<AllocateapplyDetailBO> details, String applyType){
         // 平台出库计划
-        // 根据平台的no查询平台的仓库
+        // 根据平台的机构编号查询平台的仓库
         List<QueryStorehouseDTO> list = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
         String repositoryNo = "";
         if(null != list && list.size() > 0){
@@ -319,7 +299,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         }
     }
     /**
-     * 买方出库
+     * 退货出库
      */
     private void outstockplanDetail1(List<BizOutstockplanDetail> outList, List<RelOrdstockOccupy> relOrdstockOccupies, List<BizStockDetail> stockDetails,List<AllocateapplyDetailBO> details, String applyType){
         // 买方出库计划

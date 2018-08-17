@@ -31,10 +31,6 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
     @Resource
     private BizInstockplanDetailDao bizInstockplanDetailDao;
     @Resource
-    private BizAllocateTradeorderDao bizAllocateTradeorderDao;
-    @Resource
-    private BizStockDetailDao bizStockDetailDao;
-    @Resource
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
 
     Logger logger = LoggerFactory.getLogger(getClass());

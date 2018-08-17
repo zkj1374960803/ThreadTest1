@@ -39,6 +39,7 @@ public class ApplyHandleContext {
     @Transactional(rollbackFor = Exception.class)
     public int applyHandle(String applyNo){
         try {
+            // todo 魏俊标 把if换成switch
             // 根据申请单获取申请单详情
             BizAllocateApply ba = bizAllocateApplyDao.getByNo(applyNo);
             if(null == ba){
