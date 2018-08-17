@@ -289,8 +289,8 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      * @date 2018-08-11 13:17:42
      */
     @Override
-    public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String productType) {
-        return outStockPlanService.queryOutstockplanList(applyNo, productType);
+    public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String outRepositoryNo, String productType) {
+        return outStockPlanService.queryOutstockplanList(applyNo, outRepositoryNo, productType);
     }
 
     /**
@@ -359,6 +359,19 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         bizOutstockOrderDTO.setOutstockorderDetailDTOList(outstockorderDetailDTOList);
 
         return bizOutstockOrderDTO;
+    }
+
+    /**
+     * 根据申请单号查询出库仓库
+     * @param applyNo 申请单号
+     * @return 入库仓库
+     * @author liuduo
+     * @date 2018-08-13 15:20:27
+     */
+    @Override
+    public List<String> getByApplyNo(String applyNo) {
+        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+        return outStockPlanService.getByApplyNo(applyNo, orgCode);
     }
 
     /**
