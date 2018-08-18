@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
 import com.ccbuluo.business.entity.BizAllocateApply;
+import com.ccbuluo.http.StatusDto;
 
 /**
  * 申请处理
@@ -15,7 +16,7 @@ public interface ApplyHandleStrategy {
      * @param ba 申请单
      * @date 2018-08-08 10:55:41
      */
-    int applyHandle(BizAllocateApply ba);
+    StatusDto applyHandle(BizAllocateApply ba);
 
     /**
      *  申请撤销

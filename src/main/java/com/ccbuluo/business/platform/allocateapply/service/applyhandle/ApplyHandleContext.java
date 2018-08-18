@@ -42,13 +42,13 @@ public class ApplyHandleContext {
      * @param applyNo 申请单code
      * @return
      */
-    public int applyHandle(String applyNo){
+    public StatusDto applyHandle(String applyNo){
         try {
             // todo 魏俊标 把if换成switch
             // 根据申请单获取申请单详情
             BizAllocateApply ba = bizAllocateApplyDao.getByNo(applyNo);
             if(null == ba){
-                return 0;
+                return StatusDto.buildFailureStatusDto("申请单不存在！");
             }
             // 采购
             if(AllocateApplyTypeEnum.PURCHASE.toString().equals(ba.getApplyType())){
@@ -74,7 +74,7 @@ public class ApplyHandleContext {
             if(AllocateApplyTypeEnum.REFUND.toString().equals(ba.getApplyType())){
                 refundApplyHandleStrategy.applyHandle(ba);
             }
-            return 0;
+            return StatusDto.buildFailureStatusDto("申请处理失败！");
         } catch (Exception e) {
             logger.error("提交失败！", e);
             throw e;
@@ -93,6 +93,6 @@ public class ApplyHandleContext {
         if(AllocateApplyTypeEnum.PURCHASE.toString().equals(ba.getApplyType())){
             return purchaseApplyHandleService.instockAfterCallBack(ba);
         }
-        return null;
+        return StatusDto.buildFailureStatusDto("出库计划生成失败！");
     }
 }

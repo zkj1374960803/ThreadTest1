@@ -6,6 +6,7 @@ import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
+import com.ccbuluo.http.StatusDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
      * @date 2018-08-08 10:55:41
      */
     @Override
-    public int applyHandle(BizAllocateApply ba){
+    public StatusDto applyHandle(BizAllocateApply ba){
         int flag = 0;
         String applyNo = ba.getApplyNo();
         String applyType = ba.getApplyType();
@@ -47,7 +48,7 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 根据申请单获取申请单详情
             List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
             if(null == details || details.size() == 0){
-                return 0;
+                return StatusDto.buildFailureStatusDto("申请单为空！");
             }
             // 构建占用库存和订单占用库存关系
             //获取卖方机构code
@@ -55,7 +56,7 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
             //查询库存列表
             List<BizStockDetail> stockDetails = getStockDetailList(productOrgNo, details);
             if(null == stockDetails || stockDetails.size() == 0){
-                return 0;
+                return StatusDto.buildFailureStatusDto("库存为空！");
             }
             // 构建占用库存和订单占用库存关系
             Pair<List<BizStockDetail>, List<RelOrdstockOccupy>> pair = buildStockAndRelOrdEntity(details,stockDetails,applyType);
@@ -75,7 +76,7 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
             logger.error("提交失败！", e);
             throw e;
         }
-        return flag;
+        return StatusDto.buildSuccessStatusDto("申请处理成功！");
     }
 
     /**

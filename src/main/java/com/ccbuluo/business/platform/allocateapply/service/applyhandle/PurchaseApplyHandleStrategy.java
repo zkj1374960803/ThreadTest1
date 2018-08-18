@@ -49,15 +49,14 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
      * @date 2018-08-08 10:55:41
      */
     @Override
-    public int applyHandle(BizAllocateApply ba){
-        int flag = 0;
+    public StatusDto applyHandle(BizAllocateApply ba){
         String applyNo = ba.getApplyNo();
         String applyType = ba.getApplyType();
         try {
             // 根据申请单获取申请单详情
             List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
             if(null == details || details.size() == 0){
-                return 0;
+                return StatusDto.buildFailureStatusDto("申请单为空！");
             }
             // 构建生成订单（采购）
             List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyType);
@@ -67,12 +66,11 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
             bizInstockplanDetailDao.batchInsertInstockplanDetail(pir.getRight());
             // 保存生成订单
             bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
-            flag =1;
         } catch (Exception e) {
             logger.error("提交失败！", e);
             throw e;
         }
-        return flag;
+        return StatusDto.buildSuccessStatusDto("申请处理成功！");
     }
 
     /**
@@ -96,14 +94,14 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
         // 根据申请单获取申请单详情
         List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
         if(null == details || details.size() == 0){
-            return StatusDto.buildSuccessStatusDto();
+            return StatusDto.buildFailureStatusDto("申请单为空！");
         }
         //获取卖方机构code
         String productOrgNo = getProductOrgNo(ba);
         //查询库存列表
         List<BizStockDetail> stockDetails = getStockDetailList(productOrgNo, details);
         if(null == stockDetails || stockDetails.size() == 0){
-            return StatusDto.buildSuccessStatusDto();
+            return StatusDto.buildFailureStatusDto("库存列表为空！");
         }
         // 构建占用库存和订单占用库存关系
         Pair<List<BizStockDetail>, List<RelOrdstockOccupy>> pair = buildStockAndRelOrdEntity(details,stockDetails,applyType);
@@ -122,7 +120,7 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
         bizAllocateTradeorderDao.batchInsertRelOrdstockOccupy(relOrdstockOccupies);
         // 批量保存出库计划详情
         bizOutstockplanDetailDao.batchOutstockplanDetail(pir.getLeft());
-        return null;
+        return StatusDto.buildSuccessStatusDto("出库计划生成成功");
     }
 
 }
