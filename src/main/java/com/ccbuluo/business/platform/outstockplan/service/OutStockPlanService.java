@@ -68,5 +68,14 @@ public interface OutStockPlanService {
      * @author liuduo
      * @date 2018-08-11 13:17:42
      */
-    List<BizOutstockplanDetail> queryOutstockplanList(String applyNo, String productType);
+    List<BizOutstockplanDetail> queryOutstockplanList(String applyNo, String outRepositoryNo, String productType);
+
+    /**
+     * 根据申请单号查询出库仓库
+     * @param applyNo 申请单号
+     * @return 入库仓库
+     * @author liuduo
+     * @date 2018-08-13 15:20:27
+     */
+    List<String> getByApplyNo(String applyNo, String orgCode);
 }

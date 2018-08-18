@@ -78,7 +78,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public StatusDto<String> autoSaveOutstockOrder(String applyNo, List<BizOutstockplanDetail> bizOutstockplanDetailList) {
+    public StatusDto<String> autoSaveOutstockOrder(String applyNo,  List<BizOutstockplanDetail> bizOutstockplanDetailList) {
         try {
             Map<String, List<BizOutstockplanDetail>> collect = bizOutstockplanDetailList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getOutRepositoryNo));
             // 根据申请单号查询基本信息
@@ -109,64 +109,48 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 bizOutstockOrder.setChecked(Constants.LONG_FLAG_ONE);
                 bizOutstockOrder.setCheckedTime(date);
                 bizOutstockOrder.preInsert(userHolder.getLoggedUserId());
-                bizOutstockOrderList.add(bizOutstockOrder);
-                // 组装出库单详单
-                bizOutstockorderDetailList1 = editOutstockorderDetail(bizOutstockorderDetailList, bizOutstockplanDetails, outstockNo);
-
+                int i = bizOutstockOrderDao.saveEntity(bizOutstockOrder);
+                if (i == Constants.FAILURESTATUS) {
+                    throw new CommonException("10001", "保存出库单失败！");
+                }
+                for (BizOutstockplanDetail outstockplanDetail : bizOutstockplanDetails) {
+                    BizOutstockorderDetail bizOutstockorderDetail = new BizOutstockorderDetail();
+                    bizOutstockorderDetail.setOutstockOrderno(outstockNo);
+                    bizOutstockorderDetail.setOutstockPlanid(outstockplanDetail.getId());
+                    bizOutstockorderDetail.setProductNo(outstockplanDetail.getProductNo());
+                    bizOutstockorderDetail.setProductName(outstockplanDetail.getProductName());
+                    bizOutstockorderDetail.setProductType(outstockplanDetail.getProductType());
+                    bizOutstockorderDetail.setProductCategoryname(outstockplanDetail.getProductCategoryname());
+                    bizOutstockorderDetail.setSupplierNo(outstockplanDetail.getSupplierNo());
+                    bizOutstockorderDetail.setOutstockNum(outstockplanDetail.getPlanOutstocknum());
+                    bizOutstockorderDetail.setStockType(outstockplanDetail.getOutstockType());
+                    bizOutstockorderDetail.setUnit(outstockplanDetail.getProductUnit());
+                    bizOutstockorderDetail.setCostPrice(outstockplanDetail.getCostPrice());
+                    bizOutstockorderDetail.setActualPrice(outstockplanDetail.getSalesPrice());
+                    bizOutstockorderDetailList.add(bizOutstockorderDetail);
+                }
+                List<Long> longs = bizOutstockOrderDao.batchBizOutstockOrder(bizOutstockOrderList);
+                if (null != longs && longs.size() == 0) {
+                    throw new CommonException("10002", "保存出库单详单失败！");
+                }
+                // 更改库存
+                // 根据出库单号查询出库单详单
+                updateOccupyStock(bizOutstockorderDetailList1, bizOutstockplanDetailList);
+                // 4、更新出库计划中的实际出库数量
+                updateActualOutstocknum(bizOutstockorderDetailList1);
+                // 5、更新出库计划中的状态和完成时间
+                List<BizOutstockplanDetail> bizOutstockplanDetailList2 = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
+                updatePlanStatus(bizOutstockplanDetailList2);
+                // 6、更改申请单状态
+                List<BizOutstockplanDetail> bizOutstockplanDetailList3 = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
+                updateApplyOrderStatus(applyNo, detail, bizOutstockplanDetailList3);
             }
-            // 保存出库单
-            List<Long> longs = bizOutstockOrderDao.batchBizOutstockOrder(bizOutstockOrderList);
-            if (null != longs && longs.size() == 0) {
-                throw new CommonException("10001", "保存出库单失败！");
-            }
-            // 保存出库单详单
-            List<Long> longs1 = outstockorderDetailService.saveOutstockorderDetail(bizOutstockorderDetailList1);
-            if (null != longs1 && longs1.size() == 0) {
-                throw new CommonException("10002", "保存出库单详单失败！");
-            }
-            // 更改库存
-            updateOccupyStock(bizOutstockorderDetailList1, bizOutstockplanDetailList);
-            // 4、更新出库计划中的实际出库数量
-            updateActualOutstocknum(bizOutstockorderDetailList1);
-            // 5、更新出库计划中的状态和完成时间
-            updatePlanStatus(bizOutstockplanDetailList);
-            // 6、更改申请单状态
-            updateApplyOrderStatus(applyNo, detail, bizOutstockplanDetailList);
             return StatusDto.buildSuccessStatusDto("保存成功！");
         } catch (Exception e) {
             logger.error("生成出库单失败！", e.getMessage());
             throw e;
         }
 
-    }
-
-    /**
-     * 组装出库单详单
-     * @param bizOutstockorderDetailList 出库单详单集合
-     * @param bizOutstockplanDetails 出库计划
-     * @param outstockNo 出库单号
-     * @return 组装好的出库单详单数据
-     * @author liuduo
-     * @date 2018-08-16 08:46:31
-     */
-    private List<BizOutstockorderDetail> editOutstockorderDetail(List<BizOutstockorderDetail> bizOutstockorderDetailList, List<BizOutstockplanDetail> bizOutstockplanDetails, String outstockNo) {
-        bizOutstockplanDetails.forEach(item -> {
-            BizOutstockorderDetail bizOutstockorderDetail = new BizOutstockorderDetail();
-            bizOutstockorderDetail.setOutstockOrderno(outstockNo);
-            bizOutstockorderDetail.setOutstockPlanid(item.getId());
-            bizOutstockorderDetail.setProductNo(item.getProductNo());
-            bizOutstockorderDetail.setProductName(item.getProductName());
-            bizOutstockorderDetail.setProductType(item.getProductType());
-            bizOutstockorderDetail.setProductCategoryname(item.getProductCategoryname());
-            bizOutstockorderDetail.setSupplierNo(item.getSupplierNo());
-            bizOutstockorderDetail.setOutstockNum(item.getPlanOutstocknum());
-            bizOutstockorderDetail.setStockType(item.getOutstockType());
-            bizOutstockorderDetail.setUnit(item.getProductUnit());
-            bizOutstockorderDetail.setCostPrice(item.getCostPrice());
-            bizOutstockorderDetail.setActualPrice(item.getSalesPrice());
-            bizOutstockorderDetailList.add(bizOutstockorderDetail);
-        });
-        return bizOutstockorderDetailList;
     }
 
 
@@ -207,8 +191,8 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 throw new CommonException("10002", "保存出库单详单失败！");
             }
             // 3、修改库存明细
-            // 根据申请单号查询出库单详单
-            List<BizOutstockorderDetail> bizOutstockorderDetailList1 = outstockorderDetailService.queryByApplyNo(applyNo);
+            // 根据出库单号查询出库单详单
+            List<BizOutstockorderDetail> bizOutstockorderDetailList1 = outstockorderDetailService.queryByApplyNo(outstockNo);
             updateOccupyStock(bizOutstockorderDetailList1, bizOutstockplanDetailList);
             // 4、更新出库计划中的实际出库数量
             updateActualOutstocknum(bizOutstockorderDetailList1);
@@ -290,8 +274,8 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      * @date 2018-08-11 13:17:42
      */
     @Override
-    public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String productType) {
-        return outStockPlanService.queryOutstockplanList(applyNo, productType);
+    public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String outRepositoryNo, String productType) {
+        return outStockPlanService.queryOutstockplanList(applyNo, outRepositoryNo, productType);
     }
 
     /**
@@ -360,6 +344,19 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         bizOutstockOrderDTO.setOutstockorderDetailDTOList(outstockorderDetailDTOList);
 
         return bizOutstockOrderDTO;
+    }
+
+    /**
+     * 根据申请单号查询出库仓库
+     * @param applyNo 申请单号
+     * @return 入库仓库
+     * @author liuduo
+     * @date 2018-08-13 15:20:27
+     */
+    @Override
+    public List<String> getByApplyNo(String applyNo) {
+        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+        return outStockPlanService.getByApplyNo(applyNo, orgCode);
     }
 
     /**
