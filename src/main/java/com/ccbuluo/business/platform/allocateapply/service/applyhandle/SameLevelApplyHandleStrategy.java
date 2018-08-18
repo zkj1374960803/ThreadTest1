@@ -9,6 +9,7 @@ import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
 import com.ccbuluo.core.exception.CommonException;
+import com.ccbuluo.http.StatusDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
      * @date 2018-08-08 10:55:41
      */
     @Override
-    public int applyHandle(BizAllocateApply ba){
+    public StatusDto applyHandle(BizAllocateApply ba){
         int flag = 0;
         String applyNo = ba.getApplyNo();
         String applyType = ba.getApplyType();
@@ -53,7 +54,7 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 根据申请单获取申请单详情
             List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
             if(null == details || details.size() == 0){
-                return 0;
+                return StatusDto.buildFailureStatusDto("申请单为空！");
             }
             // 构建生成订单(调拨)
             List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyType);
@@ -63,7 +64,7 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
             //查询库存列表
             List<BizStockDetail> stockDetails = getStockDetailList(productOrgNo, details);
             if(null == stockDetails || stockDetails.size() == 0){
-                return 0;
+                return StatusDto.buildFailureStatusDto("库存为空！");
             }
             // 构建占用库存和订单占用库存关系
             Pair<List<BizStockDetail>, List<RelOrdstockOccupy>> pair = buildStockAndRelOrdEntity(details,stockDetails,applyType);
@@ -85,12 +86,11 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
             bizInstockplanDetailDao.batchInsertInstockplanDetail(pir.getRight());
             // 保存订单占用库存关系
             bizAllocateTradeorderDao.batchInsertRelOrdstockOccupy(relOrdstockOccupies);
-            flag =1;
         } catch (Exception e) {
             logger.error("提交失败！", e);
             throw e;
         }
-        return flag;
+        return StatusDto.buildSuccessStatusDto("申请处理成功！");
     }
 
     /**
