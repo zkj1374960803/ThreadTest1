@@ -89,7 +89,7 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
      * @date 2018-08-11 13:35:41
      */
     @Override
-    public int cancelApply(String applyNo){
-        return 0;
+    public StatusDto cancelApply(String applyNo){
+        return StatusDto.buildSuccessStatusDto("申请撤销成功！");
     }
 }

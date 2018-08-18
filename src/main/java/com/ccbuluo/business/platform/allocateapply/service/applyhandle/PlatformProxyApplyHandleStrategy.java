@@ -120,7 +120,7 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public int cancelApply(String applyNo){
+    public StatusDto cancelApply(String applyNo){
         int flag = 0;
         try {
             // 根据申请单编号查询订单占用库存关系表
@@ -145,6 +145,6 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
             logger.error("撤销失败！", e);
             throw e;
         }
-        return flag;
+        return StatusDto.buildSuccessStatusDto("申请撤销成功！");
     }
 }

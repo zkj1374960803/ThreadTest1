@@ -24,5 +24,5 @@ public interface ApplyHandleStrategy {
      * @author weijb
      * @date 2018-08-11 13:35:41
      */
-    int cancelApply(String applyNo);
+    StatusDto cancelApply(String applyNo);
 }
