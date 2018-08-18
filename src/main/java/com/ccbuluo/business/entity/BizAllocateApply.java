@@ -314,7 +314,7 @@ public class BizAllocateApply {
      * @date 2018-08-14 18:41:05
      */
     public enum AllocateApplyTypeEnum {
-        PURCHASE("平台采购"),PLATFORMALLOCATE("平台调拨"),SERVICEALLOCATE("平级调拨"),DIRECTALLOCATE("平台直发"),
+        PURCHASE("平台采购"),PLATFORMALLOCATE("平台调拨"), SAMELEVEL("平级调拨"),DIRECTALLOCATE("平台直发"),
         BARTER("调换"),REFUND("退款");
 
         AllocateApplyTypeEnum(String label){

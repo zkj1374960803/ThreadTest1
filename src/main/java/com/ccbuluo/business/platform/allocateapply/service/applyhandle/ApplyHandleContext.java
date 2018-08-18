@@ -54,7 +54,7 @@ public class ApplyHandleContext {
                 return platformAllocateApplyHandleService.applyHandle(ba);
             }
             // 平级调拨（服务间的调拨）
-            if(AllocateApplyTypeEnum.SERVICEALLOCATE.toString().equals(ba.getApplyType())){
+            if(AllocateApplyTypeEnum.SAMELEVEL.toString().equals(ba.getApplyType())){
                 return serviceAllocateApplyHandleService.applyHandle(ba);
             }
             // 平级直调

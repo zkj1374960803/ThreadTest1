@@ -290,7 +290,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(userOrgCode)){
                 processApplyDTO.setApplyType(AllocateApplyTypeEnum.PLATFORMALLOCATE.name());
             }else {
-                processApplyDTO.setApplyType(AllocateApplyTypeEnum.SERVICEALLOCATE.name());
+                processApplyDTO.setApplyType(AllocateApplyTypeEnum.SAMELEVEL.name());
             }
             String outstockOrgno = processApplyDTO.getOutstockOrgno();
             if(StringUtils.isBlank(outstockOrgno)){

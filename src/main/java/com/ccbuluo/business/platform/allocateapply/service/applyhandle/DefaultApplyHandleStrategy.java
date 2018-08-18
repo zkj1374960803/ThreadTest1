@@ -234,11 +234,11 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
                 // 买方入库计划
                 instockplanDetail1(inList,details, AllocateApplyTypeEnum.PLATFORMALLOCATE.toString());
                 break;
-            case SERVICEALLOCATE:    // 平级调拨（服务间的调拨）
+            case SAMELEVEL:    // 平级调拨（服务间的调拨）
                 // 卖方机构出库计划
-                outstockplanDetail2(outList,relOrdstockOccupies,stockDetails,details, AllocateApplyTypeEnum.SERVICEALLOCATE.toString());
+                outstockplanDetail2(outList,relOrdstockOccupies,stockDetails,details, AllocateApplyTypeEnum.SAMELEVEL.toString());
                 // 买方入库计划
-                instockplanDetail1(inList,details, AllocateApplyTypeEnum.SERVICEALLOCATE.toString());
+                instockplanDetail1(inList,details, AllocateApplyTypeEnum.SAMELEVEL.toString());
                 break;
             case DIRECTALLOCATE:    // 直调
                 // 平台出库计划
@@ -448,15 +448,15 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     private BizOutstockplanDetail buildBizOutstockplanDetail(AllocateapplyDetailBO ad, String applyType){
         BizOutstockplanDetail outPlan = new BizOutstockplanDetail();
         // 调拨
-        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SERVICEALLOCATE.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
             outPlan.setOutstockType(InstockTypeEnum.TRANSFER.toString());// 交易类型
         }
         // 采购
-        if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType) || AllocateApplyTypeEnum.SERVICEALLOCATE.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
             outPlan.setOutstockType(InstockTypeEnum.PURCHASE.toString());// 交易类型
         }
         // 换货
-        if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) || AllocateApplyTypeEnum.SERVICEALLOCATE.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
             outPlan.setOutstockType(InstockTypeEnum.BARTER.toString());// 交易类型
         }
 
@@ -488,15 +488,15 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     private BizInstockplanDetail buildBizInstockplanDetail(AllocateapplyDetailBO ad, String applyType){
         BizInstockplanDetail inPlan = new BizInstockplanDetail();
         // 调拨
-        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SERVICEALLOCATE.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
             inPlan.setInstockType(InstockTypeEnum.TRANSFER.toString());// 交易类型
         }
         // 采购
-        if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType) || AllocateApplyTypeEnum.SERVICEALLOCATE.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
             inPlan.setInstockType(InstockTypeEnum.PURCHASE.toString());// 交易类型
         }
         // 换货
-        if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) || AllocateApplyTypeEnum.SERVICEALLOCATE.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
             inPlan.setInstockType(InstockTypeEnum.BARTER.toString());// 交易类型
         }
         inPlan.setProductNo(ad.getProductNo());// 商品编号
@@ -628,7 +628,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             sellerOrgno = ba.getOutstockOrgno();
         }
         // 平级调拨（服务间的调拨）
-        if(AllocateApplyTypeEnum.SERVICEALLOCATE.toString().equals(ba.getApplyType())){
+        if(AllocateApplyTypeEnum.SAMELEVEL.toString().equals(ba.getApplyType())){
             sellerOrgno = ba.getOutstockOrgno();
         }
         // 平级直调
