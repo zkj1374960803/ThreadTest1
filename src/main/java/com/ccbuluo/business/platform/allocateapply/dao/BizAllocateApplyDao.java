@@ -410,7 +410,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @author zhangkangjian
      * @date 2018-08-16 14:01:23
      */
-    public List<BasicCarpartsProductDTO> findEquipmentCode(Long equiptypeId) {
+    public List<BasicCarpartsProductDTO> findEquipmentCode(Integer equiptypeId) {
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("equiptypeId", equiptypeId);
         String sql = "  SELECT a.equip_code AS 'carpartsCode' FROM biz_service_equipment a WHERE a.equiptype_id = :equiptypeId ";
