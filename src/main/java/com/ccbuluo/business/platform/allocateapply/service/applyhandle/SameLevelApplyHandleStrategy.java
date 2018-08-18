@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
 import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
+import com.ccbuluo.business.constants.AllocateApplyEnum;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
@@ -73,7 +74,7 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 保存生成订单
             bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
-            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, applyType, relOrdstockOccupies);
+            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, AllocateApplyEnum.SERVICEALLOCATE, relOrdstockOccupies);
             // 保存占用库存
             flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
             if(flag == 0){// 更新失败

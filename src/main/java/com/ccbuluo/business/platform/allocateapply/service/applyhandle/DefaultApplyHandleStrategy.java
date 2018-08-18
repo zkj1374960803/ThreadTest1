@@ -207,75 +207,61 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
      *  构建出库和入库计划并保存
      * @param details 申请单详情
      * @param stockDetails 库存详情列表
-     * @param applyType 申请类型
+     * @param applyEnum 申请类型枚举
      * @author weijb
      * @date 2018-08-11 13:35:41
      */
-    public Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> buildOutAndInstockplanDetail(List<AllocateapplyDetailBO> details, List<BizStockDetail> stockDetails, String applyType, List<RelOrdstockOccupy> relOrdstockOccupies){
+    public Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> buildOutAndInstockplanDetail(List<AllocateapplyDetailBO> details, List<BizStockDetail> stockDetails, AllocateApplyEnum applyEnum, List<RelOrdstockOccupy> relOrdstockOccupies){
         List<BizOutstockplanDetail> outList = new ArrayList<BizOutstockplanDetail>();
         List<BizInstockplanDetail> inList = new ArrayList<BizInstockplanDetail>();
-        // 卖方机构出库（机构2）
-//        BizOutstockplanDetail outstockplanDetail2 = new BizOutstockplanDetail();
-        // 平台出库
-//        BizOutstockplanDetail outstockplanDetail = new BizOutstockplanDetail();
-        // 买方出库
-//        BizOutstockplanDetail outstockplanDetail1 = new BizOutstockplanDetail();
-        // 平台入库
-//        BizInstockplanDetail instockplanDetail = new BizInstockplanDetail();
-
-        // 采购
-        if(AllocateApplyEnum.PURCHASE.toString().equals(applyType)){
-            // 平台入库计划
-            instockplanDetail(inList,details, applyType);
-            // 买入方入库计划
-            instockplanDetail1(inList,details, applyType);
-        }
-        // 平台调拨
-        if(AllocateApplyEnum.PLATFORMALLOCATE.toString().equals(applyType)){
-//            BizStockDetail bd = getBizStockDetailByProductNo(stockDetails, ad.getProductNo());
-            // 卖方机构出库计划
-            outstockplanDetail2(outList, relOrdstockOccupies,stockDetails, details, applyType);
-            // 平台出库计划
-            outstockplanDetail(outList,relOrdstockOccupies,stockDetails,details, applyType);
-            // 平台入库计划
-            instockplanDetail(inList,details, applyType);
-            // 买方入库计划
-            instockplanDetail1(inList,details, applyType);
-        }
-        // 平级调拨（服务间的调拨）
-        if(AllocateApplyEnum.SERVICEALLOCATE.toString().equals(applyType)){
-//            BizStockDetail bd = getBizStockDetailByProductNo(stockDetails, ad.getProductNo());
-            // 卖方机构出库计划
-            outstockplanDetail2(outList,relOrdstockOccupies,stockDetails,details, applyType);
-            // 买方入库计划
-            instockplanDetail1(inList,details, applyType);
-        }
-        // 直调
-        if(AllocateApplyEnum.DIRECTALLOCATE.toString().equals(applyType)){
-//            BizStockDetail bd = getBizStockDetailByProductNo(stockDetails, ad.getProductNo());
-            // 平台出库计划
-            outstockplanDetail(outList,relOrdstockOccupies,stockDetails,details, applyType);
-            // 买入方入库计划
-            instockplanDetail1(inList,details, applyType);
-        }
-        // 商品退换
-        if(AllocateApplyEnum.BARTER.toString().equals(applyType)){
-            // 买方出库
-            outstockplanDetail1(outList,relOrdstockOccupies,stockDetails,details, applyType);
-            // 平台入库
-            instockplanDetail(inList,details, applyType);
-            // 平台出库
-            outstockplanDetail(outList,relOrdstockOccupies,stockDetails,details, applyType);
-            // 买方入库
-            instockplanDetail1(inList,details, applyType);
-        }
-        // 退款
-        if(AllocateApplyEnum.REFUND.toString().equals(applyType)){
-//            BizStockDetail bd = getBizStockDetailByProductNo(stockDetails, ad.getProductNo());
-            // 买方出库
-            outstockplanDetail1(outList,relOrdstockOccupies,stockDetails,details, applyType);
-            // 平台入库
-            instockplanDetail(inList,details, applyType);
+        switch (applyEnum){
+            case PURCHASE:    // 采购
+                // 平台入库计划
+                instockplanDetail(inList,details, AllocateApplyEnum.PURCHASE.toString());
+                // 买入方入库计划
+                instockplanDetail1(inList,details, AllocateApplyEnum.PURCHASE.toString());
+                break;
+            case PLATFORMALLOCATE:    // 平台调拨
+                // 卖方机构出库计划
+                outstockplanDetail2(outList, relOrdstockOccupies,stockDetails, details, AllocateApplyEnum.PLATFORMALLOCATE.toString());
+                // 平台出库计划
+                outstockplanDetail(outList,relOrdstockOccupies,stockDetails,details, AllocateApplyEnum.PLATFORMALLOCATE.toString());
+                // 平台入库计划
+                instockplanDetail(inList,details, AllocateApplyEnum.PLATFORMALLOCATE.toString());
+                // 买方入库计划
+                instockplanDetail1(inList,details, AllocateApplyEnum.PLATFORMALLOCATE.toString());
+                break;
+            case SERVICEALLOCATE:    // 平级调拨（服务间的调拨）
+                // 卖方机构出库计划
+                outstockplanDetail2(outList,relOrdstockOccupies,stockDetails,details, AllocateApplyEnum.SERVICEALLOCATE.toString());
+                // 买方入库计划
+                instockplanDetail1(inList,details, AllocateApplyEnum.SERVICEALLOCATE.toString());
+                break;
+            case DIRECTALLOCATE:    // 直调
+                // 平台出库计划
+                outstockplanDetail(outList,relOrdstockOccupies,stockDetails,details, AllocateApplyEnum.DIRECTALLOCATE.toString());
+                // 买入方入库计划
+                instockplanDetail1(inList,details, AllocateApplyEnum.DIRECTALLOCATE.toString());
+                break;
+            case BARTER:    // 商品退换
+                // 买方出库
+                outstockplanDetail1(outList,relOrdstockOccupies,stockDetails,details, AllocateApplyEnum.BARTER.toString());
+                // 平台入库
+                instockplanDetail(inList,details, AllocateApplyEnum.BARTER.toString());
+                // 平台出库
+                outstockplanDetail(outList,relOrdstockOccupies,stockDetails,details, AllocateApplyEnum.BARTER.toString());
+                // 买方入库
+                instockplanDetail1(inList,details, AllocateApplyEnum.BARTER.toString());
+                break;
+            case REFUND:    //  退款
+                // 买方出库
+                outstockplanDetail1(outList,relOrdstockOccupies,stockDetails,details, AllocateApplyEnum.REFUND.toString());
+                // 平台入库
+                instockplanDetail(inList,details, AllocateApplyEnum.REFUND.toString());
+                break;
+            default:
+                logger.error(applyEnum.toString()+"出现了未知申请类型！");
+                break;
         }
         return Pair.of(outList, inList);
     }

@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
 import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
+import com.ccbuluo.business.constants.AllocateApplyEnum;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.StockPlanEnum;
@@ -59,7 +60,7 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
             List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyType);
 
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
-            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, null, applyType, null);
+            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, null, AllocateApplyEnum.PURCHASE, null);
             bizInstockplanDetailDao.batchInsertInstockplanDetail(pir.getRight());
             // 保存生成订单
             bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
