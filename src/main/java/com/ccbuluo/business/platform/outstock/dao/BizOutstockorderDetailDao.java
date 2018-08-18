@@ -122,20 +122,20 @@ public class BizOutstockorderDetailDao extends BaseDao<BizOutstockorderDetail> {
 
     /**
      * 根据申请单号查询出库单详单
-     * @param applyNo 申请单号
+     * @param outstockNo 申请单号
      * @return 出库单详单
      * @author liuduo
      * @date 2018-08-10 14:16:32
      */
-    public List<BizOutstockorderDetail> queryByApplyNo(String applyNo) {
+    public List<BizOutstockorderDetail> queryByApplyNo(String outstockNo) {
         Map<String, Object> params = Maps.newHashMap();
-        params.put("applyNo", applyNo);
+        params.put("outstockNo", outstockNo);
 
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,outstock_orderno,outstock_planid,product_no,product_name,")
             .append("product_type,product_categoryname,supplier_no,outstock_num,unit,stock_type,")
             .append("cost_price,actual_price ")
-            .append(" FROM biz_outstockorder_detail WHERE outstock_orderno = :applyNo");
+            .append(" FROM biz_outstockorder_detail WHERE outstock_orderno = :outstockNo");
 
         return queryListBean(BizOutstockorderDetail.class, sql.toString(), params);
     }

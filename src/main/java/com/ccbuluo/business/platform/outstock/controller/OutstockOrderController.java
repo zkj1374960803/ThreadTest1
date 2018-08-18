@@ -72,11 +72,13 @@ public class OutstockOrderController extends BaseController {
      */
     @ApiOperation(value = "根据申请单号查询出库计划", notes = "【刘铎】")
     @ApiImplicitParams({@ApiImplicitParam(name = "applyNo", value = "申请单号",  required = true, paramType = "query"),
+        @ApiImplicitParam(name = "outRepositoryNo", value = "仓库编号",  required = true, paramType = "query"),
         @ApiImplicitParam(name = "productType", value = "商品类型（物料或者备件）",  required = true, paramType = "query")})
     @GetMapping("/queryoutstockplan")
     public StatusDto<List<BizOutstockplanDetail>> queryOutstockplan(@RequestParam String applyNo,
+                                                                    @RequestParam String outRepositoryNo,
                                                                     @RequestParam String productType) {
-        return StatusDto.buildDataSuccessStatusDto(outstockOrderService.queryOutstockplan(applyNo, productType));
+        return StatusDto.buildDataSuccessStatusDto(outstockOrderService.queryOutstockplan(applyNo, outRepositoryNo, productType));
     }
 
 
@@ -119,6 +121,20 @@ public class OutstockOrderController extends BaseController {
     @GetMapping("/getbyoutstockno")
     public StatusDto<BizOutstockOrderDTO> getByOutstockNo(@RequestParam String outstockNo) {
         return StatusDto.buildDataSuccessStatusDto(outstockOrderService.getByOutstockNo(outstockNo));
+    }
+
+    /**
+     * 根据申请单号查询出库仓库
+     * @param applyNo 申请单号
+     * @return 入库仓库
+     * @author liuduo
+     * @date 2018-08-13 15:20:27
+     */
+    @ApiOperation(value = "出库仓库", notes = "【刘铎】")
+    @ApiImplicitParam(name = "applyNo", value = "申请单号",  required = true, paramType = "query")
+    @GetMapping("/getbyapplyno")
+    public StatusDto<List<String>> getByApplyNo(@RequestParam String applyNo) {
+        return StatusDto.buildDataSuccessStatusDto(outstockOrderService.getByApplyNo(applyNo));
     }
 
 }

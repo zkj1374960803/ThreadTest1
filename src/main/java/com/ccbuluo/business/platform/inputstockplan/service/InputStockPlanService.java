@@ -70,9 +70,8 @@ public interface InputStockPlanService {
     int updateInStockPlanStatus(String applyNo, String completeStatus, String instockRepositoryNo);
 
     /**
-     * 根据入库单号查询入库仓库
+     * 根据申请单号查询入库仓库
      * @param applyNo 入库单号
-     * @param orgCode 当前登录人机构号
      * @return 入库仓库
      * @author liuduo
      * @date 2018-08-13 15:20:27
