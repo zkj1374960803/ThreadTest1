@@ -219,6 +219,10 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         List<BizInstockplanDetail> inList = new ArrayList<BizInstockplanDetail>();
         switch (applyTypeEnum){
             case PURCHASE:    // 采购
+                //  给入库之后回调出库计划用
+                if(null != stockDetails && null != relOrdstockOccupies){
+                    outstockplanDetail(outList,relOrdstockOccupies,stockDetails,details, AllocateApplyTypeEnum.PLATFORMALLOCATE.toString());
+                }
                 // 平台入库计划
                 instockplanDetail(inList,details, AllocateApplyTypeEnum.PURCHASE.toString());
                 // 买入方入库计划
@@ -449,15 +453,15 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         BizOutstockplanDetail outPlan = new BizOutstockplanDetail();
         // 调拨
         if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
-            outPlan.setOutstockType(InstockTypeEnum.TRANSFER.toString());// 交易类型
-        }
-        // 采购
-        if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
-            outPlan.setOutstockType(InstockTypeEnum.PURCHASE.toString());// 交易类型
+            outPlan.setOutstockType(OutstockTypeEnum.TRANSFER.toString());// 交易类型
         }
         // 换货
-        if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
-            outPlan.setOutstockType(InstockTypeEnum.BARTER.toString());// 交易类型
+        if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) ){
+            outPlan.setOutstockType(OutstockTypeEnum.BARTER.toString());// 交易类型
+        }
+        // 退款
+        if(AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
+            outPlan.setOutstockType(OutstockTypeEnum.REFUND.toString());// 交易类型
         }
 
         outPlan.setProductNo(ad.getProductNo());// 商品编号

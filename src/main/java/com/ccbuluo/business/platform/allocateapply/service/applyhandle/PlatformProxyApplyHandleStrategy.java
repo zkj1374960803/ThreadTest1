@@ -82,10 +82,8 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
             if(flag == 0){// 更新失败
                 throw new CommonException("0", "更新占用库存失败！");
             }
-            // 对出库详情处理，因为出库计划要记录到具体的库存批次id对应的出库数量
-            List<BizOutstockplanDetail> outstockplanDetails = pir.getLeft();
             // 批量保存出库计划详情
-            bizOutstockplanDetailDao.batchOutstockplanDetail(outstockplanDetails);
+            bizOutstockplanDetailDao.batchOutstockplanDetail(pir.getLeft());
             // 批量保存入库计划详情
             bizInstockplanDetailDao.batchInsertInstockplanDetail(pir.getRight());
             // 保存订单占用库存关系
