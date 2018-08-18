@@ -1,12 +1,15 @@
 package com.ccbuluo.business.platform.custmanager.dao;
 
+import com.ccbuluo.business.platform.allocateapply.dto.QueryCustManagerListDTO;
 import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
 import com.ccbuluo.dao.BaseDao;
+import com.ccbuluo.db.Page;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.CollectionUtils;
+
 
 import javax.annotation.Resource;
 import java.util.Collections;
@@ -136,5 +139,28 @@ public class BizServiceCustmanagerDao extends BaseDao<BizServiceCustmanager> {
         map.put("value", value);
         String sql = "SELECT user_uuid FROM " + tableName + "  WHERE " + fields + " = :value ";
         return querySingColum(String.class, sql, map);
+    }
+
+    /**
+     * 查询客户经理列表(创建申请)
+     * @param queryCustManagerListDTO 查询条件
+     * @return Page<QueryCustManagerListDTO> 分页的客户经理列表
+     * @author zhangkangjian
+     * @date 2018-08-09 19:03:17
+     */
+    public Page<QueryCustManagerListDTO> queryCustManagerList(QueryCustManagerListDTO queryCustManagerListDTO) {
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT a.office_phone,c.cusmanager_name as 'name',c.vin_number,b.servicecenter_code as 'serviceCenter',b.storehouse_code as 'inRepositoryNo' ")
+            .append(" FROM biz_service_custmanager a  ")
+            .append(" LEFT JOIN biz_service_storehouse b ON a.servicecenter_code = b.servicecenter_code ")
+            .append(" LEFT JOIN biz_service_maintaincar c ON a.user_uuid = c.cusmanager_uuid ")
+            .append(" WHERE 1 = 1 ");
+        if(StringUtils.isNotBlank(queryCustManagerListDTO.getName())){
+            sql.append(" AND (c.cusmanager_name like concat(:name,'%')  OR c.vin_number like concat(:name,'%'))");
+        }
+        if(StringUtils.isNotBlank(queryCustManagerListDTO.getServiceCenter())){
+            sql.append(" AND b.servicecenter_code = :serviceCenter");
+        }
+        return queryPageForBean(QueryCustManagerListDTO.class, sql.toString(), queryCustManagerListDTO, queryCustManagerListDTO.getOffset(), queryCustManagerListDTO.getPageSize());
     }
 }

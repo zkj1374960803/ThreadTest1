@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.storehouse.dao;
 
 import com.ccbuluo.business.entity.BizServiceStorehouse;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.dto.SearchStorehouseListDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
@@ -11,10 +12,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *  dao
@@ -213,5 +211,60 @@ public class BizServiceStorehouseDao extends BaseDao<BizServiceStorehouse> {
             .append(" latitude,storehouse_address,province_name,city_name,area_name FROM biz_service_storehouse WHERE servicecenter_code = :serviceCenterCode");
 
         return queryListBean(BizServiceStorehouse.class, sql.toString(), param);
+    }
+
+    /**
+     * 根据仓库code查询机构code
+     * @param storeHouseCode 仓库code
+     * @return 机构code
+     * @author liuduo
+     * @date 2018-08-07 16:08:52
+     */
+    public String getOrgCodeByStoreHouseCode(String storeHouseCode) {
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("storeHouseCode", storeHouseCode);
+
+        String sql = "SELECT servicecenter_code FROM biz_service_storehouse WHERE storehouse_code = :storeHouseCode";
+
+        return namedParameterJdbcTemplate.queryForObject(sql, param, String.class);
+    }
+
+    /**
+     * 根据服务中心查询启用的仓库列表（下拉框）
+     * @param serviceCenterCode 服务中心code
+     * @return List<QueryStorehouseDTO> 仓库列表
+     * @author zhangkangjian
+     * @date 2018-08-07 15:15:11
+     */
+    public List<QueryStorehouseDTO> queryStorehouseByServiceCenterCode(String serviceCenterCode) {
+        if(StringUtils.isBlank(serviceCenterCode)){
+            return Collections.emptyList();
+        }
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("serviceCenterCode", serviceCenterCode);
+        param.put("storehouseStatus", Constants.STATUS_FLAG_ONE);
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT storehouse_code,storehouse_name ")
+            .append(" FROM biz_service_storehouse ")
+            .append("  WHERE servicecenter_code = :serviceCenterCode AND storehouse_status = :storehouseStatus ");
+        return queryListBean(QueryStorehouseDTO.class, sql.toString(), param);
+    }
+
+    /**
+     * 根据仓库code查询仓库信息
+     * @param codes 仓库code
+     * @return 仓库信息
+     * @author liuduo
+     * @date 2018-08-13 11:58:35
+     */
+    public List<QueryStorehouseDTO> queryByCode(List<String> codes) {
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("codes", codes);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT storehouse_code,storehouse_name FROM biz_service_storehouse ")
+            .append(" WHERE storehouse_code IN(:codes)");
+
+        return queryListBean(QueryStorehouseDTO.class, sql.toString(), param);
     }
 }

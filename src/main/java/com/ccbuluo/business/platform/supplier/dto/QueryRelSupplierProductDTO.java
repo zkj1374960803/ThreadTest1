@@ -11,7 +11,7 @@ import java.util.Date;
  * @date 2018-08-01 10:12:08
  */
 @ApiModel(value = "QueryRelSupplierProduct", description = "查询供应商关联商品关系")
-public class QueryRelSupplierProduct {
+public class QueryRelSupplierProductDTO {
     /**
      * id
      */

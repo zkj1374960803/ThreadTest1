@@ -1,9 +1,11 @@
 package com.ccbuluo.business.platform.storehouse.service;
 
 import com.ccbuluo.business.entity.BizServiceStorehouse;
+import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.dto.SaveBizServiceStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.dto.SearchStorehouseListDTO;
 import com.ccbuluo.db.Page;
+import com.ccbuluo.http.StatusDto;
 import org.apache.thrift.TException;
 
 import java.util.List;
@@ -23,7 +25,7 @@ public interface StoreHouseService {
      * @author liuduo
      * @date 2018-07-03 10:20:14
      */
-    int saveStoreHouse(SaveBizServiceStorehouseDTO saveBizServiceStorehouseDTO)  throws TException;
+    int saveStoreHouse(SaveBizServiceStorehouseDTO saveBizServiceStorehouseDTO);
 
     /**
      * 启停仓库
@@ -76,4 +78,31 @@ public interface StoreHouseService {
     * @date 2018-07-05 10:27:40
     */
     List<BizServiceStorehouse> getStorehousrByCode(String serviceCenterCode);
+
+    /**
+    * 根据仓库code查询机构code
+    * @param storeHouseCode 仓库code
+    * @return 机构code
+    * @author liuduo
+    * @date 2018-08-07 16:08:52
+    */
+    String getOrgCodeByStoreHouseCode(String storeHouseCode);
+    /**
+     * 根据服务中心查询启用的仓库列表（下拉框）
+     * @param serviceCenterCode 据服务中心code
+     * @return StatusDto<QueryStorehouseDTO>
+     * @author zhangkangjian
+     * @date 2018-08-07 14:32:09
+     */
+    StatusDto<List<QueryStorehouseDTO>> queryStorehouseByServiceCenterCode(String serviceCenterCode);
+
+    /**
+     * 根据仓库code查询仓库信息
+     * @param codes 仓库code
+     * @return 仓库信息
+     * @author liuduo
+     * @date 2018-08-13 11:58:35
+     */
+    List<QueryStorehouseDTO> queryByCode(List<String> codes);
+
 }

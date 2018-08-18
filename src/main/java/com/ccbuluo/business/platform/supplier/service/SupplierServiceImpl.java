@@ -4,7 +4,6 @@ import com.ccbuluo.business.constants.Assert;
 import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceSupplier;
-import com.ccbuluo.business.platform.custmanager.dto.CustManagerDetailDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
 import com.ccbuluo.business.platform.supplier.dto.*;
@@ -12,7 +11,6 @@ import com.ccbuluo.business.platform.supplier.dto.*;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
-import com.ccbuluo.core.thrift.exception.ThriftRpcException;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftList;
@@ -23,10 +21,8 @@ import com.ccbuluo.merchandiseintf.carparts.category.service.CarpartsCategorySer
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.weakref.jmx.internal.guava.base.Preconditions;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -225,18 +221,18 @@ public class SupplierServiceImpl implements SupplierService{
     /**
      * 查询供应商的商品（零配件，物料）
      *
-     * @param queryRelSupplierProduct 查询条件
+     * @param queryRelSupplierProductDTO 查询条件
      * @return StatusDto<Page < RelSupplierProduct>> 分页信息
      * @author zhangkangjian
      * @date 2018-08-01 11:46:53
      */
     @Override
-    public Page<QueryRelSupplierProduct> findSupplierProduct(QueryRelSupplierProduct queryRelSupplierProduct) {
-        Page<QueryRelSupplierProduct> queryRelSupplierProductPage = null;
-        if(Constants.PRODUCT_TYPE_FITTINGS.equals(queryRelSupplierProduct.getProductType())){
-            queryRelSupplierProductPage = queryFittingsProduct(queryRelSupplierProduct);
+    public Page<QueryRelSupplierProductDTO> findSupplierProduct(QueryRelSupplierProductDTO queryRelSupplierProductDTO) {
+        Page<QueryRelSupplierProductDTO> queryRelSupplierProductPage = null;
+        if(Constants.PRODUCT_TYPE_FITTINGS.equals(queryRelSupplierProductDTO.getProductType())){
+            queryRelSupplierProductPage = queryFittingsProduct(queryRelSupplierProductDTO);
         }else{
-            queryRelSupplierProductPage = queryEquipmentProduct(queryRelSupplierProduct);
+            queryRelSupplierProductPage = queryEquipmentProduct(queryRelSupplierProductDTO);
         }
         return queryRelSupplierProductPage;
     }
@@ -300,16 +296,16 @@ public class SupplierServiceImpl implements SupplierService{
 
     /**
      * 查询供商零配件商品
-     * @param queryRelSupplierProduct 查询条件
+     * @param queryRelSupplierProductDTO 查询条件
      * @return Page<RelSupplierProduct> 分页的商品信息
      * @author zhangkangjian
      * @date 2018-08-01 14:40:39
      */
     @Override
-    public Page<QueryRelSupplierProduct> queryFittingsProduct(QueryRelSupplierProduct queryRelSupplierProduct) {
-        Page<QueryRelSupplierProduct> queryRelSupplierProductPage = bizServiceSupplierDao.querySupplierProduct(queryRelSupplierProduct);
-        List<QueryRelSupplierProduct> products = queryRelSupplierProductPage.getRows();
-        List<String> productCodes = products.stream().map(QueryRelSupplierProduct::getProductCode).collect(Collectors.toList());
+    public Page<QueryRelSupplierProductDTO> queryFittingsProduct(QueryRelSupplierProductDTO queryRelSupplierProductDTO) {
+        Page<QueryRelSupplierProductDTO> queryRelSupplierProductPage = bizServiceSupplierDao.querySupplierProduct(queryRelSupplierProductDTO);
+        List<QueryRelSupplierProductDTO> products = queryRelSupplierProductPage.getRows();
+        List<String> productCodes = products.stream().map(QueryRelSupplierProductDTO::getProductCode).collect(Collectors.toList());
         StatusDtoThriftList<RelSupplierProductDTO> productDto = carpartsCategoryService.queryCarpartsByProductCode(productCodes);
         StatusDto<List<RelSupplierProductDTO>> resolve = StatusDtoThriftUtils.resolve(productDto, RelSupplierProductDTO.class);
         List<RelSupplierProductDTO> data = resolve.getData();
@@ -324,13 +320,27 @@ public class SupplierServiceImpl implements SupplierService{
 
     /**
      *  查询供商物料商品
-     * @param queryRelSupplierProduct 查询条件
+     * @param queryRelSupplierProductDTO 查询条件
      * @return Page<RelSupplierProduct> 分页的商品信息
      * @author zhangkangjian
      * @date 2018-08-01 20:01:27
      */
-    public Page<QueryRelSupplierProduct> queryEquipmentProduct(QueryRelSupplierProduct queryRelSupplierProduct) {
-        return bizServiceSupplierDao.queryEquipmentProduct(queryRelSupplierProduct);
+    public Page<QueryRelSupplierProductDTO> queryEquipmentProduct(QueryRelSupplierProductDTO queryRelSupplierProductDTO) {
+        return bizServiceSupplierDao.queryEquipmentProduct(queryRelSupplierProductDTO);
+    }
+
+    /**
+     * 根据商品的code查询供应商的信息（下拉框）
+     * @param code 商品的code
+     * @param type 商品类型（注：FITTINGS零配件，EQUIPMENT物料）
+     * @return StatusDto<List < RelSupplierProduct>>
+     * @author zhangkangjian
+     * @date 2018-08-07 15:32:17
+     */
+    @Override
+    public List<QuerySupplierInfoDTO> querySupplierInfo(String code, String type) {
+        List<QuerySupplierInfoDTO> list = bizServiceSupplierDao.querySupplierInfo(code, type);
+        return list;
     }
 
 

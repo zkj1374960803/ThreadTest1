@@ -3,6 +3,8 @@ package com.ccbuluo.business.platform.custmanager.service;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.entity.BizServiceStorehouse;
+import com.ccbuluo.business.platform.allocateapply.dto.QueryCustManagerListDTO;
 import com.ccbuluo.business.platform.carmanage.dto.CusmanagerCarCountDTO;
 import com.ccbuluo.business.platform.carmanage.service.BasicCarcoreInfoService;
 import com.ccbuluo.business.platform.custmanager.dao.BizServiceCustmanagerDao;
@@ -11,6 +13,8 @@ import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
 import com.ccbuluo.business.platform.maintaincar.dao.BizServiceMaintaincarDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
+import com.ccbuluo.business.platform.storehouse.dto.SaveBizServiceStorehouseDTO;
+import com.ccbuluo.business.platform.storehouse.service.StoreHouseService;
 import com.ccbuluo.business.platform.supplier.service.SupplierServiceImpl;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.constants.SystemPropertyHolder;
@@ -21,6 +25,7 @@ import com.ccbuluo.http.*;
 import com.ccbuluo.json.JsonUtils;
 import com.ccbuluo.merchandiseintf.carparts.category.service.CarpartsCategoryService;
 import com.ccbuluo.usercoreintf.dto.BasicUserOrganizationDTO;
+import com.ccbuluo.usercoreintf.dto.QueryServiceCenterListDTO;
 import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
 import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import com.ccbuluo.usercoreintf.model.RelUserRole;
@@ -30,7 +35,6 @@ import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +75,8 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     private BizServiceMaintaincarDao bizServiceMaintaincarDao;
     @Resource
     BasicCarcoreInfoService basicCarcoreInfoService;
+    @Resource
+    private StoreHouseService storeHouseService;
 
     /**
      * 创建客户经理
@@ -85,7 +91,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         // 参数校验
         checkedRoleCodeAndOrgCode(userInfoDTO);
         // 保存基础用户
-        String useruuid = saveUserAndOrg(userInfoDTO);
+        String useruuid = saveUserAndOrg(userInfoDTO, bizServiceCustmanager.getReceivingAddress());
         // 保存客户经理信息
         saveCustManager(bizServiceCustmanager, useruuid);
         return StatusDto.buildSuccessStatusDto();
@@ -108,7 +114,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             // 手机号校验
             compareRepeat(bizServiceCustmanager.getUserUuid(), bizServiceCustmanager.getOfficePhone(), "office_phone", "biz_service_custmanager", "客户经理办公SIM卡手机号重复！");
             bizServiceCustmanagerDao.saveBizServiceCustmanager(bizServiceCustmanager);
-        }catch (Exception e){
+        }catch (CommonException e){
             // 删除用户信息
             e.printStackTrace();
             innerUserInfoService.deleteUserInfoByUseruuid(useruuid);
@@ -173,7 +179,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
      * @author zhangkangjian
      * @date 2018-07-21 12:02:26
      */
-    private String saveUserAndOrg(UserInfoDTO userInfoDTO) {
+    private String saveUserAndOrg(UserInfoDTO userInfoDTO, String address) {
         // 填充用户的默认信息
         String loggedUserId = userHolder.getLoggedUserId();
         userInfoDTO.setUserType(Constants.USER_TYPE_INNER);
@@ -191,7 +197,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         buo.setCreateTime(System.currentTimeMillis());
         buo.setOperateTime(System.currentTimeMillis());
         // 查询组织架构信息
-        StatusDtoThriftBean<BasicUserOrganization> orgcode = basicUserOrganizationService.findOrgByCode(BusinessPropertyHolder.custManager);
+        StatusDtoThriftBean<BasicUserOrganization> orgcode = basicUserOrganizationService.findOrgByCode(BusinessPropertyHolder.ORGCODE_TOP_CUSMANAGER);
         StatusDto<BasicUserOrganization> resolve = StatusDtoThriftUtils.resolve(orgcode, BasicUserOrganization.class);
         // 拿到父级组织架构的id
         buo.setParentId(resolve.getData().getId());
@@ -221,6 +227,15 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         if(!updateUser.isSuccess()){
             throw new CommonException(updateUser.getCode(), updateUser.getMessage());
         }
+        SaveBizServiceStorehouseDTO save = new SaveBizServiceStorehouseDTO();
+        StatusDtoThriftBean<UserInfoDTO> userInfo = innerUserInfoService.findUserDetail(orgAndUser.getData());
+        StatusDto<UserInfoDTO> userInfoDTOResolve = StatusDtoThriftUtils.resolve(userInfo, UserInfoDTO.class);
+        UserInfoDTO data = userInfoDTOResolve.getData();
+        save.setStorehouseName(userInfoDTO.getName() + "仓库");
+        save.setServicecenterCode(data.getOrgCode());
+        save.setStorehouseAddress(address);
+        save.setStorehouseStatus(Constants.LONG_FLAG_ONE);
+        int status = storeHouseService.saveStoreHouse(save);
         return useruuid;
     }
 
@@ -233,12 +248,12 @@ public class CustmanagerServiceImpl implements CustmanagerService{
      */
     private void checkedRoleCodeAndOrgCode(UserInfoDTO userInfoDTO) {
         // 角色校验
-        StatusDtoThriftList<Long> statusDtoRole = basicUserRoleService.queryRoleByRoleCode(BusinessPropertyHolder.custManagerRoleCode);
+        StatusDtoThriftList<Long> statusDtoRole = basicUserRoleService.queryRoleByRoleCode(BusinessPropertyHolder.ROLECODE_CUSMANAGER);
         if(!statusDtoRole.isSuccess()){
             throw new CommonException(statusDtoRole.getCode(), "客户经理角色不存在！");
         }
         // 组织架构校验
-        userInfoDTO.setOrgCode(BusinessPropertyHolder.custManager);
+        userInfoDTO.setOrgCode(BusinessPropertyHolder.ORGCODE_TOP_CUSMANAGER);
         StatusDtoThriftBean<BasicUserOrganization> orgByCode = basicUserOrganizationService.findOrgByCode(userInfoDTO.getOrgCode());
         if(!orgByCode.isSuccess()){
             throw new CommonException(statusDtoRole.getCode(), "组织架构不存在！");
@@ -258,7 +273,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     public StatusDto<Page<QueryUserListDTO>> queryUserList(UserInfoDTO userInfoDTO) {
         userInfoDTO.setAppId(SystemPropertyHolder.getBaseAppid());
         userInfoDTO.setSecretId(SystemPropertyHolder.getBaseSecret());
-        userInfoDTO.setOrgCode(BusinessPropertyHolder.custManager);
+        userInfoDTO.setOrgCode(BusinessPropertyHolder.ORGCODE_TOP_CUSMANAGER);
         // 排序字段
         userInfoDTO.setSortField(Constants.SORT_FIELD_OPERATE);
         //查询用户信息
@@ -390,14 +405,38 @@ public class CustmanagerServiceImpl implements CustmanagerService{
      */
     @Override
     public StatusDto queryOrgList(int parentId, boolean isSearchClose) {
-        StatusDtoThriftBean<BasicUserOrganization> orgByCode = basicUserOrganizationService.findOrgByCode(BusinessPropertyHolder.custManager);
+        StatusDtoThriftBean<BasicUserOrganization> orgByCode = basicUserOrganizationService.findOrgByCode(BusinessPropertyHolder.ORGCODE_TOP_CUSMANAGER);
         StatusDto<BasicUserOrganization> orgByCodeStatusDto = StatusDtoThriftUtils.resolve(orgByCode, BasicUserOrganization.class);
         StatusDtoThriftList<BasicUserOrganizationDTO> basicUserOrganizationDTO = orgService.queryOrganizationByParentId(orgByCodeStatusDto.getData().getParentId(), isSearchClose);
         StatusDto<List<BasicUserOrganizationDTO>> resolve = StatusDtoThriftUtils.resolve(basicUserOrganizationDTO, BasicUserOrganizationDTO.class);
         List<BasicUserOrganizationDTO> data = resolve.getData();
-        BasicUserOrganizationDTO basicUserOrganizationDTO1 = data.stream().filter(a -> BusinessPropertyHolder.custManager.equals(a.getOrgCode())).findFirst().get();
+        BasicUserOrganizationDTO basicUserOrganizationDTO1 = data.stream().filter(a -> BusinessPropertyHolder.ORGCODE_TOP_CUSMANAGER.equals(a.getOrgCode())).findFirst().get();
         basicUserOrganizationDTO1.setLeaf(true);
         return StatusDto.buildDataSuccessStatusDto(basicUserOrganizationDTO1);
+    }
+
+    /**
+     * 查询客户经理列表(创建申请)
+     * @param queryCustManagerListDTO 查询条件
+     * @return Page<QueryCustManagerListDTO> 分页的客户经理列表
+     * @author zhangkangjian
+     * @date 2018-08-09 19:03:17
+     */
+    @Override
+    public Page<QueryCustManagerListDTO> queryCustManagerList(QueryCustManagerListDTO queryCustManagerListDTO) {
+        Page<QueryCustManagerListDTO> queryCustManagerListDTOPage = bizServiceCustmanagerDao.queryCustManagerList(queryCustManagerListDTO);
+        StatusDtoThriftList<QueryServiceCenterListDTO> queryServiceCenterList = orgService.queryServiceCenter(null, null, null, null);
+        StatusDto<List<QueryServiceCenterListDTO>> resolve = StatusDtoThriftUtils.resolve(queryServiceCenterList, QueryServiceCenterListDTO.class);
+        List<QueryServiceCenterListDTO> data = resolve.getData();
+        Map<String, QueryServiceCenterListDTO> map = data.stream().collect(Collectors.toMap(QueryServiceCenterListDTO::getServiceCenterCode, a -> a,(k1,k2)->k1));
+        List<QueryCustManagerListDTO> rows = queryCustManagerListDTOPage.getRows();
+        rows.stream().forEach(a -> {
+            QueryServiceCenterListDTO queryServiceCenterListDTO = map.get(a.getServiceCenter());
+            if(queryServiceCenterListDTO != null){
+                a.setServiceCenterName(queryServiceCenterListDTO.getServiceCenterName());
+            }
+        });
+        return queryCustManagerListDTOPage;
     }
 
     /**
@@ -451,7 +490,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         StatusDto<UserInfoDTO> resolve = StatusDtoThriftUtils.resolve(userDetail, UserInfoDTO.class);
         List<RelUserRole> userRoles = resolve.getData().getUserRoles();
         if(userRoles != null && userRoles.size() > 0){
-            List<RelUserRole> temp = userRoles.stream().filter(a -> BusinessPropertyHolder.custManagerRoleCode.equals(a.getRoleCode())).collect(Collectors.toList());
+            List<RelUserRole> temp = userRoles.stream().filter(a -> BusinessPropertyHolder.ROLECODE_CUSMANAGER.equals(a.getRoleCode())).collect(Collectors.toList());
             if( temp != null && temp.size() > 0){
                 RelUserRole relUserRole = temp.get(0);
                 resolve.getData().setRoleName(relUserRole.getRoleName());

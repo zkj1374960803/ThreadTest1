@@ -1,16 +1,20 @@
 package com.ccbuluo.business.platform.storehouse.controller;
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.dto.SaveBizServiceStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.dto.SearchStorehouseListDTO;
 import com.ccbuluo.business.platform.storehouse.service.StoreHouseService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.usercoreintf.dto.QueryServiceCenterListDTO;
 import io.swagger.annotations.*;
 import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 仓库controller
@@ -129,6 +133,20 @@ public class StoreHouseController extends BaseController {
                                                               @RequestParam(defaultValue = "0") Integer offset,
                                                               @RequestParam(defaultValue = "10") Integer pagesize) throws TException  {
         return StatusDto.buildDataSuccessStatusDto(storeHouseService.queryList(provinceName, cityName, areaName, storeHouseStatus, keyword, offset, pagesize));
+    }
+
+    /**
+     * 根据服务中心查询启用的仓库列表（下拉框）
+     * @param serviceCenterCode 据服务中心code
+     * @return StatusDto<QueryStorehouseDTO>
+     * @author zhangkangjian
+     * @date 2018-08-07 14:32:09
+     */
+    @ApiOperation(value = "根据服务中心查询启用的仓库列表（下拉框）", notes = "【张康健】")
+    @ApiImplicitParam(name = "serviceCenterCode", value = "服务中心code",  required = true, paramType = "query",dataType = "string")
+    @GetMapping("/querystorehousebyservicecentercode")
+    public StatusDto<List<QueryStorehouseDTO>> queryStorehouseByServiceCenterCode(@RequestParam String serviceCenterCode) {
+        return storeHouseService.queryStorehouseByServiceCenterCode(serviceCenterCode);
     }
 
 }
