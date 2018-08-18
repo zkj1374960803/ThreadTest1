@@ -90,7 +90,7 @@ public class ApplyHandleContext {
         // 根据申请单获取申请单详情
         BizAllocateApply ba = bizAllocateApplyDao.getByNo(applyNo);
         // 采购
-        if(AllocateApplyEnum.PURCHASE.toString().equals(ba.getApplyType())){
+        if(AllocateApplyTypeEnum.PURCHASE.toString().equals(ba.getApplyType())){
             return purchaseApplyHandleService.instockAfterCallBack(ba);
         }
         return null;
