@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.instock.service;
 
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
+import com.ccbuluo.business.constants.StockPlanStatusEnum;
 import com.ccbuluo.business.entity.BizAllocateApply.ApplyStatusEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.DocCodePrefixEnum;
@@ -128,7 +129,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
             // 根据申请单号查询申请单基本信息
             FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
             // 查询入库计划
-            List<BizInstockplanDetail> bizInstockplanDetails = inputStockPlanService.queryListByApplyNo(applyNo, StockPlanEnum.DOING.toString(), inRepositoryNo);
+            List<BizInstockplanDetail> bizInstockplanDetails = inputStockPlanService.queryListByApplyNo(applyNo, StockPlanStatusEnum.DOING.toString(), inRepositoryNo);
             if (null == bizInstockplanDetails || bizInstockplanDetails.size() == 0) {
                 throw new CommonException("10001", "入库数量与计划不符！");
             }
@@ -162,7 +163,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
             List<Long> stockIds = saveStockDetail(applyNo, bizInstockorderDetailList1, detail, inRepositoryNo);
             // 4、更新入库计划明细中的实际入库数量
             updateInstockplan(bizInstockorderDetailList1);
-            List<BizInstockplanDetail> bizInstockplanDetails2 = inputStockPlanService.queryListByApplyNo(applyNo, StockPlanEnum.DOING.toString(), inRepositoryNo);
+            List<BizInstockplanDetail> bizInstockplanDetails2 = inputStockPlanService.queryListByApplyNo(applyNo, StockPlanStatusEnum.DOING.toString(), inRepositoryNo);
             // 5、更改入库计划的完成状态和完成时间
             updateCompleteStatus(bizInstockplanDetails2);
             // 6、如果是平台端，则把库存明细中的有效库存更新到占用库存
