@@ -11,6 +11,7 @@ import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.core.common.UserHolder;
+import com.ccbuluo.http.StatusDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -80,6 +81,15 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
      */
     public int cancelApply(String applyNo){
         return 0;
+    }
+
+    /**
+     *  入库之后回调事件
+     * @param ba 申请单
+     * @return
+     */
+    public StatusDto instockAfterCallBack(BizAllocateApply ba){
+        return null;
     }
 
 }

@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 import com.ccbuluo.business.constants.AllocateApplyEnum;
 import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
+import com.ccbuluo.http.StatusDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,11 @@ public class ApplyHandleContext {
     private BarterApplyHandleStrategy barterApplyHandleStrategy;
 
 
-    @Transactional(rollbackFor = Exception.class)
+    /**
+     *  申请处理
+     * @param applyNo 申请单code
+     * @return
+     */
     public int applyHandle(String applyNo){
         try {
             // 根据申请单获取申请单详情
@@ -73,5 +78,20 @@ public class ApplyHandleContext {
             logger.error("提交失败！", e);
             throw e;
         }
+    }
+
+    /**
+     *  入库之后回调事件
+     * @param applyNo 申请单code
+     * @return
+     */
+    public StatusDto instockAfterCallBack(String applyNo){
+        // 根据申请单获取申请单详情
+        BizAllocateApply ba = bizAllocateApplyDao.getByNo(applyNo);
+        // 采购
+        if(AllocateApplyEnum.PURCHASE.toString().equals(ba.getApplyType())){
+            return purchaseApplyHandleService.instockAfterCallBack(ba);
+        }
+        return null;
     }
 }
