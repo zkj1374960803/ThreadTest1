@@ -284,17 +284,17 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     private void outstockplanSeller(List<BizOutstockplanDetail> outList, List<RelOrdstockOccupy> relOrdstockOccupies, List<BizStockDetail> stockDetails,List<AllocateapplyDetailBO> details, String applyType){
         // 卖方机构出库计划
         for(RelOrdstockOccupy ro : relOrdstockOccupies){
-            BizOutstockplanDetail outstockplanDetail2 = new BizOutstockplanDetail();
+            BizOutstockplanDetail outstockplanSeller = new BizOutstockplanDetail();
             for(BizStockDetail bd : stockDetails){
                 if(ro.getStockId().intValue() == bd.getId().intValue()){// 关系库存批次id和库存批次id相等
                     AllocateapplyDetailBO ad = getAllocateapplyDetailBO(details, bd.getProductNo());
-                    outstockplanDetail2 = buildBizOutstockplanDetail(ad, applyType);
-                    outstockplanDetail2.setPlanOutstocknum(ro.getOccupyNum());// 计划出库数量applyNum
-                    outstockplanDetail2.setOutOrgno(ad.getOutstockOrgno());// 卖方机构编号
-                    outstockplanDetail2.setOutRepositoryNo(bd.getRepositoryNo());// 卖方仓库编号（根据机构和商品编号查询的库存）
-                    outstockplanDetail2.setStockId(bd.getId());// 库存编号id
-                    outstockplanDetail2.setCostPrice(bd.getCostPrice());// 成本价
-                    outList.add(outstockplanDetail2);
+                    outstockplanSeller = buildBizOutstockplanDetail(ad, applyType);
+                    outstockplanSeller.setPlanOutstocknum(ro.getOccupyNum());// 计划出库数量applyNum
+                    outstockplanSeller.setOutOrgno(ad.getOutstockOrgno());// 卖方机构编号
+                    outstockplanSeller.setOutRepositoryNo(bd.getRepositoryNo());// 卖方仓库编号（根据机构和商品编号查询的库存）
+                    outstockplanSeller.setStockId(bd.getId());// 库存编号id
+                    outstockplanSeller.setCostPrice(bd.getCostPrice());// 成本价
+                    outList.add(outstockplanSeller);
                     continue;
                 }
             }
@@ -342,6 +342,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
                     AllocateapplyDetailBO ad = getAllocateapplyDetailBO(details, bd.getProductNo());
                     outstockplanPlatform = buildBizOutstockplanDetail(ad, applyType);
                     outstockplanPlatform.setOutRepositoryNo(repositoryNo);// 平台仓库编号
+                    outstockplanPlatform.setPlanOutstocknum(ro.getOccupyNum());// 计划出库数量applyNum
                     outstockplanPlatform.setOutOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 平台code
                     outstockplanPlatform.setStockId(bd.getId());// 库存编号id
                     outstockplanPlatform.setCostPrice(bd.getCostPrice());// 成本价
