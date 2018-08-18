@@ -1,8 +1,8 @@
 package com.ccbuluo.business.platform.supplier.service;
 
 import com.ccbuluo.business.constants.Assert;
-import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.entity.BizServiceSupplier;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
@@ -74,7 +74,7 @@ public class SupplierServiceImpl implements SupplierService{
         bizServiceSupplier.setOperator(loggedUserId);
         bizServiceSupplier.setCreator(loggedUserId);
         // 生成供应商编号
-        StatusDto<String> supplierCode = generateProjectCodeService.grantCode(CodePrefixEnum.FG);
+        StatusDto<String> supplierCode = generateProjectCodeService.grantCode(BizServiceProjectcode.CodePrefixEnum.FG);
         if(!supplierCode.isSuccess()){
             throw new CommonException(supplierCode.getCode(), "生成供应商编号失败！");
         }

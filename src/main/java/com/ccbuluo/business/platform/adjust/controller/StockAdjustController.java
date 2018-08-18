@@ -17,10 +17,7 @@ import com.ccbuluo.merchandiseintf.carparts.category.dto.QueryCategoryListDTO;
 import com.ccbuluo.merchandiseintf.carparts.category.service.CarpartsCategoryService;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +29,7 @@ import java.util.List;
  * @version v1.0.0
  * @date 2018-08-14 16:14:25
  */
+@Api(tags = "盘库")
 @RestController
 @RequestMapping("/adjust/stockadjust")
 public class StockAdjustController extends BaseController {

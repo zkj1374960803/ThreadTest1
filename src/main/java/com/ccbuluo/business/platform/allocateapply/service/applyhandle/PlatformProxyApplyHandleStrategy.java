@@ -76,16 +76,14 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
             // 保存生成订单
             bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
-            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, applyType, relOrdstockOccupies);
+            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, BizAllocateApply.AllocateApplyTypeEnum.PLATFORMALLOCATE, relOrdstockOccupies);
             // 保存占用库存
             flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
             if(flag == 0){// 更新失败
                 throw new CommonException("0", "更新占用库存失败！");
             }
-            // 对出库详情处理，因为出库计划要记录到具体的库存批次id对应的出库数量
-            List<BizOutstockplanDetail> outstockplanDetails = pir.getLeft();
             // 批量保存出库计划详情
-            bizOutstockplanDetailDao.batchOutstockplanDetail(outstockplanDetails);
+            bizOutstockplanDetailDao.batchOutstockplanDetail(pir.getLeft());
             // 批量保存入库计划详情
             bizInstockplanDetailDao.batchInsertInstockplanDetail(pir.getRight());
             // 保存订单占用库存关系
@@ -97,9 +95,12 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
         }
         return flag;
     }
-
     /**
-     *  获取成本价
+     * 获取成本价
+     * @param stockDetails
+     * @param stockId 库存批次id
+     * @author weijb
+     * @date 2018-08-11 13:35:41
      */
     private BigDecimal getCostPrice(List<BizStockDetail> stockDetails, Long stockId){
         BigDecimal costPrice = new BigDecimal("0");

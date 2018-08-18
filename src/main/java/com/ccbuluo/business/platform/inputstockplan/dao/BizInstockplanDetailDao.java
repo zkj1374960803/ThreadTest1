@@ -1,11 +1,10 @@
 package com.ccbuluo.business.platform.inputstockplan.dao;
 
 import com.ccbuluo.business.constants.Constants;
-import com.ccbuluo.business.constants.StockPlanEnum;
+
 import com.ccbuluo.business.entity.BizInstockplanDetail;
 import com.ccbuluo.business.platform.outstock.dto.updatePlanStatusDTO;
 import com.ccbuluo.dao.BaseDao;
-import com.ccbuluo.http.StatusDto;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -262,9 +261,8 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
     }
 
     /**
-     * 根据入库单号查询入库仓库
+     * 根据申请单号查询入库仓库
      * @param applyNo 入库单号
-     * @param orgCode 当前登录人机构号
      * @return 入库仓库
      * @author liuduo
      * @date 2018-08-13 15:20:27

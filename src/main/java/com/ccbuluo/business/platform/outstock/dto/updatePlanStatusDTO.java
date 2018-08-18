@@ -1,11 +1,7 @@
 package com.ccbuluo.business.platform.outstock.dto;
 
-import com.ccbuluo.business.constants.StockPlanEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-
-import java.math.BigDecimal;
-import java.util.Date;
 
 /**
  * 修改出库计划的状态

@@ -1,8 +1,9 @@
 package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
-import com.ccbuluo.business.constants.AllocateApplyEnum;
 import com.ccbuluo.business.entity.BizAllocateApply;
+import com.ccbuluo.business.entity.BizAllocateApply.AllocateApplyTypeEnum;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
+import com.ccbuluo.http.StatusDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -36,36 +37,41 @@ public class ApplyHandleContext {
     private BarterApplyHandleStrategy barterApplyHandleStrategy;
 
 
-    @Transactional(rollbackFor = Exception.class)
+    /**
+     *  申请处理
+     * @param applyNo 申请单code
+     * @return
+     */
     public int applyHandle(String applyNo){
         try {
+            // todo 魏俊标 把if换成switch
             // 根据申请单获取申请单详情
             BizAllocateApply ba = bizAllocateApplyDao.getByNo(applyNo);
             if(null == ba){
                 return 0;
             }
             // 采购
-            if(AllocateApplyEnum.PURCHASE.toString().equals(ba.getApplyType())){
+            if(AllocateApplyTypeEnum.PURCHASE.toString().equals(ba.getApplyType())){
                 return purchaseApplyHandleService.applyHandle(ba);
             }
             // 平台调拨
-            if(AllocateApplyEnum.PLATFORMALLOCATE.toString().equals(ba.getApplyType())){
+            if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(ba.getApplyType())){
                 return platformAllocateApplyHandleService.applyHandle(ba);
             }
             // 平级调拨（服务间的调拨）
-            if(AllocateApplyEnum.SERVICEALLOCATE.toString().equals(ba.getApplyType())){
+            if(AllocateApplyTypeEnum.SAMELEVEL.toString().equals(ba.getApplyType())){
                 return serviceAllocateApplyHandleService.applyHandle(ba);
             }
             // 平级直调
-            if(AllocateApplyEnum.DIRECTALLOCATE.toString().equals(ba.getApplyType())){
+            if(AllocateApplyTypeEnum.DIRECTALLOCATE.toString().equals(ba.getApplyType())){
                 directAllocateApplyHandleService.applyHandle(ba);
             }
             // 商品退换
-            if(AllocateApplyEnum.BARTER.toString().equals(ba.getApplyType())){
+            if(AllocateApplyTypeEnum.BARTER.toString().equals(ba.getApplyType())){
                 barterApplyHandleStrategy.applyHandle(ba);
             }
             // 退款
-            if(AllocateApplyEnum.REFUND.toString().equals(ba.getApplyType())){
+            if(AllocateApplyTypeEnum.REFUND.toString().equals(ba.getApplyType())){
                 refundApplyHandleStrategy.applyHandle(ba);
             }
             return 0;
@@ -73,5 +79,20 @@ public class ApplyHandleContext {
             logger.error("提交失败！", e);
             throw e;
         }
+    }
+
+    /**
+     *  入库之后回调事件
+     * @param applyNo 申请单code
+     * @return
+     */
+    public StatusDto instockAfterCallBack(String applyNo){
+        // 根据申请单获取申请单详情
+        BizAllocateApply ba = bizAllocateApplyDao.getByNo(applyNo);
+        // 采购
+        if(AllocateApplyTypeEnum.PURCHASE.toString().equals(ba.getApplyType())){
+            return purchaseApplyHandleService.instockAfterCallBack(ba);
+        }
+        return null;
     }
 }

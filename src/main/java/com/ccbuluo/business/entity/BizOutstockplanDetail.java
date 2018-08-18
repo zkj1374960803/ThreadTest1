@@ -1,6 +1,6 @@
 package com.ccbuluo.business.entity;
 
-import com.ccbuluo.business.constants.StockPlanEnum;
+import com.ccbuluo.business.constants.StockPlanStatusEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -347,7 +347,7 @@ public class BizOutstockplanDetail {
     }
 
     public String getStatusName() {
-        return StockPlanEnum.valueOf(planStatus).getLabel();
+        return StockPlanStatusEnum.valueOf(planStatus).getLabel();
     }
 
     public Long getVersionNo() {

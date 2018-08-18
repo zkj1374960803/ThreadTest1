@@ -1,13 +1,8 @@
 package com.ccbuluo.business.platform.instock.service;
 
-import com.ccbuluo.business.constants.ApplyStatusEnum;
-import com.ccbuluo.business.constants.Constants;
-import com.ccbuluo.business.constants.DocCodePrefixEnum;
-import com.ccbuluo.business.constants.StockPlanEnum;
-import com.ccbuluo.business.entity.BizInstockOrder;
-import com.ccbuluo.business.entity.BizInstockorderDetail;
-import com.ccbuluo.business.entity.BizInstockplanDetail;
-import com.ccbuluo.business.entity.BizStockDetail;
+import com.ccbuluo.business.constants.*;
+import com.ccbuluo.business.entity.BizAllocateApply.ApplyStatusEnum;
+import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.inputstockplan.service.InputStockPlanService;
@@ -80,7 +75,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
     @Override
     public List<String> queryApplyNo() {
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
-        if (orgCode.equals(Constants.PLATFORM)) {
+        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
             return allocateApplyService.queryApplyNo(ApplyStatusEnum.INSTORE.toString(), orgCode);
         }
         return allocateApplyService.queryApplyNo(ApplyStatusEnum.WAITINGRECEIPT.toString(), orgCode);
@@ -131,7 +126,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
             // 根据申请单号查询申请单基本信息
             FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
             // 查询入库计划
-            List<BizInstockplanDetail> bizInstockplanDetails = inputStockPlanService.queryListByApplyNo(applyNo, StockPlanEnum.DOING.toString(), inRepositoryNo);
+            List<BizInstockplanDetail> bizInstockplanDetails = inputStockPlanService.queryListByApplyNo(applyNo, StockPlanStatusEnum.DOING.toString(), inRepositoryNo);
             if (null == bizInstockplanDetails || bizInstockplanDetails.size() == 0) {
                 throw new CommonException("10001", "入库数量与计划不符！");
             }
@@ -165,13 +160,13 @@ public class InstockOrderServiceImpl implements InstockOrderService {
             List<Long> stockIds = saveStockDetail(applyNo, bizInstockorderDetailList1, detail, inRepositoryNo);
             // 4、更新入库计划明细中的实际入库数量
             updateInstockplan(bizInstockorderDetailList1);
-            List<BizInstockplanDetail> bizInstockplanDetails2 = inputStockPlanService.queryListByApplyNo(applyNo, StockPlanEnum.DOING.toString(), inRepositoryNo);
+            List<BizInstockplanDetail> bizInstockplanDetails2 = inputStockPlanService.queryListByApplyNo(applyNo, StockPlanStatusEnum.DOING.toString(), inRepositoryNo);
             // 5、更改入库计划的完成状态和完成时间
             updateCompleteStatus(bizInstockplanDetails2);
             // 6、如果是平台端，则把库存明细中的有效库存更新到占用库存
             updateOccupyStockById(stockIds);
             // 7、如果是平台入库后则改变申请单状态为 平台待出库，如果是机构入库后则改变申请单的状态为  确认收货
-            List<BizInstockplanDetail> bizInstockplanDetails3 = inputStockPlanService.queryListByApplyNo(applyNo, Constants.CHECKED, inRepositoryNo);
+            List<BizInstockplanDetail> bizInstockplanDetails3 = inputStockPlanService.queryListByApplyNo(applyNo, StockPlanStatusEnum.COMPLETE.name(), inRepositoryNo);
             updateApplyStatus(applyNo, bizInstockplanDetails3);
             return StatusDto.buildSuccessStatusDto();
         } catch (Exception e) {
@@ -255,7 +250,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
     }
 
     /**
-     * 根据入库单号查询入库仓库
+     * 根据申请单号查询入库仓库
      * @param applyNo 入库单号
      * @return 入库仓库
      * @author liuduo
@@ -274,7 +269,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
      * @date 2018-08-10 15:31:50
      */
     private void updateOccupyStockById(List<Long> stockIds) {
-        if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(Constants.PLATFORM)) {
+        if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
             // 根据库存明细id查询到控制的版本号（乐观锁使用）
             List<Pair<Long, Long>> versionNos = stockDetailService.queryVersionNoById(stockIds);
             List<BizStockDetail> bizStockDetails = Lists.newArrayList();
@@ -297,13 +292,13 @@ public class InstockOrderServiceImpl implements InstockOrderService {
      * @date 2018-08-10 13:59:44
      */
     private void updateApplyStatus(String applyNo, List<BizInstockplanDetail> bizInstockplanDetails) {
-        if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(Constants.PLATFORM)) {
-            List<BizInstockplanDetail> collect = bizInstockplanDetails.stream().filter(item -> item.getCompleteStatus().equals(Constants.CHECKED)).collect(Collectors.toList());
+        if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+            List<BizInstockplanDetail> collect = bizInstockplanDetails.stream().filter(item -> item.getCompleteStatus().equals(StockPlanStatusEnum.COMPLETE.name())).collect(Collectors.toList());
             if (collect.size() == bizInstockplanDetails.size()) {
                 allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.OUTSTORE.toString());
             }
         } else {
-            List<BizInstockplanDetail> collect = bizInstockplanDetails.stream().filter(item -> item.getCompleteStatus().equals(Constants.CHECKED)).collect(Collectors.toList());
+            List<BizInstockplanDetail> collect = bizInstockplanDetails.stream().filter(item -> item.getCompleteStatus().equals(StockPlanStatusEnum.COMPLETE.name())).collect(Collectors.toList());
             if (collect.size() == bizInstockplanDetails.size()) {
                 allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.CONFIRMRECEIPT.toString());
             }
@@ -327,7 +322,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                 updatePlanStatusDTO updatePlanStatusDTO = collect.get(item.getId());
                 BizInstockplanDetail bizInstockplanDetail = new BizInstockplanDetail();
                 bizInstockplanDetail.setId(item.getId());
-                bizInstockplanDetail.setCompleteStatus(Constants.CHECKED);
+                bizInstockplanDetail.setCompleteStatus(StockPlanStatusEnum.COMPLETE.name());
                 bizInstockplanDetail.setCompleteTime(new Date());
                 bizInstockplanDetail.setVersionNo(updatePlanStatusDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
                 bizInstockplanDetailList.add(bizInstockplanDetail);
@@ -431,9 +426,9 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                 bizStockDetail.setProductCategoryname(item.getProductCategoryname());
                 bizStockDetail.setTradeNo(applyNo);
                 bizStockDetail.setSupplierNo(item.getSupplierNo());
-                if (item.getStockType().equals(BizStockDetail.StockEnum.VALIDSTOCK.toString())) {
+                if (item.getStockType().equals(BizStockDetail.StockTypeEnum.VALIDSTOCK.toString())) {
                     bizStockDetail.setValidStock(item.getInstockNum());
-                } else if (item.getStockType().equals(BizStockDetail.StockEnum.PROBLEMSTOCK.toString())) {
+                } else if (item.getStockType().equals(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.toString())) {
                     bizStockDetail.setProblemStock(item.getInstockNum());
                 }
                 bizStockDetail.setSellerOrgno(bizAllocateApply.getOutstockOrgno());
@@ -492,10 +487,11 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         bizInstockOrder.setInstockOrgno(orgCodeByStoreHouseCode);
         bizInstockOrder.setInstockOperator(userHolder.getLoggedUserId());
         bizInstockOrder.setInstockOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
-        if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(Constants.PLATFORM)) {
+        // todo 刘铎 入库单的类型 要根据 申请的类型来决定，看标哥有没有可复用的方法
+        if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
             bizInstockOrder.setInstockType(bizAllocateApply.getProcessType());
         } else {
-            bizInstockOrder.setInstockType(Constants.PROCESS_TYPE_TRANSFER);
+            bizInstockOrder.setInstockType(OutstockTypeEnum.TRANSFER.name());
         }
         bizInstockOrder.setInstockTime(date);
         bizInstockOrder.setChecked(Constants.LONG_FLAG_ONE);
