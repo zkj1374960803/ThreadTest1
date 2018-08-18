@@ -97,9 +97,12 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
         }
         return flag;
     }
-
     /**
-     *  获取成本价
+     * 获取成本价
+     * @param stockDetails
+     * @param stockId 库存批次id
+     * @author weijb
+     * @date 2018-08-11 13:35:41
      */
     private BigDecimal getCostPrice(List<BizStockDetail> stockDetails, Long stockId){
         BigDecimal costPrice = new BigDecimal("0");
