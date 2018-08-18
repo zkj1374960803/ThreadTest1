@@ -52,8 +52,8 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
      * @date 2018-08-08 10:55:41
      */
     @Override
-    public int applyHandle(BizAllocateApply ba){
-        return 0;
+    public StatusDto applyHandle(BizAllocateApply ba){
+        return StatusDto.buildSuccessStatusDto("申请处理成功！");
     }
 
     /**
@@ -133,8 +133,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         bt.setCreator(userHolder.getLoggedUserId());//处理人
         bt.setCreateTime(new Date());
         bt.setDeleteFlag(Constants.DELETE_FLAG_NORMAL);
-        // todo 标哥 把交易单 状态抽到枚举类里，枚举交易单实体里
-        bt.setOrderStatus("PAYMENTWAITING");//默认待支付
+        bt.setOrderStatus(OrderStatusEnum.PAYMENTWAITING.name());//默认待支付
         for(AllocateapplyDetailBO bd : details){
             bt.setApplyNo(bd.getApplyNo());// 申请单编号
             bt.setPurchaserOrgno(bd.getInstockOrgno());//买方机构
