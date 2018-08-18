@@ -1,7 +1,7 @@
 package com.ccbuluo.business.platform.carmanage.service;
 
-import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarseriesManageDao;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarcoreInfo;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarseriesManage;
@@ -116,7 +116,7 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
                 return statusDto;
             }
             // 1.车辆编码(新增）
-            StatusDto<String> codeDto = generateProjectCodeService.grantCode(CodePrefixEnum.FJ);
+            StatusDto<String> codeDto = generateProjectCodeService.grantCode(BizServiceProjectcode.CodePrefixEnum.FJ);
             // 获取code失败
             if(!codeDto.isSuccess()){
                 return statusDto;

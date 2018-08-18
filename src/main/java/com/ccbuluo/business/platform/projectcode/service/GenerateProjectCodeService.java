@@ -2,16 +2,12 @@ package com.ccbuluo.business.platform.projectcode.service;
 
 import com.ccbuluo.business.constants.BizErrorCodeEnum;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
-import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceProjectcode;
+import com.ccbuluo.business.entity.BizServiceProjectcode.CodePrefixEnum;
 import com.ccbuluo.business.platform.projectcode.dao.BizServiceProjectcodeDao;
-import com.ccbuluo.core.exception.CommonException;
-import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.http.StatusDto;
-import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.JedisCluster;
 
-import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 /**

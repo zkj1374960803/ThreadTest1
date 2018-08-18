@@ -1,8 +1,8 @@
 package com.ccbuluo.business.platform.carmodellabel.service;
 
-import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizCarmodelLabel;
+import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarmodelParameterDao;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelParameter;
 import com.ccbuluo.business.platform.carmodellabel.dao.BizCarmodelLabelDao;
@@ -77,7 +77,7 @@ public class BizCarmodelLabelServiceImpl implements BizCarmodelLabelService {
 
 
             // 生成编码
-            StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FD);
+            StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(BizServiceProjectcode.CodePrefixEnum.FD);
             // 获取code失败
             if(!Constants.SUCCESS_CODE.equals(stringStatusDto.getCode())){
                 return stringStatusDto;

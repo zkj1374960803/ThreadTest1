@@ -1,7 +1,8 @@
 package com.ccbuluo.business.platform.carconfiguration.service;
 
-import com.ccbuluo.business.constants.CodePrefixEnum;
+
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.entity.BizServiceProjectcode.CodePrefixEnum;
 import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarbrandManageDao;
 import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarmodelManageDao;
 import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarseriesManageDao;

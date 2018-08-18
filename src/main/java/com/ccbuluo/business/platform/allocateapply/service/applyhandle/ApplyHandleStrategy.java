@@ -15,7 +15,7 @@ public interface ApplyHandleStrategy {
      * @param ba 申请单
      * @date 2018-08-08 10:55:41
      */
-    public int applyHandle(BizAllocateApply ba);
+    int applyHandle(BizAllocateApply ba);
 
     /**
      *  申请撤销
@@ -23,5 +23,5 @@ public interface ApplyHandleStrategy {
      * @author weijb
      * @date 2018-08-11 13:35:41
      */
-    public int cancelApply(String applyNo);
+    int cancelApply(String applyNo);
 }

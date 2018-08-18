@@ -1,7 +1,6 @@
 package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
 import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
-import com.ccbuluo.business.constants.AllocateApplyEnum;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
@@ -62,7 +61,7 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 构建订单占用库存关系
             List<RelOrdstockOccupy> relOrdstockOccupies = pair.getRight();
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
-            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, AllocateApplyEnum.REFUND, relOrdstockOccupies);
+            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, BizAllocateApply.AllocateApplyTypeEnum.REFUND, relOrdstockOccupies);
             // TODO 刘铎提供：入参：pir.getLeft()（出库计划）
             // 批量保存出库计划详情
             bizOutstockplanDetailDao.batchOutstockplanDetail(pir.getLeft());

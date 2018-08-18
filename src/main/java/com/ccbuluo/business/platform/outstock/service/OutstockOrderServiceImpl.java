@@ -1,8 +1,7 @@
 package com.ccbuluo.business.platform.outstock.service;
 
-import com.ccbuluo.business.constants.ApplyStatusEnum;
-import com.ccbuluo.business.constants.Constants;
-import com.ccbuluo.business.constants.DocCodePrefixEnum;
+import com.ccbuluo.business.constants.*;
+import com.ccbuluo.business.entity.BizAllocateApply.ApplyStatusEnum;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
@@ -220,9 +219,10 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      * @date 2018-08-11 13:05:07
      */
     private void updateApplyOrderStatus(String applyNo, FindAllocateApplyDTO detail, List<BizOutstockplanDetail> bizOutstockplanDetailList) {
-        List<BizOutstockplanDetail> collect = bizOutstockplanDetailList.stream().filter(item -> item.getPlanStatus().equals(Constants.CHECKED)).collect(Collectors.toList());
-        if (detail.getApplyType().equals(Constants.PLATFORM_TRANSFER)) {
-            if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(Constants.PLATFORM)) {
+        List<BizOutstockplanDetail> collect = bizOutstockplanDetailList.stream().filter(item -> item.getPlanStatus().equals(StockPlanStatusEnum.COMPLETE)).collect(Collectors.toList());
+        // todo 刘铎 支持所有申请类型
+        if (detail.getApplyType().equals(BizAllocateApply.AllocateApplyTypeEnum.PLATFORMALLOCATE) ) {
+            if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
                 updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.WAITINGRECEIPT.toString());
             } else {
                 updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.INSTORE.toString());
@@ -243,6 +243,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      * @date 2018-08-11 13:09:11
      */
     private void updateApplyOrderStatus(String applyNo, List<BizOutstockplanDetail> bizOutstockplanDetailList, List<BizOutstockplanDetail> collect, String status) {
+        // 判断本次交易的出库计划是否全部完成
         if (bizOutstockplanDetailList.size() == collect.size()) {
             allocateApplyService.updateApplyOrderStatus(applyNo, status);
         }
@@ -258,7 +259,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     @Override
     public List<String> queryApplyNo() {
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
-        if (orgCode.equals(Constants.PLATFORM)) {
+        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
             return allocateApplyService.queryApplyNo(ApplyStatusEnum.OUTSTORE.toString(), orgCode);
         }
         return allocateApplyService.queryApplyNo(ApplyStatusEnum.WAITDELIVERY.toString(), orgCode);
@@ -375,7 +376,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 updatePlanStatusDTO updatePlanStatusDTO = collect.get(item.getId());
                 BizOutstockplanDetail bizOutstockplanDetail = new BizOutstockplanDetail();
                 bizOutstockplanDetail.setId(item.getId());
-                bizOutstockplanDetail.setPlanStatus(Constants.CHECKED);
+                bizOutstockplanDetail.setPlanStatus(StockPlanStatusEnum.COMPLETE.name());
                 bizOutstockplanDetail.setCompleteTime(new Date());
                 bizOutstockplanDetail.setVersionNo(updatePlanStatusDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
                 bizOutstockplanDetails.add(bizOutstockplanDetail);
@@ -435,7 +436,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 Long occupyStock;
                 if (updateStockBizStockDetailDTO != null) {
                     BizStockDetail bizStockDetail = new BizStockDetail();
-                    if (item.getStockType().equals(BizStockDetail.StockEnum.VALIDSTOCK.toString())) {
+                    if (item.getStockType().equals(BizStockDetail.StockTypeEnum.VALIDSTOCK.toString())) {
                         occupyStock = updateStockBizStockDetailDTO.getOccupyStock();// 库存明细中的占用库存数量
                         if (occupyStock <= outstockNum) {
                             bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
@@ -448,7 +449,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                             bizStockDetail.setVersionNo(updateStockBizStockDetailDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
                             bizStockDetails.add(bizStockDetail);
                         }
-                    } else if (item.getStockType().equals(BizStockDetail.StockEnum.PROBLEMSTOCK.toString())) {
+                    } else if (item.getStockType().equals(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.toString())) {
                         occupyStock = updateStockBizStockDetailDTO.getProblemStock();// 库存明细中的问题件库存数量
                         if (occupyStock <= outstockNum) {
                             bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
@@ -506,10 +507,11 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         bizOutstockOrder.setOutstockOrgno(detail.getOutstockOrgno());
         bizOutstockOrder.setOutstockOperator(userHolder.getLoggedUserId());
         bizOutstockOrder.setTradeDocno(applyNo);
-        if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(Constants.PLATFORM)) {
-            bizOutstockOrder.setOutstockType(detail.getProcessType());
+        // todo 刘铎 出库单的类型 要根据 申请的类型来决定，看标哥有没有可复用的方法
+        if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+            bizOutstockOrder.setOutstockType(OutstockTypeEnum.TRANSFER.name());
         } else {
-            bizOutstockOrder.setOutstockType(Constants.PROCESS_TYPE_TRANSFER);
+            bizOutstockOrder.setOutstockType(OutstockTypeEnum.TRANSFER.name());
         }
         bizOutstockOrder.setOutstockTime(date);
         bizOutstockOrder.setTransportorderNo(transportorderNo);

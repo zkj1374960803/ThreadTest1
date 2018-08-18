@@ -1,25 +1,17 @@
 package com.ccbuluo.business.platform.maintainitem.service;
 
-import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
-import com.ccbuluo.business.entity.BizServiceMaintainitem;
 import com.ccbuluo.business.entity.BizServiceMultipleprice;
-import com.ccbuluo.business.platform.maintainitem.dao.BizServiceMaintainitemDao;
 import com.ccbuluo.business.platform.maintainitem.dao.BizServiceMultiplepriceDao;
 import com.ccbuluo.business.platform.maintainitem.dto.CorrespondAreaDTO;
-import com.ccbuluo.business.platform.maintainitem.dto.DetailBizServiceMaintainitemDTO;
-import com.ccbuluo.business.platform.maintainitem.dto.SaveBizServiceMaintainitemDTO;
 import com.ccbuluo.business.platform.maintainitem.dto.SaveBizServiceMultiplepriceDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.db.Page;
-import com.ccbuluo.http.StatusDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 

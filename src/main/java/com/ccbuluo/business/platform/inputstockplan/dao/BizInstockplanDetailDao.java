@@ -1,11 +1,10 @@
 package com.ccbuluo.business.platform.inputstockplan.dao;
 
 import com.ccbuluo.business.constants.Constants;
-import com.ccbuluo.business.constants.StockPlanEnum;
+
 import com.ccbuluo.business.entity.BizInstockplanDetail;
 import com.ccbuluo.business.platform.outstock.dto.updatePlanStatusDTO;
 import com.ccbuluo.dao.BaseDao;
-import com.ccbuluo.http.StatusDto;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;

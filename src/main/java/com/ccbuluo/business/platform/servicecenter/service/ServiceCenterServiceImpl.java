@@ -1,9 +1,9 @@
 package com.ccbuluo.business.platform.servicecenter.service;
 
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
-import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceLabel;
+import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.entity.BizServiceStorehouse;
 import com.ccbuluo.business.platform.label.dto.LabelServiceCenterDTO;
 import com.ccbuluo.business.platform.label.service.LabelServiceCenterService;
@@ -77,7 +77,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
         try {
             // 生成服务中心code
             String serviceCenterCode = null;
-            StatusDto<String> serviceCenterDTO = generateProjectCodeService.grantCode(CodePrefixEnum.FW);
+            StatusDto<String> serviceCenterDTO = generateProjectCodeService.grantCode(BizServiceProjectcode.CodePrefixEnum.FW);
             if (serviceCenterDTO.getCode().equals(Constants.SUCCESS_CODE)) {
                 serviceCenterCode = serviceCenterDTO.getData();
             } else {
