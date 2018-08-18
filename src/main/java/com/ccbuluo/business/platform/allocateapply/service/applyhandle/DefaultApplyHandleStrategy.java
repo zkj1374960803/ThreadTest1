@@ -3,7 +3,7 @@ package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
 import com.ccbuluo.business.constants.*;
 import com.ccbuluo.business.entity.*;
-import com.ccbuluo.business.entity.BizAllocateApply.AllocateApplyEnum;
+import com.ccbuluo.business.entity.BizAllocateApply.AllocateApplyTypeEnum;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
@@ -82,22 +82,22 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
 
         // 特殊情况处理
         // 采购
-        if(AllocateApplyEnum.PURCHASE.toString().equals(applyType)){
+        if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType)){
             // 采购的时候卖方为供应商（供应商不填为空）
             bizAllocateTradeorder2.setSellerOrgno("");
         }
         // 平台直发
-        if(AllocateApplyEnum.DIRECTALLOCATE.toString().equals(applyType)){
+        if(AllocateApplyTypeEnum.DIRECTALLOCATE.toString().equals(applyType)){
             // 直调是没有采购订单的
             bizAllocateTradeorder2 = null;
         }
         // 商品退换
-        if(AllocateApplyEnum.BARTER.toString().equals(applyType)){
+        if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType)){
             // 从买方到平台
             bizAllocateTradeorder2 = null;
         }
         // 退款
-        if(AllocateApplyEnum.REFUND.toString().equals(applyType)){
+        if(AllocateApplyTypeEnum.REFUND.toString().equals(applyType)){
             // 从买方到平台
             bizAllocateTradeorder2 = null;
         }
@@ -185,14 +185,14 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         List<BizInstockplanDetail> inList = new ArrayList<BizInstockplanDetail>();
 
         // 采购
-        if(AllocateApplyEnum.PURCHASE.toString().equals(applyType)){
+        if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType)){
             // 平台入库计划
             instockplanDetail(inList,details, applyType);
             // 买入方入库计划
             instockplanDetail1(inList,details, applyType);
         }
         // 平台调拨
-        if(AllocateApplyEnum.PLATFORMALLOCATE.toString().equals(applyType)){
+        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType)){
 //            BizStockDetail bd = getBizStockDetailByProductNo(stockDetails, ad.getProductNo());
             // 卖方机构出库计划
             outstockplanDetail2(outList, relOrdstockOccupies,stockDetails, details, applyType);
@@ -204,7 +204,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             instockplanDetail1(inList,details, applyType);
         }
         // 平级调拨（服务间的调拨）
-        if(AllocateApplyEnum.SERVICEALLOCATE.toString().equals(applyType)){
+        if(AllocateApplyTypeEnum.SERVICEALLOCATE.toString().equals(applyType)){
 //            BizStockDetail bd = getBizStockDetailByProductNo(stockDetails, ad.getProductNo());
             // 卖方机构出库计划
             outstockplanDetail2(outList,relOrdstockOccupies,stockDetails,details, applyType);
@@ -212,7 +212,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             instockplanDetail1(inList,details, applyType);
         }
         // 直调
-        if(AllocateApplyEnum.DIRECTALLOCATE.toString().equals(applyType)){
+        if(AllocateApplyTypeEnum.DIRECTALLOCATE.toString().equals(applyType)){
 //            BizStockDetail bd = getBizStockDetailByProductNo(stockDetails, ad.getProductNo());
             // 平台出库计划
             outstockplanDetail(outList,relOrdstockOccupies,stockDetails,details, applyType);
@@ -220,7 +220,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             instockplanDetail1(inList,details, applyType);
         }
         // 商品退换
-        if(AllocateApplyEnum.BARTER.toString().equals(applyType)){
+        if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType)){
             // 买方出库
             outstockplanDetail1(outList,relOrdstockOccupies,stockDetails,details, applyType);
             // 平台入库
@@ -231,7 +231,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             instockplanDetail1(inList,details, applyType);
         }
         // 退款
-        if(AllocateApplyEnum.REFUND.toString().equals(applyType)){
+        if(AllocateApplyTypeEnum.REFUND.toString().equals(applyType)){
 //            BizStockDetail bd = getBizStockDetailByProductNo(stockDetails, ad.getProductNo());
             // 买方出库
             outstockplanDetail1(outList,relOrdstockOccupies,stockDetails,details, applyType);
@@ -375,15 +375,15 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     private BizOutstockplanDetail buildBizOutstockplanDetail(AllocateapplyDetailBO ad, String applyType){
         BizOutstockplanDetail outPlan = new BizOutstockplanDetail();
         // 调拨
-        if(AllocateApplyEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyEnum.SERVICEALLOCATE.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SERVICEALLOCATE.toString().equals(applyType) ){
             outPlan.setOutstockType(InstockTypeEnum.TRANSFER.toString());// 交易类型
         }
         // 采购
-        if(AllocateApplyEnum.PURCHASE.toString().equals(applyType) || AllocateApplyEnum.SERVICEALLOCATE.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType) || AllocateApplyTypeEnum.SERVICEALLOCATE.toString().equals(applyType) ){
             outPlan.setOutstockType(InstockTypeEnum.PURCHASE.toString());// 交易类型
         }
         // 换货
-        if(AllocateApplyEnum.BARTER.toString().equals(applyType) || AllocateApplyEnum.SERVICEALLOCATE.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) || AllocateApplyTypeEnum.SERVICEALLOCATE.toString().equals(applyType) ){
             outPlan.setOutstockType(InstockTypeEnum.BARTER.toString());// 交易类型
         }
 
@@ -414,15 +414,15 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     private BizInstockplanDetail buildBizInstockplanDetail(AllocateapplyDetailBO ad, String applyType){
         BizInstockplanDetail inPlan = new BizInstockplanDetail();
         // 调拨
-        if(AllocateApplyEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyEnum.SERVICEALLOCATE.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SERVICEALLOCATE.toString().equals(applyType) ){
             inPlan.setInstockType(InstockTypeEnum.TRANSFER.toString());// 交易类型
         }
         // 采购
-        if(AllocateApplyEnum.PURCHASE.toString().equals(applyType) || AllocateApplyEnum.SERVICEALLOCATE.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType) || AllocateApplyTypeEnum.SERVICEALLOCATE.toString().equals(applyType) ){
             inPlan.setInstockType(InstockTypeEnum.PURCHASE.toString());// 交易类型
         }
         // 换货
-        if(AllocateApplyEnum.BARTER.toString().equals(applyType) || AllocateApplyEnum.SERVICEALLOCATE.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) || AllocateApplyTypeEnum.SERVICEALLOCATE.toString().equals(applyType) ){
             inPlan.setInstockType(InstockTypeEnum.BARTER.toString());// 交易类型
         }
         inPlan.setProductNo(ad.getProductNo());// 商品编号
@@ -540,23 +540,23 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     public String getProductOrgNo(BizAllocateApply ba){
         String sellerOrgno = "";
         // 平台调拨
-        if(AllocateApplyEnum.PLATFORMALLOCATE.toString().equals(ba.getApplyType())){
+        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(ba.getApplyType())){
             sellerOrgno = ba.getOutstockOrgno();
         }
         // 平级调拨（服务间的调拨）
-        if(AllocateApplyEnum.SERVICEALLOCATE.toString().equals(ba.getApplyType())){
+        if(AllocateApplyTypeEnum.SERVICEALLOCATE.toString().equals(ba.getApplyType())){
             sellerOrgno = ba.getOutstockOrgno();
         }
         // 平级直调
-        if(AllocateApplyEnum.DIRECTALLOCATE.toString().equals(ba.getApplyType())){
+        if(AllocateApplyTypeEnum.DIRECTALLOCATE.toString().equals(ba.getApplyType())){
             sellerOrgno = BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM;//  平台的机构编号
         }
         // 商品退换
-        if(AllocateApplyEnum.BARTER.toString().equals(ba.getApplyType())){
+        if(AllocateApplyTypeEnum.BARTER.toString().equals(ba.getApplyType())){
             sellerOrgno = ba.getApplyorgNo();//  发起申请的机构编号
         }
         // 退款
-        if(AllocateApplyEnum.REFUND.toString().equals(ba.getApplyType())){
+        if(AllocateApplyTypeEnum.REFUND.toString().equals(ba.getApplyType())){
             sellerOrgno =  ba.getApplyorgNo();//  发起申请的机构编号
         }
         return sellerOrgno;

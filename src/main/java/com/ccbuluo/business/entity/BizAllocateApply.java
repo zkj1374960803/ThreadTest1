@@ -313,11 +313,11 @@ public class BizAllocateApply {
      * @author weijb
      * @date 2018-08-14 18:41:05
      */
-    public enum AllocateApplyEnum {
+    public enum AllocateApplyTypeEnum {
         PURCHASE("平台采购"),PLATFORMALLOCATE("平台调拨"),SERVICEALLOCATE("平级调拨"),DIRECTALLOCATE("平台直发"),
         BARTER("调换"),REFUND("退款");
 
-        AllocateApplyEnum(String label){
+        AllocateApplyTypeEnum(String label){
             this.label = label;
         }
 
