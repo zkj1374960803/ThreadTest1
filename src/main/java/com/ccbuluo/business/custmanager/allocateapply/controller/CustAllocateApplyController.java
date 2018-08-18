@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * @author zhangkangjian
@@ -140,7 +139,7 @@ public class CustAllocateApplyController extends BaseController {
      * @author zhangkangjian
      * @date 2018-08-10 15:45:56
      */
-    @ApiOperation(value = "查询可调拨库存列表", notes = "【张康健】")
+    @ApiOperation(value = "查看调拨库存", notes = "【张康健】")
     @GetMapping("/findstocklist")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "categoryCode", value = "分类的code", required = false, paramType = "query"),
@@ -162,7 +161,7 @@ public class CustAllocateApplyController extends BaseController {
      * @author zhangkangjian
      * @date 2018-08-13 16:50:05
      */
-    @ApiOperation(value = "查询可调拨库存列表", notes = "【张康健】")
+    @ApiOperation(value = "查看调拨库存", notes = "【张康健】")
     @GetMapping("/querytransferstock")
     public StatusDto<Page<QueryOrgDTO>> queryTransferStock(@ApiIgnore QueryOrgDTO queryOrgDTO, Integer offset, Integer pageSize){
         Page<QueryOrgDTO> queryOrgDTOPage = allocateApplyServiceImpl.queryTransferStock(queryOrgDTO, offset, pageSize);

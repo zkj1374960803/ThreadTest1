@@ -77,7 +77,7 @@ public interface StockDetailService {
      * @author liuduo
      * @date 2018-08-10 11:48:21
      */
-    void updateOccupyStockById(List<BizStockDetail> bizStockDetails);
+    int updateOccupyStockById(List<BizStockDetail> bizStockDetails);
 
     /**
     * 根据库存明细id查询到控制的版本号（乐观锁使用）

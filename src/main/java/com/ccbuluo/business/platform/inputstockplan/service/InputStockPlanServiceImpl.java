@@ -31,8 +31,8 @@ public class InputStockPlanServiceImpl implements InputStockPlanService {
      * @date 2018-08-08 11:14:56
      */
     @Override
-    public List<BizInstockplanDetail> queryListByApplyNo(String applyNo, String inRepositoryNo) {
-        return bizInstockplanDetailDao.queryListByApplyNo(applyNo, inRepositoryNo);
+    public List<BizInstockplanDetail> queryListByApplyNo(String applyNo, String status, String inRepositoryNo) {
+        return bizInstockplanDetailDao.queryListByApplyNo(applyNo, status, inRepositoryNo);
     }
 
     /**
@@ -78,8 +78,8 @@ public class InputStockPlanServiceImpl implements InputStockPlanService {
      * @date 2018-08-11 13:17:42
      */
     @Override
-    public List<BizInstockplanDetail> queryInstockplan(String applyNo, String productType) {
-        return bizInstockplanDetailDao.queryInstockplan(applyNo, productType);
+    public List<BizInstockplanDetail> queryInstockplan(String applyNo,  String inRepositoryNo, String productType) {
+        return bizInstockplanDetailDao.queryInstockplan(applyNo, inRepositoryNo, productType);
     }
 
     /**
@@ -93,5 +93,18 @@ public class InputStockPlanServiceImpl implements InputStockPlanService {
     @Override
     public int updateInStockPlanStatus(String applyNo, String completeStatus, String instockRepositoryNo){
         return bizInstockplanDetailDao.updateInStockPlanStatus(applyNo, completeStatus,instockRepositoryNo);
+    }
+
+    /**
+     * 根据入库单号查询入库仓库
+     * @param applyNo 入库单号
+     * @param orgCode 当前登录人机构号
+     * @return 入库仓库
+     * @author liuduo
+     * @date 2018-08-13 15:20:27
+     */
+    @Override
+    public List<String> getByApplyNo(String applyNo, String orgCode) {
+        return bizInstockplanDetailDao.getByApplyNo(applyNo, orgCode);
     }
 }

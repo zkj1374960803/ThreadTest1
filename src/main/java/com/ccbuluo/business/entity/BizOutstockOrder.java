@@ -68,6 +68,11 @@ public class BizOutstockOrder extends AftersaleCommonEntity{
      */
     @ApiModelProperty(name = "outstockOperatorName", value = "出库人")
     private String outstockOperatorName;
+    /**
+     * 备注
+     */
+    @ApiModelProperty(name = "remark", value = "备注")
+    private String remark;
 
     public void setOutstockorderNo(String outstockorderNo) {
         this.outstockorderNo = outstockorderNo;
@@ -155,5 +160,13 @@ public class BizOutstockOrder extends AftersaleCommonEntity{
 
     public void setOutstockOperatorName(String outstockOperatorName) {
         this.outstockOperatorName = outstockOperatorName;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

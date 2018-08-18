@@ -69,6 +69,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
 
     /**
      * 根据申请单号状态查询申请单号集合
+     *
      * @return 申请单号
      * @author liuduo
      * @date 2018-08-07 14:19:40
@@ -84,14 +85,15 @@ public class InstockOrderServiceImpl implements InstockOrderService {
 
     /**
      * 自动入库
-     * @param applyNo 申请单编号
+     *
+     * @param applyNo               申请单编号
      * @param bizInstockplanDetails 入库计划集合
      * @return 是否保存成功
      * @author liuduo
      * @date 2018-08-15 16:14:04
      */
     @Override
-    public StatusDto<String> autoSaveInstockOrder(String applyNo, List<BizInstockplanDetail> bizInstockplanDetails) {
+    public StatusDto<String> autoSaveInstockOrder(String applyNo, String inRepositoryNo, List<BizInstockplanDetail> bizInstockplanDetails) {
         List<BizInstockorderDetail> bizInstockorderDetailList1 = Lists.newArrayList();
         bizInstockplanDetails.forEach(item -> {
             BizInstockorderDetail bizInstockorderDetail = new BizInstockorderDetail();
@@ -107,7 +109,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
             bizInstockorderDetail.setCostPrice(item.getCostPrice());
             bizInstockorderDetailList1.add(bizInstockorderDetail);
         });
-        return saveInstockOrder(applyNo, bizInstockorderDetailList1);
+        return saveInstockOrder(applyNo, inRepositoryNo, bizInstockorderDetailList1);
     }
 
     /**
@@ -120,13 +122,14 @@ public class InstockOrderServiceImpl implements InstockOrderService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public StatusDto<String> saveInstockOrder(String applyNo, List<BizInstockorderDetail> bizInstockorderDetailList) {
+    public StatusDto<String> saveInstockOrder(String applyNo, String inRepositoryNo, List<BizInstockorderDetail> bizInstockorderDetailList) {
         try {
+            String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
             // 根据申请单号查询申请单基本信息
             FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
             // 查询入库计划
-            List<BizInstockplanDetail> bizInstockplanDetails = inputStockPlanService.queryListByApplyNo(applyNo, detail.getInRepositoryNo());
-            if (null == bizInstockplanDetails && bizInstockplanDetails.size() == 0) {
+            List<BizInstockplanDetail> bizInstockplanDetails = inputStockPlanService.queryListByApplyNo(applyNo, StockPlanEnum.DOING.toString(), inRepositoryNo);
+            if (null == bizInstockplanDetails || bizInstockplanDetails.size() == 0) {
                 throw new CommonException("10001", "入库数量与计划不符！");
             }
 
@@ -156,15 +159,17 @@ public class InstockOrderServiceImpl implements InstockOrderService {
             // 3、修改库存明细
             // 根据入库单号查询入库单详单
             List<BizInstockorderDetail> bizInstockorderDetailList1 = instockorderDetailService.queryListByinstockNo(instockNo);
-            saveStockDetail(applyNo, bizInstockorderDetailList1, detail);
+            List<Long> stockIds = saveStockDetail(applyNo, bizInstockorderDetailList1, detail, inRepositoryNo);
             // 4、更新入库计划明细中的实际入库数量
-            updateInstockplan(bizInstockorderDetailList);
+            updateInstockplan(bizInstockorderDetailList1);
+            List<BizInstockplanDetail> bizInstockplanDetails2 = inputStockPlanService.queryListByApplyNo(applyNo, StockPlanEnum.DOING.toString(), inRepositoryNo);
             // 5、更改入库计划的完成状态和完成时间
-            updateCompleteStatus(bizInstockplanDetails);
+            updateCompleteStatus(bizInstockplanDetails2);
             // 6、如果是平台端，则把库存明细中的有效库存更新到占用库存
-            updateOccupyStockById(bizInstockorderDetailList1);
+            updateOccupyStockById(stockIds);
             // 7、如果是平台入库后则改变申请单状态为 平台待出库，如果是机构入库后则改变申请单的状态为  确认收货
-            updateApplyStatus(applyNo, bizInstockplanDetails);
+            List<BizInstockplanDetail> bizInstockplanDetails3 = inputStockPlanService.queryListByApplyNo(applyNo, Constants.CHECKED, inRepositoryNo);
+            updateApplyStatus(applyNo, bizInstockplanDetails3);
             return StatusDto.buildSuccessStatusDto();
         } catch (Exception e) {
             logger.error("生成入库单失败！", e.getMessage());
@@ -174,24 +179,26 @@ public class InstockOrderServiceImpl implements InstockOrderService {
 
     /**
      * 根据申请单号查询入库计划
-     * @param applyNo 申请单号
+     *
+     * @param applyNo     申请单号
      * @param productType 商品类型
      * @return 入库计划
      * @author liuduo
      * @date 2018-08-11 13:17:42
      */
     @Override
-    public List<BizInstockplanDetail> queryInstockplan(String applyNo, String productType) {
-        return inputStockPlanService.queryInstockplan(applyNo, productType);
+    public List<BizInstockplanDetail> queryInstockplan(String applyNo, String inRepositoryNo, String productType) {
+        return inputStockPlanService.queryInstockplan(applyNo, inRepositoryNo, productType);
     }
 
     /**
      * 分页查询入库单列表
+     *
      * @param productType 商品类型
      * @param instockType 入库类型
-     * @param instockNo 入库单号
-     * @param offset 起始数
-     * @param pagesize 每页数
+     * @param instockNo   入库单号
+     * @param offset      起始数
+     * @param pagesize    每页数
      * @return 入库单列表
      * @author liuduo
      * @date 2018-08-11 16:43:19
@@ -216,6 +223,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
 
     /**
      * 根据入库单号查询入库单详情
+     *
      * @param instockNo 入库单号
      * @return 入库单详情
      * @author liuduo
@@ -244,19 +252,30 @@ public class InstockOrderServiceImpl implements InstockOrderService {
     }
 
     /**
+     * 根据入库单号查询入库仓库
+     * @param applyNo 入库单号
+     * @return 入库仓库
+     * @author liuduo
+     * @date 2018-08-13 15:20:27
+     */
+    @Override
+    public List<String> getByApplyNo(String applyNo) {
+        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+        return inputStockPlanService.getByApplyNo(applyNo, orgCode);
+    }
+
+    /**
      * 如果是平台端，则把库存明细中的有效库存更新到占用库存
-     * @param bizInstockorderDetailList1 入库单详单
+     * @param stockIds 库存ids
      * @author liuduo
      * @date 2018-08-10 15:31:50
      */
-    private void updateOccupyStockById(List<BizInstockorderDetail> bizInstockorderDetailList1) {
+    private void updateOccupyStockById(List<Long> stockIds) {
         if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-            // 获取到本次需要影响的库存明细id
-            List<Long> stockIds = bizInstockorderDetailList1.stream().map(BizInstockorderDetail::getStockId).collect(Collectors.toList());
             // 根据库存明细id查询到控制的版本号（乐观锁使用）
-            List<Pair<Long,Long>> versionNos = stockDetailService.queryVersionNoById(stockIds);
+            List<Pair<Long, Long>> versionNos = stockDetailService.queryVersionNoById(stockIds);
             List<BizStockDetail> bizStockDetails = Lists.newArrayList();
-            for (Pair<Long,Long> versionNo : versionNos) {
+            for (Pair<Long, Long> versionNo : versionNos) {
                 BizStockDetail bizStockDetail = new BizStockDetail();
                 bizStockDetail.setId(versionNo.getKey());
                 bizStockDetail.setVersionNo(versionNo.getValue() + Constants.FLAG_ONE);
@@ -268,7 +287,8 @@ public class InstockOrderServiceImpl implements InstockOrderService {
 
     /**
      * 修改申请单号的状态
-     * @param applyNo 申请单号
+     *
+     * @param applyNo               申请单号
      * @param bizInstockplanDetails 入库计划
      * @author liuduo
      * @date 2018-08-10 13:59:44
@@ -289,6 +309,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
 
     /**
      * 修改入库计划的完成状态
+     *
      * @param bizInstockplanDetails 入库计划
      * @author liuduo
      * @date 2018-08-09 11:16:12
@@ -316,6 +337,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
 
     /**
      * 修改入库计划中的实际入库数量
+     *
      * @param bizInstockorderDetailList 入库单详单
      * @author liuduo
      * @date 2018-08-08 20:29:20
@@ -340,6 +362,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
 
     /**
      * 校验是否有错误数据
+     *
      * @param bizInstockorderDetailList
      * @param bizInstockplanDetails
      * @return 是否有错误数据
@@ -353,15 +376,16 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         bizInstockorderDetailList.forEach(item -> {
             // 判断问题件和实入数量相加是否大于入库计划的  计划入库数量=计划入库数量-实际入库数量,若大于，则抛异常
             BizInstockplanDetail bizInstockplanDetail = map.get(item.getInstockPlanid());
-            if (null != item.getInstockNum()) {
+            if (null != bizInstockplanDetail && null != item.getInstockNum()) {
                 // 实际入库数量
                 Long actualNum = item.getInstockNum();
                 // 计划入库数量
                 long planNum = bizInstockplanDetail.getPlanInstocknum() - bizInstockplanDetail.getActualInstocknum();
                 if (actualNum > planNum) {
-                    bizInstockorderDetailList1.add(item) ;
+                    bizInstockorderDetailList1.add(item);
                 }
             }
+
         });
         if (null != bizInstockorderDetailList1 && bizInstockorderDetailList1.size() > 0) {
             return Constants.FAILURESTATUS;
@@ -372,21 +396,23 @@ public class InstockOrderServiceImpl implements InstockOrderService {
     /**
      * 修改库存明细
      *
-     * @param applyNo               申请单号
+     * @param applyNo                   申请单号
      * @param bizInstockorderDetailList 入库单详单
-     * @param bizAllocateApply 申请单
+     * @param bizAllocateApply          申请单
+     * @return 库存ids
      * @author liuduo
      * @date 2018-08-08 15:41:54
      */
-    private void saveStockDetail(String applyNo, List<BizInstockorderDetail> bizInstockorderDetailList, FindAllocateApplyDTO bizAllocateApply) {
+    private List<Long> saveStockDetail(String applyNo, List<BizInstockorderDetail> bizInstockorderDetailList, FindAllocateApplyDTO bizAllocateApply, String inRepositoryNo) {
         // 根据入库详单的  供应商、商品、仓库、批次号  查询在库存中有无记录，有则更新，无则新增
         List<BizInstockorderDetail> bizInstockorderDetailList1 = Lists.newArrayList();
         List<Long> ids = bizInstockorderDetailList.stream().map(BizInstockorderDetail::getInstockPlanid).collect(Collectors.toList());
         List<updatePlanStatusDTO> versionNoById = inputStockPlanService.getVersionNoById(ids);
         Map<Long, updatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(updatePlanStatusDTO::getId, Function.identity()));
+        List<Long> stockIds = Lists.newArrayList();
         bizInstockorderDetailList.forEach(item -> {
             updatePlanStatusDTO updatePlanStatusDTO = collect.get(item.getInstockPlanid());
-            Long id = stockDetailService.getByinstockorderDeatil(item.getSupplierNo(), item.getProductNo(), bizAllocateApply.getInRepositoryNo(), applyNo);
+            Long id = stockDetailService.getByinstockorderDeatil(item.getSupplierNo(), item.getProductNo(), inRepositoryNo, applyNo);
             if (null != id) {
                 BizStockDetail bizStockDetail = new BizStockDetail();
                 bizStockDetail.setId(id);
@@ -394,11 +420,12 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                 stockDetailService.updateValidStock(bizStockDetail, updatePlanStatusDTO.getVersionNo());
             } else {
                 BizStockDetail bizStockDetail = new BizStockDetail();
-                bizStockDetail.setRepositoryNo(bizAllocateApply.getInRepositoryNo());
+                bizStockDetail.setRepositoryNo(inRepositoryNo);
                 bizStockDetail.setOrgNo(bizAllocateApply.getInstockOrgno());
                 bizStockDetail.setProductNo(item.getProductNo());
                 bizStockDetail.setProductName(item.getProductName());
                 bizStockDetail.setProductType(item.getProductType());
+                bizStockDetail.setProductCategoryname(item.getProductCategoryname());
                 bizStockDetail.setTradeNo(applyNo);
                 bizStockDetail.setSupplierNo(item.getSupplierNo());
                 if (item.getStockType().equals(BizStockDetail.StockTypeEnum.VALIDSTOCK.toString())) {
@@ -411,6 +438,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                 bizStockDetail.setInstockPlanid(id);
                 bizStockDetail.preInsert(userHolder.getLoggedUserId());
                 Long stockDetailId = stockDetailService.saveStockDetail(bizStockDetail);
+                stockIds.add(stockDetailId);
                 // 把库存id回填到入库详单中
                 BizInstockorderDetail bizInstockorderDetail = new BizInstockorderDetail();
                 bizInstockorderDetail.setId(item.getId());
@@ -420,6 +448,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         });
         // 修改入库单详单的库存明细id
         instockorderDetailService.updateInstockorderStockId(bizInstockorderDetailList1);
+        return stockIds;
     }
 
     /**
@@ -471,9 +500,6 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         bizInstockOrder.preInsert(userHolder.getLoggedUserId());
         return bizInstockOrderDao.saveEntity(bizInstockOrder);
     }
-
-
-
 
 
 }

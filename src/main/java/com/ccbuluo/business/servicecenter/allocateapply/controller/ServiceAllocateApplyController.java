@@ -1,4 +1,4 @@
-package com.ccbuluo.business.servicecenter.allocateapply;
+package com.ccbuluo.business.servicecenter.allocateapply.controller;
 
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
@@ -19,7 +19,7 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("/servicecenter/allocateapply")
-@Api(tags = "客户经理申请管理")
+@Api(tags = "服务中心申请管理")
 public class ServiceAllocateApplyController extends BaseController {
     @Resource(name = "allocateApplyServiceImpl")
     private AllocateApplyService allocateApplyServiceImpl;

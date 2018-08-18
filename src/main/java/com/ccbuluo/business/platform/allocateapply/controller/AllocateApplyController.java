@@ -179,7 +179,7 @@ public class AllocateApplyController extends BaseController {
      * @date 2018-08-15 13:51:06
      */
     @ApiOperation(value = "检查库存", notes = "【张康健】")
-    @PostMapping("/checkStockQuantity")
+    @PostMapping("/checkstockquantity")
     public StatusDto<List<ProductStockInfoDTO>> checkStockQuantity(@ApiParam(name = "CheckStockQuantityDTO", value = "Json数据", required = true) @RequestBody CheckStockQuantityDTO checkStockQuantityDTO){
         return allocateApplyServiceImpl.checkStockQuantity(checkStockQuantityDTO);
     }

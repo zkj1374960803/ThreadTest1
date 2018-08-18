@@ -109,6 +109,11 @@ public class BizStockDetail extends AftersaleCommonEntity{
      */
     @ApiModelProperty(name = "versionNo", value = "乐观锁使用的版本号")
     private Long versionNo;
+    /**
+     * 备注
+     */
+    @ApiModelProperty(name = "remark", value = "备注")
+    private String remark;
 
     public void setRepositoryNo(String repositoryNo) {
         this.repositoryNo = repositoryNo;
@@ -260,6 +265,14 @@ public class BizStockDetail extends AftersaleCommonEntity{
 
     public void setProductName(String productName) {
         this.productName = productName;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 
     /**

@@ -26,7 +26,7 @@ public interface InstockOrderService {
      * @author liuduo
      * @date 2018-08-15 16:14:04
      */
-    StatusDto<String> autoSaveInstockOrder(String applyNo, List<BizInstockplanDetail> bizInstockplanDetails);
+    StatusDto<String> autoSaveInstockOrder(String applyNo, String inRepositoryNo,  List<BizInstockplanDetail> bizInstockplanDetails);
     /**
      * 根据申请单号状态查询申请单号集合
      * @return 申请单号
@@ -42,7 +42,7 @@ public interface InstockOrderService {
      * @author liuduo
      * @date 2018-08-07 15:15:07
      */
-    StatusDto<String> saveInstockOrder(String applyNo, List<BizInstockorderDetail> bizInstockorderDetailList);
+    StatusDto<String> saveInstockOrder(String applyNo, String inRepositoryNo, List<BizInstockorderDetail> bizInstockorderDetailList);
 
     /**
      * 根据申请单号查询入库计划
@@ -52,7 +52,7 @@ public interface InstockOrderService {
      * @author liuduo
      * @date 2018-08-11 13:17:42
      */
-    List<BizInstockplanDetail> queryInstockplan(String applyNo, String productType);
+    List<BizInstockplanDetail> queryInstockplan(String applyNo,String inRepositoryNo, String productType);
 
     /**
      * 分页查询入库单列表
@@ -75,4 +75,13 @@ public interface InstockOrderService {
      * @date 2018-08-13 15:20:27
      */
     BizInstockOrderDTO getByInstockNo(String instockNo);
+
+    /**
+     * 根据入库单号查询入库仓库
+     * @param applyNo 入库单号
+     * @return 入库仓库
+     * @author liuduo
+     * @date 2018-08-13 15:20:27
+     */
+    List<String> getByApplyNo(String applyNo);
 }
