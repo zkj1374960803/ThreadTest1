@@ -2,7 +2,9 @@ package com.ccbuluo.business.platform.stockdetail.service;
 
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.adjust.dto.StockAdjustListDTO;
+import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.UpdateStockBizStockDetailDTO;
+import com.ccbuluo.db.Page;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
@@ -114,5 +116,16 @@ public interface StockDetailService {
      * @date 2018-08-14 21:38:16
      */
     void updateAdjustValidStock(List<BizStockDetail> bizStockDetailList1);
+
+    /**
+     * 根据商品code查询某个商品在当前登录机构的库存列表
+     * @param productNo 商品编号
+     * @param offset 起始数
+     * @param pageSize 每页数量
+     * @exception
+     * @author weijb
+     * @date 2018-08-20 09:46:03
+     */
+    Page<StockBizStockDetailDTO> getSelfStockBizStockDetailByCode(String productNo, Integer offset, Integer pageSize);
 
 }

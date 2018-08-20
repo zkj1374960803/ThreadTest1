@@ -3,7 +3,10 @@ package com.ccbuluo.business.platform.stockdetail.service;
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.adjust.dto.StockAdjustListDTO;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
+import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.UpdateStockBizStockDetailDTO;
+import com.ccbuluo.core.common.UserHolder;
+import com.ccbuluo.db.Page;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,8 @@ public class StockDetailServiceImpl implements StockDetailService{
 
     @Autowired
     private BizStockDetailDao bizStockDetailDao;
+    @Autowired
+    private UserHolder userHolder;
 
     /**
      * 根据入库详单的  供应商、商品、仓库、批次号  查询在库存中有无记录
@@ -152,5 +157,20 @@ public class StockDetailServiceImpl implements StockDetailService{
     @Override
     public void updateAdjustValidStock(List<BizStockDetail> bizStockDetailList1) {
         bizStockDetailDao.updateAdjustValidStock(bizStockDetailList1);
+    }
+
+    /**
+     * 根据商品code查询某个商品在当前登录机构的库存列表
+     * @param productNo 商品编号
+     * @param offset 起始数
+     * @param pageSize 每页数量
+     * @exception
+     * @author weijb
+     * @date 2018-08-20 09:46:03
+     */
+    @Override
+    public Page<StockBizStockDetailDTO> getSelfStockBizStockDetailByCode(String productNo, Integer offset, Integer pageSize){
+        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+        return bizStockDetailDao.getProductStockBizStockDetailByCode(orgCode, productNo, offset, pageSize);
     }
 }

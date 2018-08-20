@@ -3,9 +3,12 @@ package com.ccbuluo.business.platform.stockdetail.dao;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.adjust.dto.StockAdjustListDTO;
+import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.UpdateStockBizStockDetailDTO;
 import com.ccbuluo.dao.BaseDao;
+import com.ccbuluo.db.Page;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -355,5 +358,33 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      */
     public void updateAdjustValidStock(List<BizStockDetail> bizStockDetailList1) {
         String sql = "UPDATE biz_stock_detail SET valid_stock = :validStock, version_no = version_no+1 WHERE version_no > :versionNo AND id = :id";
+    }
+
+    /**
+     * 根据商品code查询某个商品在当前登录机构的库存列表
+     * @param orgCode 当前机构编号
+     * @param productNo 商品编号
+     * @param offset 起始数
+     * @param pageSize 每页数量
+     * @return
+     * @exception
+     * @author weijb
+     * @date 2018-08-15 08:59:51
+     */
+    public Page<StockBizStockDetailDTO> getProductStockBizStockDetailByCode(String orgCode, String productNo, Integer offset, Integer pageSize){
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,product_no,product_name,product_type,product_unit,SUM(problem_stock) as problem_stock")
+                .append(" FROM biz_stock_detail LEFT WHERE delete_flag = :deleteFlag and product_no = :productNo and valid_stock>0 ")
+                .append(" ");
+        Map<String, Object> params = Maps.newHashMap();
+        // 组织机构code
+        if (StringUtils.isNotBlank(orgCode)) {
+            params.put("orgCode", orgCode);
+            sql.append(" AND org_no = :orgCode ");
+        }
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        params.put("productNo", productNo);
+        Page<StockBizStockDetailDTO> DTOS = super.queryPageForBean(StockBizStockDetailDTO.class, sql.toString(), params,offset,pageSize);
+        return DTOS;
     }
 }

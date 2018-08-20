@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.stockdetail.controller;
 
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
+import com.ccbuluo.business.platform.stockdetail.service.StockDetailService;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.Api;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  *  库存controller
@@ -23,6 +26,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/platform/stock")
 public class StockDetailController {
+
+    @Resource
+    StockDetailService stockDetailService;
     /**
      * 根据商品code查询某个商品在当前登录机构的库存列表
      * @param productNo 商品编号
@@ -30,7 +36,7 @@ public class StockDetailController {
      * @param pageSize 每页数量
      * @exception
      * @author weijb
-     * @date 2018-08-15 08:59:51
+     * @date 2018-08-20 09:46:03
      */
     @ApiOperation(value = "根据商品code查询某个商品在当前登录机构的库存",notes = "【魏俊标】")
     @GetMapping("/getselfproductstock")
@@ -42,6 +48,6 @@ public class StockDetailController {
                                                                                            @RequestParam(required = false) String keyword,
                                                                                            @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                                            @RequestParam(required = false, defaultValue = "20") Integer pageSize){
-        return StatusDto.buildDataSuccessStatusDto(/*problemStockDetailService.getSelfProdectStockBizStockDetailByCode(productNo, offset, pageSize)*/null);
+        return StatusDto.buildDataSuccessStatusDto(stockDetailService.getSelfStockBizStockDetailByCode(productNo, offset, pageSize));
     }
 }
