@@ -61,9 +61,9 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
             // 构建生成订单(调拨)
             List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyNo);
             // 构建占用库存和订单占用库存关系
-            //获取卖方机构code
+            // 获取卖方机构code
             String productOrgNo = getProductOrgNo(ba);
-            //查询库存列表
+            // 查询库存列表
             List<BizStockDetail> stockDetails = getStockDetailList(productOrgNo, details);
             if(null == stockDetails || stockDetails.size() == 0){
                 return StatusDto.buildFailureStatusDto("库存为空！");

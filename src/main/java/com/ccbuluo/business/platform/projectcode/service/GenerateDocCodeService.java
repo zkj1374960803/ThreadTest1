@@ -14,8 +14,6 @@ import redis.clients.jedis.JedisCluster;
 import java.time.LocalDateTime;
 
 /**
- * ${todo}
- *
  * @author weijb
  * @version v1.0.0
  * @date 2018-08-07 20:11:59
