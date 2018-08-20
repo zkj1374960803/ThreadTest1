@@ -404,7 +404,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         map.put("productNo", productNo);
         map.put("productType", productType);
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT SUM(a.problem_stock) AS 'totalStock',SUM(a.problem_stock) * a.cost_price AS 'totalAmount',a.product_name AS 'unit' ")
+        sql.append(" SELECT SUM(a.problem_stock) AS 'totalStock',SUM(a.problem_stock) * a.cost_price AS 'totalAmount',a.product_unit AS 'unit' ")
             .append(" FROM biz_stock_detail a  ")
             .append(" WHERE a.product_no = :productNo AND a.product_type = :productType  ");
         if(orgDTOList != null && orgDTOList.size() > 0){
@@ -430,7 +430,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         map.put("productNo", productNo);
         map.put("productType", productType);
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT SUM(a.damaged_stock) AS 'totalStock',SUM(a.damaged_stock) * a.cost_price AS 'totalAmount',a.product_name AS 'unit' ")
+        sql.append(" SELECT SUM(a.damaged_stock) AS 'totalStock',SUM(a.damaged_stock) * a.cost_price AS 'totalAmount',a.product_unit AS 'unit' ")
             .append(" FROM biz_stock_detail a  ")
             .append(" WHERE a.product_no = :productNo AND a.product_type = :productType  ");
         if(orgDTOList != null && orgDTOList.size() > 0){

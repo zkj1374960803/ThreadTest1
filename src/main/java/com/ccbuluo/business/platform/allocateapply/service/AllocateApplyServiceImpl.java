@@ -296,10 +296,13 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     public void processApply(ProcessApplyDTO processApplyDTO) {
         String processType = processApplyDTO.getApplyType();
         String userOrgCode = getUserOrgCode();
-        // todo 张康健确定申请类型的代码不合适
         // 如果是调拨类型的
         if(AllocateApplyTypeEnum.PLATFORMALLOCATE.name().equals(processType)){
-            if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(userOrgCode)){
+            String applyNo = processApplyDTO.getApplyNo();
+            FindAllocateApplyDTO detail = findDetail(applyNo);
+            String processOrgno = detail.getProcessOrgno();
+            // 根据处理类型判断
+            if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(processOrgno)){
                 processApplyDTO.setApplyType(AllocateApplyTypeEnum.PLATFORMALLOCATE.name());
             }else {
                 processApplyDTO.setApplyType(AllocateApplyTypeEnum.SAMELEVEL.name());

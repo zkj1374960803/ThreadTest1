@@ -43,8 +43,8 @@ public class StockManagementServiceImpl implements StockManagementService {
         // 查询正常件
         FindProductDetailDTO findProductDetailDTO = bizStockDetailDao.findProductDetail(productNo, productType, orgDTOList);
         // 查询可调拨库存的数量
-        Long transferInventoryNUm = bizStockDetailDao.findTransferInventory(productNo, productType, orgDTOList, BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER);
-        findProductDetailDTO.setTransferInventory(transferInventoryNUm);
+        Long transferInventoryNum = bizStockDetailDao.findTransferInventory(productNo, productType, orgDTOList, BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+        findProductDetailDTO.setTransferInventory(transferInventoryNum);
         // 查询问题件
         FindProductDetailDTO findProblemStock = bizStockDetailDao.findProblemStock(productNo, productType, orgDTOList);
         // 查询损坏件
