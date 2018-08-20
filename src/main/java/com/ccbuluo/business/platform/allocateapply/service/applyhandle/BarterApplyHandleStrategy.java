@@ -56,10 +56,10 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
                 return StatusDto.buildFailureStatusDto("申请单为空！");
             }
             // 构建占用库存和订单占用库存关系
-            //获取卖方机构code
-            String productOrgNo = getProductOrgNo(ba);
+            //获取申请方机构code
+            String applyorgNo = getProductOrgNo(ba);
             //查询库存列表
-            List<BizStockDetail> stockDetails = getStockDetailList(productOrgNo, details);
+            List<BizStockDetail> stockDetails = getProblemStockDetailList(applyorgNo, details);
             if(null == stockDetails || stockDetails.size() == 0){
                 return StatusDto.buildFailureStatusDto("库存为空！");
             }
