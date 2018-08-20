@@ -110,4 +110,12 @@ public interface AllocateApplyService {
      * @date 2018-08-20 12:02:58
      */
     StatusDto cancelApply(String applyNo);
+    /**
+     *  根据类型查询服务中心的code
+     * @param type 机构的类型
+     * @return List<String> 机构的code
+     * @author zhangkangjian
+     * @date 2018-08-20 16:17:55
+     */
+    List<String> getOrgCodesByOrgType(String type);
 }

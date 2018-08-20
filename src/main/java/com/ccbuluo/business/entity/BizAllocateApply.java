@@ -336,10 +336,13 @@ public class BizAllocateApply {
      * @date 2018-08-10 14:01:49
      */
     public enum ApplyStatusEnum {
-        PENDING("10", "待处理"), CANCEL("15", "申请撤销"), WAITINGPAYMENT("20", "等待付款"),
+        PENDING("10", "申请提交"), CANCEL("15", "申请撤销"), WAITINGPAYMENT("20", "等待付款"),
         WAITDELIVERY("30", "等待发货"), OUTSTORE("40", "平台出库"), INSTORE("50", "平台入库"),
         WAITINGRECEIPT("60", "等待收货"), CONFIRMRECEIPT("70", "确认收货"), APPLICATIONCOMPLETED("80", "申请完成"),
-        WAITINGREFUND("90", "等待退款");
+
+        WAITINGREFUND("90", "等待退款"),REFUNDCOMPLETED("100", "退款完成"),
+
+        REPLACEWAITIN("110", "更换待入库"),REPLACECOMPLETED("120", "更换完成");
         // 成员变量
         private String key;
         private String value;

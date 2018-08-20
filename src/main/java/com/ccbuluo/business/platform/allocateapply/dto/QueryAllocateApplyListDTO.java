@@ -43,6 +43,40 @@ public class QueryAllocateApplyListDTO {
     @ApiModelProperty(name = "applyType", value = "平台决定的处理类型(注：TRANSFER调拨、PURCHASE采购)")
     private String applyType;
 
+    /**
+     * 申请来源
+     */
+    @ApiModelProperty(name = "orgType", value = "申请来源")
+    private String orgType;
+    @ApiModelProperty(name = "orgName", value = "申请机构")
+    private String orgName;
+    @ApiModelProperty(name = "applyorgNo", value = "申请机构")
+    private String applyorgNo;
+
+    public String getApplyorgNo() {
+        return applyorgNo;
+    }
+
+    public void setApplyorgNo(String applyorgNo) {
+        this.applyorgNo = applyorgNo;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
+
+    public String getOrgType() {
+        return orgType;
+    }
+
+    public void setOrgType(String orgType) {
+        this.orgType = orgType;
+    }
+
     public String getApplyNo() {
         return applyNo;
     }
@@ -59,9 +93,6 @@ public class QueryAllocateApplyListDTO {
         this.applyStatus = applyStatus;
     }
 
-    public Date getCreateTime() {
-        return createTime;
-    }
     public Long getApplyTime() {
         return createTime.getTime();
     }

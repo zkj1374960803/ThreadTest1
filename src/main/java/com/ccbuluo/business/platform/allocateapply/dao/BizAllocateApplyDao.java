@@ -192,7 +192,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         return queryPageForBean(QueryAllocateApplyListDTO.class, sql.toString(), map, offset, pageSize);
     }
     /**
-     * 查询申请列表
+     * 查询处理列表
      * @param userOrgCode 用户机构
      * @return Page<QueryAllocateApplyListDTO> 分页的信息
      * @author zhangkangjian
@@ -202,7 +202,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("userOrgCode", userOrgCode);
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.apply_no,a.applyer_name,a.create_time,a.process_type,a.apply_status ")
+        sql.append(" SELECT a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.apply_status ")
             .append(" FROM biz_allocate_apply a WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(userOrgCode)){
             sql.append(" AND a.outstock_orgno = :userOrgCode ");
@@ -298,6 +298,11 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         if(orgCode != null && orgCode.size() > 0){
             map.put("orgCode", orgCode);
             sql.append(" AND  a.org_no in (:orgCode) ");
+        }
+        String orgNo = findStockListDTO.getOrgNo();
+        if(StringUtils.isNoneBlank(orgNo)){
+            map.put("orgNo", orgNo);
+            sql.append(" AND  a.org_no = :orgNo ");
         }
         sql.append(" GROUP BY a.product_no ");
         return queryPageForBean(FindStockListDTO.class, sql.toString(), map, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
