@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -104,5 +105,24 @@ public class PlatformDirectApplyHandleStrategy extends DefaultApplyHandleStrateg
     @Override
     public StatusDto cancelApply(String applyNo){
         return StatusDto.buildSuccessStatusDto("申请撤销成功！");
+    }
+
+    /**
+     *  构建出库和入库计划并保存
+     * @param details 申请单详情
+     * @param stockDetails 库存详情列表
+     * @param applyTypeEnum 申请类型枚举
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    @Override
+    public Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> buildOutAndInstockplanDetail(List<AllocateapplyDetailBO> details, List<BizStockDetail> stockDetails, BizAllocateApply.AllocateApplyTypeEnum applyTypeEnum, List<RelOrdstockOccupy> relOrdstockOccupies){
+        List<BizOutstockplanDetail> outList = new ArrayList<BizOutstockplanDetail>();
+        List<BizInstockplanDetail> inList = new ArrayList<BizInstockplanDetail>();
+        // 平台出库计划
+        outstockplanPlatform(outList,relOrdstockOccupies,stockDetails,details, BizAllocateApply.AllocateApplyTypeEnum.DIRECTALLOCATE.toString());
+        // 买入方入库计划
+        instockplanPurchaser(inList,details, BizAllocateApply.AllocateApplyTypeEnum.DIRECTALLOCATE.toString());
+        return Pair.of(outList, inList);
     }
 }

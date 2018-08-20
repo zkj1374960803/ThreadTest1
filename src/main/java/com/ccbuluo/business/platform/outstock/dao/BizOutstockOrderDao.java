@@ -77,7 +77,7 @@ public class BizOutstockOrderDao extends BaseDao<BizOutstockOrder> {
             params.put("outstockNo", outstockNo);
             sql.append(" AND  boo.outstockorder_no = :outstockNo");
         }
-        sql.append(" ORDER BY operate_time DESC");
+        sql.append(" ORDER BY boo.operate_time DESC");
 
         return queryPageForBean(BizOutstockOrder.class, sql.toString(), params, offset, pagesize);
 

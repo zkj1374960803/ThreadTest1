@@ -332,7 +332,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         StatusDtoThriftList<QueryNameByUseruuidsDTO> queryNameByUseruuidsDTOStatusDtoThriftList = innerUserInfoService.queryNameByUseruuids(outstockOperator);
         StatusDto<List<QueryNameByUseruuidsDTO>> resolve = StatusDtoThriftUtils.resolve(queryNameByUseruuidsDTOStatusDtoThriftList, QueryNameByUseruuidsDTO.class);
         List<QueryNameByUseruuidsDTO> userNames = resolve.getData();
-        Map<String, String> collect = userNames.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getAsstoreCode, QueryNameByUseruuidsDTO::getStoreName));
+        Map<String, String> collect = userNames.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, QueryNameByUseruuidsDTO::getName));
         rows.forEach(item -> {
             item.setOutstockOperatorName(collect.get(item.getOutstockOperator()));
         });
@@ -356,7 +356,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         StatusDtoThriftList<QueryNameByUseruuidsDTO> queryNameByUseruuidsDTOStatusDtoThriftList = innerUserInfoService.queryNameByUseruuids(Lists.newArrayList(bizOutstockOrderDTO.getOutstockOperator()));
         StatusDto<List<QueryNameByUseruuidsDTO>> resolve = StatusDtoThriftUtils.resolve(queryNameByUseruuidsDTOStatusDtoThriftList, QueryNameByUseruuidsDTO.class);
         List<QueryNameByUseruuidsDTO> userNames = resolve.getData();
-        Map<String, String> collect = userNames.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getAsstoreCode, QueryNameByUseruuidsDTO::getStoreName));
+        Map<String, String> collect = userNames.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, QueryNameByUseruuidsDTO::getName));
         bizOutstockOrderDTO.setOutstockOperatorName(collect.get(bizOutstockOrderDTO.getOutstockOperator()));
         // 查询出库单详单
         List<OutstockorderDetailDTO> outstockorderDetailDTOList = outstockorderDetailService.queryListByOutstockNo(outstockNo);

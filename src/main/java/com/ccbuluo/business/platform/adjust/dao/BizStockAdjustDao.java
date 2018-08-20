@@ -100,24 +100,6 @@ public class BizStockAdjustDao extends BaseDao<BizStockAdjust> {
         return super.updateForMap(sql.toString(), params);
     }
 
-    /**
-     * 保存盘库详单
-     * @param bizStockAdjustdetailList 盘库详单
-     * @return 主键id
-     * @author liuduo
-     * @date 2018-08-15 09:01:44
-     */
-    public List<Long> saveAdjustDetail(List<BizStockAdjustdetail> bizStockAdjustdetailList) {
-        StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO biz_stock_adjust ( adjust_docno,adjust_orgno,")
-            .append("adjust_userid,adjust_time,adjust_reson,adjust_result,creator,")
-            .append("create_time,operator,operate_time,delete_flag,remark ) VALUES ( ")
-            .append(" :adjustDocno, :adjustOrgno, :adjustUserid, :adjustTime,")
-            .append(" :adjustReson, :adjustResult, :creator, :createTime, :operator,")
-            .append(" :operateTime, :deleteFlag, :remark )");
-
-        return batchInsertForListBean(sql.toString(), bizStockAdjustdetailList);
-    }
 
     /**
      * 查询盘库单列表
