@@ -42,11 +42,12 @@ public class ApplyHandleContext {
     /**
      *  申请处理
      * @param applyNo 申请单code
-     * @return
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-18 17:47:52
      */
     public StatusDto applyHandle(String applyNo){
         try {
-            // todo 魏俊标 把if换成switch
             // 根据申请单获取申请单详情
             BizAllocateApply ba = bizAllocateApplyDao.getByNo(applyNo);
             if(null == ba){

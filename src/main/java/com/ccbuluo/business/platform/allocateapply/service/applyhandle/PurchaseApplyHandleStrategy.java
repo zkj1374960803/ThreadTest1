@@ -14,6 +14,7 @@ import com.ccbuluo.http.StatusDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -48,6 +49,7 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
      * @author weijb
      * @date 2018-08-08 10:55:41
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public StatusDto applyHandle(BizAllocateApply ba){
         String applyNo = ba.getApplyNo();

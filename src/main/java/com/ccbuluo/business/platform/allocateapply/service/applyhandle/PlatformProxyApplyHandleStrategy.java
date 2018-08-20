@@ -48,6 +48,7 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
      * @author weijb
      * @date 2018-08-08 10:55:41
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public StatusDto applyHandle(BizAllocateApply ba){
         String applyNo = ba.getApplyNo();
