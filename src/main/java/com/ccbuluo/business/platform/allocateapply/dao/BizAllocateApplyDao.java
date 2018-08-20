@@ -283,7 +283,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     public Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO, List<String> productCode, List<String> orgCode) {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.id,a.product_no,sum(a.valid_stock + a.occupy_stock + a.problem_stock + a.damaged_stock + a.transit_stock + a.freeze_stock) as 'total',a.product_name as 'productName',a.product_categoryname as 'productCategoryname',a.product_unit as 'unit'")
+        sql.append(" SELECT a.id,a.product_no,sum(ifnull(a.valid_stock,0) + ifnull(a.occupy_stock,0) + ifnull(a.problem_stock,0) + ifnull(a.damaged_stock,0) + ifnull(a.transit_stock,0) + ifnull(a.freeze_stock,0)) as 'total',a.product_name as 'productName',a.product_categoryname as 'productCategoryname',a.product_unit as 'unit'")
             .append(" FROM biz_stock_detail a ")
             .append(" WHERE 1 = 1 ");
         if(productCode != null && productCode.size() > 0){
