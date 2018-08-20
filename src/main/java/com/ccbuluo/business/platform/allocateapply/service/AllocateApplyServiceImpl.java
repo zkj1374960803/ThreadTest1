@@ -1,12 +1,16 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
 import com.ccbuluo.business.constants.*;
+import com.ccbuluo.business.entity.BizAllocateApply.AllocateApplyTypeEnum;
+import com.ccbuluo.business.entity.BizAllocateApply.ApplyStatusEnum;
+import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleContext;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
+import com.ccbuluo.business.platform.stockmanagement.dto.FindStockDetailDTO;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.BusinessUser;
@@ -18,8 +22,6 @@ import com.ccbuluo.http.*;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
-import com.ccbuluo.usercoreintf.dto.QueryServiceCenterDTO;
-import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
 import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
@@ -27,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -99,17 +102,17 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         // 查询组织架构类型
         String orgTypeByCode = getOrgTypeByCode(allocateApplyDTO.getOutstockOrgno());
         allocateApplyDTO.setOutstockOrgtype(orgTypeByCode);
-        // 如果是采购类型的，入库机构是平台
+        // 如果是采购类型的，处理机构和出库机构则是平台
         String applyType = allocateApplyDTO.getApplyType();
-        if(Constants.PROCESS_TYPE_PURCHASE.equals(applyType)){
-            allocateApplyDTO.setApplyorgNo(Constants.PLATFORM);
-            allocateApplyDTO.setOutstockOrgno(Constants.PLATFORM);
-            allocateApplyDTO.setProcessOrgno(Constants.PLATFORM);
-        }else if(AllocateApplyEnum.BARTER.name().equals(applyType) || AllocateApplyEnum.REFUND.equals(applyType)){
+        if(AllocateApplyTypeEnum.PURCHASE.name().equals(applyType)){
+            allocateApplyDTO.setApplyorgNo(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+            allocateApplyDTO.setOutstockOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+            allocateApplyDTO.setProcessOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+        }else if(AllocateApplyTypeEnum.BARTER.name().equals(applyType) || AllocateApplyTypeEnum.REFUND.equals(applyType)){
             StatusDto<String> thcode = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.TH);
             allocateApplyDTO.setApplyNo(thcode.getData());
-            allocateApplyDTO.setOutstockOrgno(Constants.PLATFORM);
-            allocateApplyDTO.setProcessOrgno(Constants.PLATFORM);
+            allocateApplyDTO.setOutstockOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+            allocateApplyDTO.setProcessOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
             allocateApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
         } else{
             allocateApplyDTO.setProcessOrgtype(orgTypeByCode);
@@ -123,14 +126,14 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             a.setApplyNo(allocateApplyDTO.getApplyNo());
             a.setOperator(loggedUserId);
             a.setCreator(loggedUserId);
-            if(AllocateApplyEnum.BARTER.name().equals(applyType) || AllocateApplyEnum.REFUND.equals(applyType)){
-                a.setStockType("PROBLEM");
+            if(AllocateApplyTypeEnum.BARTER.name().equals(applyType) || AllocateApplyTypeEnum.REFUND.equals(applyType)){
+                a.setStockType(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.name());
             }else {
-                a.setStockType("NORMAL");
+                a.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
             }
         });
         bizAllocateApplyDao.batchInsertForapplyDetailList(allocateapplyDetailList);
-        if(AllocateApplyEnum.BARTER.name().equals(applyType) || AllocateApplyEnum.REFUND.equals(applyType)){
+        if(AllocateApplyTypeEnum.BARTER.name().equals(applyType) || AllocateApplyTypeEnum.REFUND.equals(applyType)){
             applyHandleContext.applyHandle(allocateApplyDTO.getApplyNo());
         }
 
@@ -283,12 +286,13 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     public void processApply(ProcessApplyDTO processApplyDTO) {
         String processType = processApplyDTO.getApplyType();
         String userOrgCode = getUserOrgCode();
+        // todo 张康健确定申请类型的代码不合适
         // 如果是调拨类型的
-        if(Constants.PROCESS_TYPE_TRANSFER.equals(processType)){
-            if(Constants.PLATFORM.equals(userOrgCode)){
-                processApplyDTO.setApplyType(AllocateApplyEnum.PLATFORMALLOCATE.name());
+        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.name().equals(processType)){
+            if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(userOrgCode)){
+                processApplyDTO.setApplyType(AllocateApplyTypeEnum.PLATFORMALLOCATE.name());
             }else {
-                processApplyDTO.setApplyType(AllocateApplyEnum.SERVICEALLOCATE.name());
+                processApplyDTO.setApplyType(AllocateApplyTypeEnum.SAMELEVEL.name());
             }
             String outstockOrgno = processApplyDTO.getOutstockOrgno();
             if(StringUtils.isBlank(outstockOrgno)){
@@ -323,7 +327,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     public Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO) {
         // 根据分类查询供应商的code
         List<String> productCode = null;
-        if(StringUtils.isNotBlank(findStockListDTO.getCategoryCode())){
             List<BasicCarpartsProductDTO> carpartsProductDTOList;
             if(Constants.PRODUCT_TYPE_EQUIPMENT.equals(findStockListDTO.getProductType())){
                 // 查询类型下所有的code
@@ -337,7 +340,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             if(productCode == null || productCode.size() == 0){
                 return new Page<FindStockListDTO>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
             }
-        }
         // 根据类型查询服务中心的code
         QueryOrgDTO orgDTO = new QueryOrgDTO();
         orgDTO.setOrgType(findStockListDTO.getType());
@@ -345,8 +347,11 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         StatusDtoThriftList<QueryOrgDTO> queryOrgDTO = basicUserOrganizationService.queryOrgAndWorkInfo(orgDTO);
         StatusDto<List<QueryOrgDTO>> queryOrgDTOResolve = StatusDtoThriftUtils.resolve(queryOrgDTO, QueryOrgDTO.class);
         List<QueryOrgDTO> data = queryOrgDTOResolve.getData();
-        List<String> orgCode = data.stream().map(QueryOrgDTO::getOrgCode).collect(Collectors.toList());
-        Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode);
+        List<String> orgCode = null;
+        if(data != null && data.size() > 0){
+            orgCode = data.stream().map(QueryOrgDTO::getOrgCode).collect(Collectors.toList());
+        }
+        Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
         return page;
     }
 
@@ -383,7 +388,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public Page<QueryOrgDTO> queryTransferStock(QueryOrgDTO orgDTO, Integer offset, Integer pageSize) {
-        orgDTO.setOrgType(Constants.SERVICECENTER);
+        // todo 张康健将组织机构作为入参
+        orgDTO.setOrgType(OrganizationTypeEnum.SERVICECENTER.name());
         orgDTO.setStatus(Constants.FREEZE_STATUS_YES);
         StatusDtoThriftList<QueryOrgDTO> queryOrgDTOList = basicUserOrganizationService.queryOrgAndWorkInfo(orgDTO);
         StatusDto<List<QueryOrgDTO>> resolve = StatusDtoThriftUtils.resolve(queryOrgDTOList, QueryOrgDTO.class);
@@ -441,5 +447,19 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         listStatusDto.setCode(flag);
         listStatusDto.setMessage(message);
         return listStatusDto;
+    }
+
+    /**
+     * 撤销申请单
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-20 12:02:58
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public StatusDto cancelApply(String applyNo){
+        // 更改申请单状态 TODO
+        return applyHandleContext.cancelApply(applyNo);
     }
 }

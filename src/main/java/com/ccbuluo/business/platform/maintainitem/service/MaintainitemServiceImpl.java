@@ -1,8 +1,8 @@
 package com.ccbuluo.business.platform.maintainitem.service;
 
-import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceMaintainitem;
+import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.platform.maintainitem.dao.BizServiceMaintainitemDao;
 import com.ccbuluo.business.platform.maintainitem.dto.DetailBizServiceMaintainitemDTO;
 import com.ccbuluo.business.platform.maintainitem.dto.SaveBizServiceMaintainitemDTO;
@@ -13,8 +13,6 @@ import com.ccbuluo.http.StatusDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.invoke.ConstantCallSite;
-import java.util.List;
 
 /**
  * 工时service实现
@@ -50,7 +48,7 @@ public class MaintainitemServiceImpl implements MaintainitemService{
         }
         // 生成code
         String serviceCenterCode = null;
-        StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FL);
+        StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(BizServiceProjectcode.CodePrefixEnum.FL);
         if (stringStatusDto.getCode().equals(Constants.SUCCESS_CODE)) {
             serviceCenterCode = stringStatusDto.getData();
         } else {

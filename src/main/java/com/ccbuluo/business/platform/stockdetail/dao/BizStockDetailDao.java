@@ -3,14 +3,23 @@ package com.ccbuluo.business.platform.stockdetail.dao;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.adjust.dto.StockAdjustListDTO;
+import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.UpdateStockBizStockDetailDTO;
+import com.ccbuluo.business.platform.stockmanagement.dto.FindProductDetailDTO;
+import com.ccbuluo.business.platform.stockmanagement.dto.FindStockDetailDTO;
+import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.dao.BaseDao;
+import com.ccbuluo.db.Page;
+import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -53,62 +62,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         return super.saveRid(sql.toString(), entity);
     }
 
-    /**
-     * 编辑 批次库存表，由交易批次号、供应商、仓库等多维度唯一主键 区分的库存表实体
-     * @param entity 批次库存表，由交易批次号、供应商、仓库等多维度唯一主键 区分的库存表实体
-     * @return 影响条数
-     * @author liuduo
-     * @date 2018-08-07 11:55:41
-     */
-    public int update(BizStockDetail entity) {
-        StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_stock_detail SET repository_no = :repositoryNo,")
-            .append("org_no = :orgNo,product_no = :productNo,product_type = :productType,")
-            .append("trade_no = :tradeNo,supplier_no = :supplierNo,")
-            .append("valid_stock = :validStock,occupy_stock = :occupyStock,")
-            .append("problem_stock = :problemStock,damaged_stock = :damagedStock,")
-            .append("transit_stock = :transitStock,freeze_stock = :freezeStock,")
-            .append("seller_orgno = :sellerOrgno,cost_price = :costPrice,")
-            .append("instock_planid = :instockPlanid,")
-            .append("latest_correct_time = :latestCorrectTime,creator = :creator,")
-            .append("create_time = :createTime,operator = :operator,")
-            .append("operate_time = :operateTime,delete_flag = :deleteFlag,")
-            .append("remark = :remark WHERE id= :id");
-        return super.updateForBean(sql.toString(), entity);
-    }
 
-    /**
-     * 获取批次库存表，由交易批次号、供应商、仓库等多维度唯一主键 区分的库存表详情
-     * @param id  id
-     * @author liuduo
-     * @date 2018-08-07 11:55:41
-     */
-    public BizStockDetail getById(long id) {
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,repository_no,org_no,product_no,product_type,trade_no,")
-            .append("supplier_no,valid_stock,occupy_stock,problem_stock,damaged_stock,")
-            .append("transit_stock,freeze_stock,seller_orgno,cost_price,instock_planid,")
-            .append("latest_correct_time,creator,create_time,operator,operate_time,")
-            .append("delete_flag,remark FROM biz_stock_detail WHERE id= :id");
-        Map<String, Object> params = Maps.newHashMap();
-        params.put("id", id);
-        return super.findForBean(BizStockDetail.class, sql.toString(), params);
-    }
-
-    /**
-     * 删除批次库存表，由交易批次号、供应商、仓库等多维度唯一主键 区分的库存表
-     * @param id  id
-     * @return 影响条数
-     * @author liuduo
-     * @date 2018-08-07 11:55:41
-     */
-    public int deleteById(long id) {
-        StringBuilder sql = new StringBuilder();
-        sql.append("DELETE  FROM biz_stock_detail WHERE id= :id ");
-        Map<String, Object> params = Maps.newHashMap();
-        params.put("id", id);
-        return super.updateForMap(sql.toString(), params);
-    }
 
     /**
      * 根据入库详单的  供应商、商品、仓库、批次号  查询在库存中有无记录
@@ -196,22 +150,22 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
 
     /**
      * 根据卖方code和商品code（list）查出库存列表
-     * @param productOrgNo 卖方机构code
+     * @param sellerOrgNo 卖方机构code
      * @param codes 商品codes（list）
      * @author weijb
      * @date 2018-08-07 13:55:41
      */
-    public List<BizStockDetail> getStockDetailListByOrgAndProduct(String productOrgNo, List<String> codes){
+    public List<BizStockDetail> getStockDetailListByOrgAndProduct(String sellerOrgNo, List<String> codes){
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,repository_no,org_no,product_no,product_type,trade_no,")
                 .append("supplier_no,valid_stock,occupy_stock,problem_stock,damaged_stock,")
                 .append("transit_stock,freeze_stock,seller_orgno,cost_price,instock_planid,")
                 .append("latest_correct_time,creator,create_time,operator,operate_time,")
-                .append("delete_flag,remark,version_no FROM biz_stock_detail WHERE delete_flag = :deleteFlag and org_no= :productOrgNo and product_no IN(:codes) and valid_stock > 0")
+                .append("delete_flag,remark,version_no FROM biz_stock_detail WHERE delete_flag = :deleteFlag and org_no= :sellerOrgNo and product_no IN(:codes) and valid_stock > 0")
                 .append(" order by create_time");//先进先出排序取出，按创建时间的正序排列
         Map<String, Object> params = Maps.newHashMap();
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
-        params.put("productOrgNo", productOrgNo);
+        params.put("sellerOrgNo", sellerOrgNo);
         params.put("codes", codes);
         return super.queryListBean(BizStockDetail.class, sql.toString(), params);
     }
@@ -271,8 +225,8 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      */
     public void updateOccupyStock(List<BizStockDetail> bizStockDetails) {
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_stock_detail SET occupy_stock = :occupyStock,version_no = version_no+1")
-            .append(" WHERE id = :id AND :versionNo > version_no");
+        sql.append("UPDATE biz_stock_detail SET occupy_stock = :occupyStock,version_no = version_no+1,")
+            .append(" operator = :operator,operate_time = :operateTime WHERE id = :id AND :versionNo > version_no");
 
         batchUpdateForListBean(sql.toString(), bizStockDetails);
     }
@@ -301,8 +255,8 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      */
     public int updateOccupyStockById(List<BizStockDetail> bizStockDetails) {
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_stock_detail SET occupy_stock = valid_stock,valid_stock = 0,version_no = version_no+1")
-            .append(" WHERE id = :id AND :versionNo > version_no");
+        sql.append("UPDATE biz_stock_detail SET occupy_stock = valid_stock,valid_stock = 0,version_no = version_no+1,")
+            .append(" operator = :operator,operate_time = :operateTime WHERE id = :id AND :versionNo > version_no");
 
         return batchUpdateForListBean(sql.toString(), bizStockDetails);
     }
@@ -354,6 +308,135 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @date 2018-08-14 21:38:16
      */
     public void updateAdjustValidStock(List<BizStockDetail> bizStockDetailList1) {
-        String sql = "UPDATE biz_stock_detail SET valid_stock = :validStock, version_no = version_no+1 WHERE version_no > :versionNo AND id = :id";
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_stock_detail SET valid_stock = :validStock, version_no = version_no+1,operator = :operator,")
+            .append(" operate_time = :operateTime WHERE version_no > :versionNo AND id = :id");
+
+        batchUpdateForListBean(sql.toString(), bizStockDetailList1);
+    }
+    /**
+     * 查询库存的详情
+     * @param productNo 商品的编号
+     * @param productType 商品的类型
+     * @return FindStockDetailDTO 库存的基本信息
+     * @author zhangkangjian
+     * @date 2018-08-20 11:15:52
+     */
+    public FindStockDetailDTO findStockDetail(String productNo, String productType) {
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("productNo", productNo);
+        map.put("productType", productType);
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT a.id,a.product_no,SUM(a.valid_stock + a.occupy_stock) AS 'totalStock', ")
+            .append(" SUM(a.valid_stock + a.occupy_stock) * a.cost_price AS 'totalAmount', ")
+            .append(" a.product_name AS 'productName',a.product_categoryname AS 'productCategoryname',a.product_name AS 'unit' ")
+            .append(" FROM biz_stock_detail a WHERE a.product_no = :productNo AND a.product_type = :productType")
+            .append(" GROUP BY a.product_no ");
+        return findForBean(FindStockDetailDTO.class, sql.toString(), map);
+    }
+
+    /**
+     * 查询正常件的库存
+     * @param productNo 商品的编号
+     * @param productType 商品的类型
+     * @return FindProductDetailDTO 商品库存的详情
+     * @author zhangkangjian
+     * @date 2018-08-20 11:34:48
+     */
+    public FindProductDetailDTO findProductDetail(String productNo, String productType, List<QueryOrgDTO> orgDTOList) {
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("productNo", productNo);
+        map.put("productType", productType);
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT a.valid_stock,a.occupy_stock,SUM(a.valid_stock + a.occupy_stock) AS total, ")
+            .append(" SUM(a.valid_stock + a.occupy_stock) * a.cost_price AS 'totalAmount',a.product_unit ")
+            .append(" FROM biz_stock_detail a  ")
+            .append(" WHERE a.product_no = :productNo AND a.product_type = :productType ");
+        if(orgDTOList != null && orgDTOList.size() > 0){
+            map.put("orgDTOList", orgDTOList);
+            sql.append(" AND a.org_no in (:orgDTOList) ");
+        }
+        sql.append(" GROUP BY a.product_no ");
+        return findForBean(FindProductDetailDTO.class, sql.toString(), map);
+    }
+    /**
+     * 查询可调拨库存的数量
+     * @param productNo 商品的编号
+     * @param productType 商品的类型
+     * @param sellerOrgno 库存来源
+     * @return FindProductDetailDTO 商品库存的详情
+     * @author zhangkangjian
+     * @date 2018-08-20 11:34:48
+     */
+    public Long findTransferInventory(String productNo, String productType, List<QueryOrgDTO> orgDTOList, String sellerOrgno) {
+        if(StringUtils.isNoneBlank(productNo, productType, sellerOrgno)){
+            return NumberUtils.LONG_ZERO;
+        }
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("productNo", productNo);
+        map.put("productType", productType);
+        map.put("sellerOrgno", sellerOrgno);
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT SUM(a.valid_stock) FROM biz_stock_detail a  ")
+            .append(" WHERE a.product_no = :productNo AND a.product_type = :productType AND a.seller_orgno = :sellerOrgno ");
+        if(orgDTOList != null && orgDTOList.size() > 0){
+            map.put("orgDTOList", orgDTOList);
+            sql.append(" AND a.org_no in (:orgDTOList) ");
+        }
+        sql.append(" GROUP BY a.product_no ");
+        return namedParameterJdbcTemplate.queryForObject(sql.toString(), map, Long.class);
+    }
+
+    /**
+     * 查询问题件
+     * @param productNo 商品的编号
+     * @param productType 商品的类型
+     * @return FindProductDetailDTO 商品库存的详情
+     * @author zhangkangjian
+     * @date 2018-08-20 11:34:48
+     */
+    public FindProductDetailDTO findProblemStock(String productNo, String productType, List<QueryOrgDTO> orgDTOList) {
+        if(StringUtils.isNoneBlank(productNo, productType)){
+            new CommonException(Constants.ERROR_CODE, "必填参数为null");
+        }
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("productNo", productNo);
+        map.put("productType", productType);
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT SUM(a.problem_stock) AS 'totalStock',SUM(a.problem_stock) * a.cost_price AS 'totalAmount',a.product_name AS 'unit' ")
+            .append(" FROM biz_stock_detail a  ")
+            .append(" WHERE a.product_no = :productNo AND a.product_type = :productType  ");
+        if(orgDTOList != null && orgDTOList.size() > 0){
+            map.put("orgDTOList", orgDTOList);
+            sql.append(" AND a.org_no in (:orgDTOList) ");
+        }
+        sql.append(" GROUP BY a.product_no ");
+        return findForBean(FindProductDetailDTO.class, sql.toString(), map);
+    }
+    /**
+     * 查询损坏件
+     * @param productNo 商品的编号
+     * @param productType 商品的类型
+     * @return FindProductDetailDTO 商品库存的详情
+     * @author zhangkangjian
+     * @date 2018-08-20 11:34:48
+     */
+    public FindProductDetailDTO findDamagedStock(String productNo, String productType, List<QueryOrgDTO> orgDTOList) {
+        if(StringUtils.isNoneBlank(productNo, productType)){
+            new CommonException(Constants.ERROR_CODE, "必填参数为null");
+        }
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("productNo", productNo);
+        map.put("productType", productType);
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT SUM(a.damaged_stock) AS 'totalStock',SUM(a.damaged_stock) * a.cost_price AS 'totalAmount',a.product_name AS 'unit' ")
+            .append(" FROM biz_stock_detail a  ")
+            .append(" WHERE a.product_no = :productNo AND a.product_type = :productType  ");
+        if(orgDTOList != null && orgDTOList.size() > 0){
+            map.put("orgDTOList", orgDTOList);
+            sql.append(" AND a.org_no in (:orgDTOList) ");
+        }
+        sql.append(" GROUP BY a.product_no ");
+        return findForBean(FindProductDetailDTO.class, sql.toString(), map);
     }
 }

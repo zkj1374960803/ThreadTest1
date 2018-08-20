@@ -3,7 +3,10 @@ package com.ccbuluo.business.platform.stockdetail.service;
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.adjust.dto.StockAdjustListDTO;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
+import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.UpdateStockBizStockDetailDTO;
+import com.ccbuluo.core.common.UserHolder;
+import com.ccbuluo.db.Page;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,8 @@ public class StockDetailServiceImpl implements StockDetailService{
 
     @Autowired
     private BizStockDetailDao bizStockDetailDao;
+    @Autowired
+    private UserHolder userHolder;
 
     /**
      * 根据入库详单的  供应商、商品、仓库、批次号  查询在库存中有无记录
@@ -153,4 +158,5 @@ public class StockDetailServiceImpl implements StockDetailService{
     public void updateAdjustValidStock(List<BizStockDetail> bizStockDetailList1) {
         bizStockDetailDao.updateAdjustValidStock(bizStockDetailList1);
     }
+
 }

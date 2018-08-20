@@ -273,6 +273,9 @@ public class StockAdjustServiceImpl implements StockAdjustService{
             List<SearchStockAdjustListDTO> rows = adjustListDTOPage.getRows();
             List<String> orgCodes = rows.stream().map(SearchStockAdjustListDTO::getAdjustOrgno).distinct().collect(Collectors.toList());
             List<String> uuids = rows.stream().map(SearchStockAdjustListDTO::getAdjustUserid).distinct().collect(Collectors.toList());
+            if (orgCodes.size() == 0 || uuids.size() == 0) {
+                return null;
+            }
             // 获取组织机构或者客户经理名字
             Map<String, BasicUserOrganization> stringBasicUserOrganizationMap = orgService.queryOrganizationByOrgCodes(orgCodes);
             StatusDtoThriftList<QueryNameByUseruuidsDTO> queryNameByUseruuidsDTOStatusDtoThriftList = innerUserInfoService.queryNameByUseruuids(uuids);
@@ -318,6 +321,7 @@ public class StockAdjustServiceImpl implements StockAdjustService{
                         bizStockDetail1.setId(bizStockDetail.getId());
                         bizStockDetail1.setValidStock(validStock + differenceNum);
                         bizStockDetail1.setVersionNo(bizStockDetail.getVersionNo() + Constants.LONG_FLAG_ONE);
+                        bizStockDetail1.preUpdate(userHolder.getLoggedUserId());
                         bizStockDetailList1.add(bizStockDetail1);
                         break;
                     } else {// 现有库存小于盘库后输入的库存,更新为0
@@ -330,6 +334,7 @@ public class StockAdjustServiceImpl implements StockAdjustService{
                         bizStockDetail1.setId(bizStockDetail.getId());
                         bizStockDetail1.setValidStock(Constants.LONG_FLAG_ZERO);
                         bizStockDetail1.setVersionNo(bizStockDetail.getVersionNo() + Constants.LONG_FLAG_ONE);
+                        bizStockDetail1.preUpdate(userHolder.getLoggedUserId());
                         bizStockDetailList1.add(bizStockDetail1);
                     }
                 }

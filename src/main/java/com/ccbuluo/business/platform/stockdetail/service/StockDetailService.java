@@ -2,7 +2,9 @@ package com.ccbuluo.business.platform.stockdetail.service;
 
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.adjust.dto.StockAdjustListDTO;
+import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.UpdateStockBizStockDetailDTO;
+import com.ccbuluo.db.Page;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
@@ -114,5 +116,6 @@ public interface StockDetailService {
      * @date 2018-08-14 21:38:16
      */
     void updateAdjustValidStock(List<BizStockDetail> bizStockDetailList1);
+
 
 }

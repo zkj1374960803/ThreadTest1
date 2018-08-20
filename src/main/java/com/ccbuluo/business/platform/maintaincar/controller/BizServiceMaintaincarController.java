@@ -1,8 +1,8 @@
 package com.ccbuluo.business.platform.maintaincar.controller;
 
-import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceMaintaincar;
+import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.platform.maintaincar.dto.ListServiceMaintaincarDTO;
 import com.ccbuluo.business.platform.maintaincar.dto.SearchBizServiceMaintaincarDTO;
 import com.ccbuluo.business.platform.maintaincar.service.BizServiceMaintaincarService;
@@ -45,7 +45,7 @@ public class BizServiceMaintaincarController extends BaseController {
     @PostMapping("/create")
     public StatusDto create(@ApiParam(name = "bizServiceMaintaincar对象", value = "传入json格式", required = true)@RequestBody BizServiceMaintaincar bizServiceMaintaincar) {
         // 生成编码
-        StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FR);
+        StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(BizServiceProjectcode.CodePrefixEnum.FR);
         // 获取code失败
         if(!Constants.SUCCESS_CODE.equals(stringStatusDto.getCode())){
             return stringStatusDto;

@@ -184,5 +184,18 @@ public class AllocateApplyController extends BaseController {
         return allocateApplyServiceImpl.checkStockQuantity(checkStockQuantityDTO);
     }
 
+    /**
+     * 撤销申请单
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-20 12:02:58
+     */
+    @ApiOperation(value = "撤销申请单", notes = "【魏俊标】")
+    @GetMapping("/cancelapply/{applyNo}")
+    @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
+    public StatusDto cancelApply(@PathVariable String applyNo){
+        return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.cancelApply(applyNo));
+    }
 
 }

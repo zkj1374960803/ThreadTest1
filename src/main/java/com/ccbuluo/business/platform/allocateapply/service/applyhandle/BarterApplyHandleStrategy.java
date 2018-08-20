@@ -5,13 +5,13 @@ import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
-import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
+import com.ccbuluo.business.platform.outstock.service.OutstockOrderService;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
-import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
-import com.ccbuluo.core.exception.CommonException;
+import com.ccbuluo.http.StatusDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -31,11 +31,9 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
     @Resource
     private BizInstockplanDetailDao bizInstockplanDetailDao;
     @Resource
-    private BizAllocateTradeorderDao bizAllocateTradeorderDao;
-    @Resource
-    private BizStockDetailDao bizStockDetailDao;
-    @Resource
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
+    @Resource
+    OutstockOrderService outstockOrderService;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -45,16 +43,16 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
      * @author weijb
      * @date 2018-08-08 10:55:41
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public int applyHandle(BizAllocateApply ba){
-        int flag = 0;
+    public StatusDto applyHandle(BizAllocateApply ba){
         String applyNo = ba.getApplyNo();
         String applyType = ba.getApplyType();
         try {
             // 根据申请单获取申请单详情
             List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
             if(null == details || details.size() == 0){
-                return 0;
+                return StatusDto.buildFailureStatusDto("申请单为空！");
             }
             // 构建占用库存和订单占用库存关系
             //获取卖方机构code
@@ -62,7 +60,7 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
             //查询库存列表
             List<BizStockDetail> stockDetails = getStockDetailList(productOrgNo, details);
             if(null == stockDetails || stockDetails.size() == 0){
-                return 0;
+                return StatusDto.buildFailureStatusDto("库存为空！");
             }
             // 构建占用库存和订单占用库存关系
             Pair<List<BizStockDetail>, List<RelOrdstockOccupy>> pair = buildStockAndRelOrdEntity(details,stockDetails,applyType);
@@ -70,19 +68,18 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 构建订单占用库存关系
             List<RelOrdstockOccupy> relOrdstockOccupies = pair.getRight();
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
-            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, applyType, relOrdstockOccupies);
+            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, BizAllocateApply.AllocateApplyTypeEnum.BARTER, relOrdstockOccupies);
             // 调用自动出库
-            // TODO 刘铎提供：入参：pir.getLeft()（出库计划）
+            outstockOrderService.autoSaveOutstockOrder(applyType, pir.getLeft());
             // 批量保存出库计划详情
             bizOutstockplanDetailDao.batchOutstockplanDetail(pir.getLeft());
             // 批量保存入库计划详情
             bizInstockplanDetailDao.batchInsertInstockplanDetail(pir.getRight());
-            flag =1;
         } catch (Exception e) {
             logger.error("提交失败！", e);
             throw e;
         }
-        return flag;
+        return StatusDto.buildSuccessStatusDto("申请处理成功！");
     }
 
     /**
@@ -92,7 +89,7 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
      * @date 2018-08-11 13:35:41
      */
     @Override
-    public int cancelApply(String applyNo){
-        return 0;
+    public StatusDto cancelApply(String applyNo){
+        return StatusDto.buildSuccessStatusDto("退换货没有撤销！");
     }
 }

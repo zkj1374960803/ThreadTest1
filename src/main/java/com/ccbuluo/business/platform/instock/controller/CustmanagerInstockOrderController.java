@@ -9,7 +9,6 @@ import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.*;
-import org.apache.zookeeper.data.Stat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,10 +20,10 @@ import java.util.List;
  * @version v1.0.0
  * @date 2018-08-07 14:03:59
  */
-@Api(tags = "入库单")
+@Api(tags = "入库单（客户经理端）")
 @RestController
-@RequestMapping("/platform/instockorder")
-public class InstockOrderController extends BaseController {
+@RequestMapping("/platform/custmanagerinstockorder")
+public class CustmanagerInstockOrderController extends BaseController {
 
     @Autowired
     private InstockOrderService instockOrderService;

@@ -280,11 +280,11 @@ public class BizStockDetail extends AftersaleCommonEntity{
      * @auther liuduo
      * @date 2018-08-13 19:32:16
      */
-    public enum StockEnum {
+    public enum StockTypeEnum {
         VALIDSTOCK("有效库存"),PROBLEMSTOCK("问题库存");
         private String label;
 
-        StockEnum(String label) {
+        StockTypeEnum(String label) {
             this.label = label;
         }
 

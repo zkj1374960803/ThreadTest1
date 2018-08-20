@@ -5,10 +5,10 @@ package com.ccbuluo.business.constants;
  * @author weijb
  * @date 2018-08-09 16:00:05
  */
-public enum StockPlanEnum {
+public enum StockPlanStatusEnum {
     NOTEFFECTIVE("未生效"),DOING("计划执行中"),COMPLETE("执行完成"),CANCEL("作废");
 
-    StockPlanEnum(String label){
+    StockPlanStatusEnum(String label){
         this.label = label;
     }
 

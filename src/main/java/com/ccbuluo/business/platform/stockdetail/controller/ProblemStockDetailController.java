@@ -110,7 +110,7 @@ public class ProblemStockDetailController extends BaseController {
      * @date 2018-08-15 08:59:51
      */
     @ApiOperation(value = "根据商品code查询某个物料的问题件库存",notes = "【魏俊标】")
-    @GetMapping("/getprodectstock")
+    @GetMapping("/getproblemproductstock")
     @ApiImplicitParams({@ApiImplicitParam(name = "productNo", value = "商品编号", required = false, paramType = "query"),
             @ApiImplicitParam(name = "keyword", value = "关键字", required = false, paramType = "query"),
             @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),

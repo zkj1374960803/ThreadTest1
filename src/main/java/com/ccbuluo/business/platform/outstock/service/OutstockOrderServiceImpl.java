@@ -1,11 +1,11 @@
 package com.ccbuluo.business.platform.outstock.service;
 
-import com.ccbuluo.business.constants.ApplyStatusEnum;
-import com.ccbuluo.business.constants.Constants;
-import com.ccbuluo.business.constants.DocCodePrefixEnum;
+import com.ccbuluo.business.constants.*;
+import com.ccbuluo.business.entity.BizAllocateApply.ApplyStatusEnum;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
+import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleContext;
 import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
 import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.business.platform.outstock.dto.OutstockorderDetailDTO;
@@ -26,6 +26,7 @@ import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.usercoreintf.dto.QueryNameByUseruuidsDTO;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,8 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     private InnerUserInfoService innerUserInfoService;
     @Autowired
     private StoreHouseService storeHouseService;
+    @Autowired
+    private ApplyHandleContext applyHandleContext;
 
     /**
      * 自动保存出库单
@@ -77,7 +80,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public StatusDto<String> autoSaveOutstockOrder(String applyNo, List<BizOutstockplanDetail> bizOutstockplanDetailList) {
+    public StatusDto<String> autoSaveOutstockOrder(String applyNo,  List<BizOutstockplanDetail> bizOutstockplanDetailList) {
         try {
             Map<String, List<BizOutstockplanDetail>> collect = bizOutstockplanDetailList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getOutRepositoryNo));
             // 根据申请单号查询基本信息
@@ -108,64 +111,48 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 bizOutstockOrder.setChecked(Constants.LONG_FLAG_ONE);
                 bizOutstockOrder.setCheckedTime(date);
                 bizOutstockOrder.preInsert(userHolder.getLoggedUserId());
-                bizOutstockOrderList.add(bizOutstockOrder);
-                // 组装出库单详单
-                bizOutstockorderDetailList1 = editOutstockorderDetail(bizOutstockorderDetailList, bizOutstockplanDetails, outstockNo);
-
+                int i = bizOutstockOrderDao.saveEntity(bizOutstockOrder);
+                if (i == Constants.FAILURESTATUS) {
+                    throw new CommonException("10001", "保存出库单失败！");
+                }
+                for (BizOutstockplanDetail outstockplanDetail : bizOutstockplanDetails) {
+                    BizOutstockorderDetail bizOutstockorderDetail = new BizOutstockorderDetail();
+                    bizOutstockorderDetail.setOutstockOrderno(outstockNo);
+                    bizOutstockorderDetail.setOutstockPlanid(outstockplanDetail.getId());
+                    bizOutstockorderDetail.setProductNo(outstockplanDetail.getProductNo());
+                    bizOutstockorderDetail.setProductName(outstockplanDetail.getProductName());
+                    bizOutstockorderDetail.setProductType(outstockplanDetail.getProductType());
+                    bizOutstockorderDetail.setProductCategoryname(outstockplanDetail.getProductCategoryname());
+                    bizOutstockorderDetail.setSupplierNo(outstockplanDetail.getSupplierNo());
+                    bizOutstockorderDetail.setOutstockNum(outstockplanDetail.getPlanOutstocknum());
+                    bizOutstockorderDetail.setStockType(outstockplanDetail.getOutstockType());
+                    bizOutstockorderDetail.setUnit(outstockplanDetail.getProductUnit());
+                    bizOutstockorderDetail.setCostPrice(outstockplanDetail.getCostPrice());
+                    bizOutstockorderDetail.setActualPrice(outstockplanDetail.getSalesPrice());
+                    bizOutstockorderDetailList.add(bizOutstockorderDetail);
+                }
+                List<Long> longs = bizOutstockOrderDao.batchBizOutstockOrder(bizOutstockOrderList);
+                if (null != longs && longs.size() == 0) {
+                    throw new CommonException("10002", "保存出库单详单失败！");
+                }
+                // 更改库存
+                // 根据出库单号查询出库单详单
+                updateOccupyStock(bizOutstockorderDetailList1, bizOutstockplanDetailList);
+                // 4、更新出库计划中的实际出库数量
+                updateActualOutstocknum(bizOutstockorderDetailList1);
+                // 5、更新出库计划中的状态和完成时间
+                List<BizOutstockplanDetail> bizOutstockplanDetailList2 = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
+                updatePlanStatus(bizOutstockplanDetailList2);
+                // 6、更改申请单状态
+                List<BizOutstockplanDetail> bizOutstockplanDetailList3 = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
+                updateApplyOrderStatus(applyNo, detail, bizOutstockplanDetailList3);
             }
-            // 保存出库单
-            List<Long> longs = bizOutstockOrderDao.batchBizOutstockOrder(bizOutstockOrderList);
-            if (null != longs && longs.size() == 0) {
-                throw new CommonException("10001", "保存出库单失败！");
-            }
-            // 保存出库单详单
-            List<Long> longs1 = outstockorderDetailService.saveOutstockorderDetail(bizOutstockorderDetailList1);
-            if (null != longs1 && longs1.size() == 0) {
-                throw new CommonException("10002", "保存出库单详单失败！");
-            }
-            // 更改库存
-            updateOccupyStock(bizOutstockorderDetailList1, bizOutstockplanDetailList);
-            // 4、更新出库计划中的实际出库数量
-            updateActualOutstocknum(bizOutstockorderDetailList1);
-            // 5、更新出库计划中的状态和完成时间
-            updatePlanStatus(bizOutstockplanDetailList);
-            // 6、更改申请单状态
-            updateApplyOrderStatus(applyNo, detail, bizOutstockplanDetailList);
             return StatusDto.buildSuccessStatusDto("保存成功！");
         } catch (Exception e) {
             logger.error("生成出库单失败！", e.getMessage());
             throw e;
         }
 
-    }
-
-    /**
-     * 组装出库单详单
-     * @param bizOutstockorderDetailList 出库单详单集合
-     * @param bizOutstockplanDetails 出库计划
-     * @param outstockNo 出库单号
-     * @return 组装好的出库单详单数据
-     * @author liuduo
-     * @date 2018-08-16 08:46:31
-     */
-    private List<BizOutstockorderDetail> editOutstockorderDetail(List<BizOutstockorderDetail> bizOutstockorderDetailList, List<BizOutstockplanDetail> bizOutstockplanDetails, String outstockNo) {
-        bizOutstockplanDetails.forEach(item -> {
-            BizOutstockorderDetail bizOutstockorderDetail = new BizOutstockorderDetail();
-            bizOutstockorderDetail.setOutstockOrderno(outstockNo);
-            bizOutstockorderDetail.setOutstockPlanid(item.getId());
-            bizOutstockorderDetail.setProductNo(item.getProductNo());
-            bizOutstockorderDetail.setProductName(item.getProductName());
-            bizOutstockorderDetail.setProductType(item.getProductType());
-            bizOutstockorderDetail.setProductCategoryname(item.getProductCategoryname());
-            bizOutstockorderDetail.setSupplierNo(item.getSupplierNo());
-            bizOutstockorderDetail.setOutstockNum(item.getPlanOutstocknum());
-            bizOutstockorderDetail.setStockType(item.getOutstockType());
-            bizOutstockorderDetail.setUnit(item.getProductUnit());
-            bizOutstockorderDetail.setCostPrice(item.getCostPrice());
-            bizOutstockorderDetail.setActualPrice(item.getSalesPrice());
-            bizOutstockorderDetailList.add(bizOutstockorderDetail);
-        });
-        return bizOutstockorderDetailList;
     }
 
 
@@ -205,18 +192,8 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
             if (null != longs && longs.size() == 0) {
                 throw new CommonException("10002", "保存出库单详单失败！");
             }
-            // 3、修改库存明细
-            // 根据申请单号查询出库单详单
-            List<BizOutstockorderDetail> bizOutstockorderDetailList1 = outstockorderDetailService.queryByApplyNo(applyNo);
-            updateOccupyStock(bizOutstockorderDetailList1, bizOutstockplanDetailList);
-            // 4、更新出库计划中的实际出库数量
-            updateActualOutstocknum(bizOutstockorderDetailList1);
-            // 5、更新出库计划中的状态和完成时间
-            List<BizOutstockplanDetail> bizOutstockplanDetailList2 = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
-            updatePlanStatus(bizOutstockplanDetailList2);
-            // 6、更改申请单状态
-            List<BizOutstockplanDetail> bizOutstockplanDetailList3 = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
-            updateApplyOrderStatus(applyNo, detail, bizOutstockplanDetailList3);
+            // 复核库存和计划
+            checkStockAndPlan(applyNo, outRepositoryNo, outstockNo, detail, bizOutstockplanDetailList);
             return StatusDto.buildSuccessStatusDto("保存成功！");
         } catch (Exception e) {
             logger.error("生成出库单失败！", e.getMessage());
@@ -224,6 +201,30 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         }
     }
 
+    /**
+     * 复核库存和计划
+     * @param applyNo 申请单号
+     * @param outRepositoryNo 出库仓库编号
+     * @param outstockNo 出库单编号
+     * @param detail 申请单详情
+     * @param bizOutstockplanDetailList 出库计划集合
+     * @author liuduo
+     * @date 2018-08-20 13:57:35
+     */
+    private void checkStockAndPlan(String applyNo, String outRepositoryNo, String outstockNo, FindAllocateApplyDTO detail, List<BizOutstockplanDetail> bizOutstockplanDetailList) {
+        // 3、修改库存明细
+        // 根据出库单号查询出库单详单
+        List<BizOutstockorderDetail> bizOutstockorderDetailList1 = outstockorderDetailService.queryByApplyNo(outstockNo);
+        updateOccupyStock(bizOutstockorderDetailList1, bizOutstockplanDetailList);
+        // 4、更新出库计划中的实际出库数量
+        updateActualOutstocknum(bizOutstockorderDetailList1);
+        // 5、更新出库计划中的状态和完成时间
+        List<BizOutstockplanDetail> bizOutstockplanDetailList2 = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
+        updatePlanStatus(bizOutstockplanDetailList2);
+        // 6、更改申请单状态
+        List<BizOutstockplanDetail> bizOutstockplanDetailList3 = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
+        updateApplyOrderStatus(applyNo, detail, bizOutstockplanDetailList3);
+    }
 
 
     /**
@@ -236,16 +237,31 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      * @date 2018-08-11 13:05:07
      */
     private void updateApplyOrderStatus(String applyNo, FindAllocateApplyDTO detail, List<BizOutstockplanDetail> bizOutstockplanDetailList) {
-        List<BizOutstockplanDetail> collect = bizOutstockplanDetailList.stream().filter(item -> item.getPlanStatus().equals(Constants.CHECKED)).collect(Collectors.toList());
-        if (detail.getApplyType().equals(Constants.PLATFORM_TRANSFER)) {
-            if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(Constants.PLATFORM)) {
-                updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.WAITINGRECEIPT.toString());
-            } else {
-                updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.INSTORE.toString());
+        List<BizOutstockplanDetail> collect = bizOutstockplanDetailList.stream().filter(item -> item.getPlanStatus().equals(StockPlanStatusEnum.COMPLETE)).collect(Collectors.toList());
+        String applyType = detail.getApplyType();
+        if (StringUtils.isNotBlank(applyType)) {
+            switch (Enum.valueOf(BizAllocateApply.AllocateApplyTypeEnum.class, applyType)) {
+                case PLATFORMALLOCATE:
+                case PURCHASE:
+                case SAMELEVEL:
+                case DIRECTALLOCATE:
+                case BARTER:
+                    if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+                        updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.WAITINGRECEIPT.toString());
+                    } else {
+                        updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.INSTORE.toString());
+                    }
+                    break;
+                case REFUND:
+                    if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+                        updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.WAITINGREFUND.toString());
+                    } else {
+                        updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.INSTORE.toString());
+                    }
+                    break;
             }
-        } else {
-            updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.WAITINGRECEIPT.toString());
         }
+
     }
 
     /**
@@ -259,6 +275,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      * @date 2018-08-11 13:09:11
      */
     private void updateApplyOrderStatus(String applyNo, List<BizOutstockplanDetail> bizOutstockplanDetailList, List<BizOutstockplanDetail> collect, String status) {
+        // 判断本次交易的出库计划是否全部完成
         if (bizOutstockplanDetailList.size() == collect.size()) {
             allocateApplyService.updateApplyOrderStatus(applyNo, status);
         }
@@ -274,7 +291,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     @Override
     public List<String> queryApplyNo() {
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
-        if (orgCode.equals(Constants.PLATFORM)) {
+        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
             return allocateApplyService.queryApplyNo(ApplyStatusEnum.OUTSTORE.toString(), orgCode);
         }
         return allocateApplyService.queryApplyNo(ApplyStatusEnum.WAITDELIVERY.toString(), orgCode);
@@ -289,8 +306,8 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      * @date 2018-08-11 13:17:42
      */
     @Override
-    public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String productType) {
-        return outStockPlanService.queryOutstockplanList(applyNo, productType);
+    public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String outRepositoryNo, String productType) {
+        return outStockPlanService.queryOutstockplanList(applyNo, outRepositoryNo, productType);
     }
 
     /**
@@ -362,6 +379,19 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     }
 
     /**
+     * 根据申请单号查询出库仓库
+     * @param applyNo 申请单号
+     * @return 入库仓库
+     * @author liuduo
+     * @date 2018-08-13 15:20:27
+     */
+    @Override
+    public List<String> getByApplyNo(String applyNo) {
+        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+        return outStockPlanService.getByApplyNo(applyNo, orgCode);
+    }
+
+    /**
      * 更新出库计划中的状态和完成时间
      *
      * @param bizOutstockplanDetailList 出库计划
@@ -378,9 +408,10 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 updatePlanStatusDTO updatePlanStatusDTO = collect.get(item.getId());
                 BizOutstockplanDetail bizOutstockplanDetail = new BizOutstockplanDetail();
                 bizOutstockplanDetail.setId(item.getId());
-                bizOutstockplanDetail.setPlanStatus(Constants.CHECKED);
+                bizOutstockplanDetail.setPlanStatus(StockPlanStatusEnum.COMPLETE.name());
                 bizOutstockplanDetail.setCompleteTime(new Date());
                 bizOutstockplanDetail.setVersionNo(updatePlanStatusDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
+                bizOutstockplanDetail.preUpdate(userHolder.getLoggedUserId());
                 bizOutstockplanDetails.add(bizOutstockplanDetail);
             }
         });
@@ -405,6 +436,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
             bizOutstockplanDetail.setId(item.getOutstockPlanid());
             bizOutstockplanDetail.setActualOutstocknum(item.getOutstockNum());
             bizOutstockplanDetail.setVersionNo(updatePlanStatusDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
+            bizOutstockplanDetail.preUpdate(userHolder.getLoggedUserId());
             bizOutstockplanDetails.add(bizOutstockplanDetail);
         });
         outStockPlanService.updateActualOutstocknum(bizOutstockplanDetails);
@@ -438,30 +470,34 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 Long occupyStock;
                 if (updateStockBizStockDetailDTO != null) {
                     BizStockDetail bizStockDetail = new BizStockDetail();
-                    if (item.getStockType().equals(BizStockDetail.StockEnum.VALIDSTOCK.toString())) {
+                    if (item.getStockType().equals(BizStockDetail.StockTypeEnum.VALIDSTOCK.toString())) {
                         occupyStock = updateStockBizStockDetailDTO.getOccupyStock();// 库存明细中的占用库存数量
                         if (occupyStock <= outstockNum) {
                             bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
                             bizStockDetail.setOccupyStock(Constants.LONG_FLAG_ZERO);
                             bizStockDetail.setVersionNo(updateStockBizStockDetailDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
+                            bizStockDetail.preUpdate(userHolder.getLoggedUserId());
                             bizStockDetails.add(bizStockDetail);
                         } else {
                             bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
                             bizStockDetail.setOccupyStock(occupyStock - outstockNum);
                             bizStockDetail.setVersionNo(updateStockBizStockDetailDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
+                            bizStockDetail.preUpdate(userHolder.getLoggedUserId());
                             bizStockDetails.add(bizStockDetail);
                         }
-                    } else if (item.getStockType().equals(BizStockDetail.StockEnum.PROBLEMSTOCK.toString())) {
+                    } else if (item.getStockType().equals(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.toString())) {
                         occupyStock = updateStockBizStockDetailDTO.getProblemStock();// 库存明细中的问题件库存数量
                         if (occupyStock <= outstockNum) {
                             bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
                             bizStockDetail.setProblemStock(Constants.LONG_FLAG_ZERO);
                             bizStockDetail.setVersionNo(updateStockBizStockDetailDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
+                            bizStockDetail.preUpdate(userHolder.getLoggedUserId());
                             bizStockDetails.add(bizStockDetail);
                         } else {
                             bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
                             bizStockDetail.setProblemStock(occupyStock - outstockNum);
                             bizStockDetail.setVersionNo(updateStockBizStockDetailDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
+                            bizStockDetail.preUpdate(userHolder.getLoggedUserId());
                             bizStockDetails.add(bizStockDetail);
                         }
                     }
@@ -509,14 +545,10 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         bizOutstockOrder.setOutstockOrgno(detail.getOutstockOrgno());
         bizOutstockOrder.setOutstockOperator(userHolder.getLoggedUserId());
         bizOutstockOrder.setTradeDocno(applyNo);
-        if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(Constants.PLATFORM)) {
-            bizOutstockOrder.setOutstockType(detail.getProcessType());
-        } else {
-            bizOutstockOrder.setOutstockType(Constants.PROCESS_TYPE_TRANSFER);
-        }
+        bizOutstockOrder.setOutstockType(applyHandleContext.getOutstockType(detail.getApplyType()));
         bizOutstockOrder.setOutstockTime(date);
         bizOutstockOrder.setTransportorderNo(transportorderNo);
-        bizOutstockOrder.setChecked(Constants.LONG_FLAG_ONE);
+        bizOutstockOrder.setChecked(Constants.LONG_FLAG_ZERO);
         bizOutstockOrder.setCheckedTime(date);
         bizOutstockOrder.preInsert(userHolder.getLoggedUserId());
         return bizOutstockOrderDao.saveEntity(bizOutstockOrder);

@@ -22,12 +22,12 @@ public interface OutstockorderDetailService {
 
     /**
      * 根据申请单号查询出库单详单
-     * @param applyNo 申请单号
+     * @param outstockNo 申请单号
      * @return 出库单详单
      * @author liuduo
      * @date 2018-08-10 14:16:32
      */
-    List<BizOutstockorderDetail> queryByApplyNo(String applyNo);
+    List<BizOutstockorderDetail> queryByApplyNo(String outstockNo);
 
     /**
      * 根据出库单号查询出库单详单

@@ -29,10 +29,10 @@ import java.util.List;
  * @version v1.0.0
  * @date 2018-08-14 16:14:25
  */
-@Api(tags = "盘库")
+@Api(tags = "盘库（客户经理端）")
 @RestController
-@RequestMapping("/adjust/stockadjust")
-public class StockAdjustController extends BaseController {
+@RequestMapping("/adjust/custmanagerstockadjust")
+public class CustmanagerStockAdjustController extends BaseController {
 
     @Autowired
     private StockAdjustService stockAdjustService;

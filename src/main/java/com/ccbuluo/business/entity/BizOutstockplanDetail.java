@@ -1,6 +1,6 @@
 package com.ccbuluo.business.entity;
 
-import com.ccbuluo.business.constants.StockPlanEnum;
+import com.ccbuluo.business.constants.StockPlanStatusEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -8,18 +8,13 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 实体
+ * 出库计划实体
  * @author liuduo
  * @date 2018-05-10 11:43:11
  * @version V1.0.0
  */
-@ApiModel(value = "实体", description = "")
-public class BizOutstockplanDetail {
-    /**
-     * 
-     */
-    @ApiModelProperty(name = "id", value = "")
-    private Long id;
+@ApiModel(value = "BizOutstockplanDetail", description = "出库计划实体实体")
+public class BizOutstockplanDetail extends AftersaleCommonEntity{
     /**
      * 出库类型
      */
@@ -111,31 +106,6 @@ public class BizOutstockplanDetail {
     @ApiModelProperty(name = "completeTime", value = "完成时间")
     private Date completeTime;
     /**
-     * 创建人
-     */
-    @ApiModelProperty(name = "creator", value = "创建人")
-    private String creator;
-    /**
-     * 创建时间
-     */
-    @ApiModelProperty(name = "createTime", value = "创建时间")
-    private Date createTime;
-    /**
-     * 更新人
-     */
-    @ApiModelProperty(name = "operator", value = "更新人")
-    private String operator;
-    /**
-     * 更新时间
-     */
-    @ApiModelProperty(name = "operateTime", value = "更新时间")
-    private Date operateTime;
-    /**
-     * 删除标识
-     */
-    @ApiModelProperty(name = "deleteFlag", value = "删除标识")
-    private Integer deleteFlag;
-    /**
      * 备注
      */
     @ApiModelProperty(name = "remark", value = "备注")
@@ -161,14 +131,6 @@ public class BizOutstockplanDetail {
      */
     @ApiModelProperty(name = "stockType", value = "库存类型（正常库存、问题库存、报损件库存，等等）")
     private String stockType;
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return this.id;
-    }
 
     public void setOutstockType(String outstockType) {
         this.outstockType = outstockType;
@@ -290,46 +252,6 @@ public class BizOutstockplanDetail {
         return this.completeTime;
     }
 
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
-    public String getCreator() {
-        return this.creator;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getCreateTime() {
-        return this.createTime;
-    }
-
-    public void setOperator(String operator) {
-        this.operator = operator;
-    }
-
-    public String getOperator() {
-        return this.operator;
-    }
-
-    public void setOperateTime(Date operateTime) {
-        this.operateTime = operateTime;
-    }
-
-    public Date getOperateTime() {
-        return this.operateTime;
-    }
-
-    public void setDeleteFlag(Integer deleteFlag) {
-        this.deleteFlag = deleteFlag;
-    }
-
-    public Integer getDeleteFlag() {
-        return this.deleteFlag;
-    }
-
     public void setRemark(String remark) {
         this.remark = remark;
     }
@@ -347,7 +269,7 @@ public class BizOutstockplanDetail {
     }
 
     public String getStatusName() {
-        return StockPlanEnum.valueOf(planStatus).getLabel();
+        return StockPlanStatusEnum.valueOf(planStatus).getLabel();
     }
 
     public Long getVersionNo() {

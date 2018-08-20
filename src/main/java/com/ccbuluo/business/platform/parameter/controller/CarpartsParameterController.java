@@ -1,7 +1,7 @@
 package com.ccbuluo.business.platform.parameter.controller;
 
-import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.controller.BaseController;
@@ -49,7 +49,7 @@ public class CarpartsParameterController extends BaseController {
     @PostMapping("/savecarpartsparameter")
     public StatusDto saveCarpartsParameter(@ApiParam(name = "saveBasicCarpartsParameterDTO对象", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsParameterDTO saveBasicCarpartsParameterDTO)  throws TException {
         // 生成编码
-        StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FM);
+        StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(BizServiceProjectcode.CodePrefixEnum.FM);
         // 获取code失败
         if(!Constants.SUCCESS_CODE.equals(stringStatusDto.getCode())){
             return stringStatusDto;

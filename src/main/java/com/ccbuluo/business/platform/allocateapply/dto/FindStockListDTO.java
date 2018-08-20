@@ -27,7 +27,7 @@ public class FindStockListDTO{
     @ApiModelProperty(name = "orgNo", value = "机构的编号", hidden = true)
     private String orgNo;
 
-    @ApiModelProperty(name = "type", value = "机构的编号", hidden = true)
+    @ApiModelProperty(name = "type", value = "机构的类型", hidden = true)
     private String type;
     /**
      * 商品编号

@@ -20,10 +20,10 @@ import java.util.List;
  * @version v1.0.0
  * @date 2018-08-09 11:33:02
  */
-@Api(tags = "出库单")
+@Api(tags = "出库单（客户经理端）")
 @RestController
-@RequestMapping("/platform/outstockorder")
-public class OutstockOrderController extends BaseController {
+@RequestMapping("/platform/custmanageroutstockorder")
+public class CustmanagerOutstockOrderController extends BaseController {
 
     @Autowired
     private OutstockOrderService outstockOrderService;

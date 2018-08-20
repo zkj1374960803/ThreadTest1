@@ -1,9 +1,9 @@
 package com.ccbuluo.business.platform.equipment.service;
 
-import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.ProductUnitEnum;
 import com.ccbuluo.business.entity.BizServiceEquipment;
+import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
 import com.ccbuluo.business.platform.equipment.dto.DetailBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.equipment.dto.SaveBizServiceEquipmentDTO;
@@ -49,7 +49,7 @@ public class EquipmentServiceImpl implements EquipmentService{
         }
         // 生成code
         String serviceCenterCode = null;
-        StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FA);
+        StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(BizServiceProjectcode.CodePrefixEnum.FA);
         if (stringStatusDto.getCode().equals(Constants.SUCCESS_CODE)) {
             serviceCenterCode = stringStatusDto.getData();
         } else {

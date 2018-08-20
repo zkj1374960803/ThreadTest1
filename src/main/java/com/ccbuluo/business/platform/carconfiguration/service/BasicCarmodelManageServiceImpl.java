@@ -1,8 +1,8 @@
 package com.ccbuluo.business.platform.carconfiguration.service;
 
 import com.auth0.jwt.internal.org.apache.commons.lang3.StringUtils;
-import com.ccbuluo.business.constants.CodePrefixEnum;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.platform.carconfiguration.dao.*;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelConfiguration;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelManage;
@@ -139,7 +139,7 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
                 return statusDto;
             }
             CarmodelManage carmodelManage = buildCarModelManage(carmodelManageDTO);
-            StatusDto<String> _statusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FH);
+            StatusDto<String> _statusDto = generateProjectCodeService.grantCode(BizServiceProjectcode.CodePrefixEnum.FH);
             // 获取code失败
             if(!_statusDto.isSuccess()){
                 return _statusDto;

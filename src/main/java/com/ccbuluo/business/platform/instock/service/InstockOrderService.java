@@ -77,7 +77,7 @@ public interface InstockOrderService {
     BizInstockOrderDTO getByInstockNo(String instockNo);
 
     /**
-     * 根据入库单号查询入库仓库
+     * 根据申请单号查询入库仓库
      * @param applyNo 入库单号
      * @return 入库仓库
      * @author liuduo

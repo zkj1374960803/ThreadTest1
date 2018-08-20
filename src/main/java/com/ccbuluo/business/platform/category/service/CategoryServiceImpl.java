@@ -1,6 +1,6 @@
 package com.ccbuluo.business.platform.category.service;
 
-import com.ccbuluo.business.constants.CodePrefixEnum;
+import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
@@ -40,7 +40,7 @@ public class CategoryServiceImpl {
         String loggedUserId = userHolder.getLoggedUserId();
         carpartsCategory.setCreator(loggedUserId);
         carpartsCategory.setOperator(loggedUserId);
-        StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(CodePrefixEnum.FK);
+        StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(BizServiceProjectcode.CodePrefixEnum.FK);
         if(!stringStatusDto.isSuccess()){
             return StatusDto.buildFailure("生成分类编号失败！");
         }
