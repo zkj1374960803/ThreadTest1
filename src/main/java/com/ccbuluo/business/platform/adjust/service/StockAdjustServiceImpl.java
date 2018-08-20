@@ -240,7 +240,7 @@ public class StockAdjustServiceImpl implements StockAdjustService{
         stockAdjustDetailDTO.setAdjustDocName(data.getOrgName());
         StatusDtoThriftList<QueryNameByUseruuidsDTO> queryNameByUseruuids = innerUserInfoService.queryNameByUseruuids(Lists.newArrayList(adjustUserid));
         List<QueryNameByUseruuidsDTO> data1 = StatusDtoThriftUtils.resolve(queryNameByUseruuids, QueryNameByUseruuidsDTO.class).getData();
-        Map<String, String> collect = data1.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getAsstoreCode, QueryNameByUseruuidsDTO::getStoreName));
+        Map<String, String> collect = data1.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, QueryNameByUseruuidsDTO::getName));
         // 设置盘库人
         stockAdjustDetailDTO.setAdjustName(collect.get(stockAdjustDetailDTO.getAdjustUserid()));
         // 查询详情
@@ -280,7 +280,7 @@ public class StockAdjustServiceImpl implements StockAdjustService{
             Map<String, BasicUserOrganization> stringBasicUserOrganizationMap = orgService.queryOrganizationByOrgCodes(orgCodes);
             StatusDtoThriftList<QueryNameByUseruuidsDTO> queryNameByUseruuidsDTOStatusDtoThriftList = innerUserInfoService.queryNameByUseruuids(uuids);
             List<QueryNameByUseruuidsDTO> userList = StatusDtoThriftUtils.resolve(queryNameByUseruuidsDTOStatusDtoThriftList, QueryNameByUseruuidsDTO.class).getData();
-            Map<String, String> userMap = userList.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getAsstoreCode, QueryNameByUseruuidsDTO::getStoreName));
+            Map<String, String> userMap = userList.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, QueryNameByUseruuidsDTO::getName));
             rows.forEach(item -> {
                 item.setAdjustDocName(stringBasicUserOrganizationMap.get(item.getAdjustOrgno()).getOrgName());
                 item.setAdjustName(userMap.get(item.getAdjustUserid()));
