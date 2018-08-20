@@ -454,7 +454,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                 }
                 bizStockDetail.setSellerOrgno(bizAllocateApply.getOutstockOrgno());
                 bizStockDetail.setCostPrice(item.getCostPrice());
-                bizStockDetail.setInstockPlanid(id);
+                bizStockDetail.setInstockPlanid(item.getInstockPlanid());
                 bizStockDetail.preInsert(userHolder.getLoggedUserId());
                 Long stockDetailId = stockDetailService.saveStockDetail(bizStockDetail);
                 stockIds.add(stockDetailId);
