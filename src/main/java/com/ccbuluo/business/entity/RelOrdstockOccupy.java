@@ -14,12 +14,7 @@ import java.util.Date;
  * @date 2018-08-08 20:21:24
  */
 @ApiModel(value = "RelOrdstockOccupy", description = "订单占用库存关系实体")
-public class RelOrdstockOccupy {
-    /**
-     * id
-     */
-    @ApiModelProperty(name = "id", value = "id")
-    private Long id;
+public class RelOrdstockOccupy extends AftersaleCommonEntity{
     /**
      * 交易类型
      */
@@ -56,26 +51,6 @@ public class RelOrdstockOccupy {
     @ApiModelProperty(name = "occupyEndtime", value = "结束占用该库存的时间")
     private Date occupyEndtime;
     /**
-     * 创建人
-     */
-    @ApiModelProperty(name = "creator", value = "创建人")
-    private String creator;
-    /**
-     * 创建时间
-     */
-    @ApiModelProperty(name = "createTime", value = "创建时间")
-    private Date createTime;
-    /**
-     * 更新人
-     */
-    @ApiModelProperty(name = "operator", value = "更新人", hidden = true)
-    private String operator;
-    /**
-     * 更新时间
-     */
-    @ApiModelProperty(name = "operateTime", value = "更新时间", hidden = true)
-    private Date operateTime;
-    /**
      * 买方机构的编号
      */
     @ApiModelProperty(name = "instockOrgno", value = "买方机构的编号", hidden = true)
@@ -85,19 +60,6 @@ public class RelOrdstockOccupy {
      */
     @ApiModelProperty(name = "outstockOrgno", value = "卖方机构的编号", hidden = true)
     private String outstockOrgno;
-    /**
-     * 删除标识
-     */
-    @ApiModelProperty(name = "deleteFlag", value = "删除标识", hidden = true)
-    private Integer deleteFlag = 0;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getOrderType() {
         return orderType;
@@ -155,38 +117,6 @@ public class RelOrdstockOccupy {
         this.occupyEndtime = occupyEndtime;
     }
 
-    public String getCreator() {
-        return creator;
-    }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public String getOperator() {
-        return operator;
-    }
-
-    public void setOperator(String operator) {
-        this.operator = operator;
-    }
-
-    public Date getOperateTime() {
-        return operateTime;
-    }
-
-    public void setOperateTime(Date operateTime) {
-        this.operateTime = operateTime;
-    }
-
     public String getInstockOrgno() {
         return instockOrgno;
     }
@@ -203,11 +133,4 @@ public class RelOrdstockOccupy {
         this.outstockOrgno = outstockOrgno;
     }
 
-    public Integer getDeleteFlag() {
-        return deleteFlag;
-    }
-
-    public void setDeleteFlag(Integer deleteFlag) {
-        this.deleteFlag = deleteFlag;
-    }
 }

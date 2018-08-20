@@ -231,7 +231,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
                 // 卖方机构出库计划
                 outstockplanSeller(outList, relOrdstockOccupies,stockDetails, details, AllocateApplyTypeEnum.PLATFORMALLOCATE.toString());
                 // 平台出库计划
-                outstockplanPlatform(outList,relOrdstockOccupies,stockDetails,details, AllocateApplyTypeEnum.PLATFORMALLOCATE.toString());
+//                outstockplanPlatform(outList,relOrdstockOccupies,stockDetails,details, AllocateApplyTypeEnum.PLATFORMALLOCATE.toString());
                 // 平台入库计划
                 instockplanPlatform(inList,details, AllocateApplyTypeEnum.PLATFORMALLOCATE.toString());
                 // 买方入库计划
@@ -474,9 +474,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         outPlan.setApplyDetailId(ad.getId());//申请单详单id
         outPlan.setSalesPrice(ad.getSellPrice());// 销售价
         outPlan.setPlanStatus(StockPlanStatusEnum.DOING.toString());// 出库计划的状态（计划执行中）
-        outPlan.setCreator(userHolder.getLoggedUserId());// 创建人
-        outPlan.setCreateTime(new Date());// 创建时间
-        outPlan.setDeleteFlag(Constants.DELETE_FLAG_NORMAL);//删除标识
+        outPlan.preInsert(userHolder.getLoggedUserId());
         outPlan.setStockType(ad.getStockType());// 库存类型
         outPlan.setRemark(ad.getRemark());// 备注
         return outPlan;
@@ -514,9 +512,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         inPlan.setPlanInstocknum(ad.getApplyNum());// 计划入库数量
 //        inPlan.setActualInstocknum(ad.getApplyNum());// 实际入库数量
         inPlan.setCompleteStatus(StockPlanStatusEnum.DOING.toString());// 完成状态（计划执行中）
-        inPlan.setCreator(userHolder.getLoggedUserId());// 创建人
-        inPlan.setCreateTime(new Date());// 创建时间
-        inPlan.setDeleteFlag(Constants.DELETE_FLAG_NORMAL);//删除标识
+        inPlan.preInsert(userHolder.getLoggedUserId());
         inPlan.setStockType(ad.getStockType());// 库存类型
         inPlan.setRemark(ad.getRemark());// 备注
         return inPlan;
@@ -546,9 +542,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             ro.setOccupyStatus(StockPlanStatusEnum.DOING.toString());//占用状态occupy_status
             Date time = new Date();
             ro.setOccupyStarttime(time);//占用开始时间
-            ro.setCreator(userHolder.getLoggedUserId());//创建人
-            ro.setCreateTime(time);//创建时间
-            ro.setDeleteFlag(Constants.DELETE_FLAG_NORMAL);//删除标识
+            ro.preInsert(userHolder.getLoggedUserId());
             relOrdstockOccupies.add(ro);
         }
         return Pair.of(stockDetails, relOrdstockOccupies);

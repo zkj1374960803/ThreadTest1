@@ -24,13 +24,13 @@ import javax.annotation.Resource;
  */
 @Api(tags = "商品库存")
 @RestController
-@RequestMapping("/platform/stock")
+@RequestMapping("/platform/productstock")
 public class StockDetailController {
 
     @Resource
     StockDetailService stockDetailService;
     /**
-     * 根据商品code查询某个商品在当前登录机构的库存列表
+     * 查询某个商品在当前登录机构的库存列表
      * @param productNo 商品编号
      * @param offset 起始数
      * @param pageSize 每页数量
@@ -49,5 +49,17 @@ public class StockDetailController {
                                                                                            @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                                            @RequestParam(required = false, defaultValue = "20") Integer pageSize){
         return StatusDto.buildDataSuccessStatusDto(stockDetailService.getSelfStockBizStockDetailByCode(productNo, offset, pageSize));
+    }
+    /**
+     *  查询库存详情
+     * @param productNo 商品编号
+     * @author weijb
+     * @date 2018-08-20 10:12:33
+     */
+    @ApiOperation(value = "查询库存详情",notes = "【魏俊标】")
+    @ApiImplicitParam(name = "productNo", value = "商品编号",  required = true, paramType = "query")
+    @GetMapping("/getproductdetail")
+    public StatusDto getProductDetail(@RequestParam String productNo) {
+        return StatusDto.buildSuccessStatusDto(/*stockDetailService.getProductDetail(productNo)*/);
     }
 }
