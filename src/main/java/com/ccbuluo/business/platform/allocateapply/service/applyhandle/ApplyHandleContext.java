@@ -113,11 +113,11 @@ public class ApplyHandleContext {
             instockType = InstockTypeEnum.TRANSFER.toString();// 交易类型
         }
         // 采购
-        if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType)){
             instockType = InstockTypeEnum.PURCHASE.toString();// 交易类型
         }
         // 换货
-        if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) || AllocateApplyTypeEnum.REFUND.toString().equals(applyType) ){
             instockType = InstockTypeEnum.BARTER.toString();// 交易类型
         }
         return instockType;
@@ -133,7 +133,7 @@ public class ApplyHandleContext {
      */
     public String getOutstockType(String applyType){
         String outstockType = "";
-        // 调拨
+        // 调拨出库
         if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
             outstockType = OutstockTypeEnum.TRANSFER.toString();// 交易类型
         }
@@ -142,7 +142,7 @@ public class ApplyHandleContext {
             outstockType = OutstockTypeEnum.BARTER.toString();// 交易类型
         }
         // 退款
-        if(AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.REFUND.toString().equals(applyType) ){
             outstockType = OutstockTypeEnum.REFUND.toString();// 交易类型
         }
         return outstockType;
