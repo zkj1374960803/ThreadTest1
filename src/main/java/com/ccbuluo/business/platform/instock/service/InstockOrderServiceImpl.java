@@ -5,6 +5,7 @@ import com.ccbuluo.business.entity.BizAllocateApply.ApplyStatusEnum;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
+import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleContext;
 import com.ccbuluo.business.platform.inputstockplan.service.InputStockPlanService;
 import com.ccbuluo.business.platform.instock.dao.BizInstockOrderDao;
 import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
@@ -64,6 +65,8 @@ public class InstockOrderServiceImpl implements InstockOrderService {
     private InnerUserInfoService innerUserInfoService;
     @Autowired
     private JedisCluster jedisCluster;
+    @Autowired
+    private ApplyHandleContext applyHandleContext;
 
     /**
      * 根据申请单号状态查询申请单号集合
@@ -487,12 +490,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         bizInstockOrder.setInstockOrgno(orgCodeByStoreHouseCode);
         bizInstockOrder.setInstockOperator(userHolder.getLoggedUserId());
         bizInstockOrder.setInstockOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
-        // todo 刘铎 入库单的类型 要根据 申请的类型来决定，看标哥有没有可复用的方法
-        if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-            bizInstockOrder.setInstockType(bizAllocateApply.getProcessType());
-        } else {
-            bizInstockOrder.setInstockType(OutstockTypeEnum.TRANSFER.name());
-        }
+        bizInstockOrder.setInstockType(applyHandleContext.getInstockType(bizAllocateApply.getApplyType()));
         bizInstockOrder.setInstockTime(date);
         bizInstockOrder.setChecked(Constants.LONG_FLAG_ONE);
         bizInstockOrder.setCheckedTime(date);

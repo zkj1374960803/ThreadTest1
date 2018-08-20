@@ -5,6 +5,7 @@ import com.ccbuluo.business.entity.BizAllocateApply.ApplyStatusEnum;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
+import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleContext;
 import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
 import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.business.platform.outstock.dto.OutstockorderDetailDTO;
@@ -65,6 +66,8 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     private InnerUserInfoService innerUserInfoService;
     @Autowired
     private StoreHouseService storeHouseService;
+    @Autowired
+    private ApplyHandleContext applyHandleContext;
 
     /**
      * 自动保存出库单
@@ -220,15 +223,26 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      */
     private void updateApplyOrderStatus(String applyNo, FindAllocateApplyDTO detail, List<BizOutstockplanDetail> bizOutstockplanDetailList) {
         List<BizOutstockplanDetail> collect = bizOutstockplanDetailList.stream().filter(item -> item.getPlanStatus().equals(StockPlanStatusEnum.COMPLETE)).collect(Collectors.toList());
-        // todo 刘铎 支持所有申请类型
-        if (detail.getApplyType().equals(BizAllocateApply.AllocateApplyTypeEnum.PLATFORMALLOCATE) ) {
-            if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-                updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.WAITINGRECEIPT.toString());
-            } else {
-                updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.INSTORE.toString());
-            }
-        } else {
-            updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.WAITINGRECEIPT.toString());
+        String applyType = detail.getApplyType();
+        switch (applyType) {
+            case "PLATFORMALLOCATE":
+            case "PURCHASE":
+            case "SAMELEVEL":
+            case "DIRECTALLOCATE":
+            case "BARTER":
+                if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+                    updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.WAITINGRECEIPT.toString());
+                } else {
+                    updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.INSTORE.toString());
+                }
+                break;
+            case "REFUND":
+                if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+                    updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.WAITINGREFUND.toString());
+                } else {
+                    updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.INSTORE.toString());
+                }
+                break;
         }
     }
 
@@ -507,12 +521,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         bizOutstockOrder.setOutstockOrgno(detail.getOutstockOrgno());
         bizOutstockOrder.setOutstockOperator(userHolder.getLoggedUserId());
         bizOutstockOrder.setTradeDocno(applyNo);
-        // todo 刘铎 出库单的类型 要根据 申请的类型来决定，看标哥有没有可复用的方法
-        if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-            bizOutstockOrder.setOutstockType(OutstockTypeEnum.TRANSFER.name());
-        } else {
-            bizOutstockOrder.setOutstockType(OutstockTypeEnum.TRANSFER.name());
-        }
+        bizOutstockOrder.setOutstockType(applyHandleContext.getOutstockType(detail.getApplyType()));
         bizOutstockOrder.setOutstockTime(date);
         bizOutstockOrder.setTransportorderNo(transportorderNo);
         bizOutstockOrder.setChecked(Constants.LONG_FLAG_ONE);
