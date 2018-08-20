@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.stockmanagement.controller;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.servicecenter.service.ServiceCenterService;
@@ -52,6 +53,7 @@ public class StockManagementController extends BaseController {
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query")
     })
     public StatusDto<Page<FindStockListDTO>> findEquipmentStockList(@ApiIgnore FindStockListDTO findStockListDTO){
+        findStockListDTO.setProductType(Constants.PRODUCT_TYPE_EQUIPMENT);
         Page<FindStockListDTO> page = allocateApplyServiceImpl.findStockList(findStockListDTO);
         return StatusDto.buildDataSuccessStatusDto(page);
     }
@@ -68,12 +70,12 @@ public class StockManagementController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "categoryCode", value = "零配件类型的code", required = false, paramType = "query"),
         @ApiImplicitParam(name = "productNo", value = "商品的编号", required = false, paramType = "query"),
-        @ApiImplicitParam(name = "productType", value = "商品类型(注：FITTINGS零配件，EQUIPMENT物料)", required = true, paramType = "query"),
         @ApiImplicitParam(name = "type", value = "(注：PLATFORM集团，SERVICECENTER服务中心，CUSTMANAGER客户经理)", required = true, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query")
     })
     public StatusDto<Page<FindStockListDTO>> findFittingsStockList(@ApiIgnore FindStockListDTO findStockListDTO){
+        findStockListDTO.setProductType(Constants.PRODUCT_TYPE_FITTINGS);
         Page<FindStockListDTO> page = allocateApplyServiceImpl.findStockList(findStockListDTO);
         return StatusDto.buildDataSuccessStatusDto(page);
     }

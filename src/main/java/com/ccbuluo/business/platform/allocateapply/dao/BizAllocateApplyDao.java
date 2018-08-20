@@ -283,9 +283,8 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     public Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO, List<String> productCode, List<String> orgCode) {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.id,a.product_no,sum(a.valid_stock + a.occupy_stock + a.problem_stock + a.damaged_stock + a.transit_stock + a.freeze_stock) as 'total',b.product_name as 'productName',b.product_categoryname as 'productCategoryname',b.unit as 'unit'")
+        sql.append(" SELECT a.id,a.product_no,sum(ifnull(a.valid_stock,0) + ifnull(a.occupy_stock,0) + ifnull(a.problem_stock,0) + ifnull(a.damaged_stock,0) + ifnull(a.transit_stock,0) + ifnull(a.freeze_stock,0)) as 'total',a.product_name as 'productName',a.product_categoryname as 'productCategoryname',a.product_unit as 'unit'")
             .append(" FROM biz_stock_detail a ")
-            .append(" LEFT JOIN (SELECT product_no,unit,product_name,product_categoryname FROM biz_instockorder_detail GROUP BY product_no) b ON a.product_no = b.product_no ")
             .append(" WHERE 1 = 1 ");
         if(productCode != null && productCode.size() > 0){
             map.put("productCode", productCode);
@@ -294,15 +293,14 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         String productNo = findStockListDTO.getProductNo();
         if(StringUtils.isNotBlank(productNo)){
             map.put("productNo", productNo);
-            sql.append(" AND  a.product_no = :productNo ");
+            sql.append(" AND  a.product_no like concat('%',:productNo,'%') ");
         }
-
         if(orgCode != null && orgCode.size() > 0){
             map.put("orgCode", orgCode);
-            sql.append(" AND  a.org_no = :orgCode ");
+            sql.append(" AND  a.org_no in (:orgCode) ");
         }
         sql.append(" GROUP BY a.product_no ");
-        return queryPageForBean(FindStockListDTO.class, sql.toString(), findStockListDTO, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
+        return queryPageForBean(FindStockListDTO.class, sql.toString(), map, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
     }
 
     /**
@@ -412,7 +410,11 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     public List<BasicCarpartsProductDTO> findEquipmentCode(Integer equiptypeId) {
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("equiptypeId", equiptypeId);
-        String sql = "  SELECT a.equip_code AS 'carpartsCode' FROM biz_service_equipment a WHERE a.equiptype_id = :equiptypeId ";
-        return queryListBean(BasicCarpartsProductDTO.class, sql, map);
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT a.equip_code AS 'carpartsCode' FROM biz_service_equipment a WHERE 1 = 1 ");
+        if(equiptypeId != null && equiptypeId > 0){
+            sql.append(" AND a.equiptype_id = :equiptypeId ");
+        }
+        return queryListBean(BasicCarpartsProductDTO.class, sql.toString(), map);
     }
 }
