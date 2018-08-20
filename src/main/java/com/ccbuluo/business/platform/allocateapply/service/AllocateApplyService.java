@@ -100,4 +100,13 @@ public interface AllocateApplyService {
      * @date 2018-08-15 14:10:42
      */
     StatusDto<List<ProductStockInfoDTO>> checkStockQuantity(CheckStockQuantityDTO checkStockQuantityDTO);
+
+    /**
+     * 撤销申请单
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-20 12:02:58
+     */
+    StatusDto cancelApply(String applyNo);
 }

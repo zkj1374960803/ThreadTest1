@@ -42,7 +42,6 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
      */
     @Override
     public StatusDto applyHandle(BizAllocateApply ba){
-        int flag = 0;
         String applyNo = ba.getApplyNo();
         String applyType = ba.getApplyType();
         try {
@@ -68,9 +67,6 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
             bizOutstockplanDetailDao.batchOutstockplanDetail(pir.getLeft());
             // 批量保存入库计划详情
             bizInstockplanDetailDao.batchInsertInstockplanDetail(pir.getRight());
-
-
-            flag =1;
         } catch (Exception e) {
             logger.error("提交失败！", e);
             throw e;
@@ -86,6 +82,6 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
      */
     @Override
     public StatusDto cancelApply(String applyNo){
-        return StatusDto.buildSuccessStatusDto("申请撤销成功！");
+        return StatusDto.buildSuccessStatusDto("退换货没有撤销！");
     }
 }

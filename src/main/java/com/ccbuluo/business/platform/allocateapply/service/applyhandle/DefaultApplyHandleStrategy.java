@@ -4,7 +4,10 @@ import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
 import com.ccbuluo.business.constants.*;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.entity.BizAllocateApply.AllocateApplyTypeEnum;
+import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
+import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
+import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
@@ -42,6 +45,12 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     private BizStockDetailDao bizStockDetailDao;
     @Resource
     private BizServiceStorehouseDao bizServiceStorehouseDao;
+    @Resource
+    private BizAllocateTradeorderDao bizAllocateTradeorderDao;
+    @Resource
+    private BizOutstockplanDetailDao bizOutstockplanDetailDao;
+    @Resource
+    private BizAllocateapplyDetailDao bizAllocateapplyDetailDao;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -154,7 +163,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
      * @date 2018-08-11 13:35:41
      */
     private BigDecimal getTatal(List<AllocateapplyDetailBO> details){
-        BigDecimal bigDecimal = new BigDecimal("0");
+        BigDecimal bigDecimal = BigDecimal.ZERO;
         for(AllocateapplyDetailBO bd : details){
             bigDecimal.add(bd.getSellPrice());
         }
@@ -163,15 +172,15 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
 
     /**
      * 根据卖方机构code获取库存详情
-     * @param productOrgNo 商品编号
+     * @param sellerOrgNo 卖方机构编号
      * @param details 申请详细
      * @author weijb
      * @date 2018-08-11 13:35:41
      */
-    public List<BizStockDetail> getStockDetailList(String productOrgNo, List<AllocateapplyDetailBO> details){
+    public List<BizStockDetail> getStockDetailList(String sellerOrgNo, List<AllocateapplyDetailBO> details){
         // 根据卖方code和商品code（list）查出库存列表
         List<String> codeList = getProductList(details);
-        return bizStockDetailDao.getStockDetailListByOrgAndProduct(productOrgNo, codeList);
+        return bizStockDetailDao.getStockDetailListByOrgAndProduct(sellerOrgNo, codeList);
     }
 
     /**
@@ -682,5 +691,44 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             slist.add(r.getStockId());
         }
         return slist;
+    }
+    /**
+     *  入库之后回调事件
+     * @param ba 申请单
+     * @return
+     */
+    public StatusDto platformInstockCallback(BizAllocateApply ba){
+        String applyNo = ba.getApplyNo();
+        String applyType = ba.getApplyType();
+        // 根据申请单获取申请单详情
+        List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
+        if(null == details || details.size() == 0){
+            return StatusDto.buildFailureStatusDto("申请单为空！");
+        }
+        //获取卖方机构code
+        String productOrgNo = getProductOrgNo(ba);
+        //查询库存列表
+        List<BizStockDetail> stockDetails = getStockDetailList(productOrgNo, details);
+        if(null == stockDetails || stockDetails.size() == 0){
+            return StatusDto.buildFailureStatusDto("库存列表为空！");
+        }
+        // 构建占用库存和订单占用库存关系
+        Pair<List<BizStockDetail>, List<RelOrdstockOccupy>> pair = buildStockAndRelOrdEntity(details,stockDetails,applyType);
+        List<BizStockDetail> stockDetailList = pair.getLeft();
+        // 构建订单占用库存关系
+        List<RelOrdstockOccupy> relOrdstockOccupies = pair.getRight();
+        // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
+        Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, BizAllocateApply.AllocateApplyTypeEnum.PLATFORMALLOCATE, relOrdstockOccupies);
+
+        // 保存占用库存
+        int flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
+        if(flag == 0){// 更新失败
+            throw new CommonException("0", "更新占用库存失败！");
+        }
+        // 保存订单占用库存关系
+        bizAllocateTradeorderDao.batchInsertRelOrdstockOccupy(relOrdstockOccupies);
+        // 批量保存出库计划详情
+        bizOutstockplanDetailDao.batchOutstockplanDetail(pir.getLeft());
+        return StatusDto.buildSuccessStatusDto("出库计划生成成功");
     }
 }

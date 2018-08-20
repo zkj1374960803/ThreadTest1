@@ -199,22 +199,22 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
 
     /**
      * 根据卖方code和商品code（list）查出库存列表
-     * @param productOrgNo 卖方机构code
+     * @param sellerOrgNo 卖方机构code
      * @param codes 商品codes（list）
      * @author weijb
      * @date 2018-08-07 13:55:41
      */
-    public List<BizStockDetail> getStockDetailListByOrgAndProduct(String productOrgNo, List<String> codes){
+    public List<BizStockDetail> getStockDetailListByOrgAndProduct(String sellerOrgNo, List<String> codes){
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,repository_no,org_no,product_no,product_type,trade_no,")
                 .append("supplier_no,valid_stock,occupy_stock,problem_stock,damaged_stock,")
                 .append("transit_stock,freeze_stock,seller_orgno,cost_price,instock_planid,")
                 .append("latest_correct_time,creator,create_time,operator,operate_time,")
-                .append("delete_flag,remark,version_no FROM biz_stock_detail WHERE delete_flag = :deleteFlag and org_no= :productOrgNo and product_no IN(:codes) and valid_stock > 0")
+                .append("delete_flag,remark,version_no FROM biz_stock_detail WHERE delete_flag = :deleteFlag and org_no= :sellerOrgNo and product_no IN(:codes) and valid_stock > 0")
                 .append(" order by create_time");//先进先出排序取出，按创建时间的正序排列
         Map<String, Object> params = Maps.newHashMap();
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
-        params.put("productOrgNo", productOrgNo);
+        params.put("sellerOrgNo", sellerOrgNo);
         params.put("codes", codes);
         return super.queryListBean(BizStockDetail.class, sql.toString(), params);
     }
