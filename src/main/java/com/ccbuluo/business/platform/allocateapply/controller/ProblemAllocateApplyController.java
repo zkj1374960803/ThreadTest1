@@ -1,8 +1,9 @@
 package com.ccbuluo.business.platform.allocateapply.controller;
 
+import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.ProblemAllocateapplyDetailDTO;
+import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.allocateapply.service.ProblemAllocateApply;
-import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -10,10 +11,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import javax.annotation.Resource;
 
 /**
@@ -29,6 +28,8 @@ import javax.annotation.Resource;
 public class ProblemAllocateApplyController extends BaseController {
     @Resource
     private ProblemAllocateApply problemAllocateApply;
+    @Resource
+    private AllocateApplyService allocateApplyService;
 
 
     /**
@@ -79,5 +80,19 @@ public class ProblemAllocateApplyController extends BaseController {
                                                                                    @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                                    @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
         return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.queryProblemHandleList(applyType, applyStatus, applyNo, offset, pageSize));
+    }
+
+    /**
+     * 查询退换货申请单详情
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-20 20:02:58
+     */
+    @ApiOperation(value = "查询退换货申请单详情", notes = "【魏俊标】")
+    @GetMapping("/problemdetail/{applyNo}")
+    @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
+    public StatusDto<FindAllocateApplyDTO> getProblemdetailDetail(@PathVariable String applyNo){
+        return StatusDto.buildDataSuccessStatusDto(allocateApplyService.findDetail(applyNo));
     }
 }
