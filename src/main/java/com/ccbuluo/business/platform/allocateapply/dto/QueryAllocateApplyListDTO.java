@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * 查询申请单列表
@@ -41,8 +40,8 @@ public class QueryAllocateApplyListDTO {
     /**
      * 平台决定的处理类型：调拨、采购
      */
-    @ApiModelProperty(name = "processType", value = "平台决定的处理类型(注：TRANSFER调拨、PURCHASE采购)")
-    private String processType;
+    @ApiModelProperty(name = "applyType", value = "平台决定的处理类型(注：TRANSFER调拨、PURCHASE采购)")
+    private String applyType;
 
     public String getApplyNo() {
         return applyNo;
@@ -78,11 +77,11 @@ public class QueryAllocateApplyListDTO {
         this.applyerName = applyerName;
     }
 
-    public String getProcessType() {
-        return processType;
+    public String getApplyType() {
+        return applyType;
     }
 
-    public void setProcessType(String processType) {
-        this.processType = processType;
+    public void setApplyType(String applyType) {
+        this.applyType = applyType;
     }
 }

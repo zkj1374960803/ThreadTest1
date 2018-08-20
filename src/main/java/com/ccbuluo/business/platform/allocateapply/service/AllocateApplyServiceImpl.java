@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.allocateapply.service;
 import com.ccbuluo.business.constants.*;
 import com.ccbuluo.business.entity.BizAllocateApply.AllocateApplyTypeEnum;
 import com.ccbuluo.business.entity.BizAllocateApply.ApplyStatusEnum;
+import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
@@ -126,9 +127,9 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             a.setOperator(loggedUserId);
             a.setCreator(loggedUserId);
             if(AllocateApplyTypeEnum.BARTER.name().equals(applyType) || AllocateApplyTypeEnum.REFUND.equals(applyType)){
-                a.setStockType("PROBLEM");
+                a.setStockType(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.name());
             }else {
-                a.setStockType("NORMAL");
+                a.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
             }
         });
         bizAllocateApplyDao.batchInsertForapplyDetailList(allocateapplyDetailList);
