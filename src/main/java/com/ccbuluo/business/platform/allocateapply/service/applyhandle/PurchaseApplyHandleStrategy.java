@@ -90,6 +90,7 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
      * @param ba 申请单
      * @return
      */
+    @Override
     public StatusDto platformInstockCallback(BizAllocateApply ba){
         return platformInstockCallback(ba);
     }
