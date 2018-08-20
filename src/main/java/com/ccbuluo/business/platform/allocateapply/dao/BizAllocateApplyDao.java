@@ -175,7 +175,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("userOrgCode", userOrgCode);
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.apply_no,a.applyer_name,a.create_time,a.process_type,a.apply_status ")
+        sql.append(" SELECT a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.apply_status ")
             .append(" FROM biz_allocate_apply a WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(userOrgCode)){
             sql.append(" AND a.applyorg_no = :userOrgCode ");
@@ -280,7 +280,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @author zhangkangjian
      * @date 2018-08-10 15:45:56
      */
-    public Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO, List<String> productCode) {
+    public Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO, List<String> productCode, List<String> orgCode) {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.id,a.product_no,sum(a.valid_stock + a.occupy_stock + a.problem_stock + a.damaged_stock + a.transit_stock + a.freeze_stock) as 'total',b.product_name as 'productName',b.product_categoryname as 'productCategoryname',b.unit as 'unit'")
@@ -297,11 +297,10 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             sql.append(" AND  a.product_no = :productNo ");
         }
 
-        if(StringUtils.isNotBlank(findStockListDTO.getOrgNo())){
-            map.put("orgNo", productNo);
-            sql.append(" AND  a.product_no = :productNo ");
+        if(orgCode != null && orgCode.size() > 0){
+            map.put("orgCode", orgCode);
+            sql.append(" AND  a.org_no = :orgCode ");
         }
-
         sql.append(" GROUP BY a.product_no ");
         return queryPageForBean(FindStockListDTO.class, sql.toString(), findStockListDTO, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
     }
