@@ -56,8 +56,11 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
             if(null == details || details.size() == 0){
                 return StatusDto.buildFailureStatusDto("申请单为空！");
             }
+            //获取申请方机构code
+            String applyorgNo = getProductOrgNo(ba);
+            //查询库存列表
             // 查询库存列表(平台的库存列表)
-            List<BizStockDetail> stockDetails = getStockDetailList(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER, details);
+            List<BizStockDetail> stockDetails = getProblemStockDetailList(applyorgNo, details);
             if(null == stockDetails || stockDetails.size() == 0){
                 return StatusDto.buildFailureStatusDto("库存为空！");
             }
@@ -68,7 +71,6 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
             List<RelOrdstockOccupy> relOrdstockOccupies = pair.getRight();
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
             Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, BizAllocateApply.AllocateApplyTypeEnum.REFUND, relOrdstockOccupies);
-            // TODO 刘铎提供：入参：pir.getLeft()（出库计划）
             // 调用自动出库
             outstockOrderService.autoSaveOutstockOrder(applyType, pir.getLeft());
             // 批量保存出库计划详情

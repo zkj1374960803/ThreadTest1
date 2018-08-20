@@ -188,6 +188,19 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     }
 
     /**
+     * 根据卖方机构code获取问题件库存详情
+     * @param sellerOrgNo 卖方机构编号
+     * @param details 申请详细
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    public List<BizStockDetail> getProblemStockDetailList(String sellerOrgNo, List<AllocateapplyDetailBO> details){
+        // 根据卖方code和商品code（list）查出库存列表
+        List<String> codeList = getProductList(details);
+        return bizStockDetailDao.getProblemStockDetailListByOrgAndProduct(sellerOrgNo, codeList);
+    }
+
+    /**
      * 获取商品code
      * @param details 申请详细
      * @author weijb
