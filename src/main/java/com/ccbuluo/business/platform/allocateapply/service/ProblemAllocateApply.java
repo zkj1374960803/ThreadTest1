@@ -2,11 +2,7 @@ package com.ccbuluo.business.platform.allocateapply.service;
 
 
 import com.ccbuluo.business.platform.allocateapply.dto.ProblemAllocateapplyDetailDTO;
-import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.db.Page;
-import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
-
-import java.util.List;
 
 /**
  * 功能描述（1）

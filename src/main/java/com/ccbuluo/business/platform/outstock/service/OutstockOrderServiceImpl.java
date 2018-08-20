@@ -329,6 +329,9 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         Page<BizOutstockOrder> bizOutstockOrderPage = bizOutstockOrderDao.queryOutstockList(productType, outstockType, outstockNo, orgCode, offset, pagesize);
         List<BizOutstockOrder> rows = bizOutstockOrderPage.getRows();
         List<String> outstockOperator = rows.stream().map(BizOutstockOrder::getOutstockOperator).collect(Collectors.toList());
+        if (outstockOperator.size() == 0) {
+            return null;
+        }
         StatusDtoThriftList<QueryNameByUseruuidsDTO> queryNameByUseruuidsDTOStatusDtoThriftList = innerUserInfoService.queryNameByUseruuids(outstockOperator);
         StatusDto<List<QueryNameByUseruuidsDTO>> resolve = StatusDtoThriftUtils.resolve(queryNameByUseruuidsDTOStatusDtoThriftList, QueryNameByUseruuidsDTO.class);
         List<QueryNameByUseruuidsDTO> userNames = resolve.getData();
