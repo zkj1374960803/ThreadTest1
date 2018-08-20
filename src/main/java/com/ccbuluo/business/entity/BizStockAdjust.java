@@ -57,14 +57,6 @@ public class BizStockAdjust extends AftersaleCommonEntity{
         return this.adjustDocno;
     }
 
-    public void setAdjustOrgno(String adjustOrgno) {
-        this.adjustOrgno = adjustOrgno;
-    }
-
-    public String getAdjustOrgno() {
-        return this.adjustOrgno;
-    }
-
     public void setAdjustUserid(String adjustUserid) {
         this.adjustUserid = adjustUserid;
     }
@@ -105,5 +97,11 @@ public class BizStockAdjust extends AftersaleCommonEntity{
         return this.remark;
     }
 
+    public String getAdjustOrgno() {
+        return adjustOrgno;
+    }
 
+    public void setAdjustOrgno(String adjustOrgno) {
+        this.adjustOrgno = adjustOrgno;
+    }
 }
