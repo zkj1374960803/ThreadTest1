@@ -14,10 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 退换申请处理
+ * 换货申请处理
  *
  * @author weijb
  * @version v1.0.0
@@ -38,7 +39,7 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
     Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
-     *  退换申请处理
+     *  换货申请处理
      * @param ba 申请单
      * @author weijb
      * @date 2018-08-08 10:55:41
@@ -91,5 +92,28 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
     @Override
     public StatusDto cancelApply(String applyNo){
         return StatusDto.buildSuccessStatusDto("退换货没有撤销！");
+    }
+
+    /**
+     *  构建出库和入库计划并保存
+     * @param details 申请单详情
+     * @param stockDetails 库存详情列表
+     * @param applyTypeEnum 申请类型枚举
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    @Override
+    public Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> buildOutAndInstockplanDetail(List<AllocateapplyDetailBO> details, List<BizStockDetail> stockDetails, BizAllocateApply.AllocateApplyTypeEnum applyTypeEnum, List<RelOrdstockOccupy> relOrdstockOccupies){
+        List<BizOutstockplanDetail> outList = new ArrayList<BizOutstockplanDetail>();
+        List<BizInstockplanDetail> inList = new ArrayList<BizInstockplanDetail>();
+        // 买方出库
+        outstockplanPurchaser(outList,relOrdstockOccupies,stockDetails,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
+        // 平台入库
+        instockplanPlatform(inList,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
+        // 平台出库
+        outstockplanPlatform(outList,relOrdstockOccupies,stockDetails,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
+        // 买方入库
+        instockplanPurchaser(inList,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
+        return Pair.of(outList, inList);
     }
 }

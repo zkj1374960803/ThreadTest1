@@ -189,7 +189,15 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         updateOccupyStockById(stockIds);
         // 7、如果是平台入库后则改变申请单状态为 平台待出库，如果是机构入库后则改变申请单的状态为  确认收货
         List<BizInstockplanDetail> bizInstockplanDetails3 = inputStockPlanService.queryListByApplyNo(applyNo, StockPlanStatusEnum.COMPLETE.name(), inRepositoryNo);
-        updateApplyStatus(applyNo, bizInstockplanDetails3);
+        List<BizInstockplanDetail> collect = bizInstockplanDetails3.stream().filter(item -> item.getCompleteStatus().equals(StockPlanStatusEnum.COMPLETE.name())).collect(Collectors.toList());
+        if (collect.size() == bizInstockplanDetails3.size()) {
+            // todo 回调彪哥的更改库存的方法
+            if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+                allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.OUTSTORE.toString());
+            } else {
+                allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.CONFIRMRECEIPT.toString());
+            }
+        }
     }
 
 
@@ -225,11 +233,11 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         Page<BizInstockOrder> bizInstockOrderPage = bizInstockOrderDao.queryInstockList(productType, instockType, instockNo, orgCode, offset, pagesize);
         List<BizInstockOrder> rows = bizInstockOrderPage.getRows();
-        List<String> instockOperator = rows.stream().map(BizInstockOrder::getInstockOperator).collect(Collectors.toList());
+        List<String> instockOperator = rows.stream().map(BizInstockOrder::getInstockOperator).distinct().collect(Collectors.toList());
         StatusDtoThriftList<QueryNameByUseruuidsDTO> queryNameByUseruuidsDTOStatusDtoThriftList = innerUserInfoService.queryNameByUseruuids(instockOperator);
         StatusDto<List<QueryNameByUseruuidsDTO>> resolve = StatusDtoThriftUtils.resolve(queryNameByUseruuidsDTOStatusDtoThriftList, QueryNameByUseruuidsDTO.class);
         List<QueryNameByUseruuidsDTO> userNames = resolve.getData();
-        Map<String, String> collect = userNames.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getAsstoreCode, QueryNameByUseruuidsDTO::getStoreName));
+        Map<String, String> collect = userNames.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, QueryNameByUseruuidsDTO::getName));
         rows.forEach(item -> {
             item.setInstockOperatorName(collect.get(item.getInstockOperator()));
         });
@@ -253,7 +261,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         StatusDtoThriftList<QueryNameByUseruuidsDTO> queryNameByUseruuidsDTOStatusDtoThriftList = innerUserInfoService.queryNameByUseruuids(Lists.newArrayList(bizInstockOrderDTO.getInstockOperator()));
         StatusDto<List<QueryNameByUseruuidsDTO>> resolve = StatusDtoThriftUtils.resolve(queryNameByUseruuidsDTOStatusDtoThriftList, QueryNameByUseruuidsDTO.class);
         List<QueryNameByUseruuidsDTO> userNames = resolve.getData();
-        Map<String, String> collect = userNames.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getAsstoreCode, QueryNameByUseruuidsDTO::getStoreName));
+        Map<String, String> collect = userNames.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, QueryNameByUseruuidsDTO::getName));
         bizInstockOrderDTO.setInstockOperatorName(collect.get(bizInstockOrderDTO.getInstockOperator()));
         // 查询入库单详单
         List<InstockorderDetailDTO> instockorderDetailDTOS = instockorderDetailService.getByInstockNo(instockNo);
@@ -302,27 +310,6 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         }
     }
 
-    /**
-     * 修改申请单号的状态
-     *
-     * @param applyNo               申请单号
-     * @param bizInstockplanDetails 入库计划
-     * @author liuduo
-     * @date 2018-08-10 13:59:44
-     */
-    private void updateApplyStatus(String applyNo, List<BizInstockplanDetail> bizInstockplanDetails) {
-        if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-            List<BizInstockplanDetail> collect = bizInstockplanDetails.stream().filter(item -> item.getCompleteStatus().equals(StockPlanStatusEnum.COMPLETE.name())).collect(Collectors.toList());
-            if (collect.size() == bizInstockplanDetails.size()) {
-                allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.OUTSTORE.toString());
-            }
-        } else {
-            List<BizInstockplanDetail> collect = bizInstockplanDetails.stream().filter(item -> item.getCompleteStatus().equals(StockPlanStatusEnum.COMPLETE.name())).collect(Collectors.toList());
-            if (collect.size() == bizInstockplanDetails.size()) {
-                allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.CONFIRMRECEIPT.toString());
-            }
-        }
-    }
 
     /**
      * 修改入库计划的完成状态
@@ -396,7 +383,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
             // 判断问题件和实入数量相加是否大于入库计划的  计划入库数量=计划入库数量-实际入库数量,若大于，则抛异常
             BizInstockplanDetail bizInstockplanDetail = map.get(item.getInstockPlanid());
             if (null != bizInstockplanDetail && null != item.getInstockNum()) {
-                // 实际入库数量
+                // 本次实际入库数量
                 Long actualNum = item.getInstockNum();
                 // 计划入库数量
                 long planNum = bizInstockplanDetail.getPlanInstocknum() - bizInstockplanDetail.getActualInstocknum();

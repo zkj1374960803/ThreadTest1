@@ -201,4 +201,23 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
 
         return querySingColum(String.class, sql.toString(), params);
     }
+
+    /**
+     * 根据申请单编号查询入库计划
+     * @param applyNo 申请单编号
+     * @return 入库计划
+     * @author weijb
+     * @date 2018-08-20 17:14:56
+     */
+    public List<BizInstockplanDetail> getInstockplanDetailByApplyNo(String applyNo) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,instock_type,product_no,product_name,product_type,product_categoryname,")
+                .append("trade_no,supplier_no,instock_repository_no,cost_price,")
+                .append("IFNULL(plan_instocknum,0) AS planInstocknum,IFNULL(actual_instocknum,0) AS actualInstocknum,complete_status,complete_time,")
+                .append("outstock_planid")
+                .append(" FROM biz_instockplan_detail WHERE trade_no= :applyNo");
+        return super.queryListBean(BizInstockplanDetail.class, sql.toString(), params);
+    }
 }

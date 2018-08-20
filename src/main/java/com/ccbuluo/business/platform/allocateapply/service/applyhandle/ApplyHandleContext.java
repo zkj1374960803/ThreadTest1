@@ -68,10 +68,10 @@ public class ApplyHandleContext {
                 case DIRECTALLOCATE:    // 直调
                     handle = new PlatformDirectApplyHandleStrategy();
                     break;
-                case BARTER:    // 商品退换
+                case BARTER:    // 商品换货
                     handle = new BarterApplyHandleStrategy();
                     break;
-                case REFUND:    //  退款
+                case REFUND:    //  退货
                     handle = new RefundApplyHandleStrategy();
                     break;
                 default:
@@ -104,13 +104,17 @@ public class ApplyHandleContext {
             case PLATFORMALLOCATE:    // 平台调拨
                 handle = new  PlatformProxyApplyHandleStrategy();
                 break;
-            case SAMELEVEL:    // 平级调拨（服务间的调拨）
+            case SAMELEVEL:    // 平级调拨（服务间的调拨没有回调）
+                handle = new SameLevelApplyHandleStrategy();
                 break;
             case DIRECTALLOCATE:    // 直调
+                handle = new PlatformDirectApplyHandleStrategy();
                 break;
-            case BARTER:    // 商品退换
+            case BARTER:    // 商品换货
+                handle = new BarterApplyHandleStrategy();
                 break;
-            case REFUND:    //  退款
+            case REFUND:    //  退货
+                handle = new RefundApplyHandleStrategy();
                 break;
             default:
                 logger.error(typeEnum.toString()+"出现了未知回调类型！");
@@ -162,7 +166,7 @@ public class ApplyHandleContext {
         if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) ){
             outstockType = OutstockTypeEnum.BARTER.toString();// 交易类型
         }
-        // 退款
+        // 退货
         if(AllocateApplyTypeEnum.REFUND.toString().equals(applyType) ){
             outstockType = OutstockTypeEnum.REFUND.toString();// 交易类型
         }
@@ -197,10 +201,10 @@ public class ApplyHandleContext {
                 case DIRECTALLOCATE:    // 直调
                     handle = new PlatformDirectApplyHandleStrategy();
                     break;
-                case BARTER:    // 商品退换
+                case BARTER:    // 商品换货
                     handle = new BarterApplyHandleStrategy();
                     break;
-                case REFUND:    //  退款
+                case REFUND:    //  退货
                     handle = new RefundApplyHandleStrategy();
                     break;
                 default:
