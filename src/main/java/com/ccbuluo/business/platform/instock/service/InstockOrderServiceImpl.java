@@ -233,11 +233,11 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         Page<BizInstockOrder> bizInstockOrderPage = bizInstockOrderDao.queryInstockList(productType, instockType, instockNo, orgCode, offset, pagesize);
         List<BizInstockOrder> rows = bizInstockOrderPage.getRows();
-        List<String> instockOperator = rows.stream().map(BizInstockOrder::getInstockOperator).collect(Collectors.toList());
+        List<String> instockOperator = rows.stream().map(BizInstockOrder::getInstockOperator).distinct().collect(Collectors.toList());
         StatusDtoThriftList<QueryNameByUseruuidsDTO> queryNameByUseruuidsDTOStatusDtoThriftList = innerUserInfoService.queryNameByUseruuids(instockOperator);
         StatusDto<List<QueryNameByUseruuidsDTO>> resolve = StatusDtoThriftUtils.resolve(queryNameByUseruuidsDTOStatusDtoThriftList, QueryNameByUseruuidsDTO.class);
         List<QueryNameByUseruuidsDTO> userNames = resolve.getData();
-        Map<String, String> collect = userNames.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getAsstoreCode, QueryNameByUseruuidsDTO::getStoreName));
+        Map<String, String> collect = userNames.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, QueryNameByUseruuidsDTO::getName));
         rows.forEach(item -> {
             item.setInstockOperatorName(collect.get(item.getInstockOperator()));
         });
@@ -261,7 +261,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         StatusDtoThriftList<QueryNameByUseruuidsDTO> queryNameByUseruuidsDTOStatusDtoThriftList = innerUserInfoService.queryNameByUseruuids(Lists.newArrayList(bizInstockOrderDTO.getInstockOperator()));
         StatusDto<List<QueryNameByUseruuidsDTO>> resolve = StatusDtoThriftUtils.resolve(queryNameByUseruuidsDTOStatusDtoThriftList, QueryNameByUseruuidsDTO.class);
         List<QueryNameByUseruuidsDTO> userNames = resolve.getData();
-        Map<String, String> collect = userNames.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getAsstoreCode, QueryNameByUseruuidsDTO::getStoreName));
+        Map<String, String> collect = userNames.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, QueryNameByUseruuidsDTO::getName));
         bizInstockOrderDTO.setInstockOperatorName(collect.get(bizInstockOrderDTO.getInstockOperator()));
         // 查询入库单详单
         List<InstockorderDetailDTO> instockorderDetailDTOS = instockorderDetailService.getByInstockNo(instockNo);

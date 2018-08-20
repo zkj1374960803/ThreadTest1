@@ -171,6 +171,28 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
     }
 
     /**
+     * 根据卖方code和商品code（list）查出问题件库存列表
+     * @param sellerOrgNo 卖方机构code
+     * @param codes 商品codes（list）
+     * @author weijb
+     * @date 2018-08-07 13:55:41
+     */
+    public List<BizStockDetail> getProblemStockDetailListByOrgAndProduct(String sellerOrgNo, List<String> codes){
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,repository_no,org_no,product_no,product_type,trade_no,")
+                .append("supplier_no,valid_stock,occupy_stock,problem_stock,damaged_stock,")
+                .append("transit_stock,freeze_stock,seller_orgno,cost_price,instock_planid,")
+                .append("latest_correct_time,creator,create_time,operator,operate_time,")
+                .append("delete_flag,remark,version_no FROM biz_stock_detail WHERE delete_flag = :deleteFlag and org_no= :sellerOrgNo and product_no IN(:codes) and problem_stock > 0")
+                .append(" order by create_time");//先进先出排序取出，按创建时间的正序排列
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        params.put("sellerOrgNo", sellerOrgNo);
+        params.put("codes", codes);
+        return super.queryListBean(BizStockDetail.class, sql.toString(), params);
+    }
+
+    /**
      * 根据仓库明细id更新仓库的有效库存和占用库存
      * @param stockDetailList 仓库详情list
      * @exception

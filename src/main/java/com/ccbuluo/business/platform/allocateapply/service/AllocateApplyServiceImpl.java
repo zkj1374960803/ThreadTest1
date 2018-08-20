@@ -89,7 +89,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                 String orgCodeUser = organization.getOrgCode();
                 if(orgCodeUser != null){
                     allocateApplyDTO.setApplyorgNo(orgCodeUser);
-                    if(orgCodeUser.equals(BusinessPropertyHolder.ORGCODE_TOP_SERVICECENTER)){
+                    if(orgCodeUser.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)){
                         // 等待付款状态
                         allocateApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
                     }else {
@@ -272,6 +272,16 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         String userOrgCode = getUserOrgCode();
         // 查询分页的申请列表
         Page<QueryAllocateApplyListDTO> page = bizAllocateApplyDao.findProcessApplyList(processType, applyStatus, applyNo, offset, pageSize, userOrgCode);
+        List<QueryAllocateApplyListDTO> rows = page.getRows();
+        List<String> orgCode = rows.stream().map(QueryAllocateApplyListDTO::getApplyorgNo).collect(Collectors.toList());
+        Map<String, BasicUserOrganization> basicUserOrganizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(orgCode);
+        rows.stream().forEach(a ->{
+            BasicUserOrganization basicUserOrganization = basicUserOrganizationMap.get(a.getApplyorgNo());
+            if(basicUserOrganization != null){
+                a.setOrgName(basicUserOrganization.getOrgName());
+                a.setOrgType(basicUserOrganization.getOrgType());
+            }
+        });
         return page;
     }
 
@@ -341,8 +351,25 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                 return new Page<FindStockListDTO>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
             }
         // 根据类型查询服务中心的code
+        List<String> orgCode = null;
+        if(StringUtils.isBlank(findStockListDTO.getOrgNo())){
+            orgCode = getOrgCodesByOrgType(findStockListDTO.getType());
+        }
+        Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
+        return page;
+    }
+
+    /**
+     *  根据类型查询服务中心的code
+     * @param type 机构的类型
+     * @return List<String> 机构的code
+     * @author zhangkangjian
+     * @date 2018-08-20 16:17:55
+     */
+    @Override
+    public List<String> getOrgCodesByOrgType(String type) {
         QueryOrgDTO orgDTO = new QueryOrgDTO();
-        orgDTO.setOrgType(findStockListDTO.getType());
+        orgDTO.setOrgType(type);
         orgDTO.setStatus(Constants.FREEZE_STATUS_YES);
         StatusDtoThriftList<QueryOrgDTO> queryOrgDTO = basicUserOrganizationService.queryOrgAndWorkInfo(orgDTO);
         StatusDto<List<QueryOrgDTO>> queryOrgDTOResolve = StatusDtoThriftUtils.resolve(queryOrgDTO, QueryOrgDTO.class);
@@ -351,8 +378,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         if(data != null && data.size() > 0){
             orgCode = data.stream().map(QueryOrgDTO::getOrgCode).collect(Collectors.toList());
         }
-        Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
-        return page;
+        return orgCode;
     }
 
     /**
