@@ -3,12 +3,14 @@ package com.ccbuluo.business.platform.allocateapply.service;
 import com.ccbuluo.business.constants.*;
 import com.ccbuluo.business.entity.BizAllocateApply.AllocateApplyTypeEnum;
 import com.ccbuluo.business.entity.BizAllocateApply.ApplyStatusEnum;
+import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleContext;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
+import com.ccbuluo.business.platform.stockmanagement.dto.FindStockDetailDTO;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.BusinessUser;
@@ -125,9 +127,9 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             a.setOperator(loggedUserId);
             a.setCreator(loggedUserId);
             if(AllocateApplyTypeEnum.BARTER.name().equals(applyType) || AllocateApplyTypeEnum.REFUND.equals(applyType)){
-                a.setStockType("PROBLEM");
+                a.setStockType(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.name());
             }else {
-                a.setStockType("NORMAL");
+                a.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
             }
         });
         bizAllocateApplyDao.batchInsertForapplyDetailList(allocateapplyDetailList);
@@ -325,7 +327,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     public Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO) {
         // 根据分类查询供应商的code
         List<String> productCode = null;
-        if(StringUtils.isNotBlank(findStockListDTO.getCategoryCode())){
             List<BasicCarpartsProductDTO> carpartsProductDTOList;
             if(Constants.PRODUCT_TYPE_EQUIPMENT.equals(findStockListDTO.getProductType())){
                 // 查询类型下所有的code
@@ -339,7 +340,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             if(productCode == null || productCode.size() == 0){
                 return new Page<FindStockListDTO>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
             }
-        }
         // 根据类型查询服务中心的code
         QueryOrgDTO orgDTO = new QueryOrgDTO();
         orgDTO.setOrgType(findStockListDTO.getType());
@@ -347,8 +347,11 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         StatusDtoThriftList<QueryOrgDTO> queryOrgDTO = basicUserOrganizationService.queryOrgAndWorkInfo(orgDTO);
         StatusDto<List<QueryOrgDTO>> queryOrgDTOResolve = StatusDtoThriftUtils.resolve(queryOrgDTO, QueryOrgDTO.class);
         List<QueryOrgDTO> data = queryOrgDTOResolve.getData();
-        List<String> orgCode = data.stream().map(QueryOrgDTO::getOrgCode).collect(Collectors.toList());
-        Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode);
+        List<String> orgCode = null;
+        if(data != null && data.size() > 0){
+            orgCode = data.stream().map(QueryOrgDTO::getOrgCode).collect(Collectors.toList());
+        }
+        Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
         return page;
     }
 

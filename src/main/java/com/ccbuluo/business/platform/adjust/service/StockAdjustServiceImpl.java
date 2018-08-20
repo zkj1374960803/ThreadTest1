@@ -347,7 +347,7 @@ public class StockAdjustServiceImpl implements StockAdjustService{
         // 修改库存中的有效库存
         stockDetailService.updateAdjustValidStock(bizStockDetailList1);
         // 保存盘库详单
-        return bizStockAdjustDao.saveAdjustDetail(bizStockAdjustdetailList);
+        return bizStockAdjustdetailDao.saveAdjustDetail(bizStockAdjustdetailList);
     }
 
     /**

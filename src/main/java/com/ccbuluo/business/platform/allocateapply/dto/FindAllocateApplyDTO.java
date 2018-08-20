@@ -183,6 +183,9 @@ public class FindAllocateApplyDTO {
     public Date getCreateTime() {
         return createTime;
     }
+    public Long getApplyTime() {
+        return createTime.getTime();
+    }
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
