@@ -2,7 +2,7 @@ package com.ccbuluo.business.platform.stockmanagement.service;
 
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
-import com.ccbuluo.business.platform.stockmanagement.dao.BizStockDetailDao;
+import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
 import com.ccbuluo.business.platform.stockmanagement.dto.FindProductDetailDTO;
 import com.ccbuluo.business.platform.stockmanagement.dto.FindStockDetailDTO;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
