@@ -1,5 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
+import com.ccbuluo.business.constants.InstockTypeEnum;
+import com.ccbuluo.business.constants.OutstockTypeEnum;
 import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.entity.BizAllocateApply.AllocateApplyTypeEnum;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
@@ -94,5 +96,55 @@ public class ApplyHandleContext {
             return purchaseApplyHandleService.instockAfterCallBack(ba);
         }
         return StatusDto.buildFailureStatusDto("出库计划生成失败！");
+    }
+
+    /**
+     *  根据申请类型获取入库计划类型
+     * @param applyType 申请类型
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-08-18 17:47:52
+     */
+    public String getInstockType(String applyType){
+        String instockType = "";
+        // 调拨
+        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
+            instockType = InstockTypeEnum.TRANSFER.toString();// 交易类型
+        }
+        // 采购
+        if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
+            instockType = InstockTypeEnum.PURCHASE.toString();// 交易类型
+        }
+        // 换货
+        if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
+            instockType = InstockTypeEnum.BARTER.toString();// 交易类型
+        }
+        return instockType;
+    }
+
+    /**
+     *  根据申请类型获取出库计划类型
+     * @param applyType 申请类型
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-08-18 17:47:31
+     */
+    public String getOutstockType(String applyType){
+        String outstockType = "";
+        // 调拨
+        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
+            outstockType = OutstockTypeEnum.TRANSFER.toString();// 交易类型
+        }
+        // 换货
+        if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) ){
+            outstockType = OutstockTypeEnum.BARTER.toString();// 交易类型
+        }
+        // 退款
+        if(AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
+            outstockType = OutstockTypeEnum.REFUND.toString();// 交易类型
+        }
+        return outstockType;
     }
 }

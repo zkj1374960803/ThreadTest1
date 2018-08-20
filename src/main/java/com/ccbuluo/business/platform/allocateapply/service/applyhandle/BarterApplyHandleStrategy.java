@@ -5,6 +5,7 @@ import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
+import com.ccbuluo.business.platform.outstock.service.OutstockOrderService;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.http.StatusDto;
 import org.slf4j.Logger;
@@ -30,6 +31,8 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
     private BizInstockplanDetailDao bizInstockplanDetailDao;
     @Resource
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
+    @Resource
+    OutstockOrderService outstockOrderService;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -66,7 +69,7 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
             Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, BizAllocateApply.AllocateApplyTypeEnum.BARTER, relOrdstockOccupies);
             // 调用自动出库
-            // TODO 刘铎提供：入参：pir.getLeft()（出库计划）
+            outstockOrderService.autoSaveOutstockOrder(applyType, pir.getLeft());
             // 批量保存出库计划详情
             bizOutstockplanDetailDao.batchOutstockplanDetail(pir.getLeft());
             // 批量保存入库计划详情
