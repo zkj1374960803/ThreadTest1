@@ -25,4 +25,13 @@ public interface ApplyHandleStrategy {
      * @date 2018-08-11 13:35:41
      */
     StatusDto cancelApply(String applyNo);
+
+    /**
+     *  入库之后回调事件
+     * @param ba 申请单
+     * @author weijb
+     * @param ba 申请单
+     * @return
+     */
+    public StatusDto platformInstockCallback(BizAllocateApply ba);
 }

@@ -19,6 +19,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.lang.reflect.InvocationTargetException;
@@ -697,6 +698,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
      * @param ba 申请单
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public StatusDto platformInstockCallback(BizAllocateApply ba){
         String applyNo = ba.getApplyNo();
         String applyType = ba.getApplyType();

@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
 import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
 import com.ccbuluo.business.entity.*;
+import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
@@ -9,12 +10,12 @@ import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
 import com.ccbuluo.core.exception.CommonException;
+import com.ccbuluo.business.entity.BizAllocateApply.ApplyStatusEnum;
 import com.ccbuluo.http.StatusDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
@@ -39,6 +40,8 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
     private BizStockDetailDao bizStockDetailDao;
     @Resource
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
+    @Resource
+    BizAllocateApplyDao bizAllocateApplyDao;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -48,6 +51,7 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
      * @author weijb
      * @date 2018-08-08 10:55:41
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public StatusDto applyHandle(BizAllocateApply ba){
         String applyNo = ba.getApplyNo();
@@ -129,7 +133,7 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
             // 还原被占用的库存
             int flag = bizStockDetailDao.batchUpdateStockDetil(stockDetails);
             if(flag == 0){// 更新失败
-                throw new CommonException("0", "更新占用库存失败！");
+                throw new CommonException("0", "还原占用库存失败！");
             }
             //删除订单占用关系
             bizAllocateTradeorderDao.deleteRelOrdstockOccupyByApplyNo(applyNo);
@@ -139,6 +143,8 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
             bizOutstockplanDetailDao.deleteOutstockplanDetailByApplyNo(applyNo);
             // 删除入库计划
             bizInstockplanDetailDao.batchInsertInstockplanDetail(applyNo);
+            //更新申请单状态(已撤销)
+            bizAllocateApplyDao.updateApplyOrderStatus(applyNo, ApplyStatusEnum.CANCEL.name());
         } catch (Exception e) {
             logger.error("撤销失败！", e);
             throw e;
@@ -149,8 +155,11 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
     /**
      *  入库之后回调事件
      * @param ba 申请单
+     * @author weijb
+     * @param ba 申请单
      * @return
      */
+    @Override
     public StatusDto platformInstockCallback(BizAllocateApply ba){
         return platformInstockCallback(ba);
     }
