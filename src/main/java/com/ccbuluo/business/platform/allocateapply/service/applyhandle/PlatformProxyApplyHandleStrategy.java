@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -161,6 +162,26 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
      */
     @Override
     public StatusDto platformInstockCallback(BizAllocateApply ba){
-        return platformInstockCallback(ba);
+        return super.platformInstockCallback(ba);
+    }
+    /**
+     *  构建出库和入库计划并保存
+     * @param details 申请单详情
+     * @param stockDetails 库存详情列表
+     * @param applyTypeEnum 申请类型枚举
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    @Override
+    public Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> buildOutAndInstockplanDetail(List<AllocateapplyDetailBO> details, List<BizStockDetail> stockDetails, BizAllocateApply.AllocateApplyTypeEnum applyTypeEnum, List<RelOrdstockOccupy> relOrdstockOccupies){
+        List<BizOutstockplanDetail> outList = new ArrayList<BizOutstockplanDetail>();
+        List<BizInstockplanDetail> inList = new ArrayList<BizInstockplanDetail>();
+        // 卖方机构出库计划
+        outstockplanSeller(outList, relOrdstockOccupies,stockDetails, details, BizAllocateApply.AllocateApplyTypeEnum.PLATFORMALLOCATE.toString());
+        // 平台入库计划
+        instockplanPlatform(inList,details, BizAllocateApply.AllocateApplyTypeEnum.PLATFORMALLOCATE.toString());
+        // 买方入库计划
+        instockplanPurchaser(inList,details, BizAllocateApply.AllocateApplyTypeEnum.PLATFORMALLOCATE.toString());
+        return Pair.of(outList, inList);
     }
 }

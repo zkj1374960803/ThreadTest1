@@ -314,6 +314,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
 
         batchUpdateForListBean(sql.toString(), bizStockDetailList1);
     }
+
     /**
      * 查询库存的详情
      * @param productNo 商品的编号
@@ -438,5 +439,26 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         }
         sql.append(" GROUP BY a.product_no ");
         return findForBean(FindProductDetailDTO.class, sql.toString(), map);
+    }
+
+
+    /**
+     * 根据申请单查询库存
+     * @param applyNo 申请单编码
+     * @return 库存集合
+     * @author weijb
+     * @date 2018-08-20 16:22:08
+     */
+    public List<BizStockDetail> getStockDetailListByApplyNo(String applyNo) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,repository_no,org_no,product_no,product_type,trade_no,")
+                .append("supplier_no,valid_stock,occupy_stock,problem_stock,damaged_stock,")
+                .append("transit_stock,freeze_stock,seller_orgno,cost_price,instock_planid,")
+                .append("latest_correct_time,creator,create_time,operator,operate_time,")
+                .append("delete_flag,remark,version_no FROM biz_stock_detail WHERE delete_flag = :deleteFlag and trade_no= :applyNo");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        params.put("applyNo", applyNo);
+        return super.queryListBean(BizStockDetail.class, sql.toString(), params);
     }
 }
