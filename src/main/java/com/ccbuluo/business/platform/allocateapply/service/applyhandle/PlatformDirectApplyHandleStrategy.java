@@ -48,7 +48,6 @@ public class PlatformDirectApplyHandleStrategy extends DefaultApplyHandleStrateg
      */
     @Override
     public StatusDto applyHandle(BizAllocateApply ba){
-        int flag = 0;
         String applyNo = ba.getApplyNo();
         String applyType = ba.getApplyType();
         try {
@@ -77,7 +76,7 @@ public class PlatformDirectApplyHandleStrategy extends DefaultApplyHandleStrateg
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
             Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, BizAllocateApply.AllocateApplyTypeEnum.DIRECTALLOCATE, relOrdstockOccupies);
             // 保存占用库存
-            flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
+            int flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
             if(flag == 0){// 更新失败
                 throw new CommonException("0", "更新占用库存失败！");
             }
@@ -87,7 +86,6 @@ public class PlatformDirectApplyHandleStrategy extends DefaultApplyHandleStrateg
             bizInstockplanDetailDao.batchInsertInstockplanDetail(pir.getRight());
             // 保存订单占用库存关系
             bizAllocateTradeorderDao.batchInsertRelOrdstockOccupy(relOrdstockOccupies);
-            flag =1;
         } catch (Exception e) {
             logger.error("提交失败！", e);
             throw e;

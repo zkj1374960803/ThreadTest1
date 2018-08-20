@@ -445,4 +445,18 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         listStatusDto.setMessage(message);
         return listStatusDto;
     }
+
+    /**
+     * 撤销申请单
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-20 12:02:58
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public StatusDto cancelApply(String applyNo){
+        // 更改申请单状态 TODO
+        return applyHandleContext.cancelApply(applyNo);
+    }
 }

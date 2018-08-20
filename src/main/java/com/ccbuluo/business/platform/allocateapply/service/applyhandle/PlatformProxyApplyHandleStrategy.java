@@ -62,9 +62,9 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
             List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyNo);
             // 构建占用库存和订单占用库存关系
             // 获取卖方机构code
-            String productOrgNo = getProductOrgNo(ba);
+            String sellerOrgNo = getProductOrgNo(ba);
             // 查询库存列表
-            List<BizStockDetail> stockDetails = getStockDetailList(productOrgNo, details);
+            List<BizStockDetail> stockDetails = getStockDetailList(sellerOrgNo, details);
             if(null == stockDetails || stockDetails.size() == 0){
                 return StatusDto.buildFailureStatusDto("库存为空！");
             }
@@ -102,7 +102,7 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
      * @date 2018-08-11 13:35:41
      */
     private BigDecimal getCostPrice(List<BizStockDetail> stockDetails, Long stockId){
-        BigDecimal costPrice = new BigDecimal("0");
+        BigDecimal costPrice = BigDecimal.ZERO;
         for(BizStockDetail bd : stockDetails){
             if(bd.getId().intValue() == stockId.intValue()){
                 costPrice = bd.getCostPrice();
@@ -121,14 +121,13 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
     @Transactional(rollbackFor = Exception.class)
     @Override
     public StatusDto cancelApply(String applyNo){
-        int flag = 0;
         try {
             // 根据申请单编号查询订单占用库存关系表
             List<RelOrdstockOccupy> list = bizAllocateTradeorderDao.getRelOrdstockOccupyByApplyNo(applyNo);
             //根据订单占用库存关系构建库存list
             List<BizStockDetail> stockDetails = buildBizStockDetail(list);
             // 还原被占用的库存
-            flag = bizStockDetailDao.batchUpdateStockDetil(stockDetails);
+            int flag = bizStockDetailDao.batchUpdateStockDetil(stockDetails);
             if(flag == 0){// 更新失败
                 throw new CommonException("0", "更新占用库存失败！");
             }
@@ -140,11 +139,19 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
             bizOutstockplanDetailDao.deleteOutstockplanDetailByApplyNo(applyNo);
             // 删除入库计划
             bizInstockplanDetailDao.batchInsertInstockplanDetail(applyNo);
-            flag =1;
         } catch (Exception e) {
             logger.error("撤销失败！", e);
             throw e;
         }
         return StatusDto.buildSuccessStatusDto("申请撤销成功！");
+    }
+
+    /**
+     *  入库之后回调事件
+     * @param ba 申请单
+     * @return
+     */
+    public StatusDto platformInstockCallback(BizAllocateApply ba){
+        return platformInstockCallback(ba);
     }
 }

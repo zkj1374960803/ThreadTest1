@@ -52,29 +52,23 @@ public class ApplyHandleContext {
             if(null == ba){
                 return StatusDto.buildFailureStatusDto("申请单不存在！");
             }
-            // 采购
-            if(AllocateApplyTypeEnum.PURCHASE.toString().equals(ba.getApplyType())){
-                return purchaseApplyHandleService.applyHandle(ba);
-            }
-            // 平台调拨
-            if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(ba.getApplyType())){
-                return platformAllocateApplyHandleService.applyHandle(ba);
-            }
-            // 平级调拨（服务间的调拨）
-            if(AllocateApplyTypeEnum.SAMELEVEL.toString().equals(ba.getApplyType())){
-                return serviceAllocateApplyHandleService.applyHandle(ba);
-            }
-            // 平级直调
-            if(AllocateApplyTypeEnum.DIRECTALLOCATE.toString().equals(ba.getApplyType())){
-                directAllocateApplyHandleService.applyHandle(ba);
-            }
-            // 商品退换
-            if(AllocateApplyTypeEnum.BARTER.toString().equals(ba.getApplyType())){
-                barterApplyHandleStrategy.applyHandle(ba);
-            }
-            // 退款
-            if(AllocateApplyTypeEnum.REFUND.toString().equals(ba.getApplyType())){
-                refundApplyHandleStrategy.applyHandle(ba);
+            AllocateApplyTypeEnum typeEnum = AllocateApplyTypeEnum.valueOf(ba.getApplyType());
+            switch (typeEnum){
+                case PURCHASE:    // 采购
+                    return purchaseApplyHandleService.applyHandle(ba);
+                case PLATFORMALLOCATE:    // 平台调拨
+                    return platformAllocateApplyHandleService.applyHandle(ba);
+                case SAMELEVEL:    // 平级调拨（服务间的调拨）
+                    return serviceAllocateApplyHandleService.applyHandle(ba);
+                case DIRECTALLOCATE:    // 直调
+                    directAllocateApplyHandleService.applyHandle(ba);
+                case BARTER:    // 商品退换
+                    barterApplyHandleStrategy.applyHandle(ba);
+                case REFUND:    //  退款
+                    refundApplyHandleStrategy.applyHandle(ba);
+                default:
+                    logger.error(typeEnum.toString()+"出现了未知处理类型！");
+                    break;
             }
             return StatusDto.buildFailureStatusDto("申请处理失败！");
         } catch (Exception e) {
@@ -86,14 +80,30 @@ public class ApplyHandleContext {
     /**
      *  入库之后回调事件
      * @param applyNo 申请单code
-     * @return
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-18 17:47:52
      */
-    public StatusDto instockAfterCallBack(String applyNo){
+    public StatusDto platformInstockCallback(String applyNo){
         // 根据申请单获取申请单详情
         BizAllocateApply ba = bizAllocateApplyDao.getByNo(applyNo);
-        // 采购
-        if(AllocateApplyTypeEnum.PURCHASE.toString().equals(ba.getApplyType())){
-            return purchaseApplyHandleService.instockAfterCallBack(ba);
+        AllocateApplyTypeEnum typeEnum = AllocateApplyTypeEnum.valueOf(ba.getApplyType());
+        switch (typeEnum){
+            case PURCHASE:    // 采购
+                return purchaseApplyHandleService.platformInstockCallback(ba);
+            case PLATFORMALLOCATE:    // 平台调拨
+                return platformAllocateApplyHandleService.platformInstockCallback(ba);
+            case SAMELEVEL:    // 平级调拨（服务间的调拨）
+                break;
+            case DIRECTALLOCATE:    // 直调
+                break;
+            case BARTER:    // 商品退换
+                break;
+            case REFUND:    //  退款
+                break;
+            default:
+                logger.error(typeEnum.toString()+"出现了未知回调类型！");
+                break;
         }
         return StatusDto.buildFailureStatusDto("出库计划生成失败！");
     }
@@ -146,5 +156,43 @@ public class ApplyHandleContext {
             outstockType = OutstockTypeEnum.REFUND.toString();// 交易类型
         }
         return outstockType;
+    }
+
+    /**
+     *  申请撤销
+     * @param applyNo 申请单编号
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    public StatusDto cancelApply(String applyNo){
+        try {
+            // 根据申请单获取申请单详情
+            BizAllocateApply ba = bizAllocateApplyDao.getByNo(applyNo);
+            if(null == ba){
+                return StatusDto.buildFailureStatusDto("申请单不存在！");
+            }
+            AllocateApplyTypeEnum typeEnum = AllocateApplyTypeEnum.valueOf(ba.getApplyType());
+            switch (typeEnum){
+                case PURCHASE:    // 采购
+                    return purchaseApplyHandleService.cancelApply(applyNo);
+                case PLATFORMALLOCATE:    // 平台调拨
+                    return platformAllocateApplyHandleService.cancelApply(applyNo);
+                case SAMELEVEL:    // 平级调拨（服务间的调拨）
+                    return serviceAllocateApplyHandleService.cancelApply(applyNo);
+                case DIRECTALLOCATE:    // 直调
+                    directAllocateApplyHandleService.cancelApply(applyNo);
+                case BARTER:    // 商品退换
+                    barterApplyHandleStrategy.cancelApply(applyNo);
+                case REFUND:    //  退款
+                    refundApplyHandleStrategy.cancelApply(applyNo);
+                default:
+                    logger.error(typeEnum.toString()+"出现了未知撤销类型！");
+                    break;
+            }
+            return StatusDto.buildFailureStatusDto("撤销处理失败！");
+        } catch (Exception e) {
+            logger.error("撤销失败！", e);
+            throw e;
+        }
     }
 }

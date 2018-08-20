@@ -47,7 +47,6 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
      */
     @Override
     public StatusDto applyHandle(BizAllocateApply ba){
-        int flag = 0;
         String applyNo = ba.getApplyNo();
         String applyType = ba.getApplyType();
         try {
@@ -76,7 +75,7 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
             Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, BizAllocateApply.AllocateApplyTypeEnum.SAMELEVEL, relOrdstockOccupies);
             // 保存占用库存
-            flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
+            int flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
             if(flag == 0){// 更新失败
                 throw new CommonException("0", "更新占用库存失败！");
             }
