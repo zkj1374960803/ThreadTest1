@@ -117,4 +117,24 @@ public class BizStockAdjustdetailDao extends BaseDao<BizStockAdjustdetail> {
 
         return queryListBean(StockAdjustListDTO.class, sql.toString(), params);
     }
+
+    /**
+     * 保存盘库详单
+     * @param bizStockAdjustdetailList 盘库详单
+     * @return 主键id
+     * @author liuduo
+     * @date 2018-08-15 09:01:44
+     */
+    public List<Long> saveAdjustDetail(List<BizStockAdjustdetail> bizStockAdjustdetailList) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO biz_stock_adjustdetail ( adjust_docno,product_no,")
+            .append("product_type,product_name,product_categoryname,perfect_num,")
+            .append("actual_num,affect_stockid,creator,create_time,operator,operate_time,")
+            .append("delete_flag,remark ) VALUES (  :adjustDocno, :productNo,")
+            .append(" :productType, :productName, :productCategoryname, :perfectNum,")
+            .append(" :actualNum, :affectStockid, :creator, :createTime, :operator,")
+            .append(" :operateTime, :deleteFlag, :remark )");
+
+        return batchInsertForListBean(sql.toString(), bizStockAdjustdetailList);
+    }
 }
