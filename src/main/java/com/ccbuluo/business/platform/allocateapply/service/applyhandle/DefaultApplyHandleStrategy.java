@@ -23,11 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * 申请处理
@@ -563,10 +562,10 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     public Pair<List<BizStockDetail>, List<RelOrdstockOccupy>>  buildStockAndRelOrdEntity(List<AllocateapplyDetailBO> details, List<BizStockDetail> stockDetails, String applyType){
         //订单占用库存关系
         List<RelOrdstockOccupy> relOrdstockOccupies = new ArrayList<RelOrdstockOccupy>();
-        List<AllocateapplyDetailBO> detailBOS = copyList(details);
+        Map<String,Long> map = getProductStock(details);
         for(BizStockDetail ad : stockDetails){// 遍历库存
             //占用库存
-            Long occupyStockNum = convertStockDetail(detailBOS, ad);
+            Long occupyStockNum = convertStockDetail(details, ad,map);
             //构建订单占用库存关系
             RelOrdstockOccupy ro = new RelOrdstockOccupy();
             ro.setOrderType(applyType);//订单类型(调拨，采购不占用库存)
@@ -582,6 +581,13 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         return Pair.of(stockDetails, relOrdstockOccupies);
     }
 
+    private Map<String,Long> getProductStock(List<AllocateapplyDetailBO> details){
+        Map<String, Long> map = new HashMap<String, Long>();
+        for(AllocateapplyDetailBO ab : details){
+            map.put(ab.getProductNo(),ab.getApplyNum());
+        }
+        return map;
+    }
     /**
      * 复制list
      * @param
@@ -605,29 +611,29 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
      * @author weijb
      * @date 2018-08-08 17:55:41
      */
-    private Long convertStockDetail(List<AllocateapplyDetailBO> details, BizStockDetail stockDetail){
-        Long occupyStockNum = 0l;//占用数量
+    private Long convertStockDetail(List<AllocateapplyDetailBO> details, BizStockDetail stockDetail, Map<String,Long> map){
+        Long occupyStockNum = 0L;//占用数量
         for(AllocateapplyDetailBO ad : details){
             if(ad.getProductNo().equals(stockDetail.getProductNo())){// 找到对应商品
                 // 调拨申请数量
-                Long applyNum = ad.getApplyNum();
+                Long applyNum = map.get(ad.getProductNo());
                 // 有效库存
                 Long validStock = stockDetail.getValidStock();
                 if(validStock.intValue() == applyNum.intValue()){// 如果本批次的库存正好等于要调拨的数量
-                    validStock = 0l;// 剩余库存为零
-                    ad.setApplyNum(0l);//需要调拨的数量也设置为零
+                    validStock = 0L;// 剩余库存为零
+                    map.put(ad.getProductNo(), 0L);//需要调拨的数量也设置为零
                     //记录占用数量
                     occupyStockNum = validStock;
                 }
                 if(validStock.intValue() < applyNum.intValue()){// 如果本批次的库存缺少
-                    ad.setApplyNum(applyNum - validStock);// 下次再有库存过来的时候，就会减去剩下的调拨商品数量
+                    map.put(ad.getProductNo(), applyNum - validStock);// 下次再有库存过来的时候，就会减去剩下的调拨商品数量
                     //记录占用数量
                     occupyStockNum = validStock;// 占用了全部可用库存
-                    validStock = 0l;// 剩余库存为零
+                    validStock = 0L;// 剩余库存为零
                 }
                 if(validStock.intValue() > applyNum.intValue()){// 如果本批次的库存充足
                     validStock = validStock - applyNum;// 剩余库存为零
-                    ad.setApplyNum(0l);//需要调拨的数量也设置为零,下次再有库存过来的时候就不操作了
+                    map.put(ad.getProductNo(), 0L);//需要调拨的数量也设置为零,下次再有库存过来的时候就不操作了
                     //记录占用数量
                     occupyStockNum = applyNum;
                 }

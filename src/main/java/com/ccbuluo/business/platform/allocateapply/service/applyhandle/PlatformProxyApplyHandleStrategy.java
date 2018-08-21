@@ -74,7 +74,7 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
                 return StatusDto.buildFailureStatusDto("申请单为空！");
             }
             // 构建生成订单(调拨)
-            List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyNo);
+            List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyType);
             // 构建占用库存和订单占用库存关系
             // 获取卖方机构code
             String sellerOrgNo = getProductOrgNo(ba);
