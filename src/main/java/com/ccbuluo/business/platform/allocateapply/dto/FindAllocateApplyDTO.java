@@ -97,6 +97,8 @@ public class FindAllocateApplyDTO {
      */
     @ApiModelProperty(name = "applyorgName", value = "申请来源机构名称(申请详情用不到，处理详情需要)")
     private String applyorgName;
+    @ApiModelProperty(name = "orgType", value = "申请来源(服务中心SERVICECENTER 客户经理CUSTMANAGER 售后平台PLATFORM)")
+    private String orgType;
     /**
      * 申请处理机构类型
      */
@@ -128,6 +130,14 @@ public class FindAllocateApplyDTO {
     private Date outstockTime;
 
 
+
+    public String getOrgType() {
+        return orgType;
+    }
+
+    public void setOrgType(String orgType) {
+        this.orgType = orgType;
+    }
 
     public String getProcessOrgtype() {
         return processOrgtype;

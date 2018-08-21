@@ -2,10 +2,13 @@ package com.ccbuluo.business.platform.stockmanagement.service;
 
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
+import com.ccbuluo.business.platform.stockmanagement.dto.FindBatchStockListDTO;
 import com.ccbuluo.business.platform.stockmanagement.dto.FindProductDetailDTO;
 import com.ccbuluo.business.platform.stockmanagement.dto.FindStockDetailDTO;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
+import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftList;
 import com.ccbuluo.http.StatusDtoThriftUtils;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author zhangkangjian
@@ -39,7 +43,7 @@ public class StockManagementServiceImpl implements StockManagementService {
     public FindStockDetailDTO findStockProductDetail(String productNo, String productType, String type) {
         FindStockDetailDTO findStockDetailDTO = bizStockDetailDao.findStockDetail(productNo, productType);
         // 根据类型查询机构的编号
-        List<QueryOrgDTO> orgDTOList = getQueryOrgDTOByOrgType(type);
+        List<String> orgDTOList = getQueryOrgDTOByOrgType(type);
         // 查询正常件
         FindProductDetailDTO findProductDetailDTO = bizStockDetailDao.findProductDetail(productNo, productType, orgDTOList);
         // 查询可调拨库存的数量
@@ -54,6 +58,22 @@ public class StockManagementServiceImpl implements StockManagementService {
         findStockDetailDTO.setDamagedPiece(findDamagedStock);
         return findStockDetailDTO;
     }
+
+    /**
+     * 查看库存详情（批次库存列表查询）
+     *
+     * @param findStockListDTO
+     * @return Page<FindBatchStockListDTO>
+     * @author zhangkangjian
+     * @date 2018-08-21 10:53:48
+     */
+    @Override
+    public Page<FindBatchStockListDTO> findBatchStockList(FindStockListDTO findStockListDTO) {
+        List<String> orgCodes = getQueryOrgDTOByOrgType(findStockListDTO.getType());
+        Page<FindBatchStockListDTO> page = bizStockDetailDao.findBatchStockList(findStockListDTO, orgCodes);
+        return page;
+    }
+
     /**
      *  根据机构类型查询机构的编号
      * @param type
@@ -62,13 +82,15 @@ public class StockManagementServiceImpl implements StockManagementService {
      * @author zhangkangjian
      * @date 2018-08-20 14:56:54
      */
-    private List<QueryOrgDTO> getQueryOrgDTOByOrgType(String type) {
+    private List<String> getQueryOrgDTOByOrgType(String type) {
         QueryOrgDTO orgDTO = new QueryOrgDTO();
         orgDTO.setOrgType(type);
         orgDTO.setStatus(Constants.STATUS_FLAG_ONE);
         StatusDtoThriftList<QueryOrgDTO> queryOrgDTO =
             basicUserOrganizationService.queryOrgAndWorkInfo(orgDTO);
         StatusDto<List<QueryOrgDTO>> queryOrgDTOResolve = StatusDtoThriftUtils.resolve(queryOrgDTO, QueryOrgDTO.class);
-        return queryOrgDTOResolve.getData();
+        List<QueryOrgDTO> data = queryOrgDTOResolve.getData();
+        List<String> orgcode = data.stream().map(QueryOrgDTO::getOrgCode).collect(Collectors.toList());
+        return orgcode;
     }
 }
