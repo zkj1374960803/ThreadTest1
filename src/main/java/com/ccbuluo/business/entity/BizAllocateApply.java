@@ -338,11 +338,7 @@ public class BizAllocateApply {
     public enum ApplyStatusEnum {
         PENDING("10", "申请提交"), CANCEL("15", "申请撤销"), WAITINGPAYMENT("20", "等待付款"),
         WAITDELIVERY("30", "等待发货"), OUTSTORE("40", "平台出库"), INSTORE("50", "平台入库"),
-        WAITINGRECEIPT("60", "等待收货"), CONFIRMRECEIPT("70", "确认收货"), APPLICATIONCOMPLETED("80", "申请完成"),
-
-        WAITINGREFUND("90", "等待退款"),REFUNDCOMPLETED("100", "退款完成"),
-
-        REPLACEWAITIN("110", "更换待入库"),REPLACECOMPLETED("120", "更换完成");
+        WAITINGRECEIPT("60", "等待收货"), CONFIRMRECEIPT("70", "确认收货"), APPLICATIONCOMPLETED("80", "申请完成");
         // 成员变量
         private String key;
         private String value;
@@ -361,6 +357,35 @@ public class BizAllocateApply {
             return this.value;
         }
 
+    }
+    /**
+     * 退换货申请状态枚举
+     * @author zhangkangjian
+     * @date 2018-08-10 14:01:49
+     */
+    public enum ReturnApplyStatusEnum {
+
+        PRODRETURNED("10", "申请提交"),PLATFORMOUTBOUND("20", "等待出库"),WAITINGREFUND("30", "等待退款"),REFUNDCOMPLETED("40", "退款完成"),
+
+        REPLACEWAITIN("50", "更换待入库"),REPLACECOMPLETED("60", "更换完成")
+        ;
+        // 成员变量
+        private String key;
+        private String value;
+
+        // 构造方法
+        private ReturnApplyStatusEnum(String key, String value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public String getKey() {
+            return this.key;
+        }
+
+        public String getValue() {
+            return this.value;
+        }
     }
 
 }
