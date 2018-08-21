@@ -169,6 +169,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     @Override
     public FindAllocateApplyDTO findDetail(String applyNo) {
         FindAllocateApplyDTO allocateApplyDTO = bizAllocateApplyDao.findDetail(applyNo);
+        String applyorgNo = allocateApplyDTO.getApplyorgNo();
         // 查询组织架构的名字
         StatusDtoThriftBean<BasicUserOrganization> outstockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getOutstockOrgno());
         StatusDtoThriftBean<BasicUserOrganization> instockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getInstockOrgno());
@@ -179,6 +180,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         BasicUserOrganization outstockOrgdata = outstockOrgNameresolve.getData();
         BasicUserOrganization instockOrgdata = instockOrgNameresolve.getData();
         BasicUserOrganization applyorgNamedata = applyorgNameResolve.getData();
+        // 设置来源
+        allocateApplyDTO.setOrgType(applyorgNamedata.getOrgType());
         if (outstockOrgdata != null) {
             String orgName = outstockOrgdata.getOrgName();
             allocateApplyDTO.setOutstockOrgName(orgName);
