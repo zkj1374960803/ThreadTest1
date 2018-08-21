@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.controller;
 
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.FindProblemAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.ProblemAllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.allocateapply.service.ProblemAllocateApply;
@@ -28,8 +29,6 @@ import javax.annotation.Resource;
 public class ProblemAllocateApplyController extends BaseController {
     @Resource
     private ProblemAllocateApply problemAllocateApply;
-    @Resource
-    private AllocateApplyService allocateApplyService;
 
 
     /**
@@ -92,7 +91,7 @@ public class ProblemAllocateApplyController extends BaseController {
     @ApiOperation(value = "查询退换货申请单详情", notes = "【魏俊标】")
     @GetMapping("/problemdetail/{applyNo}")
     @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
-    public StatusDto<FindAllocateApplyDTO> getProblemdetailDetail(@PathVariable String applyNo){
-        return StatusDto.buildDataSuccessStatusDto(allocateApplyService.findDetail(applyNo));
+    public StatusDto<FindProblemAllocateApplyDTO> getProblemdetailDetail(@PathVariable String applyNo){
+        return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.getProblemdetailDetail(applyNo));
     }
 }
