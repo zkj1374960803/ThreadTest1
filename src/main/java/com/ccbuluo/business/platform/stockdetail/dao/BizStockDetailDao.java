@@ -292,12 +292,13 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author liuduo
      * @date 2018-08-14 17:43:53
      */
-    public List<StockAdjustListDTO> queryAdjustList(List<String> equipmentCodes) {
+    public List<StockAdjustListDTO> queryAdjustList(List<String> equipmentCodes, String orgCode) {
         Map<String, Object> param = Maps.newHashMap();
+        param.put("orgCode", orgCode);
 
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT id,product_no,product_type,product_categoryname,product_name,IFNULL(SUM(valid_stock + occupy_stock),0) AS dueNum")
-            .append("  FROM biz_stock_detail WHERE 1=1");
+            .append("  FROM biz_stock_detail WHERE org_no = :orgCode ");
         if (null != equipmentCodes && equipmentCodes.size() > 0) {
             param.put("equipmentCodes", equipmentCodes);
             sql.append(" AND product_no IN(:equipmentCodes)");

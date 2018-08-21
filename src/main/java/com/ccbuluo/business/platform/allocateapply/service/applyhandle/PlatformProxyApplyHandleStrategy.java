@@ -74,7 +74,7 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
                 return StatusDto.buildFailureStatusDto("申请单为空！");
             }
             // 构建生成订单(调拨)
-            List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyNo);
+            List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyType);
             // 构建占用库存和订单占用库存关系
             //获取卖方机构code
             String sellerOrgNo = getProductOrgNo(ba);
@@ -258,6 +258,7 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
                 // 一个商品有多个供应商的情况
                 AllocateapplyDetailBO ab = getAllocateapplyDetailBO(details, in.getProductNo());
                 in.setCostPrice(ab.getCostPrice());
+                inList.add(in);
                 flag = true;
                 break;
             }
