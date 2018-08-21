@@ -3,8 +3,10 @@ package com.ccbuluo.business.platform.stockdetail.dao;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.adjust.dto.StockAdjustListDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.UpdateStockBizStockDetailDTO;
+import com.ccbuluo.business.platform.stockmanagement.dto.FindBatchStockListDTO;
 import com.ccbuluo.business.platform.stockmanagement.dto.FindProductDetailDTO;
 import com.ccbuluo.business.platform.stockmanagement.dto.FindStockDetailDTO;
 import com.ccbuluo.core.exception.CommonException;
@@ -366,13 +368,13 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author zhangkangjian
      * @date 2018-08-20 11:34:48
      */
-    public FindProductDetailDTO findProductDetail(String productNo, String productType, List<QueryOrgDTO> orgDTOList) {
+    public FindProductDetailDTO findProductDetail(String productNo, String productType, List<String> orgDTOList) {
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("productNo", productNo);
         map.put("productType", productType);
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.valid_stock,a.occupy_stock,SUM(a.valid_stock + a.occupy_stock) AS total, ")
-            .append(" SUM(a.valid_stock + a.occupy_stock) * a.cost_price AS 'totalAmount',a.product_unit ")
+        sql.append(" SELECT a.valid_stock,a.occupy_stock,SUM(a.valid_stock + a.occupy_stock) AS 'totalStock', ")
+            .append(" SUM(a.valid_stock + a.occupy_stock) * a.cost_price AS 'totalAmount',a.product_unit AS 'unit' ")
             .append(" FROM biz_stock_detail a  ")
             .append(" WHERE a.product_no = :productNo AND a.product_type = :productType ");
         if(orgDTOList != null && orgDTOList.size() > 0){
@@ -391,8 +393,8 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author zhangkangjian
      * @date 2018-08-20 11:34:48
      */
-    public Long findTransferInventory(String productNo, String productType, List<QueryOrgDTO> orgDTOList, String sellerOrgno) {
-        if(StringUtils.isNoneBlank(productNo, productType, sellerOrgno)){
+    public Long findTransferInventory(String productNo, String productType, List<String> orgDTOList, String sellerOrgno) {
+        if(StringUtils.isAnyBlank(productNo, productType, sellerOrgno)){
             return NumberUtils.LONG_ZERO;
         }
         HashMap<String, Object> map = Maps.newHashMap();
@@ -418,7 +420,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author zhangkangjian
      * @date 2018-08-20 11:34:48
      */
-    public FindProductDetailDTO findProblemStock(String productNo, String productType, List<QueryOrgDTO> orgDTOList) {
+    public FindProductDetailDTO findProblemStock(String productNo, String productType, List<String> orgDTOList) {
         if(StringUtils.isNoneBlank(productNo, productType)){
             new CommonException(Constants.ERROR_CODE, "必填参数为null");
         }
@@ -444,9 +446,9 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author zhangkangjian
      * @date 2018-08-20 11:34:48
      */
-    public FindProductDetailDTO findDamagedStock(String productNo, String productType, List<QueryOrgDTO> orgDTOList) {
+    public FindProductDetailDTO findDamagedStock(String productNo, String productType, List<String> orgDTOList) {
         if(StringUtils.isNoneBlank(productNo, productType)){
-            new CommonException(Constants.ERROR_CODE, "必填参数为null");
+            throw new CommonException(Constants.ERROR_CODE, "必填参数为null");
         }
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("productNo", productNo);
@@ -472,6 +474,9 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @date 2018-08-20 16:22:08
      */
     public List<BizStockDetail> getStockDetailListByApplyNo(String applyNo) {
+        if(StringUtils.isBlank(applyNo)){
+            throw new CommonException(Constants.ERROR_CODE, "必填参数为null");
+        }
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,repository_no,org_no,product_no,product_type,trade_no,")
                 .append("supplier_no,valid_stock,occupy_stock,problem_stock,damaged_stock,")
@@ -482,5 +487,37 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         params.put("applyNo", applyNo);
         return super.queryListBean(BizStockDetail.class, sql.toString(), params);
+    }
+
+    /**
+     * 查看库存详情（批次库存列表查询）
+     * @param findStockListDTO
+     * @return Page<FindBatchStockListDTO>
+     * @return Page<FindBatchStockListDTO>
+     * @author zhangkangjian
+     * @date 2018-08-21 10:53:48
+     */
+    public Page<FindBatchStockListDTO> findBatchStockList(FindStockListDTO findStockListDTO, List<String> orgCodes) {
+        String productNo = findStockListDTO.getProductNo();
+        String productType = findStockListDTO.getProductType();
+        if(StringUtils.isAnyBlank(productNo, productType)){
+            return new Page<>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
+        }
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("productNo", productNo);
+        map.put("productType", productType);
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT a.create_time,a.trade_no,a.supplier_no,a.cost_price, a.repository_no,b.supplier_name,c.storehouse_name, ")
+            .append(" SUM(IFNULL(a.valid_stock,0) + IFNULL(a.occupy_stock,0) + IFNULL(a.problem_stock,0) + IFNULL(a.damaged_stock,0)) AS 'instockNum' ")
+            .append(" FROM biz_stock_detail a  ")
+            .append(" LEFT JOIN  biz_service_supplier b ON a.supplier_no = b.supplier_code ")
+            .append(" LEFT JOIN biz_service_storehouse c ON a.repository_no = c.storehouse_code ")
+            .append(" WHERE a.product_no = :productNo AND a.product_type = :productType  ");
+        if(orgCodes != null && orgCodes.size() > 0){
+            map.put("orgDTOList", orgCodes);
+            sql.append(" AND a.org_no in (:orgDTOList) ");
+        }
+        sql.append(" GROUP BY a.trade_no ");
+        return queryPageForBean(FindBatchStockListDTO.class, sql.toString(), map, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
     }
 }

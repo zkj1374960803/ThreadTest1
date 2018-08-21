@@ -89,32 +89,45 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
      */
     public List<BizAllocateTradeorder> buildOrderEntityList(List<AllocateapplyDetailBO> details, String applyType){
         // 构建生成订单（机构1对平台）
-        BizAllocateTradeorder purchaserToPlatform = buildOrderEntity(details);
-        BizAllocateTradeorder platformToSeller = buildOrderEntity(details);
+        BizAllocateTradeorder purchaserToPlatform = buildOrderEntity(details);// 买方到平台
+        BizAllocateTradeorder platformToSeller = buildOrderEntity(details);// 平台到卖方
+        BizAllocateTradeorder purchaserToSeller = buildOrderEntity(details);// 买方到卖方
         purchaserToPlatform.setSellerOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 从买方到平台"平台code"
         platformToSeller.setPurchaserOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 从平台到卖方"平台code"
-
         // 特殊情况处理
-        // 采购
+        // 采购平台直发(从买方到平台)
         if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType)){
             // 采购的时候卖方为供应商（供应商不填为空）
             platformToSeller.setSellerOrgno("");
+            platformToSeller = null;
+            purchaserToSeller = null;
         }
-        // 平台直发
+        // 平台直发(从买方到平台)
         if(AllocateApplyTypeEnum.DIRECTALLOCATE.toString().equals(applyType)){
-            // 直调是没有采购订单的
             platformToSeller = null;
+            purchaserToSeller = null;
         }
-        // 商品换货
+        // 商品换货（不生成订单）
         if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType)){
-            // 从买方到平台
+            purchaserToPlatform = null;
             platformToSeller = null;
+            purchaserToSeller = null;
         }
-        // 退货
+        // 退货(从买方到平台)
         if(AllocateApplyTypeEnum.REFUND.toString().equals(applyType)){
-            // 从买方到平台
+            platformToSeller = null;
+            purchaserToSeller = null;
+        }
+        // 平台调拨（从买方到平台到卖方）
+        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType)){
+            purchaserToSeller = null;
+        }
+        // 平级调拨(从买方到卖方)
+        if(AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType)){
+            purchaserToPlatform = null;
             platformToSeller = null;
         }
+
 
         List<BizAllocateTradeorder> list = new ArrayList<BizAllocateTradeorder>();
         // 从买方到平台
@@ -124,6 +137,10 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         // 从平台到卖方
         if(null != platformToSeller){
             list.add(platformToSeller);
+        }
+        // 从买方到卖方
+        if(null != purchaserToSeller){
+            list.add(purchaserToSeller);
         }
         return list;
     }
@@ -168,8 +185,12 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
      */
     private BigDecimal getTatal(List<AllocateapplyDetailBO> details){
         BigDecimal bigDecimal = BigDecimal.ZERO;
+        BigDecimal sellPrice = BigDecimal.ZERO;
         for(AllocateapplyDetailBO bd : details){
-            bigDecimal.add(bd.getSellPrice());
+            if(null != bd.getSellPrice()){
+                sellPrice = bd.getSellPrice();
+            }
+            bigDecimal.add(sellPrice);
         }
         return bigDecimal;
     }
@@ -272,7 +293,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         }
     }
     /**
-     *
+     * 根据商品编号获取申请单详情
      * @param details 申请详细
      * @param productNo 商品编号
      * @author weijb
@@ -462,7 +483,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     private BizOutstockplanDetail buildBizOutstockplanDetail(BizInstockplanDetail in, String applyType, List<AllocateapplyDetailBO> details){
         BizOutstockplanDetail outPlan = new BizOutstockplanDetail();
         // 调拨和平台采购都属于调拨出库
-        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
             outPlan.setOutstockType(OutstockTypeEnum.TRANSFER.toString());// 交易类型
         }
         // 换货
@@ -519,13 +540,14 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             inPlan.setInstockType(InstockTypeEnum.TRANSFER.toString());// 交易类型
         }
         // 采购
-        if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType)){
             inPlan.setInstockType(InstockTypeEnum.PURCHASE.toString());// 交易类型
         }
         // 换货
-        if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) || AllocateApplyTypeEnum.REFUND.toString().equals(applyType) ){
             inPlan.setInstockType(InstockTypeEnum.BARTER.toString());// 交易类型
             inPlan.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());// 库存类型 （问题件再次入库的时候应该是有效库存）
+            inPlan.setCostPrice(BigDecimal.ZERO);// 成本价(退货和换货的成本价是零)
         }
         return inPlan;
     }
@@ -764,6 +786,6 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             outstockplanPlatform.setCostPrice(in.getCostPrice());// 成本价
             outstockplanDetails.add(outstockplanPlatform);
         }
-        return null;
+        return outstockplanDetails;
     }
 }

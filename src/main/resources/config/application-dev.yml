@@ -68,8 +68,8 @@ verification:
 dev-default:
   #是否开启自动登录 只要有值即可!
   #needLogin: need
-  username: "SC00000118"
-  password: "SC00000118"
+  username: "SC00000128"
+  password: "SC00000128"
 
 
 

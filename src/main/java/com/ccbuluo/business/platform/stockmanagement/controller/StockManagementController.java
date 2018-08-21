@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.stockmanagement.controller;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
+import com.ccbuluo.business.platform.stockmanagement.dto.FindBatchStockListDTO;
 import com.ccbuluo.business.platform.stockmanagement.dto.FindStockDetailDTO;
 import com.ccbuluo.business.platform.stockmanagement.service.StockManagementService;
 import com.ccbuluo.core.controller.BaseController;
@@ -88,7 +89,7 @@ public class StockManagementController extends BaseController {
      * @date 2018-08-10 15:45:56
      */
     @ApiOperation(value = "查看库存详情", notes = "【张康健】")
-    @GetMapping("/findproductdetail")
+    @GetMapping("/findstockproductdetail")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "productNo", value = "商品的编号", required = true, paramType = "query"),
         @ApiImplicitParam(name = "productType", value = "商品类型(注：FITTINGS零配件，EQUIPMENT物料)", required = true, paramType = "query"),
@@ -98,5 +99,27 @@ public class StockManagementController extends BaseController {
         FindStockDetailDTO findStockDetailDTO = stockManagementService.findStockProductDetail(productNo, productType, type);
         return StatusDto.buildDataSuccessStatusDto(findStockDetailDTO);
     }
+
+    /**
+     * 查看库存详情（批次库存列表查询）
+     * @param findStockListDTO 查询条件
+     * @return StatusDto<Page<FindBatchStockListDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-21 10:14:35
+     */
+    @ApiOperation(value = "查看库存详情（批次库存列表查询）", notes = "【张康健】")
+    @GetMapping("/findbatchstocklist")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "productNo", value = "商品的编号", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "productType", value = "商品类型(注：FITTINGS零配件，EQUIPMENT物料)", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "type", value = "(注：PLATFORM集团，SERVICECENTER服务中心，CUSTMANAGER客户经理)", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query")
+    })
+    public StatusDto<Page<FindBatchStockListDTO>> findBatchStockList(@ApiIgnore FindStockListDTO findStockListDTO){
+        Page<FindBatchStockListDTO> page = stockManagementService.findBatchStockList(findStockListDTO);
+        return StatusDto.buildDataSuccessStatusDto(page);
+    }
+
 
 }

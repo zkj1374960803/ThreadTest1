@@ -254,7 +254,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                     break;
                 case REFUND:
                     if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-                        updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.WAITINGREFUND.toString());
+                        updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, BizAllocateApply.ReturnApplyStatusEnum.WAITINGREFUND.toString());
                     } else {
                         updateApplyOrderStatus(applyNo, bizOutstockplanDetailList, collect, ApplyStatusEnum.INSTORE.toString());
                     }

@@ -1,7 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
 
-import com.ccbuluo.business.platform.allocateapply.dto.FindProblemAllocateApplyDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.ProblemAllocateapplyDetailDTO;
 import com.ccbuluo.db.Page;
 
@@ -44,5 +44,5 @@ public interface ProblemAllocateApply {
      * @author weijb
      * @date 2018-08-20 20:02:58
      */
-    FindProblemAllocateApplyDTO getProblemdetailDetail(String applyNo);
+    FindAllocateApplyDTO getProblemdetailDetail(String applyNo);
 }

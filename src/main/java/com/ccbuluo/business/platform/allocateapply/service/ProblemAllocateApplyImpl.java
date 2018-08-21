@@ -1,11 +1,17 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
-import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.ProblemAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
-import com.ccbuluo.business.platform.allocateapply.dto.FindProblemAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.ProblemAllocateapplyDetailDTO;
+import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
+import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
+import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
+import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftBean;
+import com.ccbuluo.http.StatusDtoThriftUtils;
+import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
+import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
@@ -21,8 +27,12 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
 
     @Resource
     private ProblemAllocateApplyDao problemAllocateApplyDao;
+    @Resource(name = "allocateApplyServiceImpl")
+    private AllocateApplyService allocateApplyServiceImpl;
     @Resource
-    BizAllocateApplyDao bizAllocateApplyDao;
+    BizOutstockOrderDao bizOutstockOrderDao;
+    @ThriftRPCClient("UserCoreSerService")
+    private InnerUserInfoService innerUserInfoService;
 
     /**
      * 问题件申请列表
@@ -61,9 +71,32 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
      * @date 2018-08-20 20:02:58
      */
     @Override
-    public FindProblemAllocateApplyDTO getProblemdetailDetail(String applyNo){
-        FindAllocateApplyDTO allocateApplyDTO = bizAllocateApplyDao.findDetail(applyNo);
-        return null;
+    public FindAllocateApplyDTO getProblemdetailDetail(String applyNo){
+        FindAllocateApplyDTO allocateApplyDTO = allocateApplyServiceImpl.findDetail(applyNo);
+        // 获取出库人和出库时间
+        BizOutstockOrderDTO oOutstockOrder = bizOutstockOrderDao.getByTradeDocno(applyNo);
+        String operatorName = getUserNameByUuid(oOutstockOrder.getOutstockOperator());
+        allocateApplyDTO.setOutstockOperatorName(operatorName);// 出库人
+        allocateApplyDTO.setOutstockTime(oOutstockOrder.getOutstockTime());// 出库时间
+        return allocateApplyDTO;
+    }
+
+    /**
+     *  根据用户uuid获取用户名字
+     * @param uuid
+     * @exception 
+     * @return 
+     * @author weijb
+     * @date 2018-08-21 16:46:25
+     */
+    private String getUserNameByUuid(String uuid){
+        StatusDtoThriftBean<UserInfoDTO> userDetail = innerUserInfoService.findUserDetail(uuid);
+        StatusDto<UserInfoDTO> resolve = StatusDtoThriftUtils.resolve(userDetail, UserInfoDTO.class);
+        String operatorName = "";
+        if(null != resolve){
+            operatorName = resolve.getData().getName();
+        }
+        return operatorName;
     }
 
 }

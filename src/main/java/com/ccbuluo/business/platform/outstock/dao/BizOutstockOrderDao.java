@@ -120,4 +120,22 @@ public class BizOutstockOrderDao extends BaseDao<BizOutstockOrder> {
 
         return batchInsertForListBean(sql.toString(), bizOutstockOrderList);
     }
+
+    /**
+     * 根据申请单号查询出库单详情
+     * @param tradeDocno 申请单号
+     * @return 出库单详情
+     * @author weijb
+     * @date 2018-08-20 15:14:39
+     */
+    public BizOutstockOrderDTO getByTradeDocno(String tradeDocno) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("tradeDocno", tradeDocno);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,outstockorder_no,outstock_type,outstock_time,trade_docno,outstock_operator,transportorder_no")
+                .append(" FROM biz_outstock_order WHERE trade_docno = :tradeDocno");
+
+        return findForBean(BizOutstockOrderDTO.class, sql.toString(), params);
+    }
 }

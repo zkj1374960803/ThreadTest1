@@ -169,6 +169,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     @Override
     public FindAllocateApplyDTO findDetail(String applyNo) {
         FindAllocateApplyDTO allocateApplyDTO = bizAllocateApplyDao.findDetail(applyNo);
+        String applyorgNo = allocateApplyDTO.getApplyorgNo();
         // 查询组织架构的名字
         StatusDtoThriftBean<BasicUserOrganization> outstockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getOutstockOrgno());
         StatusDtoThriftBean<BasicUserOrganization> instockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getInstockOrgno());
@@ -179,6 +180,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         BasicUserOrganization outstockOrgdata = outstockOrgNameresolve.getData();
         BasicUserOrganization instockOrgdata = instockOrgNameresolve.getData();
         BasicUserOrganization applyorgNamedata = applyorgNameResolve.getData();
+        // 设置来源
+        allocateApplyDTO.setOrgType(applyorgNamedata.getOrgType());
         if (outstockOrgdata != null) {
             String orgName = outstockOrgdata.getOrgName();
             allocateApplyDTO.setOutstockOrgName(orgName);
@@ -297,7 +300,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         String processType = processApplyDTO.getApplyType();
         String userOrgCode = getUserOrgCode();
         // 如果是调拨类型的
-        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.name().equals(processType)){
+        if(InstockTypeEnum.TRANSFER.name().equals(processType)){
             String applyNo = processApplyDTO.getApplyNo();
             FindAllocateApplyDTO detail = findDetail(applyNo);
             String processOrgno = detail.getProcessOrgno();
@@ -326,6 +329,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         bizAllocateApplyDao.updateAllocateApply(processApplyDTO);
         // 更新申请单的详单数据
         bizAllocateApplyDao.batchUpdateForApplyDetail(processApplyDTO.getProcessApplyDetailDTO());
+        // 生成出入库计划
+        applyHandleContext.applyHandle(processApplyDTO.getApplyNo());
     }
 
 
@@ -488,7 +493,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public StatusDto cancelApply(String applyNo){
-        // 更改申请单状态 TODO
         return applyHandleContext.cancelApply(applyNo);
     }
 }

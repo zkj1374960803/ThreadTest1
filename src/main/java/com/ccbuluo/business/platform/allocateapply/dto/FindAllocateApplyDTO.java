@@ -97,6 +97,8 @@ public class FindAllocateApplyDTO {
      */
     @ApiModelProperty(name = "applyorgName", value = "申请来源机构名称(申请详情用不到，处理详情需要)")
     private String applyorgName;
+    @ApiModelProperty(name = "orgType", value = "申请来源(服务中心SERVICECENTER 客户经理CUSTMANAGER 售后平台PLATFORM)")
+    private String orgType;
     /**
      * 申请处理机构类型
      */
@@ -115,6 +117,27 @@ public class FindAllocateApplyDTO {
     @ApiModelProperty(name = "processOrgno", value = "申请的类型：平级调拨、平台调拨")
     private String applyType;
 
+    /**
+     * 出库人
+     */
+    @ApiModelProperty(name = "outstockOperatorName", value = "出库人")
+    private String outstockOperatorName;
+
+    /**
+     *  出库时间
+     */
+    @ApiModelProperty(name = "outstockTime", value = "出库时间")
+    private Date outstockTime;
+
+
+
+    public String getOrgType() {
+        return orgType;
+    }
+
+    public void setOrgType(String orgType) {
+        this.orgType = orgType;
+    }
 
     public String getProcessOrgtype() {
         return processOrgtype;
@@ -261,5 +284,21 @@ public class FindAllocateApplyDTO {
 
     public void setStorehouseAddress(String storehouseAddress) {
         this.storehouseAddress = storehouseAddress;
+    }
+
+    public String getOutstockOperatorName() {
+        return outstockOperatorName;
+    }
+
+    public void setOutstockOperatorName(String outstockOperatorName) {
+        this.outstockOperatorName = outstockOperatorName;
+    }
+
+    public Date getOutstockTime() {
+        return outstockTime;
+    }
+
+    public void setOutstockTime(Date outstockTime) {
+        this.outstockTime = outstockTime;
     }
 }

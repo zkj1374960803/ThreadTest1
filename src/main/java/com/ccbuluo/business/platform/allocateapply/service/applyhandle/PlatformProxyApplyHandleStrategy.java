@@ -1,6 +1,9 @@
 package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
 import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
+import com.ccbuluo.business.constants.BusinessPropertyHolder;
+import com.ccbuluo.business.constants.InstockTypeEnum;
+import com.ccbuluo.business.constants.StockPlanStatusEnum;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
@@ -9,6 +12,9 @@ import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
+import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
+import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
+import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.business.entity.BizAllocateApply.ApplyStatusEnum;
 import com.ccbuluo.http.StatusDto;
@@ -43,6 +49,10 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
     @Resource
     BizAllocateApplyDao bizAllocateApplyDao;
+    @Resource
+    private BizServiceStorehouseDao bizServiceStorehouseDao;
+    @Resource
+    private UserHolder userHolder;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -178,10 +188,123 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
         List<BizInstockplanDetail> inList = new ArrayList<BizInstockplanDetail>();
         // 卖方机构出库计划
         outstockplanSeller(outList, relOrdstockOccupies,stockDetails, details, BizAllocateApply.AllocateApplyTypeEnum.PLATFORMALLOCATE.toString());
-        // 平台入库计划
-        instockplanPlatform(inList,details, BizAllocateApply.AllocateApplyTypeEnum.PLATFORMALLOCATE.toString());
-        // 买方入库计划
-        instockplanPurchaser(inList,details, BizAllocateApply.AllocateApplyTypeEnum.PLATFORMALLOCATE.toString());
+        //  构建平台入库计划：平台入库计划的成本价是卖方机构库存的成本价（单个商品有可能有多个批次库存，所以这里从处理计划构建）
+        instockplanPlatformFromStock(inList, outList);
+        // 买方入库计划(也要根据出库计划来，并且还要根据供应商来分组合并商品编号)
+        instockplanPlatformFromStockAndGroup(inList, outList,details);
         return Pair.of(outList, inList);
+    }
+
+    /**
+     * 平台入库计划构建
+     * @param
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-08-21 17:47:08
+     */
+    private void instockplanPlatformFromStock(List<BizInstockplanDetail> inList, List<BizOutstockplanDetail> outList){
+        // 根据平台的no查询平台的仓库
+        List<QueryStorehouseDTO> list = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+        String repositoryNo = "";
+        if(null != list && list.size() > 0){
+            repositoryNo = list.get(0).getStorehouseCode();
+        }
+        for(BizOutstockplanDetail bd : outList){
+            BizInstockplanDetail inPlan = buildBizInstockplanDetail(bd);
+            inPlan.setInstockRepositoryNo(repositoryNo);// 平台仓库编号
+            inPlan.setInstockOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 平台机构编号
+            inList.add(inPlan);
+        }
+    }
+    /**
+     * 买方入库机构构建
+     * @param
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-08-21 17:47:08
+     */
+    private void instockplanPlatformFromStockAndGroup(List<BizInstockplanDetail> inList, List<BizOutstockplanDetail> outList, List<AllocateapplyDetailBO> details){
+        AllocateapplyDetailBO ad = null;
+        if(null != details && details.size() > 0){
+            ad = details.get(0);
+        }
+        for(BizOutstockplanDetail bd : outList){
+            // 有可能一个商品有多个供应商
+            if(distinstSupplier(inList, bd, details)){
+                continue;
+            }
+            BizInstockplanDetail inPlan = buildBizInstockplanDetail(bd);
+            if(null != ad){
+                inPlan.setInstockRepositoryNo(ad.getInRepositoryNo());// 入库仓库编号
+                inPlan.setInstockOrgno(ad.getInstockOrgno());// 买入机构编号
+            }
+            inList.add(inPlan);
+        }
+    }
+    /**
+     *   过滤供应商
+     * @param
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-08-21 18:05:46
+     */
+    private boolean distinstSupplier(List<BizInstockplanDetail> inList, BizOutstockplanDetail bd , List<AllocateapplyDetailBO> details){
+        boolean flag = false;
+        for(BizInstockplanDetail in : inList){
+            if(in.getSupplierNo().equals(bd.getSupplierNo())){
+                // 一个商品有多个供应商的情况
+                AllocateapplyDetailBO ab = getAllocateapplyDetailBO(details, in.getProductNo());
+                in.setCostPrice(ab.getCostPrice());
+                flag = true;
+                break;
+            }
+        }
+        return flag;
+    }
+    /**
+     * 根据商品编号获取申请单详情
+     * @param details 申请详细
+     * @param productNo 商品编号
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    private AllocateapplyDetailBO getAllocateapplyDetailBO(List<AllocateapplyDetailBO> details, String productNo){
+        AllocateapplyDetailBO adb = new AllocateapplyDetailBO();
+        for(AllocateapplyDetailBO ab : details){
+            if(ab.getProductNo().equals(productNo)){
+                adb = ab;
+                break;
+            }
+        }
+        return adb;
+    }
+    /**
+     *  构建平台调拨的入库计划
+     * @param
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-08-21 17:51:45
+     */
+    private BizInstockplanDetail buildBizInstockplanDetail(BizOutstockplanDetail bd){
+        BizInstockplanDetail inPlan = new BizInstockplanDetail();
+        inPlan.setProductNo(bd.getProductNo());// 商品编号
+        inPlan.setProductType(bd.getProductType());// 商品类型
+        inPlan.setProductCategoryname(bd.getProductCategoryname());// 商品分类名称
+        inPlan.setProductName(bd.getProductName());// 商品名称
+        inPlan.setProductUnit(bd.getProductUnit());// 商品计量单位
+        inPlan.setTradeNo(bd.getTradeNo());// 交易批次号（申请单编号）
+        inPlan.setSupplierNo(bd.getSupplierNo());//供应商编号
+        inPlan.setCostPrice(bd.getCostPrice());// 成本价
+        inPlan.setPlanInstocknum(bd.getPlanOutstocknum());// 计划入库数量
+        inPlan.setCompleteStatus(StockPlanStatusEnum.DOING.toString());// 完成状态（计划执行中）
+        inPlan.preInsert(userHolder.getLoggedUserId());
+        inPlan.setStockType(bd.getStockType());// 库存类型
+        inPlan.setRemark(bd.getRemark());// 备注
+        inPlan.setInstockType(InstockTypeEnum.TRANSFER.toString());// 交易类型
+        return inPlan;
     }
 }
