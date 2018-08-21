@@ -39,7 +39,7 @@ public interface AllocateApplyService {
      * @author zhangkangjian
      * @date 2018-08-09 10:36:34
      */
-    Page<QueryAllocateApplyListDTO> findApplyList(String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize);
+    Page<QueryAllocateApplyListDTO> findApplyList(String productType,String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize);
     /**
      * 查询处理申请列表
      * @param
@@ -48,7 +48,7 @@ public interface AllocateApplyService {
      * @author zhangkangjian
      * @date 2018-08-09 10:36:34
      */
-    Page<QueryAllocateApplyListDTO> findProcessApplyList(String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize);
+    Page<QueryAllocateApplyListDTO> findProcessApplyList(String productType,String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize);
     /**
      * 处理申请单
      * @param

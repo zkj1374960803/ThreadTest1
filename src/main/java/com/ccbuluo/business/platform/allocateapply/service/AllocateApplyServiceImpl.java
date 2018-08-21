@@ -103,12 +103,12 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         String orgTypeByCode = getOrgTypeByCode(allocateApplyDTO.getOutstockOrgno());
         allocateApplyDTO.setOutstockOrgtype(orgTypeByCode);
         // 如果是采购类型的，处理机构和出库机构则是平台
-        String applyType = allocateApplyDTO.getApplyType();
-        if(AllocateApplyTypeEnum.PURCHASE.name().equals(applyType)){
+        String processType = allocateApplyDTO.getProcessType();
+        if(AllocateApplyTypeEnum.PURCHASE.name().equals(processType)){
             allocateApplyDTO.setApplyorgNo(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
             allocateApplyDTO.setOutstockOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
             allocateApplyDTO.setProcessOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
-        }else if(AllocateApplyTypeEnum.BARTER.name().equals(applyType) || AllocateApplyTypeEnum.REFUND.equals(applyType)){
+        }else if(AllocateApplyTypeEnum.BARTER.name().equals(processType) || AllocateApplyTypeEnum.REFUND.equals(processType)){
             StatusDto<String> thcode = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.TH);
             allocateApplyDTO.setApplyNo(thcode.getData());
             allocateApplyDTO.setOutstockOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
@@ -126,14 +126,14 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             a.setApplyNo(allocateApplyDTO.getApplyNo());
             a.setOperator(loggedUserId);
             a.setCreator(loggedUserId);
-            if(AllocateApplyTypeEnum.BARTER.name().equals(applyType) || AllocateApplyTypeEnum.REFUND.equals(applyType)){
+            if(AllocateApplyTypeEnum.BARTER.name().equals(processType) || AllocateApplyTypeEnum.REFUND.equals(processType)){
                 a.setStockType(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.name());
             }else {
                 a.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
             }
         });
         bizAllocateApplyDao.batchInsertForapplyDetailList(allocateapplyDetailList);
-        if(AllocateApplyTypeEnum.BARTER.name().equals(applyType) || AllocateApplyTypeEnum.REFUND.equals(applyType)){
+        if(AllocateApplyTypeEnum.BARTER.name().equals(processType) || AllocateApplyTypeEnum.REFUND.equals(processType)){
             applyHandleContext.applyHandle(allocateApplyDTO.getApplyNo());
         }
 
@@ -228,11 +228,11 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      * @date 2018-08-09 10:36:34
      */
     @Override
-    public Page<QueryAllocateApplyListDTO> findApplyList(String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize) {
+    public Page<QueryAllocateApplyListDTO> findApplyList(String productType, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize) {
         // 获取用户的组织机构
         String userOrgCode = getUserOrgCode();
         // 查询分页的申请列表
-        Page<QueryAllocateApplyListDTO> page = bizAllocateApplyDao.findApplyList(processType, applyStatus, applyNo, offset, pageSize, userOrgCode);
+        Page<QueryAllocateApplyListDTO> page = bizAllocateApplyDao.findApplyList(productType, processType, applyStatus, applyNo, offset, pageSize, userOrgCode);
         return page;
     }
 
@@ -261,7 +261,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     /**
      * 查询处理申请列表
      *
-     * @param processType
+     * @param orgType
      * @param applyStatus
      * @param applyNo
      * @param offset
@@ -271,10 +271,12 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      * @date 2018-08-09 10:36:34
      */
     @Override
-    public Page<QueryAllocateApplyListDTO> findProcessApplyList(String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize) {
+    public Page<QueryAllocateApplyListDTO> findProcessApplyList(String productType,String orgType, String applyStatus, String applyNo, Integer offset, Integer pageSize) {
         String userOrgCode = getUserOrgCode();
+        List<String> orgCodesByOrgType = getOrgCodesByOrgType(orgType);
+
         // 查询分页的申请列表
-        Page<QueryAllocateApplyListDTO> page = bizAllocateApplyDao.findProcessApplyList(processType, applyStatus, applyNo, offset, pageSize, userOrgCode);
+        Page<QueryAllocateApplyListDTO> page = bizAllocateApplyDao.findProcessApplyList(productType,orgCodesByOrgType, applyStatus, applyNo, offset, pageSize, userOrgCode);
         List<QueryAllocateApplyListDTO> rows = page.getRows();
         List<String> orgCode = rows.stream().map(QueryAllocateApplyListDTO::getApplyorgNo).collect(Collectors.toList());
         Map<String, BasicUserOrganization> basicUserOrganizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(orgCode);
@@ -290,15 +292,15 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
 
     /**
      * 处理申请单
-     * @param processApplyDTO@exception
+     * @param processApplyDTO
+     * @exception
      * @author zhangkangjian
      * @date 2018-08-10 11:24:53
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void processApply(ProcessApplyDTO processApplyDTO) {
-        String processType = processApplyDTO.getApplyType();
-        String userOrgCode = getUserOrgCode();
+        String processType = processApplyDTO.getProcessType();
         // 如果是调拨类型的
         if(InstockTypeEnum.TRANSFER.name().equals(processType)){
             String applyNo = processApplyDTO.getApplyNo();
@@ -316,6 +318,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }
             String orgTypeByCode = getOrgTypeByCode(outstockOrgno);
             processApplyDTO.setOutstockOrgType(orgTypeByCode);
+        }else {
+            processApplyDTO.setApplyType(AllocateApplyTypeEnum.PURCHASE.name());
         }
 
         // 查询版本号（数据库乐观锁）

@@ -171,24 +171,32 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @author zhangkangjian
      * @date 2018-08-09 10:36:34
      */
-    public Page<QueryAllocateApplyListDTO> findApplyList(String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode) {
+    public Page<QueryAllocateApplyListDTO> findApplyList(String productType, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode) {
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("userOrgCode", userOrgCode);
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.apply_status ")
-            .append(" FROM biz_allocate_apply a WHERE 1 = 1 ");
+            .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.`apply_no` = b.`apply_no` WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(userOrgCode)){
             sql.append(" AND a.applyorg_no = :userOrgCode ");
         }
         if(StringUtils.isNotBlank(processType)){
+            map.put("process_type", processType);
             sql.append(" AND a.process_type = :processType ");
         }
         if(StringUtils.isNotBlank(applyStatus)){
+            map.put("applyStatus", applyStatus);
             sql.append(" AND a.apply_status = :applyStatus ");
         }
         if(StringUtils.isNotBlank(applyNo)){
+            map.put("applyNo", applyNo);
             sql.append(" AND a.apply_no = :applyNo ");
         }
+        if(StringUtils.isNotBlank(productType)){
+            map.put("productType", productType);
+            sql.append(" AND b.product_type = :productType ");
+        }
+        sql.append(" GROUP BY a.apply_no ");
         return queryPageForBean(QueryAllocateApplyListDTO.class, sql.toString(), map, offset, pageSize);
     }
     /**
@@ -198,24 +206,32 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @author zhangkangjian
      * @date 2018-08-09 10:36:34
      */
-    public Page<QueryAllocateApplyListDTO> findProcessApplyList(String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode) {
+    public Page<QueryAllocateApplyListDTO> findProcessApplyList(String productType,List<String> orgCodesByOrgType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode) {
         HashMap<String, Object> map = Maps.newHashMap();
-        map.put("userOrgCode", userOrgCode);
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.apply_status ")
-            .append(" FROM biz_allocate_apply a WHERE 1 = 1 ");
+            .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.`apply_no` = b.`apply_no` WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(userOrgCode)){
+            map.put("userOrgCode", userOrgCode);
             sql.append(" AND a.outstock_orgno = :userOrgCode ");
         }
-        if(StringUtils.isNotBlank(processType)){
-            sql.append(" AND a.process_type = :processType ");
+        if(orgCodesByOrgType != null && orgCodesByOrgType.size() > 0){
+            map.put("orgCodesByOrgType", orgCodesByOrgType);
+            sql.append(" AND a.applyorg_no in (:orgCodesByOrgType)  ");
         }
         if(StringUtils.isNotBlank(applyStatus)){
+            map.put("applyStatus", applyStatus);
             sql.append(" AND a.apply_status = :applyStatus ");
         }
         if(StringUtils.isNotBlank(applyNo)){
+            map.put("applyNo", applyNo);
             sql.append(" AND a.apply_no = :applyNo ");
         }
+        if(StringUtils.isNotBlank(productType)){
+            map.put("productType", productType);
+            sql.append(" AND b.product_type = :productType ");
+        }
+        sql.append(" GROUP BY a.apply_no ");
         return queryPageForBean(QueryAllocateApplyListDTO.class, sql.toString(), map, offset, pageSize);
     }
     /**

@@ -67,12 +67,13 @@ public class CustAllocateApplyController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "processType", value = "申请类型", required = false, paramType = "query"),
         @ApiImplicitParam(name = "applyStatus", value = "申请状态", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "productType", value = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）", required = true, paramType = "query"),
         @ApiImplicitParam(name = "applyNo", value = "申请单号", required = false, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query"),
     })
-    public StatusDto<Page<QueryAllocateApplyListDTO>> list(String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
-        Page<QueryAllocateApplyListDTO> page = allocateApplyServiceImpl.findApplyList(processType, applyStatus, applyNo, offset, pageSize);
+    public StatusDto<Page<QueryAllocateApplyListDTO>> list(String productType,String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
+        Page<QueryAllocateApplyListDTO> page = allocateApplyServiceImpl.findApplyList(productType, processType, applyStatus, applyNo, offset, pageSize);
         return StatusDto.buildDataSuccessStatusDto(page);
     }
 
@@ -90,11 +91,12 @@ public class CustAllocateApplyController extends BaseController {
         @ApiImplicitParam(name = "processType", value = "申请类型", required = false, paramType = "query"),
         @ApiImplicitParam(name = "applyStatus", value = "申请状态", required = false, paramType = "query"),
         @ApiImplicitParam(name = "applyNo", value = "申请单号", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "productType", value = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）", required = true, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query"),
     })
-    public StatusDto<Page<QueryAllocateApplyListDTO>> processList(String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
-        Page<QueryAllocateApplyListDTO> page = allocateApplyServiceImpl.findProcessApplyList(processType, applyStatus, applyNo, offset, pageSize);
+    public StatusDto<Page<QueryAllocateApplyListDTO>> processList(String productType,String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
+        Page<QueryAllocateApplyListDTO> page = allocateApplyServiceImpl.findProcessApplyList(productType,processType, applyStatus, applyNo, offset, pageSize);
         return StatusDto.buildDataSuccessStatusDto(page);
     }
 
