@@ -497,7 +497,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public StatusDto cancelApply(String applyNo){
-        // 更改申请单状态 TODO
         return applyHandleContext.cancelApply(applyNo);
     }
 }
