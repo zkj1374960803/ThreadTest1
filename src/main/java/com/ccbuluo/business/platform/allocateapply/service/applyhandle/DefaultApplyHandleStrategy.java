@@ -185,8 +185,12 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
      */
     private BigDecimal getTatal(List<AllocateapplyDetailBO> details){
         BigDecimal bigDecimal = BigDecimal.ZERO;
+        BigDecimal sellPrice = BigDecimal.ZERO;
         for(AllocateapplyDetailBO bd : details){
-            bigDecimal.add(bd.getSellPrice());
+            if(null != bd.getSellPrice()){
+                sellPrice = bd.getSellPrice();
+            }
+            bigDecimal.add(sellPrice);
         }
         return bigDecimal;
     }
