@@ -57,22 +57,22 @@ public class ApplyHandleContext {
             ApplyHandleStrategy handle = null;
             switch (typeEnum){
                 case PURCHASE:    // 采购
-                    handle = new PurchaseApplyHandleStrategy();
+                    handle = purchaseApplyHandleService;
                     break;
                 case PLATFORMALLOCATE:    // 平台调拨
-                    handle = new PlatformProxyApplyHandleStrategy();
+                    handle = platformAllocateApplyHandleService;
                     break;
                 case SAMELEVEL:    // 平级调拨（服务间的调拨）
-                    handle = new SameLevelApplyHandleStrategy();
+                    handle = serviceAllocateApplyHandleService;
                     break;
                 case DIRECTALLOCATE:    // 直调
-                    handle = new PlatformDirectApplyHandleStrategy();
+                    handle = directAllocateApplyHandleService;
                     break;
                 case BARTER:    // 商品换货
-                    handle = new BarterApplyHandleStrategy();
+                    handle = barterApplyHandleStrategy;
                     break;
                 case REFUND:    //  退货
-                    handle = new RefundApplyHandleStrategy();
+                    handle = refundApplyHandleStrategy;
                     break;
                 default:
                     logger.error(typeEnum.toString()+"出现了未知处理类型！");
@@ -99,22 +99,22 @@ public class ApplyHandleContext {
         ApplyHandleStrategy handle = null;
         switch (typeEnum){
             case PURCHASE:    // 采购
-                handle = new PurchaseApplyHandleStrategy();
+                handle = purchaseApplyHandleService;
                 break;
             case PLATFORMALLOCATE:    // 平台调拨
-                handle = new  PlatformProxyApplyHandleStrategy();
+                handle = platformAllocateApplyHandleService;
                 break;
             case SAMELEVEL:    // 平级调拨（服务间的调拨没有回调）
-                handle = new SameLevelApplyHandleStrategy();
+                handle = serviceAllocateApplyHandleService;
                 break;
             case DIRECTALLOCATE:    // 直调
-                handle = new PlatformDirectApplyHandleStrategy();
+                handle = directAllocateApplyHandleService;
                 break;
             case BARTER:    // 商品换货
-                handle = new BarterApplyHandleStrategy();
+                handle = barterApplyHandleStrategy;
                 break;
             case REFUND:    //  退货
-                handle = new RefundApplyHandleStrategy();
+                handle = refundApplyHandleStrategy;
                 break;
             default:
                 logger.error(typeEnum.toString()+"出现了未知回调类型！");
@@ -190,22 +190,22 @@ public class ApplyHandleContext {
             ApplyHandleStrategy handle = null;
             switch (typeEnum){
                 case PURCHASE:    // 采购
-                    handle = new PurchaseApplyHandleStrategy();
+                    handle = purchaseApplyHandleService;
                     break;
                 case PLATFORMALLOCATE:    // 平台调拨
-                    handle = new PlatformProxyApplyHandleStrategy();
+                    handle = platformAllocateApplyHandleService;
                     break;
                 case SAMELEVEL:    // 平级调拨（服务间的调拨）
-                    handle = new SameLevelApplyHandleStrategy();
+                    handle = serviceAllocateApplyHandleService;
                     break;
                 case DIRECTALLOCATE:    // 直调
-                    handle = new PlatformDirectApplyHandleStrategy();
+                    handle = directAllocateApplyHandleService;
                     break;
                 case BARTER:    // 商品换货
-                    handle = new BarterApplyHandleStrategy();
+                    handle = barterApplyHandleStrategy;
                     break;
                 case REFUND:    //  退货
-                    handle = new RefundApplyHandleStrategy();
+                    handle = refundApplyHandleStrategy;
                     break;
                 default:
                     logger.error(typeEnum.toString()+"出现了未知撤销类型！");

@@ -107,12 +107,12 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         }
         // 商品换货
         if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType)){
-            // 从买方到平台
+            // 从平台到卖方
             platformToSeller = null;
         }
         // 退货
         if(AllocateApplyTypeEnum.REFUND.toString().equals(applyType)){
-            // 从买方到平台
+            // 从平台到卖方
             platformToSeller = null;
         }
 

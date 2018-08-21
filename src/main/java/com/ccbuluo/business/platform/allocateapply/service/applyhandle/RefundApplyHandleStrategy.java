@@ -6,6 +6,7 @@ import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
+import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.outstock.service.OutstockOrderService;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.http.StatusDto;
@@ -36,6 +37,8 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
     @Resource
     OutstockOrderService outstockOrderService;
+    @Resource
+    private BizAllocateTradeorderDao bizAllocateTradeorderDao;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -56,6 +59,8 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
             if(null == details || details.size() == 0){
                 return StatusDto.buildFailureStatusDto("申请单为空！");
             }
+            // 构建生成订单(调拨)
+            List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyNo);
             //获取申请方机构code
             String applyorgNo = getProductOrgNo(ba);
             //查询库存列表
@@ -71,6 +76,8 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
             List<RelOrdstockOccupy> relOrdstockOccupies = pair.getRight();
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
             Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, BizAllocateApply.AllocateApplyTypeEnum.REFUND, relOrdstockOccupies);
+            // 保存生成订单
+            bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
             // 调用自动出库
             outstockOrderService.autoSaveOutstockOrder(applyType, pir.getLeft());
             // 批量保存出库计划详情
