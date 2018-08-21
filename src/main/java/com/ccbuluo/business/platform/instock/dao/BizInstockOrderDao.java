@@ -64,7 +64,7 @@ public class BizInstockOrderDao extends BaseDao<BizInstockOrder> {
         params.put("orgCode", orgCode);
 
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT bio.id,bio.instock_orderno,bio.instock_type,bio.instock_time,bio.trade_docno,bio.instock_operator")
+        sql.append(" SELECT DISTINCT bio.id,bio.instock_orderno,bio.instock_type,bio.instock_time,bio.trade_docno,bio.instock_operator")
             .append("  FROM biz_instock_order AS bio LEFT JOIN biz_instockorder_detail AS bid ON bid.instock_orderno = bio.instock_orderno")
             .append("    WHERE bid.product_type = :productType AND bio.instock_orgno = :orgCode");
         if (StringUtils.isNotBlank(instockType)) {

@@ -1,12 +1,9 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
 
+import com.ccbuluo.business.platform.allocateapply.dto.FindProblemAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.ProblemAllocateapplyDetailDTO;
-import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.db.Page;
-import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
-
-import java.util.List;
 
 /**
  * 功能描述（1）
@@ -39,4 +36,13 @@ public interface ProblemAllocateApply {
      * @date 2018-08-15 18:51:51
      */
     Page<ProblemAllocateapplyDetailDTO> queryProblemHandleList(String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize);
+
+    /**
+     * 查询退换货申请单详情
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-20 20:02:58
+     */
+    FindProblemAllocateApplyDTO getProblemdetailDetail(String applyNo);
 }
