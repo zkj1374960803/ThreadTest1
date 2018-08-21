@@ -19,7 +19,7 @@ public class ProcessApplyDTO {
     @ApiModelProperty(name = "processTime", value = "处理时间", hidden = true)
     private Date processTime;
 
-    @ApiModelProperty(name = "applyType", value = "申请的类型：(注：TRANSFER调拨、PURCHASE采购)")
+    @ApiModelProperty(name = "applyType", value = "申请的类型：(注：TRANSFER调拨、PURCHASE采购)", hidden = true)
     private String applyType;
     /**
      * 调拨申请单编号
@@ -29,7 +29,7 @@ public class ProcessApplyDTO {
     /**
      * 平台决定的处理类型：调拨、采购
      */
-    @ApiModelProperty(name = "processType", value = "平台决定的处理类型(注：TRANSFER调拨、PURCHASE采购)", hidden = true)
+    @ApiModelProperty(name = "processType", value = "平台决定的处理类型(注：TRANSFER调拨、PURCHASE采购)")
     private String processType;
     /**
      * 出库的组织架构的类型

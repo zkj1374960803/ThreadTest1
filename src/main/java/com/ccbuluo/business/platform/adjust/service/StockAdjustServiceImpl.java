@@ -116,18 +116,19 @@ public class StockAdjustServiceImpl implements StockAdjustService{
       */
      @Override
      public List<StockAdjustListDTO> queryAdjustList(Long equipTypeId, String equipmentcode) {
-          // 若物料类型不为空，物料为空，则根据物料类型查询物料
+         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+         // 若物料类型不为空，物料为空，则根据物料类型查询物料
           if (null != equipTypeId && StringUtils.isBlank(equipmentcode)) {
                List<DetailBizServiceEquipmentDTO> detailBizServiceEquipmentDTOS = queryEquipmentByType(equipTypeId);
                List<String> equipmentCodes = detailBizServiceEquipmentDTOS.stream().map(DetailBizServiceEquipmentDTO::getEquipCode).collect(Collectors.toList());
                if (null != equipmentCodes && equipmentCodes.size() > 0) {
-                    return stockDetailService.queryAdjustList(equipmentCodes);
+                    return stockDetailService.queryAdjustList(equipmentCodes, orgCode);
                }
                return Lists.newArrayList();
           } else if (StringUtils.isNotBlank(equipmentcode)) {
-               return stockDetailService.queryAdjustList(Lists.newArrayList(equipmentcode));
+               return stockDetailService.queryAdjustList(Lists.newArrayList(equipmentcode), orgCode);
           }
-          return stockDetailService.queryAdjustList(Lists.newArrayList());
+          return stockDetailService.queryAdjustList(Lists.newArrayList(), orgCode);
      }
 
      /**
@@ -177,19 +178,20 @@ public class StockAdjustServiceImpl implements StockAdjustService{
      */
     @Override
     public List<StockAdjustListDTO> queryAdjustListByCategoryCode(String categoryCode, String productCode) {
+        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         // 分类不为空，零配件为空
         if (StringUtils.isNotBlank(categoryCode) && StringUtils.isBlank(productCode)) {
             List<BasicCarpartsProductDTO> basicCarpartsProductDTOS = carpartsProductService.queryCarpartsProductListByCategoryCode(categoryCode);
             List<String> carparts = basicCarpartsProductDTOS.stream().map(BasicCarpartsProductDTO::getCarpartsCode).collect(Collectors.toList());
             // 零配件为空，则直接根据分类code查询下面的商品进行查询
             if (null != carparts && carparts.size() > 0) {
-                return stockDetailService.queryAdjustList(carparts);
+                return stockDetailService.queryAdjustList(carparts, orgCode);
             }
-            return stockDetailService.queryAdjustList(Lists.newArrayList());
+            return stockDetailService.queryAdjustList(Lists.newArrayList(), orgCode);
         } else if (StringUtils.isNotBlank(productCode)) {
-            return stockDetailService.queryAdjustList(Lists.newArrayList(productCode));
+            return stockDetailService.queryAdjustList(Lists.newArrayList(productCode), orgCode);
         }
-        return stockDetailService.queryAdjustList(Lists.newArrayList());
+        return stockDetailService.queryAdjustList(Lists.newArrayList(), orgCode);
     }
 
 
