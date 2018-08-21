@@ -786,6 +786,6 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             outstockplanPlatform.setCostPrice(in.getCostPrice());// 成本价
             outstockplanDetails.add(outstockplanPlatform);
         }
-        return null;
+        return outstockplanDetails;
     }
 }
