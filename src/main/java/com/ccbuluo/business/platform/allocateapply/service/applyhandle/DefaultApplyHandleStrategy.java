@@ -89,32 +89,45 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
      */
     public List<BizAllocateTradeorder> buildOrderEntityList(List<AllocateapplyDetailBO> details, String applyType){
         // 构建生成订单（机构1对平台）
-        BizAllocateTradeorder purchaserToPlatform = buildOrderEntity(details);
-        BizAllocateTradeorder platformToSeller = buildOrderEntity(details);
+        BizAllocateTradeorder purchaserToPlatform = buildOrderEntity(details);// 买方到平台
+        BizAllocateTradeorder platformToSeller = buildOrderEntity(details);// 平台到卖方
+        BizAllocateTradeorder purchaserToSeller = buildOrderEntity(details);// 买方到卖方
         purchaserToPlatform.setSellerOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 从买方到平台"平台code"
         platformToSeller.setPurchaserOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 从平台到卖方"平台code"
-
         // 特殊情况处理
-        // 采购
+        // 采购平台直发(从买方到平台)
         if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType)){
             // 采购的时候卖方为供应商（供应商不填为空）
             platformToSeller.setSellerOrgno("");
+            platformToSeller = null;
+            purchaserToSeller = null;
         }
-        // 平台直发
+        // 平台直发(从买方到平台)
         if(AllocateApplyTypeEnum.DIRECTALLOCATE.toString().equals(applyType)){
-            // 直调是没有采购订单的
             platformToSeller = null;
+            purchaserToSeller = null;
         }
-        // 商品换货
+        // 商品换货（不生成订单）
         if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType)){
-            // 从平台到卖方
+            purchaserToPlatform = null;
             platformToSeller = null;
+            purchaserToSeller = null;
         }
-        // 退货
+        // 退货(从买方到平台)
         if(AllocateApplyTypeEnum.REFUND.toString().equals(applyType)){
-            // 从平台到卖方
+            platformToSeller = null;
+            purchaserToSeller = null;
+        }
+        // 平台调拨（从买方到平台到卖方）
+        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType)){
+            purchaserToSeller = null;
+        }
+        // 平级调拨(从买方到卖方)
+        if(AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType)){
+            purchaserToPlatform = null;
             platformToSeller = null;
         }
+
 
         List<BizAllocateTradeorder> list = new ArrayList<BizAllocateTradeorder>();
         // 从买方到平台
@@ -124,6 +137,10 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         // 从平台到卖方
         if(null != platformToSeller){
             list.add(platformToSeller);
+        }
+        // 从买方到卖方
+        if(null != purchaserToSeller){
+            list.add(purchaserToSeller);
         }
         return list;
     }
@@ -272,7 +289,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         }
     }
     /**
-     *
+     * 根据商品编号获取申请单详情
      * @param details 申请详细
      * @param productNo 商品编号
      * @author weijb

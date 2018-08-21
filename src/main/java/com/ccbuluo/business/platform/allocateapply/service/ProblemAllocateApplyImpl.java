@@ -75,11 +75,28 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         FindAllocateApplyDTO allocateApplyDTO = allocateApplyServiceImpl.findDetail(applyNo);
         // 获取出库人和出库时间
         BizOutstockOrderDTO oOutstockOrder = bizOutstockOrderDao.getByTradeDocno(applyNo);
-        StatusDtoThriftBean<UserInfoDTO> userDetail = innerUserInfoService.findUserDetail(oOutstockOrder.getOutstockOperator());
-        StatusDto<UserInfoDTO> resolve = StatusDtoThriftUtils.resolve(userDetail, UserInfoDTO.class);
-        allocateApplyDTO.setOutstockOperatorName(resolve.getData().getName());// 出库人
+        String operatorName = getUserNameByUuid(oOutstockOrder.getOutstockOperator());
+        allocateApplyDTO.setOutstockOperatorName(operatorName);// 出库人
         allocateApplyDTO.setOutstockTime(oOutstockOrder.getOutstockTime());// 出库时间
         return allocateApplyDTO;
+    }
+
+    /**
+     *  根据用户uuid获取用户名字
+     * @param uuid
+     * @exception 
+     * @return 
+     * @author weijb
+     * @date 2018-08-21 16:46:25
+     */
+    private String getUserNameByUuid(String uuid){
+        StatusDtoThriftBean<UserInfoDTO> userDetail = innerUserInfoService.findUserDetail(uuid);
+        StatusDto<UserInfoDTO> resolve = StatusDtoThriftUtils.resolve(userDetail, UserInfoDTO.class);
+        String operatorName = "";
+        if(null != resolve){
+            operatorName = resolve.getData().getName();
+        }
+        return operatorName;
     }
 
 }
