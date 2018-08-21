@@ -1,6 +1,9 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
+import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.ProblemAllocateApplyDao;
+import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.FindProblemAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.ProblemAllocateapplyDetailDTO;
 import com.ccbuluo.db.Page;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,8 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
 
     @Resource
     private ProblemAllocateApplyDao problemAllocateApplyDao;
+    @Resource
+    BizAllocateApplyDao bizAllocateApplyDao;
 
     /**
      * 问题件申请列表
@@ -46,6 +51,19 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
     @Override
     public Page<ProblemAllocateapplyDetailDTO> queryProblemHandleList(String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
         return problemAllocateApplyDao.queryProblemHandleList(applyType, applyStatus, applyNo, offset, pageSize);
+    }
+
+    /**
+     * 查询退换货申请单详情
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-20 20:02:58
+     */
+    @Override
+    public FindProblemAllocateApplyDTO getProblemdetailDetail(String applyNo){
+        FindAllocateApplyDTO allocateApplyDTO = bizAllocateApplyDao.findDetail(applyNo);
+        return null;
     }
 
 }

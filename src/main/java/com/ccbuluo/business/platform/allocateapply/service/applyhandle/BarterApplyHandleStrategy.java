@@ -112,7 +112,7 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
         instockplanPlatform(inList,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
         // 平台出库
         outstockplanPlatform(outList,relOrdstockOccupies,stockDetails,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
-        // 买方入库
+        // 买方入库（换货：买方机构的入库要以出库的数据来构建（不同批次，不同价格）（问题件库存））
         instockplanPurchaser(inList,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
         return Pair.of(outList, inList);
     }

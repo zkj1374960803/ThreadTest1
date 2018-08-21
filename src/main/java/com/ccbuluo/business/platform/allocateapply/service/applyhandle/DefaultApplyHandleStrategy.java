@@ -462,7 +462,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     private BizOutstockplanDetail buildBizOutstockplanDetail(BizInstockplanDetail in, String applyType, List<AllocateapplyDetailBO> details){
         BizOutstockplanDetail outPlan = new BizOutstockplanDetail();
         // 调拨和平台采购都属于调拨出库
-        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
             outPlan.setOutstockType(OutstockTypeEnum.TRANSFER.toString());// 交易类型
         }
         // 换货
@@ -499,18 +499,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
      */
     private BizInstockplanDetail buildBizInstockplanDetail(AllocateapplyDetailBO ad, String applyType){
         BizInstockplanDetail inPlan = new BizInstockplanDetail();
-        // 调拨
-        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
-            inPlan.setInstockType(InstockTypeEnum.TRANSFER.toString());// 交易类型
-        }
-        // 采购
-        if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
-            inPlan.setInstockType(InstockTypeEnum.PURCHASE.toString());// 交易类型
-        }
-        // 换货
-        if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
-            inPlan.setInstockType(InstockTypeEnum.BARTER.toString());// 交易类型
-        }
+
         inPlan.setProductNo(ad.getProductNo());// 商品编号
         inPlan.setProductType(ad.getProductType());// 商品类型
         inPlan.setProductCategoryname(ad.getProductCategoryname());// 商品分类名称
@@ -525,6 +514,20 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         inPlan.preInsert(userHolder.getLoggedUserId());
         inPlan.setStockType(ad.getStockType());// 库存类型
         inPlan.setRemark(ad.getRemark());// 备注
+        // 调拨
+        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
+            inPlan.setInstockType(InstockTypeEnum.TRANSFER.toString());// 交易类型
+        }
+        // 采购
+        if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType)){
+            inPlan.setInstockType(InstockTypeEnum.PURCHASE.toString());// 交易类型
+        }
+        // 换货
+        if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) || AllocateApplyTypeEnum.REFUND.toString().equals(applyType) ){
+            inPlan.setInstockType(InstockTypeEnum.BARTER.toString());// 交易类型
+            inPlan.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());// 库存类型 （问题件再次入库的时候应该是有效库存）
+            inPlan.setCostPrice(BigDecimal.ZERO);// 成本价(退货和换货的成本价是零)
+        }
         return inPlan;
     }
 
