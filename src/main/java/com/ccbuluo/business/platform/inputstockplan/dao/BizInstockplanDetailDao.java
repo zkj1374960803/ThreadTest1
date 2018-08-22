@@ -218,7 +218,7 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
         sql.append("SELECT id,instock_type,product_no,product_name,product_type,product_categoryname,")
                 .append("trade_no,supplier_no,instock_repository_no,cost_price,")
                 .append("IFNULL(plan_instocknum,0) AS planInstocknum,IFNULL(actual_instocknum,0) AS actualInstocknum,complete_status,complete_time,")
-                .append("outstock_planid,product_unit")
+                .append("outstock_planid,product_unit,stock_type")
                 .append(" FROM biz_instockplan_detail WHERE trade_no= :applyNo AND instock_orgno= :instockOrgno");
         return super.queryListBean(BizInstockplanDetail.class, sql.toString(), params);
     }
