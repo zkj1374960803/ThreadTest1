@@ -258,6 +258,7 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
                 // 一个商品有多个供应商的情况
                 AllocateapplyDetailBO ab = getAllocateapplyDetailBO(details, in.getProductNo());
                 in.setCostPrice(ab.getCostPrice());
+                inList.add(in);
                 flag = true;
                 break;
             }
