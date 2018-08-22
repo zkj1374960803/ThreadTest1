@@ -96,15 +96,6 @@ public class ApplyHandleContext {
     public StatusDto platformInstockCallback(String applyNo){
         // 根据申请单获取申请单详情
         BizAllocateApply ba = bizAllocateApplyDao.getByNo(applyNo);
-        if(ba.getApplyType().equals(AllocateApplyTypeEnum.BARTER.name()) || ba.getApplyType().equals(AllocateApplyTypeEnum.REFUND.name())){// 退换货
-            throw new CommonException("0", "退换货不可以撤销！");
-        }else{
-            // 只有申请提交和等待付款的状态才可以撤销
-            if(!ba.getApplyStatus().equals(BizAllocateApply.ApplyStatusEnum.PENDING.name()) || !ba.getApplyStatus().equals(BizAllocateApply.ApplyStatusEnum.WAITINGPAYMENT.name())){
-                BizAllocateApply.ApplyStatusEnum statusEnum = BizAllocateApply.ApplyStatusEnum.valueOf(ba.getApplyStatus());
-                throw new CommonException("0", statusEnum.getKey()+" 不可以撤销！");
-            }
-        }
         AllocateApplyTypeEnum typeEnum = AllocateApplyTypeEnum.valueOf(ba.getApplyType());
         ApplyHandleStrategy handle = null;
         switch (typeEnum){
@@ -194,6 +185,15 @@ public class ApplyHandleContext {
         try {
             // 根据申请单获取申请单详情
             BizAllocateApply ba = bizAllocateApplyDao.getByNo(applyNo);
+            if(ba.getApplyType().equals(AllocateApplyTypeEnum.BARTER.name()) || ba.getApplyType().equals(AllocateApplyTypeEnum.REFUND.name())){// 退换货
+                throw new CommonException("0", "退换货不可以撤销！");
+            }else{
+                // 只有申请提交和等待付款的状态才可以撤销
+                if(!ba.getApplyStatus().equals(BizAllocateApply.ApplyStatusEnum.PENDING.name()) || !ba.getApplyStatus().equals(BizAllocateApply.ApplyStatusEnum.WAITINGPAYMENT.name())){
+                    BizAllocateApply.ApplyStatusEnum statusEnum = BizAllocateApply.ApplyStatusEnum.valueOf(ba.getApplyStatus());
+                    throw new CommonException("0", statusEnum.getKey()+" 不可以撤销！");
+                }
+            }
             if(null == ba){
                 return StatusDto.buildFailureStatusDto("申请单不存在！");
             }
