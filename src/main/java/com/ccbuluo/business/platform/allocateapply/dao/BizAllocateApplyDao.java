@@ -5,6 +5,7 @@ import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
+import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
@@ -209,7 +210,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     public Page<QueryAllocateApplyListDTO> findProcessApplyList(String productType,List<String> orgCodesByOrgType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode) {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.apply_status ")
+        sql.append(" SELECT a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.process_type,a.apply_status ")
             .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.`apply_no` = b.`apply_no` WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(userOrgCode)){
             map.put("userOrgCode", userOrgCode);
@@ -437,5 +438,32 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             sql.append(" AND a.equiptype_id = :equiptypeId ");
         }
         return queryListBean(BasicCarpartsProductDTO.class, sql.toString(), map);
+    }
+
+    /**
+     * 问题件申请查询(创建问题件，查询问题件列表)
+     * @param orgCode 机构的code
+     * @return StatusDto<List<StockBizStockDetailDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-22 14:37:40
+     */
+    public List<StockBizStockDetailDTO> queryProblemStockList(String orgCode, String productType) {
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        StringBuilder sql = new StringBuilder();
+
+        sql.append("SELECT id,product_no,product_name,product_type,product_unit,SUM(problem_stock) as problem_stock,product_categoryname")
+            .append(" FROM biz_stock_detail  WHERE delete_flag = :deleteFlag and problem_stock > 0 ");
+        // 组织机构code
+        if (StringUtils.isNotBlank(orgCode)) {
+            param.put("orgCode", orgCode);
+            sql.append(" AND org_no = :orgCode ");
+        }
+        if (StringUtils.isNotBlank(productType)) {
+            param.put("productType", productType);
+            sql.append(" AND product_type = :productType ");
+        }
+        sql.append(" GROUP BY product_no ORDER BY create_time DESC");
+        return queryListBean(StockBizStockDetailDTO.class, sql.toString(), param);
     }
 }

@@ -10,6 +10,7 @@ import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleContext;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
+import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockmanagement.dto.FindStockDetailDTO;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.core.common.UserHolder;
@@ -394,6 +395,18 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     }
 
     /**
+     * 问题件申请查询(创建问题件，查询问题件列表)
+     * @param orgCode 机构的code
+     * @return StatusDto<List < StockBizStockDetailDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-22 14:37:40
+     */
+    @Override
+    public List<StockBizStockDetailDTO> queryProblemStockList(String orgCode, String productType) {
+        return bizAllocateApplyDao.queryProblemStockList(orgCode, productType);
+    }
+
+    /**
      * 修改申请单状态
      * @param applyNo 申请单号
      * @param status 申请单状态
@@ -460,6 +473,11 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     public StatusDto<List<ProductStockInfoDTO>> checkStockQuantity(CheckStockQuantityDTO checkStockQuantityDTO) {
         String flag = Constants.SUCCESS_CODE;
         String message = "成功";
+        FindAllocateApplyDTO detail = findDetail(checkStockQuantityDTO.getOutstockOrgno());
+        // 如果是平台调拨，需要校验库存来源
+        if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(detail.getProcessOrgno())){
+            checkStockQuantityDTO.setSellerOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+        }
         Map<String, Object> map = bizAllocateApplyDao.queryStockQuantity(checkStockQuantityDTO.getOutstockOrgno(), checkStockQuantityDTO.getSellerOrgno());
         List<ProductStockInfoDTO> allocateapplyDetailList = checkStockQuantityDTO.getProductInfoList();
         for (int i = 0; i < allocateapplyDetailList.size(); i++) {

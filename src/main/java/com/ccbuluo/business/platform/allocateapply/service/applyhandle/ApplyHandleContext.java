@@ -169,7 +169,8 @@ public class ApplyHandleContext {
     public String getOutstockType(String applyType){
         String outstockType = "";
         // 调拨出库
-        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType)
+            || AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType)){
             outstockType = OutstockTypeEnum.TRANSFER.toString();// 交易类型
         }
         // 换货
