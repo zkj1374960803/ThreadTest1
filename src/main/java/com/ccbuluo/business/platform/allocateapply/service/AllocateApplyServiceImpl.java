@@ -108,10 +108,12 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         // 如果是采购类型的，处理机构和出库机构则是平台
         String processType = allocateApplyDTO.getProcessType();
         if(AllocateApplyTypeEnum.PURCHASE.name().equals(processType)){
+            allocateApplyDTO.setApplyType(AllocateApplyTypeEnum.PURCHASE.name());
             allocateApplyDTO.setApplyorgNo(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
             allocateApplyDTO.setOutstockOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
             allocateApplyDTO.setProcessOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
         }else if(AllocateApplyTypeEnum.BARTER.name().equals(processType) || AllocateApplyTypeEnum.REFUND.equals(processType)){
+            allocateApplyDTO.setApplyType(processType);
             StatusDto<String> thcode = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.TH);
             allocateApplyDTO.setApplyNo(thcode.getData());
             allocateApplyDTO.setOutstockOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
@@ -136,6 +138,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }
         });
         bizAllocateApplyDao.batchInsertForapplyDetailList(allocateapplyDetailList);
+
         if(AllocateApplyTypeEnum.PURCHASE.name().equals(processType) || AllocateApplyTypeEnum.BARTER.name().equals(processType) || AllocateApplyTypeEnum.REFUND.equals(processType)){
             applyHandleContext.applyHandle(allocateApplyDTO.getApplyNo());
         }
