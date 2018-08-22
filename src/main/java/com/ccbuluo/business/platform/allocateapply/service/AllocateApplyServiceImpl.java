@@ -93,6 +93,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                     if(orgCodeUser.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)){
                         // 等待付款状态
                         allocateApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
+                        allocateApplyDTO.setApplyProcessor(loggedUserId);
+                        allocateApplyDTO.setProcessTime(new Date());
                     }else {
                         // 待处理
                         allocateApplyDTO.setApplyStatus(ApplyStatusEnum.PENDING.name());
@@ -134,7 +136,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }
         });
         bizAllocateApplyDao.batchInsertForapplyDetailList(allocateapplyDetailList);
-        if(AllocateApplyTypeEnum.BARTER.name().equals(processType) || AllocateApplyTypeEnum.REFUND.equals(processType)){
+        if(AllocateApplyTypeEnum.PURCHASE.name().equals(processType) || AllocateApplyTypeEnum.BARTER.name().equals(processType) || AllocateApplyTypeEnum.REFUND.equals(processType)){
             applyHandleContext.applyHandle(allocateApplyDTO.getApplyNo());
         }
 
