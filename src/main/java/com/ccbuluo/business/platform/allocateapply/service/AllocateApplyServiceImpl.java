@@ -104,7 +104,11 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         }
         // 查询组织架构类型
         String orgTypeByCode = getOrgTypeByCode(allocateApplyDTO.getOutstockOrgno());
-        allocateApplyDTO.setOutstockOrgtype(orgTypeByCode);
+        if(StringUtils.isBlank(orgTypeByCode)){
+            allocateApplyDTO.setOutstockOrgtype(OrganizationTypeEnum.PLATFORM.name());
+        }else {
+            allocateApplyDTO.setOutstockOrgtype(orgTypeByCode);
+        }
         // 如果是采购类型的，处理机构和出库机构则是平台
         String processType = allocateApplyDTO.getProcessType();
         if(AllocateApplyTypeEnum.PURCHASE.name().equals(processType)){
