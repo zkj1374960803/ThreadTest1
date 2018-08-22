@@ -349,14 +349,18 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @author liuduo
      * @date 2018-08-11 12:56:39
      */
-    public List<String> queryApplyNo(String applyNoStatus, String orgCode) {
+    public List<String> queryApplyNo(String applyNoStatus, String orgCode, String productType) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNoStatus", applyNoStatus);
         params.put("orgCode", orgCode);
+        params.put("productType", productType);
 
-        String sql = "SELECT apply_no FROM biz_allocate_apply WHERE apply_status = :applyNoStatus AND process_orgno = :orgCode";
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT baa.apply_no FROM biz_allocate_apply AS baa LEFT JOIN biz_allocateapply_detail AS bad ON bad.apply_no = baa.apply_no")
+            .append("  WHERE baa.apply_status = :applyNoStatus AND baa.process_orgno = :orgCode AND bad.product_type = :productType")
+            .append("  GROUP BY bad.product_type");
 
-        return querySingColum(String.class, sql, params);
+        return querySingColum(String.class, sql.toString(), params);
     }
     /**
      * 查询库存的数量

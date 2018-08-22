@@ -46,7 +46,7 @@ public interface OutstockOrderService {
      * @author liuduo
      * @date 2018-08-11 12:53:03
      */
-    List<String> queryApplyNo();
+    List<String> queryApplyNo(String productType);
 
     /**
      * 根据申请单号查询出库计划
