@@ -1,7 +1,9 @@
 package com.ccbuluo.business.platform.stockmanagement.controller;
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.platform.allocateapply.dto.CheckStockQuantityDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.ProductStockInfoDTO;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.stockmanagement.dto.FindBatchStockListDTO;
 import com.ccbuluo.business.platform.stockmanagement.dto.FindStockDetailDTO;
@@ -9,16 +11,13 @@ import com.ccbuluo.business.platform.stockmanagement.service.StockManagementServ
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
+import io.swagger.annotations.*;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author zhangkangjian
@@ -119,6 +118,57 @@ public class StockManagementController extends BaseController {
     public StatusDto<Page<FindBatchStockListDTO>> findBatchStockList(@ApiIgnore FindStockListDTO findStockListDTO){
         Page<FindBatchStockListDTO> page = stockManagementService.findBatchStockList(findStockListDTO);
         return StatusDto.buildDataSuccessStatusDto(page);
+    }
+
+    /**
+     * 查看调拨库存
+     * @param findStockListDTO 查询条件
+     * @return StatusDto<Page<FindStockListDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-10 15:45:56
+     */
+    @ApiOperation(value = "查看调拨库存", notes = "【张康健】")
+    @GetMapping("/findstocklist")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "categoryCode", value = "分类的code", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "productNo", value = "商品的编号", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "productType", value = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query")
+    })
+    public StatusDto<Page<FindStockListDTO>> findStockList(@ApiIgnore FindStockListDTO findStockListDTO){
+        Page<FindStockListDTO> page = allocateApplyServiceImpl.findStockList(findStockListDTO);
+        return StatusDto.buildDataSuccessStatusDto(page);
+    }
+
+    /**
+     * 可调拨库存
+     * @param queryOrgDTO 查询的条件
+     * @param  offset 偏移量
+     * @param  pageSize 每页显示的数量
+     * @return StatusDto<Page<QueryOrgDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-13 16:50:05
+     */
+    @ApiOperation(value = "可调拨库存", notes = "【张康健】")
+    @GetMapping("/querytransferstock")
+    public StatusDto<Page<QueryOrgDTO>> queryTransferStock(@ApiIgnore QueryOrgDTO queryOrgDTO, Integer offset, Integer pageSize){
+        Page<QueryOrgDTO> queryOrgDTOPage = allocateApplyServiceImpl.queryTransferStock(queryOrgDTO, offset, pageSize);
+        return StatusDto.buildDataSuccessStatusDto(queryOrgDTOPage);
+    }
+
+    /**
+     * 检查库存
+     * @param
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-08-15 13:51:06
+     */
+    @ApiOperation(value = "检查库存", notes = "【张康健】")
+    @PostMapping("/checkstockquantity")
+    public StatusDto<List<ProductStockInfoDTO>> checkStockQuantity(@ApiParam(name = "CheckStockQuantityDTO", value = "Json数据", required = true) @RequestBody CheckStockQuantityDTO checkStockQuantityDTO){
+        return allocateApplyServiceImpl.checkStockQuantity(checkStockQuantityDTO);
     }
 
 

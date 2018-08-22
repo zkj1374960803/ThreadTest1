@@ -81,11 +81,4 @@ public class StockBizStockDetailDTO extends IdEntity {
         this.productUnit = productUnit;
     }
 
-    public String getUnitName() {
-        String unitName = "";
-        if(StringUtils.isNotBlank(productUnit)){
-            unitName = ProductUnitEnum.valueOf(productUnit).getLabel();
-        }
-        return unitName;
-    }
 }
