@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.allocateapply.service;
 
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
+import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockmanagement.dto.FindStockDetailDTO;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -118,4 +119,12 @@ public interface AllocateApplyService {
      * @date 2018-08-20 16:17:55
      */
     List<String> getOrgCodesByOrgType(String type);
+    /**
+     * 问题件申请查询(创建问题件，查询问题件列表)
+     * @param orgCode 机构的code
+     * @return StatusDto<List<StockBizStockDetailDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-22 14:37:40
+     */
+    List<StockBizStockDetailDTO> queryProblemStockList(String orgCode, String productType);
 }

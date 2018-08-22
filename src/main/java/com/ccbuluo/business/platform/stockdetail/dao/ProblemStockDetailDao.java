@@ -45,7 +45,7 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
 
-        sql.append("SELECT id,product_no,product_name,product_type,product_unit,SUM(problem_stock) as problem_stock")
+        sql.append("SELECT id,product_no,product_name,product_type,product_unit,SUM(problem_stock) as problem_stock,product_categoryname")
                 .append(" FROM biz_stock_detail  WHERE delete_flag = :deleteFlag and problem_stock>0 ");
         // 物料类型
         if (StringUtils.isNotBlank(productType)) {
@@ -88,8 +88,7 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
     public Page<StockBizStockDetailDTO> getProdectStockBizStockDetailByCode(String orgCode, String productNo, Integer offset, Integer pageSize){
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,product_no,product_name,product_type,product_unit,SUM(problem_stock) as problem_stock")
-                .append(" FROM biz_stock_detail LEFT WHERE delete_flag = :deleteFlag and product_no = :productNo and problem_stock>0 ")
-                .append(" ");
+                .append(" FROM biz_stock_detail WHERE delete_flag = :deleteFlag and product_no = :productNo and problem_stock>0 ");
         Map<String, Object> params = Maps.newHashMap();
         // 组织机构code
         if (StringUtils.isNotBlank(orgCode)) {

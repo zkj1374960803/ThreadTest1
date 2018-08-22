@@ -10,6 +10,7 @@ import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleContext;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
+import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockmanagement.dto.FindStockDetailDTO;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.core.common.UserHolder;
@@ -391,6 +392,18 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             orgCode = data.stream().map(QueryOrgDTO::getOrgCode).collect(Collectors.toList());
         }
         return orgCode;
+    }
+
+    /**
+     * 问题件申请查询(创建问题件，查询问题件列表)
+     * @param orgCode 机构的code
+     * @return StatusDto<List < StockBizStockDetailDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-22 14:37:40
+     */
+    @Override
+    public List<StockBizStockDetailDTO> queryProblemStockList(String orgCode, String productType) {
+        return bizAllocateApplyDao.queryProblemStockList(orgCode, productType);
     }
 
     /**

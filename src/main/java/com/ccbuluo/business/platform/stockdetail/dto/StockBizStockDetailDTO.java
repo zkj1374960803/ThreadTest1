@@ -40,6 +40,19 @@ public class StockBizStockDetailDTO extends IdEntity {
      */
     @ApiModelProperty(name = "productUnit", value = "计量单位")
     private String productUnit;
+    /**
+     * 商品分类名称，多级逗号隔开
+     */
+    @ApiModelProperty(name = "productCategoryname", value = "商品分类名称，多级逗号隔开")
+    private String productCategoryname;
+
+    public String getProductCategoryname() {
+        return productCategoryname;
+    }
+
+    public void setProductCategoryname(String productCategoryname) {
+        this.productCategoryname = productCategoryname;
+    }
 
     public String getProductNo() {
         return productNo;
