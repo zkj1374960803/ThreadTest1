@@ -62,7 +62,7 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 根据申请单获取申请单详情
             List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
             if(null == details || details.size() == 0){
-                return StatusDto.buildFailureStatusDto("申请单为空！");
+                throw new CommonException("0", "申请单为空！");
             }
             // 构建生成订单（采购）
             List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyType);

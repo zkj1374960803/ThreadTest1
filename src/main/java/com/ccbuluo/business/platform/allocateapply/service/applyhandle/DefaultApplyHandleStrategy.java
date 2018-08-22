@@ -154,7 +154,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     public BizAllocateTradeorder buildOrderEntity(List<AllocateapplyDetailBO> details){
         BizAllocateTradeorder bt = new BizAllocateTradeorder();
         // 生成订单编号
-        StatusDto<String> supplierCode = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.SW);
+        StatusDto<String> supplierCode = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.JY);
         if(!supplierCode.isSuccess()){
             throw new CommonException(supplierCode.getCode(), "生成订单编号失败！");
         }
@@ -564,6 +564,10 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         List<RelOrdstockOccupy> relOrdstockOccupies = new ArrayList<RelOrdstockOccupy>();
         Map<String,Long> map = getProductStock(details);
         for(BizStockDetail ad : stockDetails){// 遍历库存
+            Long applyNum = map.get(ad.getProductNo());
+            if(applyNum.intValue() == 0){// 说明申请商品的数据已经出库完成了
+                continue;
+            }
             //占用库存
             Long occupyStockNum = convertStockDetail(details, ad,map);
             //构建订单占用库存关系

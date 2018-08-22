@@ -10,7 +10,8 @@ public enum DocCodePrefixEnum {
     R("入库单号"),
     C("出库单号"),
     PK("盘库单号"),
-    TH("退换单号");
+    TH("退换单号"),
+    JY("交易单号");
 
 
     DocCodePrefixEnum(String label){

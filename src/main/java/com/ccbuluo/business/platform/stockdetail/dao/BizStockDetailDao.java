@@ -202,7 +202,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @date 2018-08-08 19:59:51
      */
     public int batchUpdateStockDetil(List<BizStockDetail> stockDetailList){
-        String sql = "update biz_stock_detail set valid_stock=:validStock, occupy_stock=:occupyStock, version_no=version_no+1 where version_no=:versionNo and id=:id";
+        String sql = "update biz_stock_detail set valid_stock=:validStock, occupy_stock= occupy_stock + :occupyStock, version_no=version_no+1 where version_no=:versionNo and id=:id";
         return batchUpdateForListBean(sql, stockDetailList);
     }
 

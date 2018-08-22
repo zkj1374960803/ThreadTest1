@@ -9,6 +9,7 @@ import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.outstock.service.OutstockOrderService;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
+import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.http.StatusDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,7 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 根据申请单获取申请单详情
             List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
             if(null == details || details.size() == 0){
-                return StatusDto.buildFailureStatusDto("申请单为空！");
+                throw new CommonException("0", "申请单为空！");
             }
             // 构建生成订单(调拨)
             List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyNo);
@@ -67,7 +68,7 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 查询库存列表(平台的库存列表)
             List<BizStockDetail> stockDetails = getProblemStockDetailList(applyorgNo, details);
             if(null == stockDetails || stockDetails.size() == 0){
-                return StatusDto.buildFailureStatusDto("库存为空！");
+                throw new CommonException("0", "库存为空！");
             }
             // 构建占用库存和订单占用库存关系
             Pair<List<BizStockDetail>, List<RelOrdstockOccupy>> pair = buildStockAndRelOrdEntity(details,stockDetails,applyType);
