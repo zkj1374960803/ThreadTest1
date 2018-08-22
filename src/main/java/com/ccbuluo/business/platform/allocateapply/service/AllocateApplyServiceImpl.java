@@ -377,6 +377,9 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         if(StringUtils.isBlank(findStockListDTO.getOrgNo())){
             orgCode = getOrgCodesByOrgType(findStockListDTO.getType());
         }
+        if(orgCode == null || orgCode.size() == 0){
+            return new Page<FindStockListDTO>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
+        }
         Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
         return page;
     }
