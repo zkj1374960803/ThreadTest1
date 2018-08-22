@@ -422,8 +422,8 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @date 2018-08-20 11:34:48
      */
     public FindProductDetailDTO findProblemStock(String productNo, String productType, List<String> orgDTOList) {
-        if(StringUtils.isNoneBlank(productNo, productType)){
-            new CommonException(Constants.ERROR_CODE, "必填参数为null");
+        if(StringUtils.isAnyBlank(productNo, productType)){
+            throw  new CommonException(Constants.ERROR_CODE, "必填参数为null");
         }
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("productNo", productNo);
@@ -448,7 +448,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @date 2018-08-20 11:34:48
      */
     public FindProductDetailDTO findDamagedStock(String productNo, String productType, List<String> orgDTOList) {
-        if(StringUtils.isNoneBlank(productNo, productType)){
+        if(StringUtils.isAnyBlank(productNo, productType)){
             throw new CommonException(Constants.ERROR_CODE, "必填参数为null");
         }
         HashMap<String, Object> map = Maps.newHashMap();
