@@ -191,7 +191,7 @@ public class ApplyHandleContext {
                 // 只有申请提交和等待付款的状态才可以撤销
                 if(!ba.getApplyStatus().equals(BizAllocateApply.ApplyStatusEnum.PENDING.name()) || !ba.getApplyStatus().equals(BizAllocateApply.ApplyStatusEnum.WAITINGPAYMENT.name())){
                     BizAllocateApply.ApplyStatusEnum statusEnum = BizAllocateApply.ApplyStatusEnum.valueOf(ba.getApplyStatus());
-                    throw new CommonException("0", statusEnum.getKey()+" 不可以撤销！");
+                    throw new CommonException("0", statusEnum.getValue()+" 不可以撤销！");
                 }
             }
             if(null == ba){
