@@ -1,11 +1,14 @@
 package com.ccbuluo.business.platform.instock.dao;
 
+import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.entity.BizInstockOrder;
 import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
+import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -27,6 +30,8 @@ public class BizInstockOrderDao extends BaseDao<BizInstockOrder> {
     public NamedParameterJdbcTemplate getNamedParameterJdbcTemplate() {
     return namedParameterJdbcTemplate;
     }
+    @Autowired
+    private UserHolder userHolder;
 
     /**
      * 保存 实体
@@ -73,7 +78,11 @@ public class BizInstockOrderDao extends BaseDao<BizInstockOrder> {
         }
         if (StringUtils.isNotBlank(instockNo)) {
             params.put("instockNo", instockNo);
-            sql.append(" AND  bio.instock_orderno = :instockNo");
+            if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+                sql.append(" AND  (bio.instock_orderno like CONCAT('%',:instockNo,'%') OR bio.trade_docno like CONCAT('%',:instockNo,'%'))");
+            } else {
+                sql.append(" AND  bio.instock_orderno like CONCAT('%',:instockNo,'%')");
+            }
         }
         sql.append(" ORDER BY bio.operate_time DESC");
 

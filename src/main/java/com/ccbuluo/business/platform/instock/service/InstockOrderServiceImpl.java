@@ -277,7 +277,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         List<BizInstockOrder> rows = bizInstockOrderPage.getRows();
         List<String> instockOperator = rows.stream().map(BizInstockOrder::getInstockOperator).distinct().collect(Collectors.toList());
         if (instockOperator.size() == 0) {
-            return null;
+            return new Page<>();
         }
         StatusDtoThriftList<QueryNameByUseruuidsDTO> queryNameByUseruuidsDTOStatusDtoThriftList = innerUserInfoService.queryNameByUseruuids(instockOperator);
         StatusDto<List<QueryNameByUseruuidsDTO>> resolve = StatusDtoThriftUtils.resolve(queryNameByUseruuidsDTOStatusDtoThriftList, QueryNameByUseruuidsDTO.class);
