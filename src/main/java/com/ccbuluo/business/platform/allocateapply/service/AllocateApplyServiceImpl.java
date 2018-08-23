@@ -94,13 +94,23 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         // 默认申请的状态为待处理
         allocateApplyDTO.setApplyStatus(ApplyStatusEnum.PENDING.name());
 
-        // 查询组织架构类型
-        String orgType = getOrgTypeByCode(allocateApplyDTO.getOutstockOrgno());
-        if(StringUtils.isBlank(orgType)){
+        // 默认出库机构类型
+        String outOrgType = getOrgTypeByCode(allocateApplyDTO.getOutstockOrgno());
+        if(StringUtils.isBlank(outOrgType)){
             allocateApplyDTO.setOutstockOrgtype(OrganizationTypeEnum.PLATFORM.name());
         }else {
-            allocateApplyDTO.setOutstockOrgtype(orgType);
+            allocateApplyDTO.setOutstockOrgtype(outOrgType);
         }
+        // 默认处理机构赋值
+        if(allocateApplyDTO.getApplyorgNo().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+            allocateApplyDTO.setProcessOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+            allocateApplyDTO.setProcessOrgtype(OrganizationTypeEnum.PLATFORM.name());
+        }else{
+            allocateApplyDTO.setProcessOrgno(allocateApplyDTO.getOutstockOrgno());
+            allocateApplyDTO.setProcessOrgtype(allocateApplyDTO.getOutstockOrgtype());
+        }
+
+
         // 根据处理类型，设置申请的类型、各种相关机构、状态等属性
         String processType = allocateApplyDTO.getProcessType();
         if(AllocateApplyTypeEnum.PURCHASE.name().equals(processType)){
@@ -116,18 +126,14 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             allocateApplyDTO.setOutstockOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
             allocateApplyDTO.setProcessOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
             allocateApplyDTO.setApplyStatus(BizAllocateApply.ReturnApplyStatusEnum.PRODRETURNED.name());
-        } else{
-            allocateApplyDTO.setProcessOrgtype(orgType);
-            allocateApplyDTO.setProcessOrgno(allocateApplyDTO.getOutstockOrgno());
+        }else{
             // 根据处理机构类型判断
-            if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(allocateApplyDTO.getOutstockOrgno())){
+            if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(allocateApplyDTO.getProcessOrgno())){
                 allocateApplyDTO.setApplyType(AllocateApplyTypeEnum.PLATFORMALLOCATE.name());
                 allocateApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
-
             }else {
                 allocateApplyDTO.setApplyType(AllocateApplyTypeEnum.SAMELEVEL.name());
             }
-
         }
         // 如果申请机构和处理机构是同一人，说明创建和处理是一起做的，则处理已经完成了
         if (allocateApplyDTO.getApplyorgNo().equals(allocateApplyDTO.getProcessOrgno())) {
@@ -143,7 +149,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         if(allocateApplyDTO.getApplyorgNo().equals(allocateApplyDTO.getProcessOrgno()) || AllocateApplyTypeEnum.BARTER.name().equals(processType)
             || AllocateApplyTypeEnum.REFUND.equals(processType)){
             applyHandleContext.applyHandle(allocateApplyDTO.getApplyNo());
-
         }
 
     }
