@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.inputstockplan.dao;
 
+import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 
 import com.ccbuluo.business.entity.BizInstockplanDetail;
@@ -104,7 +105,7 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
         params.put("bizInstockplanDetailList", bizInstockplanDetailList);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_instockplan_detail SET actual_instocknum = :actualInstocknum + IFNULL(actual_instocknum,0),")
+        sql.append("UPDATE biz_instockplan_detail SET actual_instocknum = :actualInstocknum + IFNULL(actual_instocknum,0),cost_price = :costPrice,")
             .append(" version_no = version_no+1,operator = :operator,operate_time = :operateTime WHERE id = :id AND :versionNo > version_no");
 
         batchUpdateForListBean(sql.toString(), bizInstockplanDetailList);
@@ -203,7 +204,7 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
     }
 
     /**
-     * 根据申请单编号查询入库计划
+     * 根据申请单编号查询平台的入库计划（平台方）
      * @param applyNo 申请单编号
      * @return 入库计划
      * @author weijb
@@ -212,12 +213,13 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
     public List<BizInstockplanDetail> getInstockplanDetailByApplyNo(String applyNo) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNo", applyNo);
+        params.put("instockOrgno", BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,instock_type,product_no,product_name,product_type,product_categoryname,")
                 .append("trade_no,supplier_no,instock_repository_no,cost_price,")
                 .append("IFNULL(plan_instocknum,0) AS planInstocknum,IFNULL(actual_instocknum,0) AS actualInstocknum,complete_status,complete_time,")
-                .append("outstock_planid")
-                .append(" FROM biz_instockplan_detail WHERE trade_no= :applyNo");
+                .append("outstock_planid,product_unit,stock_type")
+                .append(" FROM biz_instockplan_detail WHERE trade_no= :applyNo AND instock_orgno= :instockOrgno");
         return super.queryListBean(BizInstockplanDetail.class, sql.toString(), params);
     }
 }

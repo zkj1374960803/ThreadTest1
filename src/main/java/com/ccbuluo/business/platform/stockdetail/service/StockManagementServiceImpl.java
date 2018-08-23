@@ -1,12 +1,12 @@
-package com.ccbuluo.business.platform.stockmanagement.service;
+package com.ccbuluo.business.platform.stockdetail.service;
 
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
-import com.ccbuluo.business.platform.stockmanagement.dto.FindBatchStockListDTO;
-import com.ccbuluo.business.platform.stockmanagement.dto.FindProductDetailDTO;
-import com.ccbuluo.business.platform.stockmanagement.dto.FindStockDetailDTO;
+import com.ccbuluo.business.platform.stockdetail.dao.FindBatchStockListDTO;
+import com.ccbuluo.business.platform.stockdetail.dao.FindProductDetailDTO;
+import com.ccbuluo.business.platform.stockdetail.dao.FindStockDetailDTO;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;

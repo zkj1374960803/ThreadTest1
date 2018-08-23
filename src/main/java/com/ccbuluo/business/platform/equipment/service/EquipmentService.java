@@ -69,4 +69,13 @@ public interface EquipmentService {
     * @date 2018-08-02 10:41:20
     */
     List<DetailBizServiceEquipmentDTO> queryEqupmentByEquiptype(Long equiptypeId);
+
+    /**
+     * 根据code删除物料
+     * @param equipCode 物料code
+     * @return 是否删除成功
+     * @author liuduo
+     * @date 2018-08-23 11:10:57
+     */
+    int delete(String equipCode);
 }

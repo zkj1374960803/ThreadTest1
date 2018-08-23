@@ -50,6 +50,9 @@ public class GenerateDocCodeService {
             case TH:    // 退换单号
                 resultDto = getCode(prefix.toString());
                 break;
+            case JY:    // 交易单号
+                resultDto = getCode(prefix.toString());
+                break;
             default:
                 resultDto = StatusDto.buildStatusDtoWithCode(BizErrorCodeEnum.CODE_UNKONEPREFIX.getErrorCode(),
                         BizErrorCodeEnum.CODE_UNKONEPREFIX.getMessage());

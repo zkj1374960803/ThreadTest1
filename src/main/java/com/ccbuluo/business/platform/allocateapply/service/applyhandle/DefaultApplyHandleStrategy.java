@@ -154,7 +154,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     public BizAllocateTradeorder buildOrderEntity(List<AllocateapplyDetailBO> details){
         BizAllocateTradeorder bt = new BizAllocateTradeorder();
         // 生成订单编号
-        StatusDto<String> supplierCode = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.SW);
+        StatusDto<String> supplierCode = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.JY);
         if(!supplierCode.isSuccess()){
             throw new CommonException(supplierCode.getCode(), "生成订单编号失败！");
         }
@@ -410,6 +410,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         for(AllocateapplyDetailBO ad : details){
             BizInstockplanDetail instockplanPurchaser = new BizInstockplanDetail();
             instockplanPurchaser = buildBizInstockplanDetail(ad, applyType);
+            instockplanPurchaser.setInstockType(InstockTypeEnum.TRANSFER.toString());// 交易类型（只有平台是采购，机构是调拨）
             instockplanPurchaser.setInstockRepositoryNo(ad.getInRepositoryNo());// 入库仓库编号
             instockplanPurchaser.setInstockOrgno(ad.getInstockOrgno());// 买入机构编号
             inList.add(instockplanPurchaser);
@@ -482,7 +483,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     private BizOutstockplanDetail buildBizOutstockplanDetail(BizInstockplanDetail in, String applyType, List<AllocateapplyDetailBO> details){
         BizOutstockplanDetail outPlan = new BizOutstockplanDetail();
         // 调拨和平台采购都属于调拨出库
-        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) || AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType)){
             outPlan.setOutstockType(OutstockTypeEnum.TRANSFER.toString());// 交易类型
         }
         // 换货
@@ -527,7 +528,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         inPlan.setProductUnit(ad.getUnit());// 商品计量单位
         inPlan.setTradeNo(String.valueOf(ad.getApplyNo()));// 交易批次号（申请单编号）
         inPlan.setSupplierNo(ad.getSupplierNo());//供应商编号
-        inPlan.setCostPrice(ad.getCostPrice());// 成本价
+        inPlan.setCostPrice(ad.getSellPrice());// 成本价(入库的成本价是详单的销售价)
         inPlan.setPlanInstocknum(ad.getApplyNum());// 计划入库数量
 //        inPlan.setActualInstocknum(ad.getApplyNum());// 实际入库数量
         inPlan.setCompleteStatus(StockPlanStatusEnum.DOING.toString());// 完成状态（计划执行中）
@@ -541,6 +542,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         // 采购
         if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType)){
             inPlan.setInstockType(InstockTypeEnum.PURCHASE.toString());// 交易类型
+            inPlan.setCostPrice(BigDecimal.ZERO);//  平台采购类型的成本价在生成入库计划的时候是0，等入库回调的时候再回填
         }
         // 换货
         if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) || AllocateApplyTypeEnum.REFUND.toString().equals(applyType) ){
@@ -564,6 +566,10 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         List<RelOrdstockOccupy> relOrdstockOccupies = new ArrayList<RelOrdstockOccupy>();
         Map<String,Long> map = getProductStock(details);
         for(BizStockDetail ad : stockDetails){// 遍历库存
+            Long applyNum = map.get(ad.getProductNo());
+            if(applyNum.intValue() == 0){// 说明申请商品的数据已经出库完成了
+                continue;
+            }
             //占用库存
             Long occupyStockNum = convertStockDetail(details, ad,map);
             //构建订单占用库存关系

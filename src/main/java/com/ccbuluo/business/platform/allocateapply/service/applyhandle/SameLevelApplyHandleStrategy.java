@@ -60,7 +60,7 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 根据申请单获取申请单详情
             List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
             if(null == details || details.size() == 0){
-                return StatusDto.buildFailureStatusDto("申请单为空！");
+                throw new CommonException("0", "申请单为空！");
             }
             // 构建生成订单(调拨)
             List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyType);
@@ -70,7 +70,7 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 查询库存列表
             List<BizStockDetail> stockDetails = getStockDetailList(productOrgNo, details);
             if(null == stockDetails || stockDetails.size() == 0){
-                return StatusDto.buildFailureStatusDto("库存为空！");
+                throw new CommonException("0", "库存为空！");
             }
             // 构建占用库存和订单占用库存关系
             Pair<List<BizStockDetail>, List<RelOrdstockOccupy>> pair = buildStockAndRelOrdEntity(details,stockDetails,applyType);

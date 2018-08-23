@@ -3,11 +3,16 @@ package com.ccbuluo.business.platform.allocateapply.controller;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
+import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftBean;
+import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
+import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import io.swagger.annotations.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -135,56 +140,7 @@ public class AllocateApplyController extends BaseController {
         return StatusDto.buildSuccessStatusDto();
     }
 
-    /**
-     * 查询可调拨库存列表
-     * @param findStockListDTO 查询条件
-     * @return StatusDto<Page<FindStockListDTO>>
-     * @author zhangkangjian
-     * @date 2018-08-10 15:45:56
-     */
-    @ApiOperation(value = "查询可调拨库存列表", notes = "【张康健】")
-    @GetMapping("/findstocklist")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "categoryCode", value = "分类的code", required = false, paramType = "query"),
-        @ApiImplicitParam(name = "productNo", value = "商品的编号", required = false, paramType = "query"),
-        @ApiImplicitParam(name = "productType", value = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）", required = false, paramType = "query"),
-        @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
-        @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query")
-    })
-    public StatusDto<Page<FindStockListDTO>> findStockList(@ApiIgnore FindStockListDTO findStockListDTO){
-        Page<FindStockListDTO> page = allocateApplyServiceImpl.findStockList(findStockListDTO);
-        return StatusDto.buildDataSuccessStatusDto(page);
-    }
 
-    /**
-     * 查询可调拨库存列表
-     * @param queryOrgDTO 查询的条件
-     * @param  offset 偏移量
-     * @param  pageSize 每页显示的数量
-     * @return StatusDto<Page<QueryOrgDTO>>
-     * @author zhangkangjian
-     * @date 2018-08-13 16:50:05
-     */
-    @ApiOperation(value = "查询可调拨库存列表", notes = "【张康健】")
-    @GetMapping("/querytransferstock")
-    public StatusDto<Page<QueryOrgDTO>> queryTransferStock(@ApiIgnore QueryOrgDTO queryOrgDTO, Integer offset, Integer pageSize){
-        Page<QueryOrgDTO> queryOrgDTOPage = allocateApplyServiceImpl.queryTransferStock(queryOrgDTO, offset, pageSize);
-        return StatusDto.buildDataSuccessStatusDto(queryOrgDTOPage);
-    }
-
-    /**
-     * 检查库存
-     * @param
-     * @exception
-     * @return
-     * @author zhangkangjian
-     * @date 2018-08-15 13:51:06
-     */
-    @ApiOperation(value = "检查库存", notes = "【张康健】")
-    @PostMapping("/checkstockquantity")
-    public StatusDto<List<ProductStockInfoDTO>> checkStockQuantity(@ApiParam(name = "CheckStockQuantityDTO", value = "Json数据", required = true) @RequestBody CheckStockQuantityDTO checkStockQuantityDTO){
-        return allocateApplyServiceImpl.checkStockQuantity(checkStockQuantityDTO);
-    }
 
     /**
      * 撤销申请单
@@ -198,6 +154,19 @@ public class AllocateApplyController extends BaseController {
     @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
     public StatusDto cancelApply(@PathVariable String applyNo){
         return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.cancelApply(applyNo));
+    }
+
+
+    /**
+     * 查询售后平台的信息
+     * @return StatusDto<BasicUserOrganization>
+     * @author zhangkangjian
+     * @date 2018-08-23 11:12:47
+     */
+    @ApiOperation(value = "查询平台的信息",notes = "【张康健】")
+    @GetMapping("/querytopplatform")
+    public StatusDto<List<BasicUserOrganization>> queryTopPlatform(){
+        return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.queryTopPlatform());
     }
 
 }

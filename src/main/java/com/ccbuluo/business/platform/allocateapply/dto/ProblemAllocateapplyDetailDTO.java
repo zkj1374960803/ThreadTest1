@@ -45,6 +45,24 @@ public class ProblemAllocateapplyDetailDTO {
     @ApiModelProperty(name = "outstockTime", value = "出库时间", hidden = true)
     private Date outstockTime;
 
+    /**
+     * 出库人
+     */
+    @ApiModelProperty(name = "outstockOperator", value = "出库人", hidden = true)
+    private String outstockOperator;
+
+    /**
+     * 入库人
+     */
+    @ApiModelProperty(name = "instockOperator", value = "入库人", hidden = true)
+    private String instockOperator;
+
+    /**
+     * 物流单号
+     */
+    @ApiModelProperty(name = "transportorderNo", value = "物流单号", hidden = true)
+    private String transportorderNo;
+
     public Long getId() {
         return id;
     }
@@ -91,5 +109,29 @@ public class ProblemAllocateapplyDetailDTO {
 
     public void setOutstockTime(Date outstockTime) {
         this.outstockTime = outstockTime;
+    }
+
+    public String getOutstockOperator() {
+        return outstockOperator;
+    }
+
+    public void setOutstockOperator(String outstockOperator) {
+        this.outstockOperator = outstockOperator;
+    }
+
+    public String getInstockOperator() {
+        return instockOperator;
+    }
+
+    public void setInstockOperator(String instockOperator) {
+        this.instockOperator = instockOperator;
+    }
+
+    public String getTransportorderNo() {
+        return transportorderNo;
+    }
+
+    public void setTransportorderNo(String transportorderNo) {
+        this.transportorderNo = transportorderNo;
     }
 }

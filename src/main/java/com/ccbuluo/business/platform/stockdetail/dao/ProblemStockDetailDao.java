@@ -45,31 +45,33 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
 
-        sql.append("SELECT id,product_no,product_name,product_type,product_unit,SUM(problem_stock) as problem_stock")
-                .append(" FROM biz_stock_detail  WHERE delete_flag = :deleteFlag and problem_stock>0 ");
+        sql.append("SELECT t1.id,t1.product_no,t1.product_name,t1.product_type,t1.product_unit,SUM(t1.problem_stock) as problem_stock,t1.product_categoryname,t2.checked_time as outstock_time,t3.checked_time as instock_time ")
+                .append(" FROM biz_stock_detail t1 LEFT JOIN biz_outstock_order t2 on t1.trade_no=t2.trade_docno ")
+                .append(" LEFT JOIN biz_instock_order t3 on t1.trade_no=t3.trade_docno ")
+                .append(" WHERE t1.delete_flag = :deleteFlag and t1.problem_stock>0 ");
         // 物料类型
         if (StringUtils.isNotBlank(productType)) {
             param.put("productType", productType);
-            sql.append(" AND product_type = :productType ");
+            sql.append(" AND t1.product_type = :productType ");
         }
         // 零配件codes
         if (null != codes && codes.size() > 0) {
             param.put("codes", codes);
-            sql.append(" AND product_no IN(:codes) ");
+            sql.append(" AND t1.product_no IN(:codes) ");
         }
         // 关键字查询
         if (StringUtils.isNotBlank(keyword)) {
             param.put("keyword", keyword);
             //根据编号或名称查询
-            sql.append(" AND (product_no LIKE CONCAT('%',:keyword,'%') OR product_name LIKE CONCAT('%',:keyword,'%'))");
+            sql.append(" AND (t1.product_no LIKE CONCAT('%',:keyword,'%') OR t1.product_name LIKE CONCAT('%',:keyword,'%'))");
         }
         // 组织机构code
         if (StringUtils.isNotBlank(orgCode)) {
             param.put("orgCode", orgCode);
-            sql.append(" AND org_no = :orgCode ");
+            sql.append(" AND t1.org_no = :orgCode ");
         }
 
-        sql.append(" GROUP BY product_no ORDER BY create_time DESC");
+        sql.append(" GROUP BY t1.product_no ORDER BY t1.create_time DESC");
         Page<StockBizStockDetailDTO> DTOS = super.queryPageForBean(StockBizStockDetailDTO.class, sql.toString(), param,offset,pageSize);
         return DTOS;
     }
@@ -87,14 +89,15 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
      */
     public Page<StockBizStockDetailDTO> getProdectStockBizStockDetailByCode(String orgCode, String productNo, Integer offset, Integer pageSize){
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,product_no,product_name,product_type,product_unit,SUM(problem_stock) as problem_stock")
-                .append(" FROM biz_stock_detail LEFT WHERE delete_flag = :deleteFlag and product_no = :productNo and problem_stock>0 ")
-                .append(" ");
+        sql.append("SELECT t1.id,t1.product_no,t1.product_name,t1.product_type,t1.product_unit,SUM(t1.problem_stock) as problem_stock,t2.checked_time as outstock_time,t3.checked_time as instock_time ")
+                .append(" FROM biz_stock_detail t1 LEFT JOIN biz_outstock_order t2 on t1.trade_no=t2.trade_docno ")
+                .append(" LEFT JOIN biz_instock_order t3 on t1.trade_no=t3.trade_docno ")
+                .append(" WHERE t1.delete_flag = :deleteFlag and t1.product_no = :productNo and t1.problem_stock>0 ");
         Map<String, Object> params = Maps.newHashMap();
         // 组织机构code
         if (StringUtils.isNotBlank(orgCode)) {
             params.put("orgCode", orgCode);
-            sql.append(" AND org_no = :orgCode ");
+            sql.append(" AND t1.org_no = :orgCode ");
         }
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         params.put("productNo", productNo);

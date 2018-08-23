@@ -1,10 +1,12 @@
 package com.ccbuluo.business.platform.allocateapply.dao;
 
+import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
+import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
@@ -175,8 +177,8 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("userOrgCode", userOrgCode);
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.apply_status ")
-            .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.`apply_no` = b.`apply_no` WHERE 1 = 1 ");
+        sql.append(" SELECT a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.apply_status,a.process_type ")
+            .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(userOrgCode)){
             sql.append(" AND a.applyorg_no = :userOrgCode ");
         }
@@ -209,11 +211,11 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     public Page<QueryAllocateApplyListDTO> findProcessApplyList(String productType,List<String> orgCodesByOrgType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode) {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.apply_status ")
+        sql.append(" SELECT a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.process_type,a.apply_status ")
             .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.`apply_no` = b.`apply_no` WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(userOrgCode)){
             map.put("userOrgCode", userOrgCode);
-            sql.append(" AND a.outstock_orgno = :userOrgCode ");
+            sql.append(" AND (a.outstock_orgno = :userOrgCode or process_orgno = :userOrgCode) ");
         }
         if(orgCodesByOrgType != null && orgCodesByOrgType.size() > 0){
             map.put("orgCodesByOrgType", orgCodesByOrgType);
@@ -344,18 +346,32 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     /**
      * 根据申请单状态查询申请单
      * @param applyNoStatus 申请单状态
-     * @return 状态为等待收货的申请单
+     * @return 申请单
      * @author liuduo
      * @date 2018-08-11 12:56:39
      */
-    public List<String> queryApplyNo(String applyNoStatus, String orgCode) {
+    public List<String> queryApplyNo(String applyNoStatus, String orgCode, String productType, Integer stockType) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNoStatus", applyNoStatus);
+        params.put("productType", productType);
+        params.put("stockType", stockType);
         params.put("orgCode", orgCode);
 
-        String sql = "SELECT apply_no FROM biz_allocate_apply WHERE apply_status = :applyNoStatus AND process_orgno = :orgCode";
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT DISTINCT baa.apply_no FROM biz_allocate_apply AS baa LEFT JOIN biz_allocateapply_detail AS bad ON bad.apply_no = baa.apply_no")
+            .append("  WHERE baa.apply_status = :applyNoStatus AND bad.product_type = :productType");
+        // 如果是平台入库、出库
+        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+            sql.append(" AND baa.process_orgno = :orgCode");
+        } else if (stockType == Constants.STATUS_FLAG_ZERO) {
+            // 是机构入库
+            sql.append(" AND baa.instock_orgno = :orgCode");
+        } else {
+            // 是机构出库
+            sql.append(" AND baa.outstock_orgno = :orgCode");
+        }
 
-        return querySingColum(String.class, sql, params);
+        return querySingColum(String.class, sql.toString(), params);
     }
     /**
      * 查询库存的数量
@@ -366,7 +382,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @date 2018-08-13 19:47:32
      */
     public Page<QueryOrgDTO> findStockNum(List<String> orgCode, Integer offset, Integer pageSize) {
-        String sql = "SELECT a.org_no,SUM(a.valid_stock) FROM biz_stock_detail a WHERE a.org_no IN (:org_no) GROUP BY a.org_no";
+        String sql = "SELECT a.org_no as 'orgCode',SUM(a.valid_stock) as 'stockNum' FROM biz_stock_detail a WHERE a.org_no IN (:orgCode) GROUP BY a.org_no";
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("orgCode", orgCode);
         return queryPageForBean(QueryOrgDTO.class, sql, map, offset, pageSize);
@@ -437,5 +453,32 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             sql.append(" AND a.equiptype_id = :equiptypeId ");
         }
         return queryListBean(BasicCarpartsProductDTO.class, sql.toString(), map);
+    }
+
+    /**
+     * 问题件申请查询(创建问题件，查询问题件列表)
+     * @param orgCode 机构的code
+     * @return StatusDto<List<StockBizStockDetailDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-22 14:37:40
+     */
+    public List<StockBizStockDetailDTO> queryProblemStockList(String orgCode, String productType) {
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        StringBuilder sql = new StringBuilder();
+
+        sql.append("SELECT id,product_no,product_name,product_type,product_unit,SUM(problem_stock) as problem_stock,product_categoryname")
+            .append(" FROM biz_stock_detail  WHERE delete_flag = :deleteFlag and problem_stock > 0 ");
+        // 组织机构code
+        if (StringUtils.isNotBlank(orgCode)) {
+            param.put("orgCode", orgCode);
+            sql.append(" AND org_no = :orgCode ");
+        }
+        if (StringUtils.isNotBlank(productType)) {
+            param.put("productType", productType);
+            sql.append(" AND product_type = :productType ");
+        }
+        sql.append(" GROUP BY product_no ORDER BY create_time DESC");
+        return queryListBean(StockBizStockDetailDTO.class, sql.toString(), param);
     }
 }

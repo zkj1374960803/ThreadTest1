@@ -21,7 +21,7 @@ public class AllocateApplyDTO {
     @ApiModelProperty(name = "processOrgno", value = "申请处理机构编号", hidden = true)
     private String processOrgno;
 
-    @ApiModelProperty(name = "applyType", value = "申请的类型注：TRANSFER调拨、PURCHASE采购", hidden = true)
+    @ApiModelProperty(name = "applyType", value = "", hidden = true)
     private String applyType;
 
     @ApiModelProperty(name = "applyerName", value = "申请人的姓名", hidden = true)
@@ -80,7 +80,7 @@ public class AllocateApplyDTO {
     /**
      * 平台决定的处理类型：调拨、采购
      */
-    @ApiModelProperty(name = "processType", value = "平台决定的处理类型(注：TRANSFER调拨、PURCHASE采购)")
+    @ApiModelProperty(name = "processType", value = "平台决定的处理类型(注：TRANSFER调拨、PURCHASE采购、BARTER调换、REFUND退款)")
     private String processType;
     /**
      * 待处理、申请撤销、等待付款、等待发货、（平台待出入库只用在平台端）、等待收货、确认收货、申请完成
@@ -115,7 +115,7 @@ public class AllocateApplyDTO {
     /**
      * 备注
      */
-    @ApiModelProperty(name = "remark", value = "备注", hidden = true)
+    @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
     /**
      * 申请商品详情列表

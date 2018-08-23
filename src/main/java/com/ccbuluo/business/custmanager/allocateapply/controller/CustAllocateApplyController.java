@@ -3,6 +3,7 @@ package com.ccbuluo.business.custmanager.allocateapply.controller;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
+import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author zhangkangjian
@@ -19,7 +21,7 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("/custmanager/allocateapply")
-@Api(tags = "客户经理申请管理")
+@Api(tags = "申请管理（客户经理）")
 public class CustAllocateApplyController extends BaseController {
     @Resource(name = "allocateApplyServiceImpl")
     private AllocateApplyService allocateApplyServiceImpl;
@@ -169,6 +171,25 @@ public class CustAllocateApplyController extends BaseController {
         Page<QueryOrgDTO> queryOrgDTOPage = allocateApplyServiceImpl.queryTransferStock(queryOrgDTO, offset, pageSize);
         return StatusDto.buildDataSuccessStatusDto(queryOrgDTOPage);
     }
+
+    /**
+     * 问题件申请查询(创建问题件，查询问题件列表)
+     * @param orgCode 机构的code
+     * @return StatusDto<List<StockBizStockDetailDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-22 14:37:40
+     */
+    @ApiOperation(value = "问题件申请查询(创建问题件，查询问题件列表)",notes = "【张康健】")
+    @GetMapping("/queryproblemstocklist")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "orgCode", value = "所属机构的编号", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "productType", value = "商品类型(注：FITTINGS零配件，EQUIPMENT物料)", required = false, paramType = "query")
+    })
+
+    public StatusDto<List<StockBizStockDetailDTO>> queryProblemStockList(String orgCode, String productType) {
+        return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.queryProblemStockList(orgCode, productType));
+    }
+
 
 
 

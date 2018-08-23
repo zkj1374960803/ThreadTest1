@@ -8,6 +8,7 @@ import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
 import com.ccbuluo.business.platform.equipment.dto.DetailBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.equipment.dto.SaveBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
+import com.ccbuluo.business.platform.supplier.service.SupplierService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -32,6 +33,8 @@ public class EquipmentServiceImpl implements EquipmentService{
     private UserHolder userHolder;
     @Autowired
     private GenerateProjectCodeService generateProjectCodeService;
+    @Autowired
+    private SupplierService supplierService;
 
     /**
      * 保存物料
@@ -145,6 +148,24 @@ public class EquipmentServiceImpl implements EquipmentService{
     @Override
     public List<DetailBizServiceEquipmentDTO> queryEqupmentByEquiptype(Long equiptypeId) {
         return bizServiceEquipmentDao.queryEqupmentByEquiptype(equiptypeId);
+    }
+
+    /**
+     * 根据code删除物料
+     * @param equipCode 物料code
+     * @return 是否删除成功
+     * @author liuduo
+     * @date 2018-08-23 11:10:57
+     */
+    @Override
+    public int delete(String equipCode) {
+        // 根据code查询物料是否已经被关联
+        Boolean aboolean = supplierService.getSupplier(equipCode);
+        if (aboolean) {
+            return Constants.FAILURE_ONE;
+        }
+        // 删除物料
+        return bizServiceEquipmentDao.delete(equipCode);
     }
 
 }

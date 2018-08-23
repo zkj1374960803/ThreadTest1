@@ -15,7 +15,7 @@ public class CheckStockQuantityDTO {
     private String outstockOrgno;
     @ApiModelProperty(name = "productInfoList", value = "商品的信息")
     List<ProductStockInfoDTO> productInfoList;
-    @ApiModelProperty(name = "sellerOrgno", value = "库存的来源")
+    @ApiModelProperty(name = "sellerOrgno", value = "库存的来源", hidden = true)
     private String sellerOrgno;
 
     public String getSellerOrgno() {

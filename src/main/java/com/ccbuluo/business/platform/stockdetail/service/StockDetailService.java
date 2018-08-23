@@ -106,7 +106,7 @@ public interface StockDetailService {
      * @author liuduo
      * @date 2018-08-14 20:22:08
      */
-    List<BizStockDetail> queryStockDetailByProductNo(String productNo);
+    List<BizStockDetail> queryStockDetailByProductNo(String productNo, String orgCode);
 
     /**
      * 更改盘库后的库存的有效库存

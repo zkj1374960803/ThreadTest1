@@ -40,7 +40,7 @@ public class QueryAllocateApplyListDTO {
     /**
      * 平台决定的处理类型：调拨、采购
      */
-    @ApiModelProperty(name = "applyType", value = "平台决定的处理类型(注：TRANSFER调拨、PURCHASE采购)")
+    @ApiModelProperty(name = "applyType", value = "")
     private String applyType;
 
     /**
@@ -52,6 +52,16 @@ public class QueryAllocateApplyListDTO {
     private String orgName;
     @ApiModelProperty(name = "applyorgNo", value = "申请机构")
     private String applyorgNo;
+    @ApiModelProperty(name = "processType", value = "平台决定的处理类型(注：TRANSFER调拨、PURCHASE采购)")
+    private String processType;
+
+    public String getProcessType() {
+        return processType;
+    }
+
+    public void setProcessType(String processType) {
+        this.processType = processType;
+    }
 
     public String getApplyorgNo() {
         return applyorgNo;

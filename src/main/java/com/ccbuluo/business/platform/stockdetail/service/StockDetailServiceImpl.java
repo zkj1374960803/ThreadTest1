@@ -143,8 +143,8 @@ public class StockDetailServiceImpl implements StockDetailService{
      * @date 2018-08-14 20:22:08
      */
     @Override
-    public List<BizStockDetail> queryStockDetailByProductNo(String productNo) {
-        return bizStockDetailDao.queryStockDetailByProductNo(productNo);
+    public List<BizStockDetail> queryStockDetailByProductNo(String productNo, String orgCode) {
+        return bizStockDetailDao.queryStockDetailByProductNo(productNo, orgCode);
     }
 
     /**
