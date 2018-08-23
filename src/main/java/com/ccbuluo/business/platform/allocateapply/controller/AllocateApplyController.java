@@ -156,23 +156,6 @@ public class AllocateApplyController extends BaseController {
         return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.cancelApply(applyNo));
     }
 
-    /**
-     * 问题件申请查询(创建问题件，查询问题件列表)
-     * @param orgCode 机构的code
-     * @return StatusDto<List<StockBizStockDetailDTO>>
-     * @author zhangkangjian
-     * @date 2018-08-22 14:37:40
-     */
-    @ApiOperation(value = "问题件申请查询(创建问题件，查询问题件列表)",notes = "【张康健】")
-    @GetMapping("/queryproblemstocklist")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "orgCode", value = "所属机构的编号", required = true, paramType = "query"),
-        @ApiImplicitParam(name = "productType", value = "商品类型(注：FITTINGS零配件，EQUIPMENT物料)", required = false, paramType = "query")
-    })
-
-    public StatusDto<List<StockBizStockDetailDTO>> queryProblemStockList(String orgCode, String productType) {
-        return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.queryProblemStockList(orgCode, productType));
-    }
 
     /**
      * 查询售后平台的信息
