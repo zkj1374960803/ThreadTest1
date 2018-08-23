@@ -45,6 +45,11 @@ public class BizStockDetail extends AftersaleCommonEntity{
     @ApiModelProperty(name = "productType", value = "商品类型(物料、零配件)")
     private String productType;
     /**
+     * 商品计量单位
+     */
+    @ApiModelProperty(name = "productUnit", value = "商品计量单位")
+    private String productUnit;
+    /**
      * 交易批次号,可以是调拨申请单号等
      */
     @ApiModelProperty(name = "tradeNo", value = "交易批次号,可以是调拨申请单号等")
@@ -273,6 +278,14 @@ public class BizStockDetail extends AftersaleCommonEntity{
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getProductUnit() {
+        return productUnit;
+    }
+
+    public void setProductUnit(String productUnit) {
+        this.productUnit = productUnit;
     }
 
     /**

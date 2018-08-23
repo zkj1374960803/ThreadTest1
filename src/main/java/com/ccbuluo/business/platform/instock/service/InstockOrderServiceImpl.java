@@ -77,12 +77,12 @@ public class InstockOrderServiceImpl implements InstockOrderService {
      * @date 2018-08-07 14:19:40
      */
     @Override
-    public List<String> queryApplyNo() {
+    public List<String> queryApplyNo(String productType) {
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-            return allocateApplyService.queryApplyNo(ApplyStatusEnum.INSTORE.toString(), orgCode);
+            return allocateApplyService.queryApplyNo(ApplyStatusEnum.INSTORE.toString(), orgCode, productType);
         }
-        return allocateApplyService.queryApplyNo(ApplyStatusEnum.WAITINGRECEIPT.toString(), orgCode);
+        return allocateApplyService.queryApplyNo(ApplyStatusEnum.WAITINGRECEIPT.toString(), orgCode, productType);
     }
 
     /**
@@ -403,6 +403,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
             bizInstockplanDetail.setId(item.getInstockPlanid());
             bizInstockplanDetail.setActualInstocknum(item.getInstockNum());
             bizInstockplanDetail.setVersionNo(updatePlanStatusDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
+            bizInstockplanDetail.setCostPrice(item.getCostPrice());
             bizInstockplanDetail.preUpdate(userHolder.getLoggedUserId());
             bizInstockplanDetailList.add(bizInstockplanDetail);
         });
@@ -487,6 +488,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                 bizStockDetail.setSellerOrgno(bizAllocateApply.getOutstockOrgno());
                 bizStockDetail.setCostPrice(item.getCostPrice());
                 bizStockDetail.setInstockPlanid(item.getInstockPlanid());
+                bizStockDetail.setProductUnit(item.getUnit());
                 bizStockDetail.preInsert(userHolder.getLoggedUserId());
                 Long stockDetailId = stockDetailService.saveStockDetail(bizStockDetail);
                 stockIds.add(stockDetailId);
@@ -517,7 +519,8 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         Map<Long, BizInstockplanDetail> collect = bizInstockplanDetails.stream().collect(Collectors.toMap(BizInstockplanDetail::getId, Function.identity()));
         bizInstockorderDetailList.forEach(item -> {
             // 如果不是采购，那么取计划上的价格，如果是采购，取页面传回的价格
-            if (!detail.getProcessType().equals(BizAllocateApply.AllocateApplyTypeEnum.PURCHASE.name())) {
+            if ((!detail.getApplyType().equals(BizAllocateApply.AllocateApplyTypeEnum.PURCHASE.name()))
+                && (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM))) {
                 BizInstockplanDetail bizInstockplanDetail = collect.get(item.getInstockPlanid());
                 item.setCostPrice(bizInstockplanDetail.getCostPrice());
             }

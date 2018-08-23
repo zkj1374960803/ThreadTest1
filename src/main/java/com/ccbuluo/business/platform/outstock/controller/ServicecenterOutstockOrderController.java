@@ -57,9 +57,10 @@ public class ServicecenterOutstockOrderController extends BaseController {
      * @date 2018-08-11 12:53:03
      */
     @ApiOperation(value = "查询申请单", notes = "【刘铎】")
+    @ApiImplicitParam(name = "productType", value = "商品类型(物料或者备件)",  required = true, paramType = "query")
     @GetMapping("/queryapplyno")
-    public StatusDto<List<String>> queryApplyNo() {
-        return StatusDto.buildDataSuccessStatusDto(outstockOrderService.queryApplyNo());
+    public StatusDto<List<String>> queryApplyNo(@RequestParam String productType) {
+        return StatusDto.buildDataSuccessStatusDto(outstockOrderService.queryApplyNo(productType));
     }
 
     /**
