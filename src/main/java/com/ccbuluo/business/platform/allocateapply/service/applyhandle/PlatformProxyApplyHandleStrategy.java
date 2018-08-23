@@ -230,9 +230,10 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
         if(null != details && details.size() > 0){
             ad = details.get(0);
         }
+        List<BizInstockplanDetail> list = new ArrayList<BizInstockplanDetail>();
         for(BizOutstockplanDetail bd : outList){
             // 有可能一个商品有多个供应商
-            if(distinstSupplier(inList, bd, details)){
+            if(distinstSupplier(list, bd, details)){
                 continue;
             }
             BizInstockplanDetail inPlan = buildBizInstockplanDetail(bd);
@@ -240,7 +241,7 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
                 inPlan.setInstockRepositoryNo(ad.getInRepositoryNo());// 入库仓库编号
                 inPlan.setInstockOrgno(ad.getInstockOrgno());// 买入机构编号
             }
-            inList.add(inPlan);
+            inList.addAll(list);
         }
     }
     /**
@@ -258,9 +259,10 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
                 // 一个商品有多个供应商的情况
                 AllocateapplyDetailBO ab = getAllocateapplyDetailBO(details, in.getProductNo());
                 in.setCostPrice(ab.getCostPrice());
-                inList.add(in);
                 flag = true;
                 break;
+            }else{
+                inList.add(in);
             }
         }
         return flag;
