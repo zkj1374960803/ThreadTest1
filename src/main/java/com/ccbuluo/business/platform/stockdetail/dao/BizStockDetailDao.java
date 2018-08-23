@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,16 +71,17 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author liuduo
      * @date 2018-08-08 14:55:43
      */
-    public Long getByinstockorderDeatil(String supplierNo, String productNo, String inRepositoryNo, String applyNo) {
+    public Long getByinstockorderDeatil(String supplierNo, String productNo, BigDecimal costPrice, String inRepositoryNo, String applyNo) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("supplierNo", supplierNo);
         params.put("productNo", productNo);
         params.put("inRepositoryNo", inRepositoryNo);
         params.put("applyNo", applyNo);
+        params.put("costPrice", costPrice);
 
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT id FROM biz_stock_detail WHERE supplier_no = :supplierNo AND repository_no = :inRepositoryNo")
-            .append(" AND trade_no = :applyNo AND product_no = :productNo");
+            .append(" AND trade_no = :applyNo AND product_no = :productNo AND cost_price = :costPrice");
 
         return findForObject(sql.toString(), params, Long.class);
     }
@@ -116,10 +118,10 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author liuduo
      * @date 2018-08-08 15:24:09
      */
-    public void updateValidStock(BizStockDetail bizStockDetail, Long versionNo) {
+    public void updateValidStock(BizStockDetail bizStockDetail, Integer versionNo) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("bizStockDetail", bizStockDetail);
-        params.put("versionNo", versionNo + Constants.LONG_FLAG_ONE);
+        params.put("versionNo", versionNo + Constants.FLAG_ONE);
 
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE `biz_stock_detail` SET valid_stock = :validStock + IFNULL(valid_stock,0),version_no = version_no+1")

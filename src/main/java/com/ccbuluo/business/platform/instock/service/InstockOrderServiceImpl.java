@@ -466,20 +466,22 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         // 根据入库详单的  供应商、商品、仓库、批次号  查询在库存中有无记录，有则更新，无则新增
         List<BizInstockorderDetail> bizInstockorderDetailList1 = Lists.newArrayList();
-        List<Long> ids = bizInstockorderDetailList.stream().map(BizInstockorderDetail::getInstockPlanid).collect(Collectors.toList());
-        List<updatePlanStatusDTO> versionNoById = inputStockPlanService.getVersionNoById(ids);
-        Map<Long, updatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(updatePlanStatusDTO::getId, Function.identity()));
+//        List<Long> ids = bizInstockorderDetailList.stream().map(BizInstockorderDetail::getInstockPlanid).collect(Collectors.toList());
+//        List<updatePlanStatusDTO> versionNoById = inputStockPlanService.getVersionNoById(ids);
+//        Map<Long, updatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(updatePlanStatusDTO::getId, Function.identity()));
         // 根据仓库编号查询机构号
         String orgCodeByStoreHouseCode = storeHouseService.getOrgCodeByStoreHouseCode(inRepositoryNo);
         List<Long> stockIds = Lists.newArrayList();
         bizInstockorderDetailList.forEach(item -> {
-            updatePlanStatusDTO updatePlanStatusDTO = collect.get(item.getInstockPlanid());
-            Long id = stockDetailService.getByinstockorderDeatil(item.getSupplierNo(), item.getProductNo(), inRepositoryNo, applyNo);
+//            updatePlanStatusDTO updatePlanStatusDTO = collect.get(item.getInstockPlanid());
+            Long id = stockDetailService.getByinstockorderDeatil(item.getSupplierNo(), item.getProductNo(), item.getCostPrice(), inRepositoryNo, applyNo);
             if (null != id) {
+                // 根据id查询乐观锁
+                Integer versionNoById1 = stockDetailService.getVersionNoById(id);
                 BizStockDetail bizStockDetail = new BizStockDetail();
                 bizStockDetail.setId(id);
                 bizStockDetail.setValidStock(item.getInstockNum());
-                stockDetailService.updateValidStock(bizStockDetail, updatePlanStatusDTO.getVersionNo());
+                stockDetailService.updateValidStock(bizStockDetail, versionNoById1);
             } else {
                 BizStockDetail bizStockDetail = new BizStockDetail();
                 bizStockDetail.setRepositoryNo(inRepositoryNo);

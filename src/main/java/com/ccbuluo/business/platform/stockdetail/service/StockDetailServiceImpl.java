@@ -11,6 +11,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -38,8 +39,8 @@ public class StockDetailServiceImpl implements StockDetailService{
      * @date 2018-08-08 14:55:43
      */
     @Override
-    public Long getByinstockorderDeatil(String supplierNo, String productNo, String inRepositoryNo, String applyNo) {
-        return bizStockDetailDao.getByinstockorderDeatil(supplierNo, productNo, inRepositoryNo, applyNo);
+    public Long getByinstockorderDeatil(String supplierNo, String productNo, BigDecimal costPrice, String inRepositoryNo, String applyNo) {
+        return bizStockDetailDao.getByinstockorderDeatil(supplierNo, productNo, costPrice, inRepositoryNo, applyNo);
     }
 
     /**
@@ -50,7 +51,7 @@ public class StockDetailServiceImpl implements StockDetailService{
      * @date 2018-08-08 15:24:09
      */
     @Override
-    public void updateValidStock(BizStockDetail bizStockDetail, Long versionNo) {
+    public void updateValidStock(BizStockDetail bizStockDetail, Integer versionNo) {
         bizStockDetailDao.updateValidStock(bizStockDetail, versionNo);
     }
 

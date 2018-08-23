@@ -26,6 +26,8 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 平台调拨申请处理
@@ -229,6 +231,15 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
         AllocateapplyDetailBO ad = null;
         if(null != details && details.size() > 0){
             ad = details.get(0);
+        }
+        Map<String, List<BizOutstockplanDetail>> collect = outList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getProductNo));
+        for (Map.Entry<String, List<BizOutstockplanDetail>> entry : collect.entrySet()) {
+            List<BizOutstockplanDetail> value = entry.getValue();
+            Map<String, List<BizOutstockplanDetail>> collect1 = value.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getSupplierNo));
+            for (Map.Entry<String, List<BizOutstockplanDetail>> outPlan : collect1.entrySet()) {
+                List<BizOutstockplanDetail> value1 = outPlan.getValue();
+                value1 // 分组之后的同一个商品
+            }
         }
         List<BizInstockplanDetail> list = new ArrayList<BizInstockplanDetail>();
         for(BizOutstockplanDetail bd : outList){
