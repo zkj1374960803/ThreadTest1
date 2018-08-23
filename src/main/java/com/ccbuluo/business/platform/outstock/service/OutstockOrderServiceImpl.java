@@ -113,7 +113,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 bizOutstockOrder.preInsert(userHolder.getLoggedUserId());
                 int i = bizOutstockOrderDao.saveEntity(bizOutstockOrder);
                 if (i == Constants.FAILURESTATUS) {
-                    throw new CommonException("10001", "保存出库单失败！");
+                    throw new CommonException("2001", "保存出库单失败！");
                 }
                 for (BizOutstockplanDetail outstockplanDetail : bizOutstockplanDetails) {
                     BizOutstockorderDetail bizOutstockorderDetail = new BizOutstockorderDetail();
@@ -133,7 +133,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 }
                 List<Long> longs = bizOutstockOrderDao.batchBizOutstockOrder(bizOutstockOrderList);
                 if (null != longs && longs.size() == 0) {
-                    throw new CommonException("10002", "保存出库单详单失败！");
+                    throw new CommonException("2002", "保存出库单详单失败！");
                 }
                 // 更改库存
                 // 根据出库单号查询出库单详单
@@ -181,16 +181,19 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
             // 1、保存出库单
             // 根据申请单号查询基本信息
             FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
+            if (!(detail.getApplyStatus().equals(ApplyStatusEnum.WAITDELIVERY.name()) && detail.getApplyStatus().equals(ApplyStatusEnum.OUTSTORE.name()))) {
+                throw new CommonException("2004", "该申请单已经出库，请核对！");
+            }
             // 查询出库计划
             List<BizOutstockplanDetail> bizOutstockplanDetailList = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
             int outstockorderStatus = saveOutstockOrder(outstockNo, applyNo, transportorderNo, detail, outRepositoryNo);
             if (outstockorderStatus == Constants.FAILURESTATUS) {
-                throw new CommonException("10001", "生成出库单失败！");
+                throw new CommonException("2001", "生成出库单失败！");
             }
             // 2、保存出库单详单
             List<Long> longs = saveOutstockorderDetail(bizOutstockorderDetailList, outstockNo, bizOutstockplanDetailList);
             if (null != longs && longs.size() == 0) {
-                throw new CommonException("10002", "保存出库单详单失败！");
+                throw new CommonException("2002", "保存出库单详单失败！");
             }
             // 复核库存和计划
             checkStockAndPlan(applyNo, outRepositoryNo, outstockNo, detail, bizOutstockplanDetailList);
@@ -285,9 +288,9 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     public List<String> queryApplyNo(String productType) {
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-            return allocateApplyService.queryApplyNo(ApplyStatusEnum.OUTSTORE.toString(), orgCode, productType);
+            return allocateApplyService.queryApplyNo(ApplyStatusEnum.OUTSTORE.toString(), orgCode, productType, Constants.STATUS_FLAG_ONE);
         }
-        return allocateApplyService.queryApplyNo(ApplyStatusEnum.WAITDELIVERY.toString(), orgCode, productType);
+        return allocateApplyService.queryApplyNo(ApplyStatusEnum.WAITDELIVERY.toString(), orgCode, productType, Constants.STATUS_FLAG_ONE);
     }
 
     /**

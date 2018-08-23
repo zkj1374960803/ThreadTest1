@@ -450,8 +450,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      * @date 2018-08-11 12:56:39
      */
     @Override
-    public List<String> queryApplyNo(String applyNoStatus, String orgCode, String productType) {
-        return bizAllocateApplyDao.queryApplyNo(applyNoStatus, orgCode, productType);
+    public List<String> queryApplyNo(String applyNoStatus, String orgCode, String productType, Integer stockType) {
+        return bizAllocateApplyDao.queryApplyNo(applyNoStatus, orgCode, productType, stockType);
     }
 
     /**

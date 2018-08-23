@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.allocateapply.dao;
 
+import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
@@ -345,19 +346,30 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     /**
      * 根据申请单状态查询申请单
      * @param applyNoStatus 申请单状态
-     * @return 状态为等待收货的申请单
+     * @return 申请单
      * @author liuduo
      * @date 2018-08-11 12:56:39
      */
-    public List<String> queryApplyNo(String applyNoStatus, String orgCode, String productType) {
+    public List<String> queryApplyNo(String applyNoStatus, String orgCode, String productType, Integer stockType) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNoStatus", applyNoStatus);
-        params.put("orgCode", orgCode);
         params.put("productType", productType);
+        params.put("stockType", stockType);
+        params.put("orgCode", orgCode);
 
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT DISTINCT baa.apply_no FROM biz_allocate_apply AS baa LEFT JOIN biz_allocateapply_detail AS bad ON bad.apply_no = baa.apply_no")
-            .append("  WHERE baa.apply_status = :applyNoStatus AND baa.process_orgno = :orgCode AND bad.product_type = :productType");
+            .append("  WHERE baa.apply_status = :applyNoStatus AND bad.product_type = :productType");
+        // 如果是平台入库、出库
+        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+            sql.append(" AND baa.process_orgno = :orgCode");
+        } else if (stockType == Constants.STATUS_FLAG_ZERO) {
+            // 是机构入库
+            sql.append(" AND baa.instock_orgno = :orgCode");
+        } else {
+            // 是机构出库
+            sql.append(" AND baa.outstock_orgno = :orgCode");
+        }
 
         return querySingColum(String.class, sql.toString(), params);
     }
