@@ -315,12 +315,13 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author liuduo
      * @date 2018-08-14 20:22:08
      */
-    public List<BizStockDetail> queryStockDetailByProductNo(String productNo) {
+    public List<BizStockDetail> queryStockDetailByProductNo(String productNo, String orgCode) {
         Map<String, Object> param = Maps.newHashMap();
         param.put("productNo", productNo);
+        param.put("orgCode", orgCode);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,product_no,product_type,valid_stock,version_no FROM biz_stock_detail WHERE product_no = :productNo ORDER BY create_time DESC");
+        sql.append("SELECT id,product_no,product_type,valid_stock,version_no FROM biz_stock_detail WHERE product_no = :productNo AND org_no = :orgCode ORDER BY create_time DESC");
 
         return queryListBean(BizStockDetail.class, sql.toString(), param);
     }
@@ -335,7 +336,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
     public void updateAdjustValidStock(List<BizStockDetail> bizStockDetailList1) {
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE biz_stock_detail SET valid_stock = :validStock, version_no = version_no+1,operator = :operator,")
-            .append(" operate_time = :operateTime WHERE version_no > :versionNo AND id = :id");
+            .append(" operate_time = :operateTime WHERE :versionNo > version_no AND id = :id");
 
         batchUpdateForListBean(sql.toString(), bizStockDetailList1);
     }

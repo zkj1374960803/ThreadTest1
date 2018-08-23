@@ -157,10 +157,10 @@ public class StockAdjustServiceImpl implements StockAdjustService{
                }
               // 2、保存盘库单详单
               List<Long> ids = saveAdjustDetail(saveBizStockAdjustDTO, adjustNo);
-              if (null != ids && ids.size() > 0) {
-                  return StatusDto.buildSuccessStatusDto("保存成功！");
+              if (null == ids && ids.size() == 0) {
+                  return StatusDto.buildFailure("保存失败！");
               }
-               return StatusDto.buildFailure("保存失败！");
+              return StatusDto.buildSuccessStatusDto("保存成功！");
           } catch (Exception e) {
                logger.error("保存盘库单失败！", e.getMessage());
                throw e;
@@ -306,7 +306,7 @@ public class StockAdjustServiceImpl implements StockAdjustService{
             if (!item.getPerfectNum().equals(item.getActualNum())) {
                 List<Map<String, Long>> list = Lists.newArrayList();
                 // 根据商品编号查询库存，和盘库后的实际数量做对比，进行记录
-                List<BizStockDetail> bizStockDetailList = stockDetailService.queryStockDetailByProductNo(item.getProductNo());
+                List<BizStockDetail> bizStockDetailList = stockDetailService.queryStockDetailByProductNo(item.getProductNo(), userHolder.getLoggedUser().getOrganization().getOrgCode());
                 // 相差的数量
                 long differenceNum = item.getActualNum() - item.getPerfectNum();
                 for (BizStockDetail bizStockDetail : bizStockDetailList) {
@@ -325,7 +325,6 @@ public class StockAdjustServiceImpl implements StockAdjustService{
                         bizStockDetail1.setVersionNo(bizStockDetail.getVersionNo() + Constants.LONG_FLAG_ONE);
                         bizStockDetail1.preUpdate(userHolder.getLoggedUserId());
                         bizStockDetailList1.add(bizStockDetail1);
-                        break;
                     } else {// 现有库存小于盘库后输入的库存,更新为0
                         Map<String, Long> map = Maps.newHashMap();
                         map.put("stockId", bizStockDetail.getId());
@@ -342,9 +341,10 @@ public class StockAdjustServiceImpl implements StockAdjustService{
                 }
                 // 把list转为json 作为  影响的库存情况  的值
                 String affectStockid = JsonUtils.writeValue(list);
-                item.setAdjustDocno(adjustNo);
                 item.setAffectStockid(affectStockid);
             }
+            item.setAdjustDocno(adjustNo);
+            item.preInsert(userHolder.getLoggedUserId());
         });
         // 修改库存中的有效库存
         stockDetailService.updateAdjustValidStock(bizStockDetailList1);
