@@ -237,7 +237,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      * @date 2018-08-11 13:05:07
      */
     private void updateApplyOrderStatus(String applyNo, FindAllocateApplyDTO detail, List<BizOutstockplanDetail> bizOutstockplanDetailList) {
-        List<BizOutstockplanDetail> collect = bizOutstockplanDetailList.stream().filter(item -> item.getPlanStatus().equals(StockPlanStatusEnum.COMPLETE)).collect(Collectors.toList());
+        List<BizOutstockplanDetail> collect = bizOutstockplanDetailList.stream().filter(item -> item.getPlanStatus().equals(StockPlanStatusEnum.COMPLETE.name())).collect(Collectors.toList());
         String applyType = detail.getApplyType();
         if (StringUtils.isNotBlank(applyType)) {
             // 判断本次交易的出库计划是否全部完成

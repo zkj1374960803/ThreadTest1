@@ -356,9 +356,8 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         params.put("productType", productType);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT baa.apply_no FROM biz_allocate_apply AS baa LEFT JOIN biz_allocateapply_detail AS bad ON bad.apply_no = baa.apply_no")
-            .append("  WHERE baa.apply_status = :applyNoStatus AND baa.process_orgno = :orgCode AND bad.product_type = :productType")
-            .append("  GROUP BY bad.product_type");
+        sql.append("SELECT DISTINCT baa.apply_no FROM biz_allocate_apply AS baa LEFT JOIN biz_allocateapply_detail AS bad ON bad.apply_no = baa.apply_no")
+            .append("  WHERE baa.apply_status = :applyNoStatus AND baa.process_orgno = :orgCode AND bad.product_type = :productType");
 
         return querySingColum(String.class, sql.toString(), params);
     }
