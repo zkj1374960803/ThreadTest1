@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -387,6 +388,12 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public List<String> getOrgCodesByOrgType(String type) {
+        if(StringUtils.isBlank(type)){
+            return Collections.emptyList();
+        }
+        if(OrganizationTypeEnum.PLATFORM.name().equals(type)){
+            return List.of(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+        }
         QueryOrgDTO orgDTO = new QueryOrgDTO();
         orgDTO.setOrgType(type);
         orgDTO.setStatus(Constants.FREEZE_STATUS_YES);
@@ -420,10 +427,10 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      * @date 2018-08-23 11:12:47
      */
     @Override
-    public BasicUserOrganization queryTopPlatform() {
+    public List<BasicUserOrganization> queryTopPlatform() {
         StatusDtoThriftBean<BasicUserOrganization> orgByCode = basicUserOrganizationService.findOrgByCode(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
         StatusDto<BasicUserOrganization> resolve = StatusDtoThriftUtils.resolve(orgByCode, BasicUserOrganization.class);
-        return resolve.getData();
+        return List.of(resolve.getData());
     }
 
     /**

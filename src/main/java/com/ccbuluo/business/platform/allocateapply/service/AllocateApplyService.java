@@ -131,5 +131,5 @@ public interface AllocateApplyService {
      * @author zhangkangjian
      * @date 2018-08-23 11:12:47
      */
-    BasicUserOrganization queryTopPlatform();
+    List<BasicUserOrganization> queryTopPlatform();
 }
