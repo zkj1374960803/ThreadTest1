@@ -42,36 +42,12 @@ public class PaymentServiceImpl implements PaymentService {
      */
     @Override
     public StatusDto paymentCompletion(String applyNo){
-        BizAllocateApply ba = bizAllocateApplyDao.getByNo(applyNo);
-        if(null == ba){
-            return StatusDto.buildFailureStatusDto("申请单不存在！");
+        String status = BizAllocateApply.ApplyStatusEnum.WAITDELIVERY.name();// 等待发货
+        // 支付成功之后，如果是采购，则状态为平台待入库
+        if(applyNo.equals(BizAllocateApply.AllocateApplyTypeEnum.PURCHASE.name())){
+            status = BizAllocateApply.ApplyStatusEnum.INSTORE.name();// 等待平台入库
         }
-        BizAllocateApply.AllocateApplyTypeEnum typeEnum = BizAllocateApply.AllocateApplyTypeEnum.valueOf(ba.getApplyType());
-        String status = "";
-        switch (typeEnum){
-            case PURCHASE:    // 采购
-                status = BizAllocateApply.ApplyStatusEnum.WAITDELIVERY.name();// 等待发货
-                break;
-            case PLATFORMALLOCATE:    // 平台调拨
-                status = "";
-                break;
-            case SAMELEVEL:    // 平级调拨（服务间的调拨）
-                status = "";
-                break;
-            case DIRECTALLOCATE:    // 直调
-                status = "";
-                break;
-            case BARTER:    // 商品换货
-                status = "";
-                break;
-            case REFUND:    //  退货
-                status = "";
-                break;
-            default:
-                logger.error(typeEnum.toString()+"出现了未知处理类型！");
-                break;
-        }
-        //更新申请单状态(已撤销)
+        //更新申请单状态
         bizAllocateApplyDao.updateApplyOrderStatus(applyNo, status);
         return StatusDto.buildSuccessStatusDto("支付成功！");
     }
