@@ -342,4 +342,5 @@ public class FindAllocateApplyDTO {
     public void setTransportorderNo(String transportorderNo) {
         this.transportorderNo = transportorderNo;
     }
+
 }
