@@ -241,6 +241,7 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
                 inPlan.setInstockRepositoryNo(ad.getInRepositoryNo());// 入库仓库编号
                 inPlan.setInstockOrgno(ad.getInstockOrgno());// 买入机构编号
             }
+            list.add(inPlan);
             inList.addAll(list);
         }
     }
@@ -258,7 +259,8 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
             if(in.getSupplierNo().equals(bd.getSupplierNo())){
                 // 一个商品有多个供应商的情况
                 AllocateapplyDetailBO ab = getAllocateapplyDetailBO(details, in.getProductNo());
-                in.setCostPrice(ab.getCostPrice());
+                in.setCostPrice(ab.getSellPrice());
+                in.setPlanInstocknum(in.getPlanInstocknum() + bd.getPlanOutstocknum());
                 flag = true;
                 break;
             }else{

@@ -175,15 +175,16 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      */
     public Page<QueryAllocateApplyListDTO> findApplyList(String productType, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode) {
         HashMap<String, Object> map = Maps.newHashMap();
-        map.put("userOrgCode", userOrgCode);
+
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.apply_status,a.process_type ")
             .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(userOrgCode)){
+            map.put("userOrgCode", userOrgCode);
             sql.append(" AND a.applyorg_no = :userOrgCode ");
         }
         if(StringUtils.isNotBlank(processType)){
-            map.put("process_type", processType);
+            map.put("processType", processType);
             sql.append(" AND a.process_type = :processType ");
         }
         if(StringUtils.isNotBlank(applyStatus)){
