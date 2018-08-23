@@ -413,6 +413,20 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     }
 
     /**
+     * 查询售后平台的信息
+     *
+     * @return StatusDto<BasicUserOrganization>
+     * @author zhangkangjian
+     * @date 2018-08-23 11:12:47
+     */
+    @Override
+    public BasicUserOrganization queryTopPlatform() {
+        StatusDtoThriftBean<BasicUserOrganization> orgByCode = basicUserOrganizationService.findOrgByCode(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+        StatusDto<BasicUserOrganization> resolve = StatusDtoThriftUtils.resolve(orgByCode, BasicUserOrganization.class);
+        return resolve.getData();
+    }
+
+    /**
      * 修改申请单状态
      * @param applyNo 申请单号
      * @param status 申请单状态

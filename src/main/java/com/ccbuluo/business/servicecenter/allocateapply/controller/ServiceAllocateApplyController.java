@@ -7,6 +7,7 @@ import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
+import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -168,6 +169,19 @@ public class ServiceAllocateApplyController extends BaseController {
     public StatusDto<Page<QueryOrgDTO>> queryTransferStock(@ApiIgnore QueryOrgDTO queryOrgDTO, Integer offset, Integer pageSize){
         Page<QueryOrgDTO> queryOrgDTOPage = allocateApplyServiceImpl.queryTransferStock(queryOrgDTO, offset, pageSize);
         return StatusDto.buildDataSuccessStatusDto(queryOrgDTOPage);
+    }
+
+    /**
+     * 查询售后平台的信息
+     * @return StatusDto<BasicUserOrganization>
+     * @author zhangkangjian
+     * @date 2018-08-23 11:12:47
+     */
+    @ApiOperation(value = "查询平台的信息",notes = "【张康健】")
+    @GetMapping("/querytopplatform")
+    public StatusDto<BasicUserOrganization> queryTopPlatform(){
+        BasicUserOrganization org = allocateApplyServiceImpl.queryTopPlatform();
+        return StatusDto.buildDataSuccessStatusDto(org);
     }
 
 

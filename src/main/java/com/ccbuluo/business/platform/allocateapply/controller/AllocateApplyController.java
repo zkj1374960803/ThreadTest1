@@ -7,8 +7,10 @@ import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftBean;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
+import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import io.swagger.annotations.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -172,5 +174,17 @@ public class AllocateApplyController extends BaseController {
         return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.queryProblemStockList(orgCode, productType));
     }
 
+    /**
+     * 查询售后平台的信息
+     * @return StatusDto<BasicUserOrganization>
+     * @author zhangkangjian
+     * @date 2018-08-23 11:12:47
+     */
+    @ApiOperation(value = "查询平台的信息",notes = "【张康健】")
+    @GetMapping("/querytopplatform")
+    public StatusDto<BasicUserOrganization> queryTopPlatform(){
+        BasicUserOrganization org = allocateApplyServiceImpl.queryTopPlatform();
+        return StatusDto.buildDataSuccessStatusDto(org);
+    }
 
 }
