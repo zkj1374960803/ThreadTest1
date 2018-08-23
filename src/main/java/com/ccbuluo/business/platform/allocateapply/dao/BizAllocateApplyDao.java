@@ -177,7 +177,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         HashMap<String, Object> map = Maps.newHashMap();
 
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.apply_status,a.process_type ")
+        sql.append(" SELECT a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.apply_status,a.process_type,a.process_orgtype as 'orgType' ")
             .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(userOrgCode)){
             map.put("userOrgCode", userOrgCode);
