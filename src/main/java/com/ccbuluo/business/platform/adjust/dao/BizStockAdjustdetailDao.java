@@ -112,8 +112,8 @@ public class BizStockAdjustdetailDao extends BaseDao<BizStockAdjustdetail> {
         params.put("adjustNo", adjustNo);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,adjust_docno,product_no,product_type,product_name,product_categoryname,")
-            .append(" IFNULL(perfect_num,0) AS dueNum,IFNULL(actual_num, 0) AS actualNum WHERE adjust_docno = :adjustNo");
+        sql.append("SELECT id,adjust_docno,product_no,product_type,product_name,product_categoryname,IFNULL(perfect_num,0) AS dueNum,")
+            .append(" IFNULL(actual_num, 0) AS actualNum FROM biz_stock_adjustdetail WHERE adjust_docno = :adjustNo");
 
         return queryListBean(StockAdjustListDTO.class, sql.toString(), params);
     }

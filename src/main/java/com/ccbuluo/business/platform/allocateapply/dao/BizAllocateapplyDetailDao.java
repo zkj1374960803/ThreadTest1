@@ -117,4 +117,20 @@ public class BizAllocateapplyDetailDao extends BaseDao<AllocateapplyDetailDTO> {
         params.put("applyNo", applyNo);
         return super.queryListBean(AllocateapplyDetailBO.class, sql.toString(), params);
     }
+
+    /**
+     * 根据物料code查询物料是否被申请
+     * @param equipCode 物料code
+     * @return 物料是否被申请
+     * @author liuduo
+     * @date 2018-08-23 16:01:38
+     */
+    public Boolean getEquipMent(String equipCode) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("equipCode", equipCode);
+
+        String sql = "SELECT COUNT(id) > 0 FROM biz_allocateapply_detail WHERE product_no = :equipCode";
+
+        return findForObject(sql, params, Boolean.class);
+    }
 }
