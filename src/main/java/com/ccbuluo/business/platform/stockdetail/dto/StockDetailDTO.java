@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Date;
+
 /**
  * 某个商品库存详情用
  * @author weijb
@@ -16,64 +18,57 @@ import org.apache.commons.lang3.StringUtils;
 public class StockDetailDTO extends IdEntity {
 
     /**
-     * 商品编号
+     * 交易批次号,可以是调拨申请的单号或维修销售的服务单号
      */
-    @ApiModelProperty(name = "productNo", value = "商品编号")
-    private String productNo;
+    @ApiModelProperty(name = "tradeNo", value = "交易批次号,可以是调拨申请的单号或维修销售的服务单号")
+    private String tradeNo;
+
     /**
-     * 商品名称
+     * 入库时间
      */
-    @ApiModelProperty(name = "productName", value = "商品名称")
-    private String productName;
+    @ApiModelProperty(name = "instockTime", value = "入库时间")
+    private Date instockTime;
+
     /**
-     * 商品分类
+     * 供应商code
      */
-    @ApiModelProperty(name = "productType", value = "商品分类")
-    private String productType;
-    /**
-     * 商品数量（总数量）
-     */
-    @ApiModelProperty(name = "problemStock", value = "商品数量（总数量）")
-    private Long productNum;
-    /**
-     * 问题件数量（总数量）
-     */
-    @ApiModelProperty(name = "problemStock", value = "商品数量（总数量）")
-    private Long problemNum;
+    @ApiModelProperty(name = "supplierCode", value = "供应商code")
+    private String supplierNo;
 
     /**
      * 问题件库存
      */
     @ApiModelProperty(name = "problemStock", value = "问题件库存数量")
     private Long problemStock;
+
     /**
      * 计量单位
      */
     @ApiModelProperty(name = "productUnit", value = "计量单位")
     private String productUnit;
 
-    public String getProductNo() {
-        return productNo;
+    public String getTradeNo() {
+        return tradeNo;
     }
 
-    public void setProductNo(String productNo) {
-        this.productNo = productNo;
+    public void setTradeNo(String tradeNo) {
+        this.tradeNo = tradeNo;
     }
 
-    public String getProductName() {
-        return productName;
+    public Date getInstockTime() {
+        return instockTime;
     }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
+    public void setInstockTime(Date instockTime) {
+        this.instockTime = instockTime;
     }
 
-    public String getProductType() {
-        return productType;
+    public String getSupplierNo() {
+        return supplierNo;
     }
 
-    public void setProductType(String productType) {
-        this.productType = productType;
+    public void setSupplierNo(String supplierNo) {
+        this.supplierNo = supplierNo;
     }
 
     public Long getProblemStock() {
@@ -90,13 +85,5 @@ public class StockDetailDTO extends IdEntity {
 
     public void setProductUnit(String productUnit) {
         this.productUnit = productUnit;
-    }
-
-    public String getUnitName() {
-        String unitName = "";
-        if(StringUtils.isNotBlank(productUnit)){
-            unitName = ProductUnitEnum.valueOf(productUnit).getLabel();
-        }
-        return unitName;
     }
 }

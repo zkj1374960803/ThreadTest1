@@ -375,16 +375,17 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     }
     /**
      * 查询库存的数量
-     * @param orgCode 组织架构code
+     * @param productNo 组织架构code
      * @exception
      * @return
      * @author zhangkangjian
      * @date 2018-08-13 19:47:32
      */
-    public Page<QueryOrgDTO> findStockNum(List<String> orgCode, Integer offset, Integer pageSize) {
-        String sql = "SELECT a.org_no as 'orgCode',SUM(a.valid_stock) as 'stockNum' FROM biz_stock_detail a WHERE a.org_no IN (:orgCode) GROUP BY a.org_no";
+    public Page<QueryOrgDTO> findStockNum(String productNo,List<String> orgCodes, Integer offset, Integer pageSize) {
+        String sql = "SELECT a.org_no as 'orgCode',SUM(a.valid_stock) as 'stockNum' FROM biz_stock_detail a WHERE a.product_no = :productNo AND a.org_no in (:orgCodes) GROUP BY a.org_no";
         HashMap<String, Object> map = Maps.newHashMap();
-        map.put("orgCode", orgCode);
+        map.put("productNo", productNo);
+        map.put("orgCodes", orgCodes);
         return queryPageForBean(QueryOrgDTO.class, sql, map, offset, pageSize);
     }
 

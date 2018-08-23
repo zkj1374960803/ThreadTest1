@@ -86,11 +86,12 @@ public interface AllocateApplyService {
     /**
      * 查询可调拨库存列表
      * @param orgDTO 查询条件
+     * @param productNo
      * @return StatusDtoThriftPage<QueryOrgDTO>
      * @author zhangkangjian
      * @date 2018-08-13 17:19:54
      */
-    Page<QueryOrgDTO> queryTransferStock(QueryOrgDTO orgDTO,Integer offset,Integer pageSize);
+    Page<QueryOrgDTO> queryTransferStock(QueryOrgDTO orgDTO, String productNo, Integer offset, Integer pageSize);
     /**
      *  
      * @param 
@@ -132,4 +133,14 @@ public interface AllocateApplyService {
      * @date 2018-08-23 11:12:47
      */
     List<BasicUserOrganization> queryTopPlatform();
+
+    /**
+     * 根据物料code查询物料是否被申请
+     * @param equipCode 物料code
+     * @return 物料是否被申请
+     * @author liuduo
+     * @date 2018-08-23 16:01:38
+     */
+    Boolean getEquipMent(String equipCode);
+
 }

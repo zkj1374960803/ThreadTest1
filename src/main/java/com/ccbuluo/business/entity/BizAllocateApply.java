@@ -388,4 +388,20 @@ public class BizAllocateApply {
         }
     }
 
+    /**
+     * 处理类型
+     * @author zhangkangjian
+     * @date 2018-08-10 14:01:49
+     */
+    public enum ProcessTypeEnum {
+        TRANSFER("调拨"),PURCHASE("采购"),BARTER("更换"),REFUND("退款");
+        ProcessTypeEnum(String label){
+            this.label = label;
+        }
+        private String label;
+        public String getLabel(){
+            return label;
+        }
+    }
+
 }

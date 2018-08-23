@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.stockdetail.service;
 
 
+import com.ccbuluo.business.platform.stockdetail.dto.ProblemStockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
@@ -58,4 +59,13 @@ public interface ProblemStockDetailService {
      * @date 2018-08-15 08:59:51
      */
     Page<StockBizStockDetailDTO> getSelfProdectStockBizStockDetailByCode(String productNo, Integer offset, Integer pageSize);
+
+    /**
+     * 查询问题库存详情
+     * @param id 库存批次id
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-23 16:02:58
+     */
+    ProblemStockBizStockDetailDTO getProblemStockDetail(Long id);
 }

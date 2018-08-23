@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.stockdetail.service;
 
 import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
+import com.ccbuluo.business.platform.stockdetail.dto.ProblemStockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.db.Page;
@@ -103,5 +104,20 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
             codes.add(bp.getCarpartsCode());
         }
         return codes;
+    }
+
+    /**
+     * 查询问题库存详情
+     * @param id 库存批次id
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-23 16:02:58
+     */
+    @Override
+    public ProblemStockBizStockDetailDTO getProblemStockDetail(Long id){
+        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+        ProblemStockBizStockDetailDTO psd = problemStockDetailDao.getProblemStockDetail(id);
+        psd.setProblemDetailList(problemStockDetailDao.queryProblemStockBizStockList(orgCode, psd.getProductNo()));
+        return psd;
     }
 }
