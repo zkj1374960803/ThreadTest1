@@ -4,15 +4,10 @@ import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.adjust.dto.StockAdjustListDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
-import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.UpdateStockBizStockDetailDTO;
-import com.ccbuluo.business.platform.stockmanagement.dto.FindBatchStockListDTO;
-import com.ccbuluo.business.platform.stockmanagement.dto.FindProductDetailDTO;
-import com.ccbuluo.business.platform.stockmanagement.dto.FindStockDetailDTO;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
-import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -24,7 +19,6 @@ import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 批次库存表，由交易批次号、供应商、仓库等多维度唯一主键 区分的库存表 dao

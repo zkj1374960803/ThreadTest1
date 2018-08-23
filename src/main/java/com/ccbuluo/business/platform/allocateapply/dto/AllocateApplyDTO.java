@@ -115,7 +115,7 @@ public class AllocateApplyDTO {
     /**
      * 备注
      */
-    @ApiModelProperty(name = "remark", value = "备注", hidden = true)
+    @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
     /**
      * 申请商品详情列表

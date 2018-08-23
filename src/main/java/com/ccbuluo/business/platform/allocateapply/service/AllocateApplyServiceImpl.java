@@ -11,7 +11,6 @@ import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleContext;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
-import com.ccbuluo.business.platform.stockmanagement.dto.FindStockDetailDTO;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.BusinessUser;
@@ -83,23 +82,17 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         // 生成申请单编号
         StatusDto<String> stringStatusDto = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.SW);
         allocateApplyDTO.setApplyNo(stringStatusDto.getData());
-        BusinessUser loggedUser = userHolder.getLoggedUser();
-        if(loggedUser != null){
-            Organization organization = loggedUser.getOrganization();
-            if(organization != null){
-                String orgCodeUser = organization.getOrgCode();
-                if(orgCodeUser != null){
-                    allocateApplyDTO.setApplyorgNo(orgCodeUser);
-                    if(orgCodeUser.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)){
-                        // 等待付款状态
-                        allocateApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
-                        allocateApplyDTO.setApplyProcessor(loggedUserId);
-                        allocateApplyDTO.setProcessTime(new Date());
-                    }else {
-                        // 待处理
-                        allocateApplyDTO.setApplyStatus(ApplyStatusEnum.PENDING.name());
-                    }
-                }
+        String userOrgCode = getUserOrgCode();
+        if(userOrgCode != null) {
+            allocateApplyDTO.setApplyorgNo(userOrgCode);
+            if (userOrgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+                // 等待付款状态
+                allocateApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
+                allocateApplyDTO.setApplyProcessor(loggedUserId);
+                allocateApplyDTO.setProcessTime(new Date());
+            } else {
+                // 待处理
+                allocateApplyDTO.setApplyStatus(ApplyStatusEnum.PENDING.name());
             }
         }
         // 查询组织架构类型
@@ -142,9 +135,11 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }
         });
         bizAllocateApplyDao.batchInsertForapplyDetailList(allocateapplyDetailList);
-
+        // 处理机构是平台，并处理类是采购，退换货类型的
         if(AllocateApplyTypeEnum.PURCHASE.name().equals(processType) || AllocateApplyTypeEnum.BARTER.name().equals(processType) || AllocateApplyTypeEnum.REFUND.equals(processType)){
-            applyHandleContext.applyHandle(allocateApplyDTO.getApplyNo());
+            if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(allocateApplyDTO.getProcessOrgno())){
+                applyHandleContext.applyHandle(allocateApplyDTO.getApplyNo());
+            }
         }
 
     }
@@ -179,7 +174,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     @Override
     public FindAllocateApplyDTO findDetail(String applyNo) {
         FindAllocateApplyDTO allocateApplyDTO = bizAllocateApplyDao.findDetail(applyNo);
-        String applyorgNo = allocateApplyDTO.getApplyorgNo();
         // 查询组织架构的名字
         StatusDtoThriftBean<BasicUserOrganization> outstockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getOutstockOrgno());
         StatusDtoThriftBean<BasicUserOrganization> instockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getInstockOrgno());

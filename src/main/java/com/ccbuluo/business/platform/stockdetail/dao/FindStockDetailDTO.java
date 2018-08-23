@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.stockmanagement.dto;
+package com.ccbuluo.business.platform.stockdetail.dao;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

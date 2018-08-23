@@ -1,13 +1,13 @@
-package com.ccbuluo.business.platform.stockmanagement.controller;
+package com.ccbuluo.business.platform.stockdetail.controller;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.allocateapply.dto.CheckStockQuantityDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.ProductStockInfoDTO;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
-import com.ccbuluo.business.platform.stockmanagement.dto.FindBatchStockListDTO;
-import com.ccbuluo.business.platform.stockmanagement.dto.FindStockDetailDTO;
-import com.ccbuluo.business.platform.stockmanagement.service.StockManagementService;
+import com.ccbuluo.business.platform.stockdetail.dao.FindBatchStockListDTO;
+import com.ccbuluo.business.platform.stockdetail.dao.FindStockDetailDTO;
+import com.ccbuluo.business.platform.stockdetail.service.StockManagementService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -20,6 +20,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
+ * 库存管理
  * @author zhangkangjian
  * @date 2018-08-16 10:23:20
  */
