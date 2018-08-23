@@ -182,9 +182,8 @@ public class AllocateApplyController extends BaseController {
      */
     @ApiOperation(value = "查询平台的信息",notes = "【张康健】")
     @GetMapping("/querytopplatform")
-    public StatusDto<BasicUserOrganization> queryTopPlatform(){
-        BasicUserOrganization org = allocateApplyServiceImpl.queryTopPlatform();
-        return StatusDto.buildDataSuccessStatusDto(org);
+    public StatusDto<List<BasicUserOrganization>> queryTopPlatform(){
+        return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.queryTopPlatform());
     }
 
 }
