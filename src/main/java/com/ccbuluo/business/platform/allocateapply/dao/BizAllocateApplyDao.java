@@ -322,7 +322,8 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             map.put("orgNo", orgNo);
             sql.append(" AND  a.org_no = :orgNo ");
         }
-        sql.append(" GROUP BY a.product_no ");
+        sql.append(" GROUP BY a.product_no ")
+        .append(" HAVING  sum(ifnull(a.valid_stock,0) + ifnull(a.occupy_stock,0) + ifnull(a.problem_stock,0) + ifnull(a.damaged_stock,0) + ifnull(a.transit_stock,0) + ifnull(a.freeze_stock,0)) > 0");
         return queryPageForBean(FindStockListDTO.class, sql.toString(), map, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
     }
 
@@ -382,7 +383,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @date 2018-08-13 19:47:32
      */
     public Page<QueryOrgDTO> findStockNum(String productNo,List<String> orgCodes, Integer offset, Integer pageSize) {
-        String sql = "SELECT a.org_no as 'orgCode',SUM(a.valid_stock) as 'stockNum' FROM biz_stock_detail a WHERE a.product_no = :productNo AND a.org_no in (:orgCodes) GROUP BY a.org_no";
+        String sql = "SELECT a.org_no as 'orgCode',SUM(a.valid_stock) as 'stockNum' FROM biz_stock_detail a WHERE a.product_no = :productNo AND a.org_no in (:orgCodes) GROUP BY a.org_no having SUM(a.valid_stock) > 0";
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("productNo", productNo);
         map.put("orgCodes", orgCodes);
