@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Date;
+
 /**
  * 商品库存列表展示用
  * @author liuduo
@@ -45,6 +47,17 @@ public class StockBizStockDetailDTO extends IdEntity {
      */
     @ApiModelProperty(name = "productCategoryname", value = "商品分类名称，多级逗号隔开")
     private String productCategoryname;
+
+    /**
+     * 入库时间
+     */
+    @ApiModelProperty(name = "instockTime", value = "入库时间", hidden = true)
+    private Date instockTime;
+    /**
+     * 出库时间
+     */
+    @ApiModelProperty(name = "outstockTime", value = "出库时间", hidden = true)
+    private Date outstockTime;
 
     public String getProductCategoryname() {
         return productCategoryname;
@@ -94,4 +107,19 @@ public class StockBizStockDetailDTO extends IdEntity {
         this.productUnit = productUnit;
     }
 
+    public Date getInstockTime() {
+        return instockTime;
+    }
+
+    public void setInstockTime(Date instockTime) {
+        this.instockTime = instockTime;
+    }
+
+    public Date getOutstockTime() {
+        return outstockTime;
+    }
+
+    public void setOutstockTime(Date outstockTime) {
+        this.outstockTime = outstockTime;
+    }
 }

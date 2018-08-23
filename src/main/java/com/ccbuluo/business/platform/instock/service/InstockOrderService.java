@@ -33,7 +33,7 @@ public interface InstockOrderService {
      * @author liuduo
      * @date 2018-08-07 14:19:40
      */
-    List<String> queryApplyNo();
+    List<String> queryApplyNo(String productType);
 
     /**
      * 保存入库单

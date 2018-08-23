@@ -45,12 +45,12 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      */
     public Long saveEntity(BizStockDetail entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO biz_stock_detail ( repository_no,org_no,product_no,product_name,product_categoryname,")
+        sql.append("INSERT INTO biz_stock_detail ( repository_no,org_no,product_no,product_name,product_unit,product_categoryname,")
             .append("product_type,trade_no,supplier_no,valid_stock,occupy_stock,")
             .append("problem_stock,damaged_stock,transit_stock,freeze_stock,seller_orgno,")
             .append("cost_price,instock_planid,latest_correct_time,creator,create_time,")
             .append("operator,operate_time,delete_flag,remark ) VALUES (  :repositoryNo,")
-            .append(" :orgNo, :productNo, :productName,:productCategoryname, :productType, :tradeNo, :supplierNo,")
+            .append(" :orgNo, :productNo, :productName,:productUnit,:productCategoryname, :productType, :tradeNo, :supplierNo,")
             .append(" :validStock, :occupyStock, :problemStock, :damagedStock,")
             .append(" :transitStock, :freezeStock, :sellerOrgno, :costPrice,")
             .append(" :instockPlanid, :latestCorrectTime, :creator, :createTime,")
@@ -122,7 +122,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         params.put("versionNo", versionNo + Constants.LONG_FLAG_ONE);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE `biz_stock_detail` SET valid_stock = :validStock+valid_stock,version_no = version_no+1")
+        sql.append("UPDATE `biz_stock_detail` SET valid_stock = :validStock + IFNULL(valid_stock,0),version_no = version_no+1")
             .append(" WHERE id = :id AND :versionNo > version_no");
 
         updateForBean(sql.toString(), bizStockDetail);

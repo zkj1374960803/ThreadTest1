@@ -105,7 +105,7 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
         params.put("bizInstockplanDetailList", bizInstockplanDetailList);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_instockplan_detail SET actual_instocknum = :actualInstocknum + IFNULL(actual_instocknum,0),")
+        sql.append("UPDATE biz_instockplan_detail SET actual_instocknum = :actualInstocknum + IFNULL(actual_instocknum,0),cost_price = :costPrice,")
             .append(" version_no = version_no+1,operator = :operator,operate_time = :operateTime WHERE id = :id AND :versionNo > version_no");
 
         batchUpdateForListBean(sql.toString(), bizInstockplanDetailList);

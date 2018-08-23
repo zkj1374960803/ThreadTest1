@@ -35,9 +35,10 @@ public class CustmanagerInstockOrderController extends BaseController {
      * @date 2018-08-07 14:19:40
      */
     @ApiOperation(value = "申请单号查询", notes = "【刘铎】")
+    @ApiImplicitParam(name = "productType", value = "商品类型(物料或者备件)",  required = true, paramType = "query")
     @GetMapping("/queryapplyno")
-    public StatusDto<List<String>> queryApplyNo() {
-        return StatusDto.buildDataSuccessStatusDto(instockOrderService.queryApplyNo());
+    public StatusDto<List<String>> queryApplyNo(@RequestParam String productType) {
+        return StatusDto.buildDataSuccessStatusDto(instockOrderService.queryApplyNo(productType));
     }
 
 
