@@ -1,10 +1,9 @@
-package com.ccbuluo.business.platform.stockmanagement.service;
+package com.ccbuluo.business.platform.stockdetail.service;
 
 import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
-import com.ccbuluo.business.platform.stockmanagement.dto.FindBatchStockListDTO;
-import com.ccbuluo.business.platform.stockmanagement.dto.FindStockDetailDTO;
+import com.ccbuluo.business.platform.stockdetail.dao.FindBatchStockListDTO;
+import com.ccbuluo.business.platform.stockdetail.dao.FindStockDetailDTO;
 import com.ccbuluo.db.Page;
-import org.springframework.stereotype.Service;
 
 /**
  * @author zhangkangjian

@@ -3,13 +3,10 @@ package com.ccbuluo.business.platform.allocateapply.service;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
-import com.ccbuluo.business.platform.stockmanagement.dto.FindStockDetailDTO;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
-import com.ccbuluo.http.StatusDtoThriftPage;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 
-import java.util.HashMap;
 import java.util.List;
 
 /**

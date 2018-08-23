@@ -4,15 +4,10 @@ import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.adjust.dto.StockAdjustListDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
-import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.UpdateStockBizStockDetailDTO;
-import com.ccbuluo.business.platform.stockmanagement.dto.FindBatchStockListDTO;
-import com.ccbuluo.business.platform.stockmanagement.dto.FindProductDetailDTO;
-import com.ccbuluo.business.platform.stockmanagement.dto.FindStockDetailDTO;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
-import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -24,7 +19,6 @@ import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 批次库存表，由交易批次号、供应商、仓库等多维度唯一主键 区分的库存表 dao
@@ -315,12 +309,13 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author liuduo
      * @date 2018-08-14 20:22:08
      */
-    public List<BizStockDetail> queryStockDetailByProductNo(String productNo) {
+    public List<BizStockDetail> queryStockDetailByProductNo(String productNo, String orgCode) {
         Map<String, Object> param = Maps.newHashMap();
         param.put("productNo", productNo);
+        param.put("orgCode", orgCode);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,product_no,product_type,valid_stock,version_no FROM biz_stock_detail WHERE product_no = :productNo ORDER BY create_time DESC");
+        sql.append("SELECT id,product_no,product_type,valid_stock,version_no FROM biz_stock_detail WHERE product_no = :productNo AND org_no = :orgCode ORDER BY create_time DESC");
 
         return queryListBean(BizStockDetail.class, sql.toString(), param);
     }
@@ -335,7 +330,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
     public void updateAdjustValidStock(List<BizStockDetail> bizStockDetailList1) {
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE biz_stock_detail SET valid_stock = :validStock, version_no = version_no+1,operator = :operator,")
-            .append(" operate_time = :operateTime WHERE version_no > :versionNo AND id = :id");
+            .append(" operate_time = :operateTime WHERE :versionNo > version_no AND id = :id");
 
         batchUpdateForListBean(sql.toString(), bizStockDetailList1);
     }

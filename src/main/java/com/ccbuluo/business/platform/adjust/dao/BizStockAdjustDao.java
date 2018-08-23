@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.adjust.dao;
 
+import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizStockAdjust;
 import com.ccbuluo.business.entity.BizStockAdjustdetail;
@@ -114,7 +115,7 @@ public class BizStockAdjustDao extends BaseDao<BizStockAdjust> {
      */
     public Page<SearchStockAdjustListDTO> queryAdjustStockList(Integer adjustResult, String adjustSource, String keyWord, Integer offset, Integer pagesize, String orgCode) {
         Map<String, Object> params = Maps.newHashMap();
-        params.put("orgCode", orgCode);
+
 
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT adjust_docno,adjust_orgno,adjust_userid,adjust_time,adjust_result FROM biz_stock_adjust WHERE 1=1");
@@ -134,7 +135,11 @@ public class BizStockAdjustDao extends BaseDao<BizStockAdjust> {
             params.put("keyWord", keyWord);
             sql.append(" AND (adjust_orgno LIKE CONCAT('%',:keyWord,'%') OR adjust_docno LIKE CONCAT('%',:keyWord,'%'))");
         }
-        sql.append(" AND adjust_orgno = :orgCode ORDER BY operate_time DESC");
+        if (StringUtils.isNotBlank(orgCode) && !(orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM))) {
+            params.put("orgCode", orgCode);
+            sql.append(" AND adjust_orgno = :orgCode");
+        }
+        sql.append("  ORDER BY operate_time DESC");
 
         return queryPageForBean(SearchStockAdjustListDTO.class, sql.toString(), params, offset, pagesize);
     }
