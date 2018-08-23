@@ -454,6 +454,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public List<StockBizStockDetailDTO> queryProblemStockList(String orgCode, String productType) {
+
+
         return bizAllocateApplyDao.queryProblemStockList(orgCode, productType);
     }
 

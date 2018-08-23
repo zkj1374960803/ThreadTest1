@@ -470,18 +470,18 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
 
-        sql.append("SELECT id,product_no,product_name,product_type,product_unit,SUM(problem_stock) as problem_stock,product_categoryname")
-            .append(" FROM biz_stock_detail  WHERE delete_flag = :deleteFlag and problem_stock > 0 ");
+        sql.append("SELECT a.id,a.product_no,a.product_name,a.product_type,a.product_unit,SUM(a.problem_stock) AS problem_stock,a.product_categoryname,a.supplier_no,b.supplier_name")
+            .append(" FROM biz_stock_detail a LEFT JOIN biz_service_supplier b ON a.supplier_no = b.supplier_code where 1 = 1");
         // 组织机构code
         if (StringUtils.isNotBlank(orgCode)) {
             param.put("orgCode", orgCode);
-            sql.append(" AND org_no = :orgCode ");
+            sql.append(" AND a.org_no = :orgCode ");
         }
         if (StringUtils.isNotBlank(productType)) {
             param.put("productType", productType);
-            sql.append(" AND product_type = :productType ");
+            sql.append(" AND a.product_type = :productType ");
         }
-        sql.append(" GROUP BY product_no ORDER BY create_time DESC");
+        sql.append(" GROUP BY a.product_no ORDER BY a.create_time DESC");
         return queryListBean(StockBizStockDetailDTO.class, sql.toString(), param);
     }
 }
