@@ -6,6 +6,7 @@ import com.ccbuluo.business.entity.BizAllocateApply.AllocateApplyTypeEnum;
 import com.ccbuluo.business.entity.BizAllocateApply.ApplyStatusEnum;
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
+import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
@@ -63,6 +64,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     private CarpartsProductService carpartsProductService;
     @Resource
     private ApplyHandleContext applyHandleContext;
+    @Autowired
+    private BizAllocateapplyDetailDao bizAllocateapplyDetailDao;
 
     /**
      * 创建物料或者零配件申请
@@ -432,6 +435,18 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     }
 
     /**
+     * 根据物料code查询物料是否被申请
+     * @param equipCode 物料code
+     * @return 物料是否被申请
+     * @author liuduo
+     * @date 2018-08-23 16:01:38
+     */
+    @Override
+    public Boolean getEquipMent(String equipCode) {
+        return bizAllocateapplyDetailDao.getEquipMent(equipCode);
+    }
+
+    /**
      * 修改申请单状态
      * @param applyNo 申请单号
      * @param status 申请单状态
@@ -504,11 +519,11 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     public StatusDto<List<ProductStockInfoDTO>> checkStockQuantity(CheckStockQuantityDTO checkStockQuantityDTO) {
         String flag = Constants.SUCCESS_CODE;
         String message = "成功";
-        FindAllocateApplyDTO detail = findDetail(checkStockQuantityDTO.getOutstockOrgno());
+       /* FindAllocateApplyDTO detail = findDetail(checkStockQuantityDTO.getOutstockOrgno());
         // 如果是平台调拨，需要校验库存来源
         if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(detail.getProcessOrgno())){
             checkStockQuantityDTO.setSellerOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
-        }
+        }*/
         Map<String, Object> map = bizAllocateApplyDao.queryStockQuantity(checkStockQuantityDTO.getOutstockOrgno(), checkStockQuantityDTO.getSellerOrgno());
         List<ProductStockInfoDTO> allocateapplyDetailList = checkStockQuantityDTO.getProductInfoList();
         for (int i = 0; i < allocateapplyDetailList.size(); i++) {
