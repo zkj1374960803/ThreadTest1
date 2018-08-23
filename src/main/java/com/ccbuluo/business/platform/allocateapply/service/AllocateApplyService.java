@@ -82,7 +82,7 @@ public interface AllocateApplyService {
      * @author liuduo
      * @date 2018-08-11 12:56:39
      */
-    List<String> queryApplyNo(String applyNoStatus, String orgCode, String productType);
+    List<String> queryApplyNo(String applyNoStatus, String orgCode, String productType, Integer stockType);
     /**
      * 查询可调拨库存列表
      * @param orgDTO 查询条件

@@ -74,11 +74,15 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
     public FindAllocateApplyDTO getProblemdetailDetail(String applyNo){
         FindAllocateApplyDTO allocateApplyDTO = allocateApplyServiceImpl.findDetail(applyNo);
         // 获取出库人和出库时间
-        BizOutstockOrderDTO oOutstockOrder = bizOutstockOrderDao.getByTradeDocno(applyNo);
-        if(null != oOutstockOrder){
-            String operatorName = getUserNameByUuid(oOutstockOrder.getOutstockOperator());
-            allocateApplyDTO.setOutstockOperatorName(operatorName);// 出库人
-            allocateApplyDTO.setOutstockTime(oOutstockOrder.getOutstockTime());// 出库时间
+        ProblemAllocateapplyDetailDTO info = problemAllocateApplyDao.queryProblemApplyInfo(applyNo, allocateApplyDTO.getApplyorgNo());
+        if(null != info){
+            String outOperatorName = getUserNameByUuid(info.getOutstockOperator());
+            String inOperatorName = getUserNameByUuid(info.getInstockOperator());
+            allocateApplyDTO.setOutstockOperatorName(outOperatorName);// 出库人
+            allocateApplyDTO.setOutstockTime(info.getOutstockTime());// 出库时间
+            allocateApplyDTO.setInstockOperatorName(inOperatorName); // 入库人
+            allocateApplyDTO.setInstockTime(info.getInstockTime());// 入库时间
+            allocateApplyDTO.setTransportorderNo(info.getTransportorderNo());// 物流单号
         }
         return allocateApplyDTO;
     }

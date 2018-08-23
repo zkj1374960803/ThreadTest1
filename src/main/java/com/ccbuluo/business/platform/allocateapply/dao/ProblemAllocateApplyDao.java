@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.allocateapply.dao;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
+import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
@@ -112,6 +113,26 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         sql.append(" ORDER BY t1.create_time DESC");
         Page<ProblemAllocateapplyDetailDTO> DTOS = super.queryPageForBean(ProblemAllocateapplyDetailDTO.class, sql.toString(), param,offset,pageSize);
         return DTOS;
+    }
+
+    /**
+     * 获取申请机构出入库时间
+     * @param applyNo 申请单号
+     * @param applyorgNo 申请机构
+     * @author weijb
+     * @date 2018-08-15 18:51:51
+     */
+    public ProblemAllocateapplyDetailDTO queryProblemApplyInfo(String applyNo, String applyorgNo){
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        param.put("applyorgNo", applyorgNo);
+        StringBuilder sql = new StringBuilder();
+
+        sql.append("SELECT t1.id,t1.apply_no,t1.apply_type,t1.apply_status ,t2.checked_time as outstock_time,t3.checked_time as instock_time,t2.outstock_operator,t3.instock_operator,t2.transportorder_no")
+                .append(" FROM biz_allocate_apply t1 LEFT JOIN biz_outstock_order t2 on t1.apply_no=t2.trade_docno ")
+                .append(" LEFT JOIN biz_instock_order t3 on t1.apply_no=t3.trade_docno ")
+                .append(" WHERE t1.delete_flag = :deleteFlag and t1.applyorg_no = :applyorgNo");
+        return findForBean(ProblemAllocateapplyDetailDTO.class, sql.toString(), param);
     }
 
 }
