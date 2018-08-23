@@ -133,4 +133,14 @@ public interface AllocateApplyService {
      * @date 2018-08-23 11:12:47
      */
     List<BasicUserOrganization> queryTopPlatform();
+
+    /**
+     * 根据物料code查询物料是否被申请
+     * @param equipCode 物料code
+     * @return 物料是否被申请
+     * @author liuduo
+     * @date 2018-08-23 16:01:38
+     */
+    Boolean getEquipMent(String equipCode);
+
 }

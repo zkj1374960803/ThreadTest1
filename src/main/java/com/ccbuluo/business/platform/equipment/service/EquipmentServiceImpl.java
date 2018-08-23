@@ -4,6 +4,7 @@ import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.ProductUnitEnum;
 import com.ccbuluo.business.entity.BizServiceEquipment;
 import com.ccbuluo.business.entity.BizServiceProjectcode;
+import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
 import com.ccbuluo.business.platform.equipment.dto.DetailBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.equipment.dto.SaveBizServiceEquipmentDTO;
@@ -35,6 +36,8 @@ public class EquipmentServiceImpl implements EquipmentService{
     private GenerateProjectCodeService generateProjectCodeService;
     @Autowired
     private SupplierService supplierService;
+    @Autowired
+    private AllocateApplyService allocateApplyService;
 
     /**
      * 保存物料
@@ -159,9 +162,10 @@ public class EquipmentServiceImpl implements EquipmentService{
      */
     @Override
     public int delete(String equipCode) {
-        // 根据code查询物料是否已经被关联
+        // 根据code查询物料是否已经被供应商关联或者申请里有该物料
         Boolean aboolean = supplierService.getSupplier(equipCode);
-        if (aboolean) {
+        Boolean bboolean = allocateApplyService.getEquipMent(equipCode);
+        if (aboolean || bboolean) {
             return Constants.FAILURE_ONE;
         }
         // 删除物料
