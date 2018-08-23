@@ -177,4 +177,20 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
 
         return queryListBean(DetailBizServiceEquipmentDTO.class, sql, params);
     }
+
+    /**
+     * 根据物料code删除物料
+     * @param equipCode 物料code
+     * @return 删除是否成功
+     * @author liuduo
+     * @date 2018-08-23 11:22:11
+     */
+    public int delete(String equipCode) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("equipCode", equipCode);
+
+        String sql = "DELETE FROM biz_service_equipment WHERE equip_code = :equipCode ";
+
+        return updateForBean(sql, params);
+    }
 }

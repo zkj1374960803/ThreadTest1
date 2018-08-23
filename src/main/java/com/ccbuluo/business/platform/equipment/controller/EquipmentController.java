@@ -134,4 +134,25 @@ public class EquipmentController extends BaseController {
     public StatusDto<List<DetailBizServiceEquipmentDTO>> queryEqupmentByEquiptype(Long equiptypeId) {
         return StatusDto.buildDataSuccessStatusDto(equipmentService.queryEqupmentByEquiptype(equiptypeId));
     }
+
+    /**
+     * 根据code删除物料
+     * @param equipCode 物料code
+     * @return 是否删除成功
+     * @author liuduo
+     * @date 2018-08-23 11:10:57
+     */
+    @ApiOperation(value = "删除物料", notes = "【刘铎】")
+    @ApiImplicitParam(name = "equipCode", value = "物料code", paramType = "query", required = true)
+    @DeleteMapping("/delete")
+    public StatusDto delete(@RequestParam String equipCode) {
+        int delete = equipmentService.delete(equipCode);
+        if (delete == Constants.FAILURE_ONE) {
+            return StatusDto.buildFailure("该物料已被关联，无法删除！");
+        } else if (delete == Constants.DELETE_FLAG_NORMAL) {
+            return StatusDto.buildFailure("删除失败！");
+        }
+
+        return StatusDto.buildSuccessStatusDto("删除成功！");
+    }
 }

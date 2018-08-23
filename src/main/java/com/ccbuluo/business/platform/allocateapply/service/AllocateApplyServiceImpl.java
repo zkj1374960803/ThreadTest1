@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -371,9 +372,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         if(StringUtils.isBlank(findStockListDTO.getOrgNo())){
             orgCode = getOrgCodesByOrgType(findStockListDTO.getType());
         }
-        if(orgCode == null || orgCode.size() == 0){
-            return new Page<FindStockListDTO>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
-        }
         Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
         return page;
     }
@@ -387,6 +385,12 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public List<String> getOrgCodesByOrgType(String type) {
+        if(StringUtils.isBlank(type)){
+            return Collections.emptyList();
+        }
+        if(OrganizationTypeEnum.PLATFORM.name().equals(type)){
+            return List.of(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+        }
         QueryOrgDTO orgDTO = new QueryOrgDTO();
         orgDTO.setOrgType(type);
         orgDTO.setStatus(Constants.FREEZE_STATUS_YES);
@@ -413,6 +417,20 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     }
 
     /**
+     * 查询售后平台的信息
+     *
+     * @return StatusDto<BasicUserOrganization>
+     * @author zhangkangjian
+     * @date 2018-08-23 11:12:47
+     */
+    @Override
+    public List<BasicUserOrganization> queryTopPlatform() {
+        StatusDtoThriftBean<BasicUserOrganization> orgByCode = basicUserOrganizationService.findOrgByCode(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+        StatusDto<BasicUserOrganization> resolve = StatusDtoThriftUtils.resolve(orgByCode, BasicUserOrganization.class);
+        return List.of(resolve.getData());
+    }
+
+    /**
      * 修改申请单状态
      * @param applyNo 申请单号
      * @param status 申请单状态
@@ -432,8 +450,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      * @date 2018-08-11 12:56:39
      */
     @Override
-    public List<String> queryApplyNo(String applyNoStatus, String orgCode, String productType) {
-        return bizAllocateApplyDao.queryApplyNo(applyNoStatus, orgCode, productType);
+    public List<String> queryApplyNo(String applyNoStatus, String orgCode, String productType, Integer stockType) {
+        return bizAllocateApplyDao.queryApplyNo(applyNoStatus, orgCode, productType, stockType);
     }
 
     /**

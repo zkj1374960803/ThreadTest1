@@ -6,6 +6,7 @@ import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
+import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 
 import java.util.List;
 
@@ -81,7 +82,7 @@ public interface AllocateApplyService {
      * @author liuduo
      * @date 2018-08-11 12:56:39
      */
-    List<String> queryApplyNo(String applyNoStatus, String orgCode, String productType);
+    List<String> queryApplyNo(String applyNoStatus, String orgCode, String productType, Integer stockType);
     /**
      * 查询可调拨库存列表
      * @param orgDTO 查询条件
@@ -124,4 +125,11 @@ public interface AllocateApplyService {
      * @date 2018-08-22 14:37:40
      */
     List<StockBizStockDetailDTO> queryProblemStockList(String orgCode, String productType);
+    /**
+     * 查询售后平台的信息
+     * @return StatusDto<BasicUserOrganization>
+     * @author zhangkangjian
+     * @date 2018-08-23 11:12:47
+     */
+    List<BasicUserOrganization> queryTopPlatform();
 }

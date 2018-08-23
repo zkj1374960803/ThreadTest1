@@ -7,8 +7,10 @@ import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftBean;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
+import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import io.swagger.annotations.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -154,23 +156,17 @@ public class AllocateApplyController extends BaseController {
         return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.cancelApply(applyNo));
     }
 
+
     /**
-     * 问题件申请查询(创建问题件，查询问题件列表)
-     * @param orgCode 机构的code
-     * @return StatusDto<List<StockBizStockDetailDTO>>
+     * 查询售后平台的信息
+     * @return StatusDto<BasicUserOrganization>
      * @author zhangkangjian
-     * @date 2018-08-22 14:37:40
+     * @date 2018-08-23 11:12:47
      */
-    @ApiOperation(value = "问题件申请查询(创建问题件，查询问题件列表)",notes = "【张康健】")
-    @GetMapping("/queryproblemstocklist")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "orgCode", value = "所属机构的编号", required = true, paramType = "query"),
-        @ApiImplicitParam(name = "productType", value = "商品类型(注：FITTINGS零配件，EQUIPMENT物料)", required = false, paramType = "query")
-    })
-
-    public StatusDto<List<StockBizStockDetailDTO>> queryProblemStockList(String orgCode, String productType) {
-        return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.queryProblemStockList(orgCode, productType));
+    @ApiOperation(value = "查询平台的信息",notes = "【张康健】")
+    @GetMapping("/querytopplatform")
+    public StatusDto<List<BasicUserOrganization>> queryTopPlatform(){
+        return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.queryTopPlatform());
     }
-
 
 }

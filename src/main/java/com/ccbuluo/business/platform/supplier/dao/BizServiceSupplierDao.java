@@ -271,4 +271,20 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
             .append(" WHERE a.product_code = :productCode GROUP BY a.supplier_code ");
         return queryListBean(QuerySupplierInfoDTO.class, sql.toString(), map);
 }
+
+    /**
+     * 根据物料code查询是否已经关联
+     * @param equipCode 物料code
+     * @return 是否已经关联
+     * @author liuduo
+     * @date 2018-08-23 11:14:29
+     */
+    public Boolean getSupplier(String equipCode) {
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("equipCode", equipCode);
+
+        String sql = "SELECT COUNT(id) > 0 FROM rel_supplier_product WHERE product_code = :equipCode";
+
+        return findForObject(sql, map, Boolean.class);
+    }
 }

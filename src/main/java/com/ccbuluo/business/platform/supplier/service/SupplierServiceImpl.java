@@ -343,5 +343,17 @@ public class SupplierServiceImpl implements SupplierService{
         return list;
     }
 
+    /**
+     * 根据物料code查询是否已经关联
+     * @param equipCode 物料code
+     * @return 是否已经关联
+     * @author liuduo
+     * @date 2018-08-23 11:14:29
+     */
+    @Override
+    public Boolean getSupplier(String equipCode) {
+        return bizServiceSupplierDao.getSupplier(equipCode);
+    }
+
 
 }
