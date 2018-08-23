@@ -402,8 +402,19 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         if(StringUtils.isBlank(findStockListDTO.getOrgNo())){
             orgCode = getOrgCodesByOrgType(findStockListDTO.getType());
         }
-        Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
-        return page;
+        // 如果类型是null的，查询全部库存
+        if(StringUtils.isBlank(findStockListDTO.getType())){
+            Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
+            return page;
+        }else {
+            if(orgCode == null || orgCode.size() == 0){
+                return new Page<>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
+            }else {
+                Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
+                return page;
+            }
+        }
+
     }
 
     /**
