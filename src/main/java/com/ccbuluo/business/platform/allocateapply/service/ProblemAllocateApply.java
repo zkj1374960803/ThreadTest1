@@ -38,7 +38,15 @@ public interface ProblemAllocateApply {
     Page<ProblemAllocateapplyDetailDTO> queryProblemHandleList(String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize);
 
     /**
-     * 查询退换货申请单详情
+     * 查询退换货申请单详情(申请)
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-20 20:02:58
+     */
+    FindAllocateApplyDTO getProblemdetailApplyDetail(String applyNo);
+    /**
+     * 查询退换货申请单详情（处理）
      * @param applyNo 申请单号
      * @return StatusDto
      * @author weijb

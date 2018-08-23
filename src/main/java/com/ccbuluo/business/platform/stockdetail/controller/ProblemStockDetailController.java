@@ -1,6 +1,8 @@
 package com.ccbuluo.business.platform.stockdetail.controller;
 
+import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleContext;
+import com.ccbuluo.business.platform.stockdetail.dto.ProblemStockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.service.ProblemStockDetailService;
 import com.ccbuluo.core.controller.BaseController;
@@ -14,10 +16,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -144,15 +143,16 @@ public class ProblemStockDetailController extends BaseController {
         return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.getSelfProdectStockBizStockDetailByCode(productNo, offset, pageSize));
     }
     /**
-     * 缓存列表
+     * 查询问题库存详情
+     * @param id 库存批次id
+     * @return StatusDto
      * @author weijb
-     * @date 2018-07-11 15:52:33
+     * @date 2018-08-23 16:02:58
      */
-    @ApiOperation(value = "测试申请单处理",notes = "【魏俊标】")
-    @ApiImplicitParam(name = "applyNo", value = "申请单编号",  required = true, paramType = "query")
-    @GetMapping("/applyhandle")
-    public StatusDto redisList(@RequestParam String applyNo) {
-        applyHandleContext.applyHandle(applyNo);
-        return StatusDto.buildSuccessStatusDto();
+    @ApiOperation(value = "查询问题库存详情", notes = "【魏俊标】")
+    @GetMapping("/problemdetail/{id}")
+    @ApiImplicitParam(name = "id", value = "库存批次id", required = true, paramType = "path")
+    public StatusDto<ProblemStockBizStockDetailDTO> getProblemStockDetail(@PathVariable Long id){
+        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.getProblemStockDetail(id));
     }
 }

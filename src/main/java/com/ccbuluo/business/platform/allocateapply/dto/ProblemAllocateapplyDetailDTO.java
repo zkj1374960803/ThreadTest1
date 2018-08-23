@@ -63,6 +63,17 @@ public class ProblemAllocateapplyDetailDTO {
     @ApiModelProperty(name = "transportorderNo", value = "物流单号", hidden = true)
     private String transportorderNo;
 
+    /**
+     * 出库数量
+     */
+    @ApiModelProperty(name = "outstockNum", value = "出库数量", hidden = true)
+    private Long outstockNum;
+    /**
+     * 入库数量
+     */
+    @ApiModelProperty(name = "instockNum", value = "入库数量", hidden = true)
+    private Long instockNum;
+
     public Long getId() {
         return id;
     }
@@ -133,5 +144,21 @@ public class ProblemAllocateapplyDetailDTO {
 
     public void setTransportorderNo(String transportorderNo) {
         this.transportorderNo = transportorderNo;
+    }
+
+    public Long getOutstockNum() {
+        return outstockNum;
+    }
+
+    public void setOutstockNum(Long outstockNum) {
+        this.outstockNum = outstockNum;
+    }
+
+    public Long getInstockNum() {
+        return instockNum;
+    }
+
+    public void setInstockNum(Long instockNum) {
+        this.instockNum = instockNum;
     }
 }

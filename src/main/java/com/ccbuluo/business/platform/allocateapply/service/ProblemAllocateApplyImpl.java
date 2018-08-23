@@ -64,7 +64,30 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
     }
 
     /**
-     * 查询退换货申请单详情
+     * 查询退换货申请单详情(申请)
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-20 20:02:58
+     */
+    @Override
+    public FindAllocateApplyDTO getProblemdetailApplyDetail(String applyNo){
+        FindAllocateApplyDTO allocateApplyDTO = allocateApplyServiceImpl.findDetail(applyNo);
+        // 获取出库人和出库时间
+        ProblemAllocateapplyDetailDTO info = problemAllocateApplyDao.getProblemdetailApplyDetail(applyNo, allocateApplyDTO.getApplyorgNo());
+        if(null != info){
+            String outOperatorName = getUserNameByUuid(info.getOutstockOperator());
+            String inOperatorName = getUserNameByUuid(info.getInstockOperator());
+            allocateApplyDTO.setOutstockOperatorName(outOperatorName);// 出库人
+            allocateApplyDTO.setOutstockTime(info.getOutstockTime());// 出库时间
+            allocateApplyDTO.setInstockOperatorName(inOperatorName); // 入库人
+            allocateApplyDTO.setInstockTime(info.getInstockTime());// 入库时间
+            allocateApplyDTO.setTransportorderNo(info.getTransportorderNo());// 物流单号
+        }
+        return allocateApplyDTO;
+    }
+    /**
+     * 查询退换货申请单详情（处理）
      * @param applyNo 申请单号
      * @return StatusDto
      * @author weijb

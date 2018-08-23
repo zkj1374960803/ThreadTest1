@@ -86,10 +86,25 @@ public class ProblemAllocateApplyController extends BaseController {
      * @author weijb
      * @date 2018-08-20 20:02:58
      */
-    @ApiOperation(value = "查询退换货申请单详情", notes = "【魏俊标】")
+    @ApiOperation(value = "查询退换货申请单详情（申请）", notes = "【魏俊标】")
+    @GetMapping("/problemApplydetail/{applyNo}")
+    @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
+    public StatusDto<FindAllocateApplyDTO> getProblemdetailApplyDetail(@PathVariable String applyNo){
+        return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.getProblemdetailApplyDetail(applyNo));
+    }
+
+    /**
+     * 查询退换货处理申请单详情（处理）
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-20 20:02:58
+     */
+    @ApiOperation(value = "查询退换货处理申请单详情（处理）", notes = "【魏俊标】")
     @GetMapping("/problemdetail/{applyNo}")
     @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
     public StatusDto<FindAllocateApplyDTO> getProblemdetailDetail(@PathVariable String applyNo){
         return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.getProblemdetailDetail(applyNo));
     }
+
 }

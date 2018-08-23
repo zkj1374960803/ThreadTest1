@@ -116,22 +116,42 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     }
 
     /**
-     * 获取申请机构出入库时间
+     * 获取申请机构出入库时间(申请)
      * @param applyNo 申请单号
-     * @param applyorgNo 申请机构
+     * @param orgCode 申请机构
      * @author weijb
      * @date 2018-08-15 18:51:51
      */
-    public ProblemAllocateapplyDetailDTO queryProblemApplyInfo(String applyNo, String applyorgNo){
+    public ProblemAllocateapplyDetailDTO getProblemdetailApplyDetail(String applyNo, String orgCode){
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
-        param.put("applyorgNo", applyorgNo);
+        param.put("orgCode", orgCode);
         StringBuilder sql = new StringBuilder();
 
         sql.append("SELECT t1.id,t1.apply_no,t1.apply_type,t1.apply_status ,t2.checked_time as outstock_time,t3.checked_time as instock_time,t2.outstock_operator,t3.instock_operator,t2.transportorder_no")
                 .append(" FROM biz_allocate_apply t1 LEFT JOIN biz_outstock_order t2 on t1.apply_no=t2.trade_docno ")
                 .append(" LEFT JOIN biz_instock_order t3 on t1.apply_no=t3.trade_docno ")
-                .append(" WHERE t1.delete_flag = :deleteFlag and t1.applyorg_no = :applyorgNo");
+                .append(" WHERE t1.delete_flag = :deleteFlag and t1.applyorg_no = :orgCode and t2.outstock_orgno= :orgCode and t3.instock_orgno = :orgCode ");
+        return findForBean(ProblemAllocateapplyDetailDTO.class, sql.toString(), param);
+    }
+
+    /**
+     * 获取申请机构出入库时间（处理）
+     * @param applyNo 申请单号
+     * @param orgCode 申请机构
+     * @author weijb
+     * @date 2018-08-15 18:51:51
+     */
+    public ProblemAllocateapplyDetailDTO queryProblemApplyInfo(String applyNo, String orgCode){
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        param.put("orgCode", orgCode);
+        StringBuilder sql = new StringBuilder();
+
+        sql.append("SELECT t1.id,t1.apply_no,t1.apply_type,t1.apply_status ,t2.checked_time as outstock_time,t3.checked_time as instock_time,t2.outstock_operator,t3.instock_operator,t2.transportorder_no")
+                .append(" FROM biz_allocate_apply t1 LEFT JOIN biz_outstock_order t2 on t1.apply_no=t2.trade_docno ")
+                .append(" LEFT JOIN biz_instock_order t3 on t1.apply_no=t3.trade_docno ")
+                .append(" WHERE t1.delete_flag = :deleteFlag and t1.process_orgno = :orgCode  and t2.outstock_orgno= :orgCode and t3.instock_orgno = :orgCode ");
         return findForBean(ProblemAllocateapplyDetailDTO.class, sql.toString(), param);
     }
 
