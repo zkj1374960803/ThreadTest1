@@ -189,7 +189,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             if(null != bd.getSellPrice()){
                 sellPrice = bd.getSellPrice();
             }
-            bigDecimal.add(sellPrice);
+            bigDecimal = bigDecimal.add(sellPrice);
         }
         return bigDecimal;
     }

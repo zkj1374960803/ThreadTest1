@@ -181,7 +181,10 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
             // 1、保存出库单
             // 根据申请单号查询基本信息
             FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
-            if (!(detail.getApplyStatus().equals(ApplyStatusEnum.WAITDELIVERY.name()) && detail.getApplyStatus().equals(ApplyStatusEnum.OUTSTORE.name()))) {
+            if (!(detail.getApplyStatus().equals(ApplyStatusEnum.WAITDELIVERY.name())
+                || detail.getApplyStatus().equals(ApplyStatusEnum.OUTSTORE.name())
+                || detail.getApplyStatus().equals(BizAllocateApply.ReturnApplyStatusEnum.PRODRETURNED.name())
+                || detail.getApplyStatus().equals(BizAllocateApply.ReturnApplyStatusEnum.PLATFORMOUTBOUND.name()))) {
                 throw new CommonException("2004", "该申请单已经出库，请核对！");
             }
             // 查询出库计划
