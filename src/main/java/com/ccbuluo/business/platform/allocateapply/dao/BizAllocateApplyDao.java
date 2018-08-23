@@ -370,7 +370,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @date 2018-08-13 19:47:32
      */
     public Page<QueryOrgDTO> findStockNum(List<String> orgCode, Integer offset, Integer pageSize) {
-        String sql = "SELECT a.org_no,SUM(a.valid_stock) FROM biz_stock_detail a WHERE a.org_no IN (:org_no) GROUP BY a.org_no";
+        String sql = "SELECT a.org_no as 'orgCode',SUM(a.valid_stock) as 'stockNum' FROM biz_stock_detail a WHERE a.org_no IN (:orgCode) GROUP BY a.org_no";
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("orgCode", orgCode);
         return queryPageForBean(QueryOrgDTO.class, sql, map, offset, pageSize);

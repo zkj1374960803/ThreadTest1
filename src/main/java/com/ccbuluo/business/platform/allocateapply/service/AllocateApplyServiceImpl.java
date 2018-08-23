@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import javax.annotation.Resource;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Date;
@@ -465,6 +466,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     public Page<QueryOrgDTO> queryTransferStock(QueryOrgDTO orgDTO, Integer offset, Integer pageSize) {
         // todo 张康健将组织机构作为入参
         orgDTO.setOrgType(OrganizationTypeEnum.SERVICECENTER.name());
+        List<String> name = List.of(OrganizationTypeEnum.PLATFORM.name(), OrganizationTypeEnum.SERVICECENTER.name(), OrganizationTypeEnum.CUSTMANAGER.name());
         orgDTO.setStatus(Constants.FREEZE_STATUS_YES);
         StatusDtoThriftList<QueryOrgDTO> queryOrgDTOList = basicUserOrganizationService.queryOrgAndWorkInfo(orgDTO);
         StatusDto<List<QueryOrgDTO>> resolve = StatusDtoThriftUtils.resolve(queryOrgDTOList, QueryOrgDTO.class);
@@ -476,11 +478,14 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         List<QueryOrgDTO> rows = findStockListDTO.getRows();
         rows.stream().forEach(a -> {
             QueryOrgDTO org = queryOrgDTOMap.get(a.getOrgCode());
-            a.setAddress(org.getAddress());
-            a.setProvince(org.getProvince());
-            a.setOrgCode(org.getOrgCode());
-            a.setOrgName(org.getOrgName());
-            a.setCity(org.getCity());
+            if(org != null){
+                a.setAddress(org.getAddress());
+                a.setProvince(org.getProvince());
+                a.setOrgCode(org.getOrgCode());
+                a.setOrgName(org.getOrgName());
+                a.setCity(org.getCity());
+            }
+
         });
         return findStockListDTO;
     }
