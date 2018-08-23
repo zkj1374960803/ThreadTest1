@@ -59,6 +59,35 @@ public class StockBizStockDetailDTO extends IdEntity {
     @ApiModelProperty(name = "outstockTime", value = "出库时间", hidden = true)
     private Date outstockTime;
 
+    /**
+     * 供应商code
+     */
+    @ApiModelProperty(name = "supplierNo", value = "供应商code", hidden = true)
+    private String supplierNo;
+
+    /**
+     * 供应商name
+     */
+    @ApiModelProperty(name = "supplierName", value = "供应商name", hidden = true)
+    private String supplierName;
+
+
+    public String getSupplierNo() {
+        return supplierNo;
+    }
+
+    public void setSupplierNo(String supplierNo) {
+        this.supplierNo = supplierNo;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
     public String getProductCategoryname() {
         return productCategoryname;
     }
