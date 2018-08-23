@@ -129,6 +129,23 @@ public class FindAllocateApplyDTO {
     @ApiModelProperty(name = "outstockTime", value = "出库时间")
     private Date outstockTime;
 
+    /**
+     * 入库时间
+     */
+    @ApiModelProperty(name = "instockTime", value = "入库时间", hidden = true)
+    private Date instockTime;
+
+    /**
+     * 入库人
+     */
+    @ApiModelProperty(name = "instockOperator", value = "入库人", hidden = true)
+    private String instockOperatorName;
+
+    /**
+     * 物流单号
+     */
+    @ApiModelProperty(name = "transportorderNo", value = "物流单号", hidden = true)
+    private String transportorderNo;
 
 
     public String getOrgType() {
@@ -300,5 +317,29 @@ public class FindAllocateApplyDTO {
 
     public void setOutstockTime(Date outstockTime) {
         this.outstockTime = outstockTime;
+    }
+
+    public Date getInstockTime() {
+        return instockTime;
+    }
+
+    public void setInstockTime(Date instockTime) {
+        this.instockTime = instockTime;
+    }
+
+    public String getInstockOperatorName() {
+        return instockOperatorName;
+    }
+
+    public void setInstockOperatorName(String instockOperatorName) {
+        this.instockOperatorName = instockOperatorName;
+    }
+
+    public String getTransportorderNo() {
+        return transportorderNo;
+    }
+
+    public void setTransportorderNo(String transportorderNo) {
+        this.transportorderNo = transportorderNo;
     }
 }
