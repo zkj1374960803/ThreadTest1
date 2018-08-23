@@ -19,7 +19,7 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("/servicecenter/allocateapply")
-@Api(tags = "服务中心申请管理")
+@Api(tags = "申请管理（服务中心）")
 public class ServiceAllocateApplyController extends BaseController {
     @Resource(name = "allocateApplyServiceImpl")
     private AllocateApplyService allocateApplyServiceImpl;
