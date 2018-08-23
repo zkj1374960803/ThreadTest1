@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
 import com.ccbuluo.business.constants.*;
+import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.entity.BizAllocateApply.AllocateApplyTypeEnum;
 import com.ccbuluo.business.entity.BizAllocateApply.ApplyStatusEnum;
 import com.ccbuluo.business.entity.BizStockDetail;
@@ -32,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import javax.annotation.Resource;
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Date;
@@ -308,7 +308,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     public void processApply(ProcessApplyDTO processApplyDTO) {
         String processType = processApplyDTO.getProcessType();
         // 如果是调拨类型的
-        if(InstockTypeEnum.TRANSFER.name().equals(processType)){
+        if(BizAllocateApply.ProcessTypeEnum.TRANSFER.name().equals(processType)){
             String applyNo = processApplyDTO.getApplyNo();
             FindAllocateApplyDTO detail = findDetail(applyNo);
             String processOrgno = detail.getProcessOrgno();
@@ -458,23 +458,25 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     /**
      * 查询可调拨库存列表
      * @param orgDTO 查询条件
+     * @param productNo
      * @return StatusDtoThriftPage<QueryOrgDTO>
      * @author zhangkangjian
      * @date 2018-08-13 17:19:54
      */
     @Override
-    public Page<QueryOrgDTO> queryTransferStock(QueryOrgDTO orgDTO, Integer offset, Integer pageSize) {
+    public Page<QueryOrgDTO> queryTransferStock(QueryOrgDTO orgDTO, String productNo, Integer offset, Integer pageSize) {
         // todo 张康健将组织机构作为入参
-        orgDTO.setOrgType(OrganizationTypeEnum.SERVICECENTER.name());
         List<String> name = List.of(OrganizationTypeEnum.PLATFORM.name(), OrganizationTypeEnum.SERVICECENTER.name(), OrganizationTypeEnum.CUSTMANAGER.name());
         orgDTO.setStatus(Constants.FREEZE_STATUS_YES);
+        orgDTO.setOrgTypeList(name);
         StatusDtoThriftList<QueryOrgDTO> queryOrgDTOList = basicUserOrganizationService.queryOrgAndWorkInfo(orgDTO);
         StatusDto<List<QueryOrgDTO>> resolve = StatusDtoThriftUtils.resolve(queryOrgDTOList, QueryOrgDTO.class);
         List<QueryOrgDTO> queryOrgList = resolve.getData();
         Map<String, QueryOrgDTO> queryOrgDTOMap = queryOrgList.stream().collect(Collectors.toMap(QueryOrgDTO::getOrgCode, a -> a,(k1,k2)->k1));
         List<String> orgCodes = queryOrgList.stream().map(QueryOrgDTO::getOrgCode).collect(Collectors.toList());
+        orgCodes.add(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
         // 查询库存数量
-        Page<QueryOrgDTO> findStockListDTO = bizAllocateApplyDao.findStockNum(orgCodes, offset, pageSize);
+        Page<QueryOrgDTO> findStockListDTO = bizAllocateApplyDao.findStockNum(productNo, orgCodes , offset, pageSize);
         List<QueryOrgDTO> rows = findStockListDTO.getRows();
         rows.stream().forEach(a -> {
             QueryOrgDTO org = queryOrgDTOMap.get(a.getOrgCode());

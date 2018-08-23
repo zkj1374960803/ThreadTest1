@@ -153,8 +153,8 @@ public class StockManagementController extends BaseController {
      */
     @ApiOperation(value = "可调拨库存", notes = "【张康健】")
     @GetMapping("/querytransferstock")
-    public StatusDto<Page<QueryOrgDTO>> queryTransferStock(QueryOrgDTO queryOrgDTO, Integer offset, Integer pageSize){
-        Page<QueryOrgDTO> queryOrgDTOPage = allocateApplyServiceImpl.queryTransferStock(queryOrgDTO, offset, pageSize);
+    public StatusDto<Page<QueryOrgDTO>> queryTransferStock(QueryOrgDTO queryOrgDTO,String productNo, Integer offset, Integer pageSize){
+        Page<QueryOrgDTO> queryOrgDTOPage = allocateApplyServiceImpl.queryTransferStock(queryOrgDTO, productNo, offset, pageSize);
         return StatusDto.buildDataSuccessStatusDto(queryOrgDTOPage);
     }
 

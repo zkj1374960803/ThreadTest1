@@ -86,11 +86,12 @@ public interface AllocateApplyService {
     /**
      * 查询可调拨库存列表
      * @param orgDTO 查询条件
+     * @param productNo
      * @return StatusDtoThriftPage<QueryOrgDTO>
      * @author zhangkangjian
      * @date 2018-08-13 17:19:54
      */
-    Page<QueryOrgDTO> queryTransferStock(QueryOrgDTO orgDTO,Integer offset,Integer pageSize);
+    Page<QueryOrgDTO> queryTransferStock(QueryOrgDTO orgDTO, String productNo, Integer offset, Integer pageSize);
     /**
      *  
      * @param 
