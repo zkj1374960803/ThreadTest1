@@ -232,9 +232,11 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
         if(null != details && details.size() > 0){
             ad = details.get(0);
         }
+        // 根据商品分组
         Map<String, List<BizOutstockplanDetail>> collect = outList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getProductNo));
         for (Map.Entry<String, List<BizOutstockplanDetail>> entry : collect.entrySet()) {
             List<BizOutstockplanDetail> value = entry.getValue();
+            // 根据供应商分组
             Map<String, List<BizOutstockplanDetail>> collect1 = value.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getSupplierNo));
             for (Map.Entry<String, List<BizOutstockplanDetail>> outPlan : collect1.entrySet()) {
                 List<BizOutstockplanDetail> value1 = outPlan.getValue();
