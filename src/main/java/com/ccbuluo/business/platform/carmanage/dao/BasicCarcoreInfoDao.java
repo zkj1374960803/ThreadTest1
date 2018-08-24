@@ -184,7 +184,7 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,car_number,vin_number,engine_number,beidou_number,")
                 .append("carbrand_id,carseries_id,carmodel_id,produce_time,remark,car_status, creator,")
-                .append("create_time,operator,operate_time,delete_flag,store_name,cusmanager_name FROM basic_carcore_info")
+                .append("create_time,operator,operate_time,delete_flag,store_name,cusmanager_name,store_assigned FROM basic_carcore_info")
                 .append(" WHERE id= :id");
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
