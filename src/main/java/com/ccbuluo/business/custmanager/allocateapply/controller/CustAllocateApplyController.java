@@ -35,7 +35,7 @@ public class CustAllocateApplyController extends BaseController {
      * @author zhangkangjian
      * @date 2018-08-07 20:54:24
      */
-    @ApiOperation(value = "创建物料或者零配件申请", notes = "【张康健】")
+    @ApiOperation(value = "创建物料申请（退换货）", notes = "【张康健】")
     @PostMapping("/create")
     public StatusDto<String> createAllocateApply(@ApiParam(name = "bizAllocateApply", value = "创建申请json", required = true) @RequestBody AllocateApplyDTO allocateApplyDTO){
         allocateApplyServiceImpl.createAllocateApply(allocateApplyDTO);
