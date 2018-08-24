@@ -276,7 +276,7 @@ public class StockAdjustServiceImpl implements StockAdjustService{
             List<String> orgCodes = rows.stream().map(SearchStockAdjustListDTO::getAdjustOrgno).distinct().collect(Collectors.toList());
             List<String> uuids = rows.stream().map(SearchStockAdjustListDTO::getAdjustUserid).distinct().collect(Collectors.toList());
             if (orgCodes.size() == 0 || uuids.size() == 0) {
-                return null;
+                return new Page<>();
             }
             // 获取组织机构或者客户经理名字
             Map<String, BasicUserOrganization> stringBasicUserOrganizationMap = orgService.queryOrganizationByOrgCodes(orgCodes);
