@@ -76,9 +76,6 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
             if(null == details || details.size() == 0){
                 return StatusDto.buildFailureStatusDto("申请单为空！");
             }
-            // 构建生成订单(调拨)
-            List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyType);
-            // 构建占用库存和订单占用库存关系
             //获取卖方机构code
             String sellerOrgNo = getProductOrgNo(ba);
             //查询库存列表
@@ -91,10 +88,12 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
             List<BizStockDetail> stockDetailList = pair.getLeft();
             // 构建订单占用库存关系
             List<RelOrdstockOccupy> relOrdstockOccupies = pair.getRight();
-            // 保存生成订单
-            bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
             Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, BizAllocateApply.AllocateApplyTypeEnum.PLATFORMALLOCATE, relOrdstockOccupies);
+            // 构建生成订单(调拨)
+            List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyType,pir.getLeft(),sellerOrgNo);
+            // 保存生成订单
+            bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
             // 保存占用库存
             int flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
             if(flag == 0){// 更新失败
@@ -112,6 +111,7 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
         }
         return StatusDto.buildSuccessStatusDto("申请处理成功！");
     }
+
     /**
      * 获取成本价
      * @param stockDetails

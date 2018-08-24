@@ -85,10 +85,11 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
      * 构建订单list用于批量保存
      * @param details 申请单详情
      * @param applyType 申请类型
+     * @param sellerOrgNo 卖方机构
      * @author weijb
      * @date 2018-08-11 13:35:41
      */
-    public List<BizAllocateTradeorder> buildOrderEntityList(List<AllocateapplyDetailBO> details, String applyType){
+    public List<BizAllocateTradeorder> buildOrderEntityList(List<AllocateapplyDetailBO> details, String applyType,List<BizOutstockplanDetail> outStocks,String sellerOrgNo){
         // 构建生成订单（机构1对平台）
         BizAllocateTradeorder purchaserToPlatform = buildOrderEntity(details);// 买方到平台
         BizAllocateTradeorder platformToSeller = buildOrderEntity(details);// 平台到卖方
@@ -96,17 +97,21 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         purchaserToPlatform.setSellerOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 从买方到平台"平台code"
         platformToSeller.setPurchaserOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 从平台到卖方"平台code"
         // 特殊情况处理
+        // 计算订单总价
+        BigDecimal total = getSellTotal(details);
         // 采购平台直发(从买方到平台)
         if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType)){
             // 采购的时候卖方为供应商（供应商不填为空）
             platformToSeller.setSellerOrgno("");
             platformToSeller = null;
             purchaserToSeller = null;
+            purchaserToPlatform.setTotalPrice(total);
         }
         // 平台直发(从买方到平台)
         if(AllocateApplyTypeEnum.DIRECTALLOCATE.toString().equals(applyType)){
             platformToSeller = null;
             purchaserToSeller = null;
+            purchaserToPlatform.setTotalPrice(total);
         }
         // 商品换货（不生成订单）
         if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType)){
@@ -118,15 +123,20 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         if(AllocateApplyTypeEnum.REFUND.toString().equals(applyType)){
             platformToSeller = null;
             purchaserToSeller = null;
+            purchaserToPlatform.setTotalPrice(total);
         }
         // 平台调拨（从买方到平台到卖方）
         if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType)){
             purchaserToSeller = null;
+            platformToSeller.setTotalPrice(total);
+            purchaserToPlatform.setTotalPrice(total);
         }
         // 平级调拨(从买方到卖方)
         if(AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType)){
             purchaserToPlatform = null;
             platformToSeller = null;
+            BigDecimal costTotal = getCostTatol(outStocks,sellerOrgNo);
+            purchaserToSeller.setTotalPrice(costTotal);
         }
 
 
@@ -172,10 +182,29 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             bt.setTradeType(bd.getApplyType());//交易类型
             break;
         }
-        // 计算订单总价
-        BigDecimal total = getTatal(details);
-        bt.setTotalPrice(total);
         return bt;
+    }
+
+    /**
+     *  计算订单总价(卖方成本价)
+     * @param outStocks 卖方出库计划
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    private BigDecimal getCostTatol(List<BizOutstockplanDetail> outStocks,String sellerOrgNo){
+        BigDecimal bigDecimal = BigDecimal.ZERO;
+        BigDecimal costPrice = BigDecimal.ZERO;
+        for(BizOutstockplanDetail outStock : outStocks){
+            // 卖方机构
+            if(sellerOrgNo.equals(outStock.getOutOrgno())){
+                // 占用商品的数量(卖方计划出库数量)
+                BigDecimal occupyNum = BigDecimal.valueOf(outStock.getPlanOutstocknum());
+                // 成本价格
+                costPrice = outStock.getCostPrice();
+                bigDecimal = bigDecimal.add(occupyNum.multiply(costPrice));
+            }
+        }
+        return bigDecimal;
     }
 
     /**
@@ -184,7 +213,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
      * @author weijb
      * @date 2018-08-11 13:35:41
      */
-    private BigDecimal getTatal(List<AllocateapplyDetailBO> details){
+    private BigDecimal getSellTotal(List<AllocateapplyDetailBO> details){
         BigDecimal bigDecimal = BigDecimal.ZERO;
         BigDecimal sellPrice = BigDecimal.ZERO;
         BigDecimal appNum = BigDecimal.ZERO;
@@ -778,11 +807,14 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
      * @date 2018-08-20 17:12:43
      */
     private List<BizOutstockplanDetail> buildPlatformOutstockplan(BizAllocateApply ba, List<AllocateapplyDetailBO> details, List<BizStockDetail> stockDetails){
-        Map<String, BizStockDetail> collect = stockDetails.stream().collect(Collectors.toMap(BizStockDetail::getProductNo, Function.identity()));
         List<BizOutstockplanDetail> outstockplanDetails = new ArrayList<BizOutstockplanDetail>();
         List<BizInstockplanDetail> instockplanDetails = bizInstockplanDetailDao.getInstockplanDetailByApplyNo(ba.getApplyNo());
+        BizStockDetail bizStockDetail = new BizStockDetail();
         for(BizInstockplanDetail in : instockplanDetails){
-            BizStockDetail bizStockDetail = collect.get(in.getProductNo());
+            Optional<BizStockDetail> stockFilter = stockDetails.stream() .filter(stockDetail -> in.getId().equals(stockDetail.getInstockPlanid())) .findFirst();
+            if (stockFilter.isPresent()) {
+                bizStockDetail = stockFilter.get();
+            }
             BizOutstockplanDetail outstockplanPlatform = new BizOutstockplanDetail();
             outstockplanPlatform = buildBizOutstockplanDetail(in, ba.getApplyType(), details);
             outstockplanPlatform.setOutRepositoryNo(bizStockDetail.getRepositoryNo());// 平台仓库编号

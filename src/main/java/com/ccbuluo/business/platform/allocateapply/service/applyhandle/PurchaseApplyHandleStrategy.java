@@ -65,7 +65,7 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
                 throw new CommonException("0", "申请单为空！");
             }
             // 构建生成订单（采购）
-            List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyType);
+            List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyType,null,null);
 
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
             Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, null, BizAllocateApply.AllocateApplyTypeEnum.PURCHASE, null);

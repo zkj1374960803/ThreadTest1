@@ -61,7 +61,7 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
                 throw new CommonException("0", "申请单为空！");
             }
             // 构建生成订单(调拨)
-            List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyNo);
+            List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyNo,null,null);
             //获取申请方机构code
             String applyorgNo = getProductOrgNo(ba);
             //查询库存列表
