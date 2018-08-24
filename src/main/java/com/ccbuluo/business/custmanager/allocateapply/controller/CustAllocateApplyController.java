@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zhangkangjian
@@ -188,6 +190,22 @@ public class CustAllocateApplyController extends BaseController {
 
     public StatusDto<List<StockBizStockDetailDTO>> queryProblemStockList(String orgCode, String productType) {
         return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.queryProblemStockList(orgCode, productType));
+    }
+    
+    
+    /**
+     * 查询客户经理关联的服务中心
+     * @param useruuid
+     * @return StatusDto<Map<String,String>>
+     * @author zhangkangjian
+     * @date 2018-08-24 17:37:13
+     */
+    @GetMapping("/findcustmanagerservicecenter")
+    @ApiOperation(value = "查询客户经理关联的服务中心", notes = "【张康健】")
+    @ApiImplicitParam(name = "useruuid", value = "用户uuid", required = false, paramType = "query")
+    public StatusDto<Map<String,String>> findCustManagerServiceCenter(String useruuid) throws IOException {
+        Map<String,String> map = allocateApplyServiceImpl.findCustManagerServiceCenter(useruuid);
+        return StatusDto.buildDataSuccessStatusDto(map);
     }
 
 

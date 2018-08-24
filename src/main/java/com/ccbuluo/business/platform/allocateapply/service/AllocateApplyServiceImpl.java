@@ -11,6 +11,10 @@ import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleContext;
+import com.ccbuluo.business.platform.custmanager.dao.BizServiceCustmanagerDao;
+import com.ccbuluo.business.platform.custmanager.dto.CustManagerDetailDTO;
+import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
+import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
@@ -31,14 +35,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.weakref.jmx.internal.guava.collect.Maps;
 
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -66,6 +69,11 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     private ApplyHandleContext applyHandleContext;
     @Autowired
     private BizAllocateapplyDetailDao bizAllocateapplyDetailDao;
+    @Resource
+    BizServiceCustmanagerDao bizServiceCustmanagerDao;
+    @Resource(name = "custmanagerServiceImpl")
+    CustmanagerService custmanagerServiceImpl;
+
 
     /**
      * 创建物料或者零配件申请
@@ -512,6 +520,36 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     @Override
     public Boolean getEquipMent(String equipCode) {
         return bizAllocateapplyDetailDao.getEquipMent(equipCode);
+    }
+//    @Resource
+//    BizServiceCustmanagerDao bizServiceCustmanagerDao;
+    /**
+     * 查询客户经理关联的服务中心
+     *
+     * @param useruuid
+     * @return StatusDto<Map < String , String>>
+     * @author zhangkangjian
+     * @date 2018-08-24 17:37:13
+     */
+    @Override
+    public Map<String, String> findCustManagerServiceCenter(String useruuid) throws IOException {
+        if(StringUtils.isBlank(useruuid)){
+            String loggedUserId = userHolder.getLoggedUserId();
+            useruuid = loggedUserId;
+        }
+        HashMap<String, String> map = Maps.newHashMap();
+        // 查询客户经理的详情
+        BizServiceCustmanager bizServiceCustmanager = bizServiceCustmanagerDao.queryCustManagerByUuid(useruuid);
+        String servicecenterCode = bizServiceCustmanager.getServicecenterCode();
+        StatusDtoThriftBean<BasicUserOrganization> orgByCode = basicUserOrganizationService.findOrgByCode(servicecenterCode);
+        StatusDto<BasicUserOrganization> resolve = StatusDtoThriftUtils.resolve(orgByCode, BasicUserOrganization.class);
+        BasicUserOrganization data = resolve.getData();
+        if(data != null){
+            String orgName = data.getOrgName();
+            String orgCode = data.getOrgCode();
+            map.put(orgCode, orgName);
+        }
+        return map;
     }
 
     /**
