@@ -220,45 +220,6 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
         }
     }
 
-    public static void main(String[] args) {
-        List<BizOutstockplanDetail> outList = new ArrayList<BizOutstockplanDetail>();
-        BizOutstockplanDetail outl1 = new BizOutstockplanDetail();
-        outl1.setProductNo("FA0014");
-        outl1.setProductName("手套");
-        outl1.setSupplierNo("FG000077");
-        outList.add(outl1);
-        BizOutstockplanDetail outl2 = new BizOutstockplanDetail();
-        outl2.setProductNo("FA0019");
-        outl2.setProductName("螺丝刀");
-        outl2.setSupplierNo("FG000077");
-        outList.add(outl2);
-        BizOutstockplanDetail outl3 = new BizOutstockplanDetail();
-        outl3.setProductNo("FA0019");
-        outl3.setProductName("螺丝刀");
-        outl3.setSupplierNo("FG000077");
-        outList.add(outl3);
-        // 根据商品分组
-        Map<String, List<BizOutstockplanDetail>> collect = outList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getProductNo));
-        for (Map.Entry<String, List<BizOutstockplanDetail>> entryP : collect.entrySet()) {
-            List<BizOutstockplanDetail> valueP = entryP.getValue();
-            BizOutstockplanDetail outPlan = new BizOutstockplanDetail();
-            // 根据供应商分组
-            Map<String, List<BizOutstockplanDetail>> collect1 = valueP.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getSupplierNo));
-            for (Map.Entry<String, List<BizOutstockplanDetail>> entryS : collect1.entrySet()) {
-                List<BizOutstockplanDetail> valueS = entryS.getValue();
-                if(null != valueS && valueS.size() > 0){
-                    outPlan = valueS.get(0);
-                }
-                Long planOutstocknum = 0L;
-                for(BizOutstockplanDetail bd : valueS){
-                    // 计划出库数量
-                    planOutstocknum += bd.getPlanOutstocknum();
-                }
-                outPlan.setPlanOutstocknum(planOutstocknum);
-                valueP.add(outPlan);
-            }
-        }
-    }
     /**
      * 买方入库机构构建
      * @param
@@ -272,55 +233,56 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
         if(null != details && details.size() > 0){
             ad = details.get(0);
         }
-        // 根据商品分组
-        Map<String, List<BizOutstockplanDetail>> collect = outList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getProductNo));
-        for (Map.Entry<String, List<BizOutstockplanDetail>> entry : collect.entrySet()) {
-            List<BizOutstockplanDetail> value = entry.getValue();
-            // 根据供应商分组
-            Map<String, List<BizOutstockplanDetail>> collect1 = value.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getSupplierNo));
-            for (Map.Entry<String, List<BizOutstockplanDetail>> outPlan : collect1.entrySet()) {
-                List<BizOutstockplanDetail> value1 = outPlan.getValue();
-//                value1 // 分组之后的同一个商品
-            }
-        }
-        List<BizInstockplanDetail> list = new ArrayList<BizInstockplanDetail>();
-        for(BizOutstockplanDetail bd : outList){
-            // 有可能一个商品有多个供应商
-            if(distinstSupplier(list, bd, details)){
-                continue;
-            }
+        // 有可能一个商品有多个供应商（根据商品和供应商分组合并）
+        List<BizOutstockplanDetail> outPlanList = distinstSupplier(outList);
+        for(BizOutstockplanDetail bd : outPlanList){
             BizInstockplanDetail inPlan = buildBizInstockplanDetail(bd);
             if(null != ad){
-                inPlan.setInstockRepositoryNo(ad.getInRepositoryNo());// 入库仓库编号
-                inPlan.setInstockOrgno(ad.getInstockOrgno());// 买入机构编号
+                // 入库仓库编号
+                inPlan.setInstockRepositoryNo(ad.getInRepositoryNo());
+                // 买入机构编号
+                inPlan.setInstockOrgno(ad.getInstockOrgno());
             }
-            list.add(inPlan);
-            inList.addAll(list);
+            inList.add(inPlan);
         }
     }
+
     /**
-     *   过滤供应商
+     *   过滤供应商(有可能一个商品有多个供应商（根据商品和供应商分组合并）)
      * @param
      * @exception
      * @return
      * @author weijb
      * @date 2018-08-21 18:05:46
      */
-    private boolean distinstSupplier(List<BizInstockplanDetail> inList, BizOutstockplanDetail bd , List<AllocateapplyDetailBO> details){
-        boolean flag = false;
-        for(BizInstockplanDetail in : inList){
-            if(in.getSupplierNo().equals(bd.getSupplierNo())){
-                // 一个商品有多个供应商的情况
-                AllocateapplyDetailBO ab = getAllocateapplyDetailBO(details, in.getProductNo());
-                in.setCostPrice(ab.getSellPrice());
-                in.setPlanInstocknum(in.getPlanInstocknum() + bd.getPlanOutstocknum());
-                flag = true;
-                break;
-            }else{
-                inList.add(in);
+    private List<BizOutstockplanDetail> distinstSupplier(List<BizOutstockplanDetail> outList){
+        List<BizOutstockplanDetail> list = new ArrayList<BizOutstockplanDetail>();
+        Map<String, List<BizOutstockplanDetail>> collect = outList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getProductNo));
+        for (Map.Entry<String, List<BizOutstockplanDetail>> entryP : collect.entrySet()) {
+            List<BizOutstockplanDetail> valueP = entryP.getValue();
+            BizOutstockplanDetail outPlan = null;
+            // 根据供应商分组
+            Map<String, List<BizOutstockplanDetail>> collect1 = valueP.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getSupplierNo));
+            int i = 0;
+            for (Map.Entry<String, List<BizOutstockplanDetail>> entryS : collect1.entrySet()) {
+                List<BizOutstockplanDetail> valueS = entryS.getValue();
+                if(null != valueS && valueS.size() > 0){
+                    if(i == 0){
+                        outPlan = new BizOutstockplanDetail();
+                        outPlan = valueS.get(0);
+                        i++;
+                    }
+                }
+                Long planOutstocknum = 0L;
+                for(BizOutstockplanDetail bd : valueS){
+                    // 计划出库数量
+                    planOutstocknum += bd.getPlanOutstocknum();
+                }
+                outPlan.setPlanOutstocknum(planOutstocknum);
+                list.add(outPlan);
             }
         }
-        return flag;
+        return list;
     }
     /**
      * 根据商品编号获取申请单详情
