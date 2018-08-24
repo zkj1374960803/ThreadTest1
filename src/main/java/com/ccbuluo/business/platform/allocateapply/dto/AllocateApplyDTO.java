@@ -117,11 +117,26 @@ public class AllocateApplyDTO {
      */
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
+
+    /**
+     * 货物退回的地址
+     */
+    @ApiModelProperty(name = "refundAddress", value = "货物退回的地址")
+    private String refundAddress;
+
     /**
      * 申请商品详情列表
      */
     @ApiModelProperty(name = "allocateapplyDetailList", value = "申请商品详情列表")
     private List<AllocateapplyDetailDTO> allocateapplyDetailList;
+
+    public String getRefundAddress() {
+        return refundAddress;
+    }
+
+    public void setRefundAddress(String refundAddress) {
+        this.refundAddress = refundAddress;
+    }
 
     public List<AllocateapplyDetailDTO> getAllocateapplyDetailList() {
         return allocateapplyDetailList;
