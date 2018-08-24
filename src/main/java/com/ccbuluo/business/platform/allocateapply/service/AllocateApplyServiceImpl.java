@@ -268,8 +268,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         String userOrgCode = getUserOrgCode();
         // 查询分页的申请列表
         Page<QueryAllocateApplyListDTO> page = bizAllocateApplyDao.findApplyList(productType, processType, applyStatus, applyNo, offset, pageSize, userOrgCode);
-        List<QueryAllocateApplyListDTO> rows = page.getRows();
-
         return page;
     }
 
@@ -420,18 +418,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
             return page;
         }
-        // 如果类型是null的，查询全部库存
-
-
-
-
-
-
-
-
-
-
-
 
     }
 
