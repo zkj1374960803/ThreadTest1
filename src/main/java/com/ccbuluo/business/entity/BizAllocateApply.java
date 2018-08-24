@@ -85,7 +85,7 @@ public class BizAllocateApply {
     /**
      * 待处理、申请撤销、等待付款、等待发货、（平台待出入库只用在平台端）、等待收货、确认收货、申请完成
      */
-    @ApiModelProperty(name = "applyStatus", value = "10待处理、15申请撤销、20等待付款、30等待发货、40 50（平台待出入库只用在平台端）、60等待收货、70确认收货、80申请完成", hidden = true)
+    @ApiModelProperty(name = "applyStatus", value = "", hidden = true)
     private String applyStatus;
     /**
      * 创建人

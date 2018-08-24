@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.outstock.dao;
 
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.entity.BizOutstockOrder;
+import com.ccbuluo.business.entity.BizOutstockorderDetail;
 import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.dao.BaseDao;
@@ -117,7 +118,7 @@ public class BizOutstockOrderDao extends BaseDao<BizOutstockOrder> {
      * @author liuduo
      * @date 2018-08-15 20:15:50
      */
-    public List<Long> batchBizOutstockOrder(List<BizOutstockOrder> bizOutstockOrderList) {
+    public List<Long> batchBizOutstockOrder(List<BizOutstockorderDetail> bizOutstockOrderList) {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO biz_outstock_order ( outstockorder_no,out_repository_no,outstock_orgno,")
             .append("outstock_operator,trade_docno,outstock_type,outstock_time,")
