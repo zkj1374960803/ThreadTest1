@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -70,7 +71,20 @@ public class StockBizStockDetailDTO extends IdEntity {
      */
     @ApiModelProperty(name = "supplierName", value = "供应商name", hidden = true)
     private String supplierName;
+    /**
+     * 成本价格
+     */
+    @ApiModelProperty(name = "costPrice", value = "成本价格")
+    private BigDecimal costPrice;
 
+
+    public BigDecimal getCostPrice() {
+        return costPrice;
+    }
+
+    public void setCostPrice(BigDecimal costPrice) {
+        this.costPrice = costPrice;
+    }
 
     public String getSupplierNo() {
         return supplierNo;
