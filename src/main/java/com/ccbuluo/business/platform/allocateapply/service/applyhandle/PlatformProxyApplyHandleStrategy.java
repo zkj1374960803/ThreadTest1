@@ -219,6 +219,46 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
             inList.add(inPlan);
         }
     }
+
+    public static void main(String[] args) {
+        List<BizOutstockplanDetail> outList = new ArrayList<BizOutstockplanDetail>();
+        BizOutstockplanDetail outl1 = new BizOutstockplanDetail();
+        outl1.setProductNo("FA0014");
+        outl1.setProductName("手套");
+        outl1.setSupplierNo("FG000077");
+        outList.add(outl1);
+        BizOutstockplanDetail outl2 = new BizOutstockplanDetail();
+        outl2.setProductNo("FA0019");
+        outl2.setProductName("螺丝刀");
+        outl2.setSupplierNo("FG000077");
+        outList.add(outl2);
+        BizOutstockplanDetail outl3 = new BizOutstockplanDetail();
+        outl3.setProductNo("FA0019");
+        outl3.setProductName("螺丝刀");
+        outl3.setSupplierNo("FG000077");
+        outList.add(outl3);
+        // 根据商品分组
+        Map<String, List<BizOutstockplanDetail>> collect = outList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getProductNo));
+        for (Map.Entry<String, List<BizOutstockplanDetail>> entryP : collect.entrySet()) {
+            List<BizOutstockplanDetail> valueP = entryP.getValue();
+            BizOutstockplanDetail outPlan = new BizOutstockplanDetail();
+            // 根据供应商分组
+            Map<String, List<BizOutstockplanDetail>> collect1 = valueP.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getSupplierNo));
+            for (Map.Entry<String, List<BizOutstockplanDetail>> entryS : collect1.entrySet()) {
+                List<BizOutstockplanDetail> valueS = entryS.getValue();
+                if(null != valueS && valueS.size() > 0){
+                    outPlan = valueS.get(0);
+                }
+                Long planOutstocknum = 0L;
+                for(BizOutstockplanDetail bd : valueS){
+                    // 计划出库数量
+                    planOutstocknum += bd.getPlanOutstocknum();
+                }
+                outPlan.setPlanOutstocknum(planOutstocknum);
+                valueP.add(outPlan);
+            }
+        }
+    }
     /**
      * 买方入库机构构建
      * @param
@@ -240,7 +280,7 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
             Map<String, List<BizOutstockplanDetail>> collect1 = value.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getSupplierNo));
             for (Map.Entry<String, List<BizOutstockplanDetail>> outPlan : collect1.entrySet()) {
                 List<BizOutstockplanDetail> value1 = outPlan.getValue();
-                value1 // 分组之后的同一个商品
+//                value1 // 分组之后的同一个商品
             }
         }
         List<BizInstockplanDetail> list = new ArrayList<BizInstockplanDetail>();
