@@ -8,7 +8,9 @@ import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zhangkangjian
@@ -142,5 +144,12 @@ public interface AllocateApplyService {
      * @date 2018-08-23 16:01:38
      */
     Boolean getEquipMent(String equipCode);
-
+    /**
+     * 查询客户经理关联的服务中心
+     * @param useruuid
+     * @return StatusDto<Map<String,String>>
+     * @author zhangkangjian
+     * @date 2018-08-24 17:37:13
+     */
+    Map<String,String> findCustManagerServiceCenter(String useruuid) throws IOException;
 }

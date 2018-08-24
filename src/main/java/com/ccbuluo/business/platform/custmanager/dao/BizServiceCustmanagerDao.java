@@ -163,4 +163,5 @@ public class BizServiceCustmanagerDao extends BaseDao<BizServiceCustmanager> {
         }
         return queryPageForBean(QueryCustManagerListDTO.class, sql.toString(), queryCustManagerListDTO, queryCustManagerListDTO.getOffset(), queryCustManagerListDTO.getPageSize());
     }
+
 }

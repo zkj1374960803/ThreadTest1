@@ -50,11 +50,11 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         sql.append("INSERT INTO biz_allocate_apply ( applyer_name,apply_type,apply_no,applyorg_no,applyer,process_orgtype,process_orgno,")
             .append("instock_orgno,in_repository_no,outstock_orgtype,outstock_orgno,")
             .append("apply_processor,process_time,process_type,apply_status,creator,")
-            .append("create_time,operator,operate_time,delete_flag,remark ) VALUES (:applyerName,:applyType,:applyNo, :applyorgNo, :applyer,:processOrgtype,:processOrgno, ")
+            .append("create_time,operator,operate_time,delete_flag,remark,refund_address ) VALUES (:applyerName,:applyType,:applyNo, :applyorgNo, :applyer,:processOrgtype,:processOrgno, ")
             .append(" :instockOrgno, :inRepositoryNo,")
             .append(" :outstockOrgtype, :outstockOrgno, :applyProcessor, :processTime,")
             .append(" :processType, :applyStatus, :creator, :createTime, :operator,")
-            .append(" :operateTime, :deleteFlag, :remark )");
+            .append(" :operateTime, :deleteFlag, :remark,:refundAddress )");
         return super.save(sql.toString(), entity);
     }
 

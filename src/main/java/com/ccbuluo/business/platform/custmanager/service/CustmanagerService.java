@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.custmanager.service;
 
 import com.ccbuluo.business.platform.allocateapply.dto.QueryCustManagerListDTO;
+import com.ccbuluo.business.platform.custmanager.dto.CustManagerDetailDTO;
 import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
 import com.ccbuluo.db.Page;
@@ -50,7 +51,7 @@ public interface CustmanagerService {
      * @author zhangkangjian
      * @date 2018-07-19 14:47:07
      */
-    StatusDto custManagerDetail(String useruuid) throws IOException;
+    StatusDto<CustManagerDetailDTO> custManagerDetail(String useruuid) throws IOException;
     /**
      * 更新客户经理信息
      * @param bizServiceCustmanager 客户经理信息
