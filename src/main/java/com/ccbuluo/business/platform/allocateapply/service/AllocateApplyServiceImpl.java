@@ -76,6 +76,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createAllocateApply(AllocateApplyDTO allocateApplyDTO) {
+
+
         String loggedUserId = userHolder.getLoggedUserId();
         allocateApplyDTO.setOperator(loggedUserId);
         allocateApplyDTO.setCreator(loggedUserId);
@@ -162,7 +164,9 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     private void batchInsertForapplyDetailList(AllocateApplyDTO allocateApplyDTO, String loggedUserId, String processType) {
         List<AllocateapplyDetailDTO> allocateapplyDetailList = allocateApplyDTO.getAllocateapplyDetailList();
-        allocateapplyDetailList.stream().forEach(a -> {
+        // 过滤掉申请数量小于零的
+        List<AllocateapplyDetailDTO> filterAllocateapply = allocateapplyDetailList.stream().filter(dto ->dto.getApplyNum() > 0).collect(Collectors.toList());
+        filterAllocateapply.stream().forEach(a -> {
             a.setApplyNo(allocateApplyDTO.getApplyNo());
             a.setOperator(loggedUserId);
             a.setCreator(loggedUserId);
