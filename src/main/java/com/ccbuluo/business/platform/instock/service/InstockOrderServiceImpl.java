@@ -531,8 +531,10 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         Map<Long, BizInstockplanDetail> collect = bizInstockplanDetails.stream().collect(Collectors.toMap(BizInstockplanDetail::getId, Function.identity()));
         bizInstockorderDetailList.forEach(item -> {
             // 如果不是采购，那么取计划上的价格，如果是采购，取页面传回的价格
-            if ((!detail.getApplyType().equals(BizAllocateApply.AllocateApplyTypeEnum.PURCHASE.name()))
-                && !(userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM))) {
+            if (detail.getApplyType().equals(BizAllocateApply.AllocateApplyTypeEnum.PURCHASE.name())
+                && userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+                item.setCostPrice(item.getCostPrice());
+            } else {
                 BizInstockplanDetail bizInstockplanDetail = collect.get(item.getInstockPlanid());
                 item.setCostPrice(bizInstockplanDetail.getCostPrice());
             }
