@@ -7,6 +7,7 @@ import com.ccbuluo.business.platform.stockdetail.dto.UpdateStockBizStockDetailDT
 import com.ccbuluo.db.Page;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ public interface StockDetailService {
      * @author liuduo
      * @date 2018-08-08 14:55:43
      */
-    Long getByinstockorderDeatil(String supplierNo, String productNo, String inRepositoryNo, String applyNo);
+    Long getByinstockorderDeatil(String supplierNo, String productNo, BigDecimal costPrice, String inRepositoryNo, String applyNo);
 
     /**
     * 修改有效库存
@@ -37,7 +38,7 @@ public interface StockDetailService {
     * @author liuduo
     * @date 2018-08-08 15:24:09
     */
-    void updateValidStock(BizStockDetail bizStockDetail, Long versionNo);
+    void updateValidStock(BizStockDetail bizStockDetail, Integer versionNo);
 
     /**
      * 保存库存明细

@@ -175,15 +175,16 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      */
     public Page<QueryAllocateApplyListDTO> findApplyList(String productType, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode) {
         HashMap<String, Object> map = Maps.newHashMap();
-        map.put("userOrgCode", userOrgCode);
+
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.apply_status,a.process_type ")
+        sql.append(" SELECT a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.apply_status,a.process_type,a.process_orgtype as 'orgType' ")
             .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(userOrgCode)){
+            map.put("userOrgCode", userOrgCode);
             sql.append(" AND a.applyorg_no = :userOrgCode ");
         }
         if(StringUtils.isNotBlank(processType)){
-            map.put("process_type", processType);
+            map.put("processType", processType);
             sql.append(" AND a.process_type = :processType ");
         }
         if(StringUtils.isNotBlank(applyStatus)){
@@ -322,7 +323,8 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             map.put("orgNo", orgNo);
             sql.append(" AND  a.org_no = :orgNo ");
         }
-        sql.append(" GROUP BY a.product_no ");
+        sql.append(" GROUP BY a.product_no ")
+        .append(" HAVING  sum(ifnull(a.valid_stock,0) + ifnull(a.occupy_stock,0) + ifnull(a.problem_stock,0) + ifnull(a.damaged_stock,0) + ifnull(a.transit_stock,0) + ifnull(a.freeze_stock,0)) > 0");
         return queryPageForBean(FindStockListDTO.class, sql.toString(), map, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
     }
 
@@ -382,7 +384,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @date 2018-08-13 19:47:32
      */
     public Page<QueryOrgDTO> findStockNum(String productNo,List<String> orgCodes, Integer offset, Integer pageSize) {
-        String sql = "SELECT a.org_no as 'orgCode',SUM(a.valid_stock) as 'stockNum' FROM biz_stock_detail a WHERE a.product_no = :productNo AND a.org_no in (:orgCodes) GROUP BY a.org_no";
+        String sql = "SELECT a.org_no as 'orgCode',SUM(a.valid_stock) as 'stockNum' FROM biz_stock_detail a WHERE a.product_no = :productNo AND a.org_no in (:orgCodes) GROUP BY a.org_no having SUM(a.valid_stock) > 0";
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("productNo", productNo);
         map.put("orgCodes", orgCodes);
@@ -468,18 +470,18 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
 
-        sql.append("SELECT id,product_no,product_name,product_type,product_unit,SUM(problem_stock) as problem_stock,product_categoryname")
-            .append(" FROM biz_stock_detail  WHERE delete_flag = :deleteFlag and problem_stock > 0 ");
+        sql.append("SELECT a.id,a.product_no,a.product_name,a.product_type,a.product_unit,SUM(a.problem_stock) AS problem_stock,a.product_categoryname,a.supplier_no,b.supplier_name")
+            .append(" FROM biz_stock_detail a LEFT JOIN biz_service_supplier b ON a.supplier_no = b.supplier_code where 1 = 1");
         // 组织机构code
         if (StringUtils.isNotBlank(orgCode)) {
             param.put("orgCode", orgCode);
-            sql.append(" AND org_no = :orgCode ");
+            sql.append(" AND a.org_no = :orgCode ");
         }
         if (StringUtils.isNotBlank(productType)) {
             param.put("productType", productType);
-            sql.append(" AND product_type = :productType ");
+            sql.append(" AND a.product_type = :productType ");
         }
-        sql.append(" GROUP BY product_no ORDER BY create_time DESC");
+        sql.append(" GROUP BY a.product_no ORDER BY a.create_time DESC");
         return queryListBean(StockBizStockDetailDTO.class, sql.toString(), param);
     }
 }

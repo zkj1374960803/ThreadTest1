@@ -268,6 +268,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         String userOrgCode = getUserOrgCode();
         // 查询分页的申请列表
         Page<QueryAllocateApplyListDTO> page = bizAllocateApplyDao.findApplyList(productType, processType, applyStatus, applyNo, offset, pageSize, userOrgCode);
+        List<QueryAllocateApplyListDTO> rows = page.getRows();
+
         return page;
     }
 
@@ -402,8 +404,19 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         if(StringUtils.isBlank(findStockListDTO.getOrgNo())){
             orgCode = getOrgCodesByOrgType(findStockListDTO.getType());
         }
-        Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
-        return page;
+        // 如果类型是null的，查询全部库存
+        if(StringUtils.isBlank(findStockListDTO.getType())){
+            Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
+            return page;
+        }else {
+            if(orgCode == null || orgCode.size() == 0){
+                return new Page<>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
+            }else {
+                Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
+                return page;
+            }
+        }
+
     }
 
     /**
@@ -443,6 +456,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public List<StockBizStockDetailDTO> queryProblemStockList(String orgCode, String productType) {
+
+
         return bizAllocateApplyDao.queryProblemStockList(orgCode, productType);
     }
 

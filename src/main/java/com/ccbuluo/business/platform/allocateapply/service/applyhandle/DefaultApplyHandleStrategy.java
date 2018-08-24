@@ -189,7 +189,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             if(null != bd.getSellPrice()){
                 sellPrice = bd.getSellPrice();
             }
-            bigDecimal.add(sellPrice);
+            bigDecimal = bigDecimal.add(sellPrice);
         }
         return bigDecimal;
     }
@@ -279,7 +279,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             for(BizStockDetail bd : stockDetails){
                 if(ro.getStockId().intValue() == bd.getId().intValue()){// 关系库存批次id和库存批次id相等
                     AllocateapplyDetailBO ad = getAllocateapplyDetailBO(details, bd.getProductNo());
-                    outstockplanSeller = buildBizOutstockplanDetail(ad, applyType);
+                    outstockplanSeller = buildBizOutstockplanDetail(ad, applyType,bd);
                     outstockplanSeller.setPlanOutstocknum(ro.getOccupyNum());// 计划出库数量applyNum
                     outstockplanSeller.setOutOrgno(ad.getOutstockOrgno());// 卖方机构编号
                     outstockplanSeller.setOutRepositoryNo(bd.getRepositoryNo());// 卖方仓库编号（根据机构和商品编号查询的库存）
@@ -331,7 +331,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             for(BizStockDetail bd : stockDetails){
                 if(ro.getStockId().intValue() == bd.getId().intValue()){// 关系库存批次id和库存批次id相等
                     AllocateapplyDetailBO ad = getAllocateapplyDetailBO(details, bd.getProductNo());
-                    outstockplanPlatform = buildBizOutstockplanDetail(ad, applyType);
+                    outstockplanPlatform = buildBizOutstockplanDetail(ad, applyType,bd);
                     outstockplanPlatform.setOutRepositoryNo(repositoryNo);// 平台仓库编号
                     outstockplanPlatform.setPlanOutstocknum(ro.getOccupyNum());// 计划出库数量applyNum
                     outstockplanPlatform.setOutOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 平台code
@@ -360,7 +360,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             for(BizStockDetail bd : stockDetails){
                 if(ro.getStockId().intValue() == bd.getId().intValue()){// 关系库存批次id和库存批次id相等
                     AllocateapplyDetailBO ad = getAllocateapplyDetailBO(details, bd.getProductNo());
-                    outstockplanPurchaser = buildBizOutstockplanDetail(ad, applyType);
+                    outstockplanPurchaser = buildBizOutstockplanDetail(ad, applyType,bd);
                     outstockplanPurchaser.setPlanOutstocknum(ro.getOccupyNum());// 计划出库数量applyNum
                     outstockplanPurchaser.setOutRepositoryNo(bd.getRepositoryNo());// 仓库code
                     outstockplanPurchaser.setOutOrgno(ad.getOutstockOrgno());// 卖方机构code
@@ -441,7 +441,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
      * @author weijb
      * @date 2018-08-11 13:35:41
      */
-    private BizOutstockplanDetail buildBizOutstockplanDetail(AllocateapplyDetailBO ad, String applyType){
+    private BizOutstockplanDetail buildBizOutstockplanDetail(AllocateapplyDetailBO ad, String applyType,BizStockDetail bd){
         BizOutstockplanDetail outPlan = new BizOutstockplanDetail();
         // 调拨
         if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
@@ -462,7 +462,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         outPlan.setProductName(ad.getProductName());// 商品名称
         outPlan.setProductUnit(ad.getUnit());// 商品计量单位
         outPlan.setTradeNo(String.valueOf(ad.getApplyNo()));// 交易批次号（申请单编号）
-        outPlan.setSupplierNo(ad.getSupplierNo());//供应商编号
+        outPlan.setSupplierNo(bd.getSupplierNo());//供应商编号
         outPlan.setApplyDetailId(ad.getId());//申请单详单id
         outPlan.setSalesPrice(ad.getSellPrice());// 销售价
         outPlan.setPlanStatus(StockPlanStatusEnum.DOING.toString());// 出库计划的状态（计划执行中）

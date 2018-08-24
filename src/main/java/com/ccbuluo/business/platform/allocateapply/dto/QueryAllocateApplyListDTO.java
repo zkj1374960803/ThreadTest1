@@ -46,7 +46,7 @@ public class QueryAllocateApplyListDTO {
     /**
      * 申请来源
      */
-    @ApiModelProperty(name = "orgType", value = "申请来源")
+    @ApiModelProperty(name = "orgType", value = "申请来源(SERVICECENTER(服务中心),CUSTMANAGER(客户经理)PLATFORM(售后平台);)")
     private String orgType;
     @ApiModelProperty(name = "orgName", value = "申请机构")
     private String orgName;

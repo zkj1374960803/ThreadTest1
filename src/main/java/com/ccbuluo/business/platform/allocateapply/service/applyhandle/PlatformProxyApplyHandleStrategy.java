@@ -26,6 +26,8 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 平台调拨申请处理
@@ -217,6 +219,46 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
             inList.add(inPlan);
         }
     }
+
+    public static void main(String[] args) {
+        List<BizOutstockplanDetail> outList = new ArrayList<BizOutstockplanDetail>();
+        BizOutstockplanDetail outl1 = new BizOutstockplanDetail();
+        outl1.setProductNo("FA0014");
+        outl1.setProductName("手套");
+        outl1.setSupplierNo("FG000077");
+        outList.add(outl1);
+        BizOutstockplanDetail outl2 = new BizOutstockplanDetail();
+        outl2.setProductNo("FA0019");
+        outl2.setProductName("螺丝刀");
+        outl2.setSupplierNo("FG000077");
+        outList.add(outl2);
+        BizOutstockplanDetail outl3 = new BizOutstockplanDetail();
+        outl3.setProductNo("FA0019");
+        outl3.setProductName("螺丝刀");
+        outl3.setSupplierNo("FG000077");
+        outList.add(outl3);
+        // 根据商品分组
+        Map<String, List<BizOutstockplanDetail>> collect = outList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getProductNo));
+        for (Map.Entry<String, List<BizOutstockplanDetail>> entryP : collect.entrySet()) {
+            List<BizOutstockplanDetail> valueP = entryP.getValue();
+            BizOutstockplanDetail outPlan = new BizOutstockplanDetail();
+            // 根据供应商分组
+            Map<String, List<BizOutstockplanDetail>> collect1 = valueP.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getSupplierNo));
+            for (Map.Entry<String, List<BizOutstockplanDetail>> entryS : collect1.entrySet()) {
+                List<BizOutstockplanDetail> valueS = entryS.getValue();
+                if(null != valueS && valueS.size() > 0){
+                    outPlan = valueS.get(0);
+                }
+                Long planOutstocknum = 0L;
+                for(BizOutstockplanDetail bd : valueS){
+                    // 计划出库数量
+                    planOutstocknum += bd.getPlanOutstocknum();
+                }
+                outPlan.setPlanOutstocknum(planOutstocknum);
+                valueP.add(outPlan);
+            }
+        }
+    }
     /**
      * 买方入库机构构建
      * @param
@@ -230,9 +272,21 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
         if(null != details && details.size() > 0){
             ad = details.get(0);
         }
+        // 根据商品分组
+        Map<String, List<BizOutstockplanDetail>> collect = outList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getProductNo));
+        for (Map.Entry<String, List<BizOutstockplanDetail>> entry : collect.entrySet()) {
+            List<BizOutstockplanDetail> value = entry.getValue();
+            // 根据供应商分组
+            Map<String, List<BizOutstockplanDetail>> collect1 = value.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getSupplierNo));
+            for (Map.Entry<String, List<BizOutstockplanDetail>> outPlan : collect1.entrySet()) {
+                List<BizOutstockplanDetail> value1 = outPlan.getValue();
+//                value1 // 分组之后的同一个商品
+            }
+        }
+        List<BizInstockplanDetail> list = new ArrayList<BizInstockplanDetail>();
         for(BizOutstockplanDetail bd : outList){
             // 有可能一个商品有多个供应商
-            if(distinstSupplier(inList, bd, details)){
+            if(distinstSupplier(list, bd, details)){
                 continue;
             }
             BizInstockplanDetail inPlan = buildBizInstockplanDetail(bd);
@@ -240,7 +294,8 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
                 inPlan.setInstockRepositoryNo(ad.getInRepositoryNo());// 入库仓库编号
                 inPlan.setInstockOrgno(ad.getInstockOrgno());// 买入机构编号
             }
-            inList.add(inPlan);
+            list.add(inPlan);
+            inList.addAll(list);
         }
     }
     /**
@@ -257,10 +312,12 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
             if(in.getSupplierNo().equals(bd.getSupplierNo())){
                 // 一个商品有多个供应商的情况
                 AllocateapplyDetailBO ab = getAllocateapplyDetailBO(details, in.getProductNo());
-                in.setCostPrice(ab.getCostPrice());
-                inList.add(in);
+                in.setCostPrice(ab.getSellPrice());
+                in.setPlanInstocknum(in.getPlanInstocknum() + bd.getPlanOutstocknum());
                 flag = true;
                 break;
+            }else{
+                inList.add(in);
             }
         }
         return flag;

@@ -194,9 +194,9 @@ public class ApplyHandleContext {
                 throw new CommonException("0", "退换货不可以撤销！");
             } else {
                 // 只有申请提交和等待付款的状态才可以撤销
-                if (!ba.getApplyStatus().equals(BizAllocateApply.ApplyStatusEnum.PENDING.name()) || !ba.getApplyStatus().equals(BizAllocateApply.ApplyStatusEnum.WAITINGPAYMENT.name())) {
+                if (!ba.getApplyStatus().equals(BizAllocateApply.ApplyStatusEnum.PENDING.name()) && !ba.getApplyStatus().equals(BizAllocateApply.ApplyStatusEnum.WAITINGPAYMENT.name())) {
                     BizAllocateApply.ApplyStatusEnum statusEnum = BizAllocateApply.ApplyStatusEnum.valueOf(ba.getApplyStatus());
-                    throw new CommonException("0", statusEnum.getKey() + " 不可以撤销！");
+                    throw new CommonException("0", statusEnum.getValue() + "的申请不可以撤销！");
                 }
             }
             if (null == ba) {
