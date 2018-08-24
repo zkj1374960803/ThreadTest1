@@ -401,21 +401,37 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }
         // 根据类型查询服务中心的code
         List<String> orgCode = null;
-        if(StringUtils.isBlank(findStockListDTO.getOrgNo())){
-            orgCode = getOrgCodesByOrgType(findStockListDTO.getType());
-        }
-        // 如果类型是null的，查询全部库存
-        if(StringUtils.isBlank(findStockListDTO.getType())){
+        String orgNo = findStockListDTO.getOrgNo();
+        if(StringUtils.isBlank(orgNo)){
+            String type = findStockListDTO.getType();
+            if(StringUtils.isBlank(type)){
+                Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, null);
+                return page;
+            }else {
+                orgCode = getOrgCodesByOrgType(type);
+                if(orgCode == null || orgCode.size() == 0){
+                    return new Page<>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
+                }else {
+                    Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
+                    return page;
+                }
+            }
+        }else {
             Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
             return page;
-        }else {
-            if(orgCode == null || orgCode.size() == 0){
-                return new Page<>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
-            }else {
-                Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
-                return page;
-            }
         }
+        // 如果类型是null的，查询全部库存
+
+
+
+
+
+
+
+
+
+
+
 
     }
 
@@ -521,7 +537,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public Page<QueryOrgDTO> queryTransferStock(QueryOrgDTO orgDTO, String productNo, Integer offset, Integer pageSize) {
-        // todo 张康健将组织机构作为入参
         List<String> name = List.of(OrganizationTypeEnum.PLATFORM.name(), OrganizationTypeEnum.SERVICECENTER.name(), OrganizationTypeEnum.CUSTMANAGER.name());
         orgDTO.setStatus(Constants.FREEZE_STATUS_YES);
         orgDTO.setOrgTypeList(name);
@@ -560,11 +575,11 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     public StatusDto<List<ProductStockInfoDTO>> checkStockQuantity(CheckStockQuantityDTO checkStockQuantityDTO) {
         String flag = Constants.SUCCESS_CODE;
         String message = "成功";
-       /* FindAllocateApplyDTO detail = findDetail(checkStockQuantityDTO.getOutstockOrgno());
-        // 如果是平台调拨，需要校验库存来源
-        if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(detail.getProcessOrgno())){
+        // 如果当前登陆人是平台的人，说明这个申请是平台创建的或者是平台处理的，需要校验库存来源
+        String userOrgCode = getUserOrgCode();
+        if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(userOrgCode)){
             checkStockQuantityDTO.setSellerOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
-        }*/
+        }
         Map<String, Object> map = bizAllocateApplyDao.queryStockQuantity(checkStockQuantityDTO.getOutstockOrgno(), checkStockQuantityDTO.getSellerOrgno());
         List<ProductStockInfoDTO> allocateapplyDetailList = checkStockQuantityDTO.getProductInfoList();
         for (int i = 0; i < allocateapplyDetailList.size(); i++) {
