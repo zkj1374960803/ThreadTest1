@@ -88,4 +88,25 @@ public class BizOutstockorderDetailDao extends BaseDao<BizOutstockorderDetail> {
 
         return queryListBean(OutstockorderDetailDTO.class, sql.toString(), params);
     }
+
+    /**
+     * 保存出库单详单
+     * @param bizOutstockorderDetailList 出库单详单
+     * @return ids
+     * @author liuduo
+     * @date 2018-08-24 18:40:19
+     */
+    public List<Long> batchBizOutstockOrderDetail(List<BizOutstockorderDetail> bizOutstockorderDetailList) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO biz_outstockorder_detail ( outstock_orderno,")
+            .append("outstock_planid,product_no,product_name,product_type,")
+            .append("product_categoryname,supplier_no,outstock_num,stock_type,unit,cost_price,")
+            .append("actual_price,creator,create_time,operator,operate_time,delete_flag,")
+            .append("remark ) VALUES (  :outstockOrderno, :outstockPlanid, :productNo,")
+            .append(" :productName, :productType, :productCategoryname, :supplierNo,")
+            .append(" :outstockNum, :stockType, :unit, :costPrice, :actualPrice, :creator,")
+            .append(" :createTime, :operator, :operateTime, :deleteFlag, :remark )");
+
+        return batchInsertForListBean(sql.toString(), bizOutstockorderDetailList);
+    }
 }
