@@ -199,7 +199,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             map.put("productType", productType);
             sql.append(" AND b.product_type = :productType ");
         }
-        sql.append(" GROUP BY a.apply_no ");
+        sql.append(" GROUP BY a.apply_no order by a.operate_time DESC");
         return queryPageForBean(QueryAllocateApplyListDTO.class, sql.toString(), map, offset, pageSize);
     }
     /**
@@ -213,7 +213,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.process_type,a.apply_status ")
-            .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.`apply_no` = b.`apply_no` WHERE 1 = 1 ");
+            .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(userOrgCode)){
             map.put("userOrgCode", userOrgCode);
             sql.append(" AND (a.outstock_orgno = :userOrgCode or process_orgno = :userOrgCode) ");
@@ -234,7 +234,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             map.put("productType", productType);
             sql.append(" AND b.product_type = :productType ");
         }
-        sql.append(" GROUP BY a.apply_no ");
+        sql.append(" GROUP BY a.apply_no order by a.operate_time DESC");
         return queryPageForBean(QueryAllocateApplyListDTO.class, sql.toString(), map, offset, pageSize);
     }
     /**
@@ -481,7 +481,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             param.put("productType", productType);
             sql.append(" AND a.product_type = :productType ");
         }
-        sql.append(" GROUP BY a.product_no ORDER BY a.create_time DESC");
+        sql.append(" GROUP BY a.product_no having SUM(a.problem_stock) > 0 ORDER BY a.create_time DESC");
         return queryListBean(StockBizStockDetailDTO.class, sql.toString(), param);
     }
 }
