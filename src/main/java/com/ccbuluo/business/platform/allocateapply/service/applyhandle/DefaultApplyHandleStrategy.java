@@ -27,6 +27,8 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 申请处理
@@ -185,11 +187,15 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     private BigDecimal getTatal(List<AllocateapplyDetailBO> details){
         BigDecimal bigDecimal = BigDecimal.ZERO;
         BigDecimal sellPrice = BigDecimal.ZERO;
+        BigDecimal appNum = BigDecimal.ZERO;
         for(AllocateapplyDetailBO bd : details){
             if(null != bd.getSellPrice()){
+                //单价
                 sellPrice = bd.getSellPrice();
+                // 数量
+                appNum = BigDecimal.valueOf(bd.getApplyNum());
             }
-            bigDecimal = bigDecimal.add(sellPrice);
+            bigDecimal = bigDecimal.add(sellPrice.multiply(appNum));
         }
         return bigDecimal;
     }
@@ -418,23 +424,6 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     }
 
     /**
-     * 根据商品编号查找到某个商品的库存详情信息
-     * @param stockDetails 库存list
-     * @param productNo 商品编号
-     * @author weijb
-     * @date 2018-08-11 13:35:41
-     */
-    private BizStockDetail getBizStockDetailByProductNo(List<BizStockDetail> stockDetails, String productNo){
-        BizStockDetail applyDetail = new BizStockDetail();
-        for(BizStockDetail ad : stockDetails){
-            if (productNo.equals(ad.getProductNo())){
-                applyDetail = ad;
-            }
-        }
-        return applyDetail;
-    }
-
-    /**
      * 构建出库计划
      * @param ad 申请详细
      * @param applyType 申请类型
@@ -575,7 +564,11 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             //构建订单占用库存关系
             RelOrdstockOccupy ro = new RelOrdstockOccupy();
             ro.setOrderType(applyType);//订单类型(调拨，采购不占用库存)
-            ro.setDocNo(ad.getTradeNo());//申请单号
+            Optional<AllocateapplyDetailBO> applyFilter = details.stream() .filter(applyDetail -> ad.getProductNo().equals(applyDetail.getProductNo())) .findFirst();
+            if (applyFilter.isPresent()) {
+                AllocateapplyDetailBO applyDetail = applyFilter.get();
+                ro.setDocNo(applyDetail.getApplyNo());//申请单号
+            }
             ro.setStockId(ad.getId());//库存id
             ro.setOccupyNum(occupyStockNum);//占用数量
             ro.setOccupyStatus(StockPlanStatusEnum.DOING.toString());//占用状态occupy_status
@@ -785,16 +778,17 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
      * @date 2018-08-20 17:12:43
      */
     private List<BizOutstockplanDetail> buildPlatformOutstockplan(BizAllocateApply ba, List<AllocateapplyDetailBO> details, List<BizStockDetail> stockDetails){
+        Map<String, BizStockDetail> collect = stockDetails.stream().collect(Collectors.toMap(BizStockDetail::getProductNo, Function.identity()));
         List<BizOutstockplanDetail> outstockplanDetails = new ArrayList<BizOutstockplanDetail>();
         List<BizInstockplanDetail> instockplanDetails = bizInstockplanDetailDao.getInstockplanDetailByApplyNo(ba.getApplyNo());
         for(BizInstockplanDetail in : instockplanDetails){
+            BizStockDetail bizStockDetail = collect.get(in.getProductNo());
             BizOutstockplanDetail outstockplanPlatform = new BizOutstockplanDetail();
             outstockplanPlatform = buildBizOutstockplanDetail(in, ba.getApplyType(), details);
-            BizStockDetail bd = getBizStockDetailByProductNo(stockDetails,in.getProductNo());
-            outstockplanPlatform.setOutRepositoryNo(bd.getRepositoryNo());// 平台仓库编号
+            outstockplanPlatform.setOutRepositoryNo(bizStockDetail.getRepositoryNo());// 平台仓库编号
             outstockplanPlatform.setPlanOutstocknum(in.getPlanInstocknum());// 计划出库数量applyNum
             outstockplanPlatform.setOutOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 平台code
-            outstockplanPlatform.setStockId(bd.getId());// 库存编号id
+            outstockplanPlatform.setStockId(bizStockDetail.getId());// 库存编号id
             outstockplanPlatform.setCostPrice(in.getCostPrice());// 成本价
             outstockplanDetails.add(outstockplanPlatform);
         }

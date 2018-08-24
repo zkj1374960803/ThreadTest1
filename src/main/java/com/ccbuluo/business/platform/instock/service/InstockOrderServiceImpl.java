@@ -156,7 +156,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
             } else {
                 return StatusDto.buildFailure("生成入库单编码失败！");
             }
-            int i = saveInstockOrder(instockNo, detail, detail.getInstockOrgno());
+            int i = saveInstockOrder(instockNo, detail, inRepositoryNo);
             if (i == Constants.FAILURESTATUS) {
                 throw new CommonException("1002", "生成入库单失败！");
             }
@@ -548,20 +548,21 @@ public class InstockOrderServiceImpl implements InstockOrderService {
      *
      * @param instockOrderno          入库单号
      * @param bizAllocateApply        申请单详情
-     * @param orgCodeByStoreHouseCode 入库机构code
+     * @param inRepositoryNo 入库仓库code
      * @return 保存是否成功
      * @author liuduo
      * @date 2018-08-08 10:56:05
      */
-    private int saveInstockOrder(String instockOrderno, FindAllocateApplyDTO bizAllocateApply, String orgCodeByStoreHouseCode) {
+    private int saveInstockOrder(String instockOrderno, FindAllocateApplyDTO bizAllocateApply, String inRepositoryNo) {
         BizInstockOrder bizInstockOrder = new BizInstockOrder();
         Date date = new Date();
         bizInstockOrder.setInstockOrderno(instockOrderno);
         bizInstockOrder.setTradeDocno(bizAllocateApply.getApplyNo());
         bizInstockOrder.setInRepositoryNo(bizAllocateApply.getInRepositoryNo());
-        bizInstockOrder.setInstockOrgno(orgCodeByStoreHouseCode);
         bizInstockOrder.setInstockOperator(userHolder.getLoggedUserId());
-        bizInstockOrder.setInstockOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        // 根据仓库code查询机构code
+        String orgCodeByStoreHouseCode = storeHouseService.getOrgCodeByStoreHouseCode(inRepositoryNo);
+        bizInstockOrder.setInstockOrgno(orgCodeByStoreHouseCode);
         bizInstockOrder.setInstockType(applyHandleContext.getInstockType(bizAllocateApply.getApplyType()));
         bizInstockOrder.setInstockTime(date);
         bizInstockOrder.setChecked(Constants.LONG_FLAG_ZERO);

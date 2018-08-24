@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -234,7 +235,7 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
             ad = details.get(0);
         }
         // 有可能一个商品有多个供应商（根据商品和供应商分组合并）
-        distinstSupplier(inList, outList,ad);
+        distinstSupplier(inList, outList,details);
     }
 
     /**
@@ -245,7 +246,7 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
      * @author weijb
      * @date 2018-08-21 18:05:46
      */
-    private void distinstSupplier(List<BizInstockplanDetail> inList,List<BizOutstockplanDetail> outList,AllocateapplyDetailBO ad){
+    private void distinstSupplier(List<BizInstockplanDetail> inList,List<BizOutstockplanDetail> outList,List<AllocateapplyDetailBO> details){
         List<BizOutstockplanDetail> list = new ArrayList<BizOutstockplanDetail>();
         Map<String, List<BizOutstockplanDetail>> collect = outList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getProductNo));
         for (Map.Entry<String, List<BizOutstockplanDetail>> entryP : collect.entrySet()) {
@@ -259,11 +260,16 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
                 if(null != valueS && valueS.size() > 0){
                     if(i == 0){
                         inPlan = buildBizInstockplanDetail(valueS.get(0));
-                        if(null != ad){
+                        BizInstockplanDetail finalInPlan = inPlan;
+                        Optional<AllocateapplyDetailBO> applyFilter = details.stream() .filter(applyDetail -> finalInPlan.getProductNo().equals(applyDetail.getProductNo())) .findFirst();
+                        if (applyFilter.isPresent()) {
+                            AllocateapplyDetailBO ad = applyFilter.get();
                             // 入库仓库编号
                             inPlan.setInstockRepositoryNo(ad.getInRepositoryNo());
                             // 买入机构编号
                             inPlan.setInstockOrgno(ad.getInstockOrgno());
+                            // 买方入库的成本价等于单子上的销售价
+                            inPlan.setCostPrice(ad.getSellPrice());
                         }
                         i++;
                     }
