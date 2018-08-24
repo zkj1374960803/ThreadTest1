@@ -235,9 +235,7 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
         }
         // 有可能一个商品有多个供应商（根据商品和供应商分组合并）
         List<BizOutstockplanDetail> outPlanList = distinstSupplier(outList);
-        List<BizInstockplanDetail> list = new ArrayList<BizInstockplanDetail>();
         for(BizOutstockplanDetail bd : outPlanList){
-
             BizInstockplanDetail inPlan = buildBizInstockplanDetail(bd);
             if(null != ad){
                 // 入库仓库编号
@@ -245,10 +243,10 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
                 // 买入机构编号
                 inPlan.setInstockOrgno(ad.getInstockOrgno());
             }
-            list.add(inPlan);
-            inList.addAll(list);
+            inList.add(inPlan);
         }
     }
+
     /**
      *   过滤供应商(有可能一个商品有多个供应商（根据商品和供应商分组合并）)
      * @param
