@@ -548,7 +548,9 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         Date date = new Date();
         bizOutstockOrder.setOutstockorderNo(outstockNo);
         bizOutstockOrder.setOutRepositoryNo(outRepositoryNo);
-        bizOutstockOrder.setOutstockOrgno(detail.getOutstockOrgno());
+        // 根据仓库编号查询所在机构
+        String orgCodeByStoreHouseCode = storeHouseService.getOrgCodeByStoreHouseCode(outRepositoryNo);
+        bizOutstockOrder.setOutstockOrgno(orgCodeByStoreHouseCode);
         bizOutstockOrder.setOutstockOperator(userHolder.getLoggedUserId());
         bizOutstockOrder.setTradeDocno(applyNo);
         bizOutstockOrder.setOutstockType(applyHandleContext.getOutstockType(detail.getApplyType()));
