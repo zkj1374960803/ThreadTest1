@@ -83,9 +83,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         allocateApplyDTO.setCreator(loggedUserId);
         allocateApplyDTO.setApplyer(loggedUserId);
         allocateApplyDTO.setApplyerName(userHolder.getLoggedUser().getName());
-        // 入库仓库查询入库组织机构
-        String orgCode = bizServiceStorehouseDao.getOrgCodeByStoreHouseCode(allocateApplyDTO.getInRepositoryNo());
-        allocateApplyDTO.setInstockOrgno(orgCode);
+
         // 生成申请单编号
         StatusDto<String> stringStatusDto = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.SW);
         allocateApplyDTO.setApplyNo(stringStatusDto.getData());
@@ -96,13 +94,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         // 默认申请的状态为待处理
         allocateApplyDTO.setApplyStatus(ApplyStatusEnum.PENDING.name());
 
-        // 默认出库机构类型
-        String outOrgType = getOrgTypeByCode(allocateApplyDTO.getOutstockOrgno());
-        if(StringUtils.isBlank(outOrgType)){
-            allocateApplyDTO.setOutstockOrgtype(OrganizationTypeEnum.PLATFORM.name());
-        }else {
-            allocateApplyDTO.setOutstockOrgtype(outOrgType);
-        }
+
         // 默认处理机构赋值
         if(allocateApplyDTO.getApplyorgNo().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
             allocateApplyDTO.setProcessOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
@@ -120,11 +112,12 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             allocateApplyDTO.setOutstockOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
             allocateApplyDTO.setProcessOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
             allocateApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
-        }else if(AllocateApplyTypeEnum.BARTER.name().equals(processType) || AllocateApplyTypeEnum.REFUND.equals(processType)){
+        }else if(AllocateApplyTypeEnum.BARTER.name().equals(processType) || AllocateApplyTypeEnum.REFUND.name().equals(processType)){
             allocateApplyDTO.setApplyType(processType);
             StatusDto<String> thcode = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.TH);
             allocateApplyDTO.setApplyNo(thcode.getData());
-
+            allocateApplyDTO.setProcessOrgtype(OrganizationTypeEnum.PLATFORM.name());
+            allocateApplyDTO.setOutstockOrgtype(OrganizationTypeEnum.PLATFORM.name());
             allocateApplyDTO.setOutstockOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
             allocateApplyDTO.setProcessOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
             allocateApplyDTO.setApplyStatus(BizAllocateApply.ReturnApplyStatusEnum.PRODRETURNED.name());
@@ -142,6 +135,20 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             allocateApplyDTO.setApplyProcessor(loggedUserId);
             allocateApplyDTO.setProcessTime(new Date());
         }
+
+        // 默认出库机构类型orgType
+        String outOrgType = getOrgTypeByCode(allocateApplyDTO.getOutstockOrgno());
+        if(StringUtils.isBlank(outOrgType)){
+            allocateApplyDTO.setOutstockOrgtype(OrganizationTypeEnum.PLATFORM.name());
+        }else {
+            allocateApplyDTO.setOutstockOrgtype(outOrgType);
+        }
+        // 如果是退款类型，没有入库机构，不需要查询类型
+        if(!AllocateApplyTypeEnum.REFUND.name().equals(processType)){
+            // 入库仓库查询入库组织机构
+            String orgCode = bizServiceStorehouseDao.getOrgCodeByStoreHouseCode(allocateApplyDTO.getInRepositoryNo());
+            allocateApplyDTO.setInstockOrgno(orgCode);
+        }
         // 保存申请单基础数据
         bizAllocateApplyDao.saveEntity(allocateApplyDTO);
         // 保存申请单详情数据
@@ -150,7 +157,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         // 已经自动处理了，调用 申请构建计划的方法
         if(allocateApplyDTO.getApplyorgNo().equals(allocateApplyDTO.getProcessOrgno()) || AllocateApplyTypeEnum.BARTER.name().equals(processType)
             || AllocateApplyTypeEnum.REFUND.equals(processType)){
-            applyHandleContext.applyHandle(allocateApplyDTO.getApplyNo());
+//            applyHandleContext.applyHandle(allocateApplyDTO.getApplyNo());
         }
 
     }
@@ -209,6 +216,9 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     @Override
     public FindAllocateApplyDTO findDetail(String applyNo) {
         FindAllocateApplyDTO allocateApplyDTO = bizAllocateApplyDao.findDetail(applyNo);
+        if(allocateApplyDTO == null){
+            throw new CommonException(Constants.ERROR_CODE, "根据申请编号查询详情数据异常！");
+        }
         // 查询组织架构的名字
         StatusDtoThriftBean<BasicUserOrganization> outstockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getOutstockOrgno());
         StatusDtoThriftBean<BasicUserOrganization> instockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getInstockOrgno());
