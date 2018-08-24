@@ -165,7 +165,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         // 已经自动处理了，调用 申请构建计划的方法
         if(allocateApplyDTO.getApplyorgNo().equals(allocateApplyDTO.getProcessOrgno()) || AllocateApplyTypeEnum.BARTER.name().equals(processType)
             || AllocateApplyTypeEnum.REFUND.equals(processType)){
-//            applyHandleContext.applyHandle(allocateApplyDTO.getApplyNo());
+            applyHandleContext.applyHandle(allocateApplyDTO.getApplyNo());
         }
 
     }
