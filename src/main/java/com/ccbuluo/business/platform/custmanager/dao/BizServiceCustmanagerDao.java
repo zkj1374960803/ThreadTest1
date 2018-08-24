@@ -150,7 +150,7 @@ public class BizServiceCustmanagerDao extends BaseDao<BizServiceCustmanager> {
      */
     public Page<QueryCustManagerListDTO> queryCustManagerList(QueryCustManagerListDTO queryCustManagerListDTO) {
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.office_phone,c.cusmanager_name as 'name',c.vin_number,b.servicecenter_code as 'serviceCenter',b.storehouse_code as 'inRepositoryNo' ")
+        sql.append(" SELECT a.user_uuid as 'useruuid', a.office_phone,c.cusmanager_name as 'name',c.vin_number,b.servicecenter_code as 'serviceCenter',b.storehouse_code as 'inRepositoryNo' ")
             .append(" FROM biz_service_custmanager a  ")
             .append(" LEFT JOIN biz_service_storehouse b ON a.servicecenter_code = b.servicecenter_code ")
             .append(" LEFT JOIN biz_service_maintaincar c ON a.user_uuid = c.cusmanager_uuid ")

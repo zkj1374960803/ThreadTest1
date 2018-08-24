@@ -26,6 +26,16 @@ public class QueryCustManagerListDTO {
     private Integer offset;
     @ApiModelProperty(name = "pageSize", value = "每页显示的条数")
     private Integer pageSize;
+    @ApiModelProperty(name = "useruuid", value = "uuid")
+    private String useruuid;
+
+    public String getUseruuid() {
+        return useruuid;
+    }
+
+    public void setUseruuid(String useruuid) {
+        this.useruuid = useruuid;
+    }
 
     public Integer getOffset() {
         return offset;
