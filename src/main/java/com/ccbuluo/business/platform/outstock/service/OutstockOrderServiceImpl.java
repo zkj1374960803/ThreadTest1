@@ -131,11 +131,10 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                     bizOutstockorderDetail.setActualPrice(outstockplanDetail.getSalesPrice());
                     bizOutstockorderDetailList.add(bizOutstockorderDetail);
                 }
-                // todo 注意
-                /*List<Long> longs = bizOutstockOrderDao.batchBizOutstockOrder(bizOutstockorderDetailList);
+                List<Long> longs = outstockorderDetailService.batchBizOutstockOrderDetail(bizOutstockorderDetailList);
                 if (null != longs && longs.size() == 0) {
                     throw new CommonException("2002", "保存出库单详单失败！");
-                }*/
+                }
                 // 更改库存
                 // 根据出库单号查询出库单详单
                 updateOccupyStock(bizOutstockorderDetailList1, bizOutstockplanDetailList);
