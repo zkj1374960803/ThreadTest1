@@ -313,9 +313,20 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     public Page<QueryAllocateApplyListDTO> findProcessApplyList(String productType,String orgType, String applyStatus, String applyNo, Integer offset, Integer pageSize) {
         String userOrgCode = getUserOrgCode();
         List<String> orgCodesByOrgType = getOrgCodesByOrgType(orgType);
-
-        // 查询分页的申请列表
-        Page<QueryAllocateApplyListDTO> page = bizAllocateApplyDao.findProcessApplyList(productType,orgCodesByOrgType, applyStatus, applyNo, offset, pageSize, userOrgCode);
+        // 如果类型是空的话，全部类型，查询所有的申请数据
+        Page<QueryAllocateApplyListDTO> page;
+        if(StringUtils.isBlank(orgType)){
+            // 查询分页的处理申请列表
+            page = bizAllocateApplyDao.findProcessApplyList(productType,orgCodesByOrgType, applyStatus, applyNo, offset, pageSize, userOrgCode);
+        }else {
+            // 类型不是空，查不到机构的编码
+            if(orgCodesByOrgType == null || orgCodesByOrgType.size() == 0){
+                return new Page<>(offset, pageSize);
+            }else {
+                // 查询分页的处理申请列表
+                page = bizAllocateApplyDao.findProcessApplyList(productType,orgCodesByOrgType, applyStatus, applyNo, offset, pageSize, userOrgCode);
+            }
+        }
         List<QueryAllocateApplyListDTO> rows = page.getRows();
         List<String> orgCode = rows.stream().map(QueryAllocateApplyListDTO::getApplyorgNo).collect(Collectors.toList());
         Map<String, BasicUserOrganization> basicUserOrganizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(orgCode);
