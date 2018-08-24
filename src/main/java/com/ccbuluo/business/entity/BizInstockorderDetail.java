@@ -55,6 +55,11 @@ public class BizInstockorderDetail extends AftersaleCommonEntity{
     @ApiModelProperty(name = "instockNum", value = "入库数量")
     private Long instockNum;
     /**
+     * 问题件数量
+     */
+    @ApiModelProperty(name = "problemNum", value = "问题件数量")
+    private Long problemNum;
+    /**
      * 库存类型
      */
     @ApiModelProperty(name = "stockType", value = "库存类型")
@@ -180,4 +185,11 @@ public class BizInstockorderDetail extends AftersaleCommonEntity{
         this.stockId = stockId;
     }
 
+    public Long getProblemNum() {
+        return problemNum;
+    }
+
+    public void setProblemNum(Long problemNum) {
+        this.problemNum = problemNum;
+    }
 }

@@ -52,4 +52,16 @@ public class OutstockorderDetailServiceImpl implements OutstockorderDetailServic
     public List<OutstockorderDetailDTO> queryListByOutstockNo(String outstockNo) {
         return bizOutstockorderDetailDao.queryListByOutstockNo(outstockNo);
     }
+
+    /**
+     * 保存出库单详单
+     * @param bizOutstockorderDetailList 出库单详单
+     * @return ids
+     * @author liuduo
+     * @date 2018-08-24 18:40:19
+     */
+    @Override
+    public List<Long> batchBizOutstockOrderDetail(List<BizOutstockorderDetail> bizOutstockorderDetailList) {
+        return bizOutstockorderDetailDao.batchBizOutstockOrderDetail(bizOutstockorderDetailList);
+    }
 }

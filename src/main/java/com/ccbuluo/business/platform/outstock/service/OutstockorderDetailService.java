@@ -38,4 +38,13 @@ public interface OutstockorderDetailService {
      */
     List<OutstockorderDetailDTO> queryListByOutstockNo(String outstockNo);
 
+    /**
+     * 保存出库单详单
+     * @param bizOutstockorderDetailList 出库单详单
+     * @return ids
+     * @author liuduo
+     * @date 2018-08-24 18:40:19
+     */
+    List<Long> batchBizOutstockOrderDetail(List<BizOutstockorderDetail> bizOutstockorderDetailList);
+
 }
