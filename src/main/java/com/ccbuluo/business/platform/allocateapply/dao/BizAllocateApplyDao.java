@@ -470,7 +470,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
 
-        sql.append("SELECT a.id,a.product_no,a.product_name,a.product_type,a.product_unit,SUM(a.problem_stock) AS problem_stock,a.product_categoryname,a.supplier_no,b.supplier_name")
+        sql.append("SELECT a.id,a.product_no,a.product_name,a.product_type,a.product_unit,SUM(a.problem_stock) AS problem_stock,a.product_categoryname,a.supplier_no,b.supplier_name,a.cost_price")
             .append(" FROM biz_stock_detail a LEFT JOIN biz_service_supplier b ON a.supplier_no = b.supplier_code where 1 = 1");
         // 组织机构code
         if (StringUtils.isNotBlank(orgCode)) {
