@@ -61,7 +61,7 @@ public class BizServiceMaintaincarDao extends BaseDao<BizServiceMaintaincar> {
     public int updateServiceMaintaincar(BizServiceMaintaincar entity) {
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE biz_service_maintaincar SET ")
-            .append("vin_number = :vinNumber,car_status = :carStatus,")
+            .append("vin_number = :vinNumber,")
             .append("carbrand_id = :carbrandId,carseries_id = :carseriesId,")
             .append("carmodel_id = :carmodelId,beidou_number = :beidouNumber,")
             .append("remark = :remark,operator = :operator,operate_time = :operateTime WHERE id= :id");
