@@ -129,14 +129,15 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType)){
             purchaserToSeller = null;
             platformToSeller.setTotalPrice(total);
-            purchaserToPlatform.setTotalPrice(total);
+            BigDecimal costTotal = getCostTatol(outStocks,sellerOrgNo);
+            purchaserToPlatform.setTotalPrice(costTotal);
+
         }
         // 平级调拨(从买方到卖方)
         if(AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType)){
             purchaserToPlatform = null;
             platformToSeller = null;
-            BigDecimal costTotal = getCostTatol(outStocks,sellerOrgNo);
-            purchaserToSeller.setTotalPrice(costTotal);
+            purchaserToSeller.setTotalPrice(total);
         }
 
 
