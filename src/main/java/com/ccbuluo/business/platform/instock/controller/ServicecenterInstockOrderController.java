@@ -4,6 +4,7 @@ import com.ccbuluo.business.entity.BizInstockOrder;
 import com.ccbuluo.business.entity.BizInstockorderDetail;
 import com.ccbuluo.business.entity.BizInstockplanDetail;
 import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
+import com.ccbuluo.business.platform.instock.dto.SaveInstockorderDetailDTO;
 import com.ccbuluo.business.platform.instock.service.InstockOrderService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
@@ -44,21 +45,15 @@ public class ServicecenterInstockOrderController extends BaseController {
 
     /**
      * 保存入库单
-     * @param applyNo 申请单号
-     * @param bizInstockorderDetailList 入库单详单
+     * @param saveInstockorderDetailDTO 入库单信息
      * @return 是否保存成功
      * @author liuduo
      * @date 2018-08-07 15:15:07
      */
     @ApiOperation(value = "入库单新增", notes = "【刘铎】")
-    @ApiImplicitParams({@ApiImplicitParam(name = "applyNo", value = "申请单号",  required = true, paramType = "query"),
-        @ApiImplicitParam(name = "inRepositoryNo", value = "入库仓库编号",  required = true, paramType = "query")})
-
     @PostMapping("/save")
-    public StatusDto<String> saveInstockOrder(@RequestParam String applyNo,
-                                              @RequestParam String inRepositoryNo,
-                                              @ApiParam(name = "入库单详单集合", value = "传入json格式", required = true)@RequestBody List<BizInstockorderDetail> bizInstockorderDetailList) {
-        return instockOrderService.saveInstockOrder(applyNo, inRepositoryNo, bizInstockorderDetailList);
+    public StatusDto<String> saveInstockOrder(@ApiParam(name = "入库单详单集合", value = "传入json格式", required = true)@RequestBody SaveInstockorderDetailDTO saveInstockorderDetailDTO) {
+        return instockOrderService.saveInstockOrder(saveInstockorderDetailDTO.getApplyNo(), saveInstockorderDetailDTO.getInRepositoryNo(), saveInstockorderDetailDTO.getBizInstockorderDetailList());
     }
 
 

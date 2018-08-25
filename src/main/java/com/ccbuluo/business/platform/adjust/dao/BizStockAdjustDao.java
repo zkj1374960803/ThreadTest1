@@ -118,32 +118,33 @@ public class BizStockAdjustDao extends BaseDao<BizStockAdjust> {
 
 
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT adjust_docno,adjust_orgno,adjust_userid,adjust_time,adjust_result FROM biz_stock_adjust WHERE 1=1");
+        sql.append(" SELECT DISTINCT bsa.adjust_docno,bsa.adjust_orgno,bsa.adjust_userid,bsa.adjust_time,bsa.adjust_result FROM biz_stock_adjust AS bsa")
+            .append(" LEFT JOIN biz_stock_adjustdetail AS bsaa ON bsaa.adjust_docno = bsa.adjust_docno WHERE 1=1");
         if (null != adjustResult) {
             params.put("adjustResult", adjustResult);
             if (adjustResult.equals(Constants.FLAG_ONE)) {
-                sql.append(" AND adjust_result > 0");
+                sql.append(" AND bsa.adjust_result > 0");
             } else {
-                sql.append(" AND adjust_result = 0");
+                sql.append(" AND bsa.adjust_result = 0");
             }
         }
         if (StringUtils.isNotBlank(adjustSource)) {
             params.put("adjustSource", adjustSource);
-            sql.append(" AND adjust_orgno = :adjustSource");
+            sql.append(" AND bsa.adjust_orgno = :adjustSource");
         }
         if (StringUtils.isNotBlank(keyWord)) {
             params.put("keyWord", keyWord);
-            sql.append(" AND (adjust_orgno LIKE CONCAT('%',:keyWord,'%') OR adjust_docno LIKE CONCAT('%',:keyWord,'%'))");
+            sql.append(" AND (bsa.adjust_orgno LIKE CONCAT('%',:keyWord,'%') OR bsa.adjust_docno LIKE CONCAT('%',:keyWord,'%'))");
         }
         if (StringUtils.isNotBlank(orgCode) && !(orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM))) {
             params.put("orgCode", orgCode);
-            sql.append(" AND adjust_orgno = :orgCode");
+            sql.append(" AND bsa.adjust_orgno = :orgCode");
         }
         if (StringUtils.isNotBlank(productType)) {
             params.put("productType", productType);
-            sql.append(" AND product_type = :productType");
+            sql.append(" AND bsaa.product_type = :productType");
         }
-        sql.append("  ORDER BY operate_time DESC");
+        sql.append("  ORDER BY bsa.operate_time DESC");
 
         return queryPageForBean(SearchStockAdjustListDTO.class, sql.toString(), params, offset, pagesize);
     }

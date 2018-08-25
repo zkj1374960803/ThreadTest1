@@ -472,12 +472,12 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         QueryOrgDTO orgDTO = new QueryOrgDTO();
         orgDTO.setOrgType(type);
         orgDTO.setStatus(Constants.FREEZE_STATUS_YES);
-        StatusDtoThriftList<QueryOrgDTO> queryOrgDTO = basicUserOrganizationService.queryOrgAndWorkInfo(orgDTO);
-        StatusDto<List<QueryOrgDTO>> queryOrgDTOResolve = StatusDtoThriftUtils.resolve(queryOrgDTO, QueryOrgDTO.class);
-        List<QueryOrgDTO> data = queryOrgDTOResolve.getData();
+        StatusDtoThriftList<BasicUserOrganization> basicUserOrganization = basicUserOrganizationService.queryOrgListByOrgType(type, true);
+        StatusDto<List<BasicUserOrganization>> resolve = StatusDtoThriftUtils.resolve(basicUserOrganization, BasicUserOrganization.class);
+        List<BasicUserOrganization> data = resolve.getData();
         List<String> orgCode = null;
         if(data != null && data.size() > 0){
-            orgCode = data.stream().map(QueryOrgDTO::getOrgCode).collect(Collectors.toList());
+            orgCode = data.stream().map(BasicUserOrganization::getOrgCode).collect(Collectors.toList());
         }
         return orgCode;
     }
@@ -521,8 +521,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     public Boolean getEquipMent(String equipCode) {
         return bizAllocateapplyDetailDao.getEquipMent(equipCode);
     }
-//    @Resource
-//    BizServiceCustmanagerDao bizServiceCustmanagerDao;
+
     /**
      * 查询客户经理关联的服务中心
      *
@@ -532,24 +531,18 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      * @date 2018-08-24 17:37:13
      */
     @Override
-    public Map<String, String> findCustManagerServiceCenter(String useruuid) throws IOException {
+    public BasicUserOrganization findCustManagerServiceCenter(String useruuid) throws IOException {
         if(StringUtils.isBlank(useruuid)){
             String loggedUserId = userHolder.getLoggedUserId();
             useruuid = loggedUserId;
         }
-        HashMap<String, String> map = Maps.newHashMap();
         // 查询客户经理的详情
         BizServiceCustmanager bizServiceCustmanager = bizServiceCustmanagerDao.queryCustManagerByUuid(useruuid);
         String servicecenterCode = bizServiceCustmanager.getServicecenterCode();
         StatusDtoThriftBean<BasicUserOrganization> orgByCode = basicUserOrganizationService.findOrgByCode(servicecenterCode);
         StatusDto<BasicUserOrganization> resolve = StatusDtoThriftUtils.resolve(orgByCode, BasicUserOrganization.class);
         BasicUserOrganization data = resolve.getData();
-        if(data != null){
-            String orgName = data.getOrgName();
-            String orgCode = data.getOrgCode();
-            map.put(orgCode, orgName);
-        }
-        return map;
+        return data;
     }
 
     /**

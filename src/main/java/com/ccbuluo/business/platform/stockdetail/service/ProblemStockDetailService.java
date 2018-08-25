@@ -19,26 +19,29 @@ public interface ProblemStockDetailService {
 
     /**
      * 带条件分页查询所有零配件的问题库存
-     * @param productType 物料类型
+     *  @param type 物料或是零配件
+     * @param productCategory 物料类型
      * @param productList 商品
      * @param offset 起始数
      * @param pageSize 每页数量
      * @author weijb
      * @date 2018-08-14 21:59:51
      */
-    Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(String productType, List<BasicCarpartsProductDTO> productList, String keyword, Integer offset, Integer pageSize);
+    Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(String type, String productCategory, List<BasicCarpartsProductDTO> productList, String keyword, Integer offset, Integer pageSize);
     /**
      * 带条件分页查询本机构所有零配件的问题库存
-     * @param productType 物料类型
+     * @param type 物料或是零配件
+     * @param productCategory 物料类型
      * @param productList 商品
      * @param offset 起始数
      * @param pageSize 每页数量
      * @author weijb
      * @date 2018-08-14 21:59:51
      */
-    Page<StockBizStockDetailDTO> querySelfStockBizStockDetailDTOList(String productType, List<BasicCarpartsProductDTO> productList, String keyword, Integer offset, Integer pageSize);
+    Page<StockBizStockDetailDTO> querySelfStockBizStockDetailDTOList(String type, String productCategory, List<BasicCarpartsProductDTO> productList, String keyword, Integer offset, Integer pageSize);
     /**
      * 根据物料code查询某个物料的问题件库存
+     * @param type 物料或是零配件
      * @param productNo 商品编号
      * @param offset 起始数
      * @param pageSize 每页数量
@@ -47,7 +50,7 @@ public interface ProblemStockDetailService {
      * @author weijb
      * @date 2018-08-15 08:59:51
      */
-    Page<StockBizStockDetailDTO> getProdectStockBizStockDetailByCode(String productNo, Integer offset, Integer pageSize);
+    Page<StockBizStockDetailDTO> getProdectStockBizStockDetailByCode(String type, String productNo, Integer offset, Integer pageSize);
     /**
      * 根据物料code查询某个物料在当前登录机构的问题件库存
      * @param productNo 商品编号

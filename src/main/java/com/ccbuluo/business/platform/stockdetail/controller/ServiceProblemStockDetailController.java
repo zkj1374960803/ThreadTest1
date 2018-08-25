@@ -1,7 +1,6 @@
 package com.ccbuluo.business.platform.stockdetail.controller;
 
 import com.ccbuluo.business.constants.Constants;
-import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleContext;
 import com.ccbuluo.business.platform.stockdetail.dto.ProblemStockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
@@ -29,10 +28,10 @@ import java.util.List;
  * @version v1.0.0
  * @date 2018-08-15 08:01:51
  */
-@Api(tags = "问题库存(平台端)")
+@Api(tags = "问题库存(服务中心端)")
 @RestController
-@RequestMapping("/platform/problemstock")
-public class ProblemStockDetailController extends BaseController {
+@RequestMapping("/platform/serviceproblemstock")
+public class ServiceProblemStockDetailController extends BaseController {
     @Resource
     private ProblemStockDetailService problemStockDetailService;
     @ThriftRPCClient("BasicMerchandiseSer")
@@ -40,9 +39,8 @@ public class ProblemStockDetailController extends BaseController {
     @Resource
     ApplyHandleContext applyHandleContext;
 
-
     /**
-     * 物料问题库存列表（平台端用）
+     * 本机构物料问题库存列表（服务中心端用）
      * @param productCategory 物料分类
      * @param keyword 关键字
      * @param offset 起始数
@@ -50,40 +48,17 @@ public class ProblemStockDetailController extends BaseController {
      * @author weijb
      * @date 2018-08-15 08:59:51
      */
-    @ApiOperation(value = "物料问题库存列表（平台端用）",notes = "【魏俊标】")
-    @GetMapping("/equipmentlist")
-    @ApiImplicitParams({@ApiImplicitParam(name = "productCategory", value = "物料分类", required = false, paramType = "query"),
+    @ApiOperation(value = "当前登录机构物料问题库存列表（服务中心端用）",notes = "【魏俊标】")
+    @GetMapping("/selfequipmentlist")
+    @ApiImplicitParams({@ApiImplicitParam(name = "productCategory", value = "物料类型", required = false, paramType = "query"),
             @ApiImplicitParam(name = "keyword", value = "关键字", required = false, paramType = "query"),
             @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
             @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
-    public StatusDto<Page<StockBizStockDetailDTO>> queryequipmentStockList(@RequestParam(required = false) String productCategory,
+    public StatusDto<Page<StockBizStockDetailDTO>> querySelfequipmentStockList(@RequestParam(required = false) String productCategory,
                                                                                    @RequestParam(required = false) String keyword,
                                                                                    @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                                    @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
-        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.queryStockBizStockDetailDTOList(Constants.PRODUCT_TYPE_EQUIPMENT,productCategory, null, keyword, offset, pageSize));
-    }
-
-    /**
-     * 根据商品code查询某个物料的问题件库存（平台用）
-     * @param productNo 商品编号
-     * @param offset 起始数
-     * @param pageSize 每页数量
-     * @return
-     * @exception
-     * @author weijb
-     * @date 2018-08-15 08:59:51
-     */
-    @ApiOperation(value = "根据商品code查询某个物料的问题件库存（平台用）",notes = "【魏俊标】")
-    @GetMapping("/getproblemequipmentstock")
-    @ApiImplicitParams({@ApiImplicitParam(name = "productNo", value = "商品编号", required = false, paramType = "query"),
-            @ApiImplicitParam(name = "keyword", value = "关键字", required = false, paramType = "query"),
-            @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
-            @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
-    public StatusDto<Page<StockBizStockDetailDTO>> getProdectequipmentStockDetailByCode(@RequestParam(required = false) String productNo,
-                                                         @RequestParam(required = false) String keyword,
-                                                         @RequestParam(required = false, defaultValue = "0") Integer offset,
-                                                         @RequestParam(required = false, defaultValue = "20") Integer pageSize){
-        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.getProdectStockBizStockDetailByCode(Constants.PRODUCT_TYPE_EQUIPMENT,productNo, offset, pageSize));
+        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.querySelfStockBizStockDetailDTOList(Constants.PRODUCT_TYPE_EQUIPMENT,productCategory, null, keyword, offset, pageSize));
     }
 
     /**
@@ -122,51 +97,28 @@ public class ProblemStockDetailController extends BaseController {
     }
 
     /**
-     * 零配件问题库存列表（平台端用）
-     * @param productCategory 商品类型
+     * 本机构零配件问题库存列表（服务中心端用）
+     * @param productCategory 零配件分类
      * @param keyword 关键字
      * @param offset 起始数
      * @param pageSize 每页数量
      * @author weijb
      * @date 2018-08-15 08:59:51
      */
-    @ApiOperation(value = "零配件问题库存列表（平台端用）",notes = "【魏俊标】")
-    @GetMapping("/fittingslist")
+    @ApiOperation(value = "当前登录机构零配件问题库存列表（服务中心端用）",notes = "【魏俊标】")
+    @GetMapping("/selffittingslist")
     @ApiImplicitParams({@ApiImplicitParam(name = "productCategory", value = "零配件分类code", required = false, paramType = "query"),
             @ApiImplicitParam(name = "keyword", value = "关键字", required = false, paramType = "query"),
             @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
             @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
-    public StatusDto<Page<StockBizStockDetailDTO>> queryfittingsStockList(@RequestParam(required = false) String productCategory,
-                                                                                   @RequestParam(required = false) String keyword,
-                                                                                   @RequestParam(required = false, defaultValue = "0") Integer offset,
-                                                                                   @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
+    public StatusDto<Page<StockBizStockDetailDTO>> querySelffittingsStockList(@RequestParam(required = false) String productCategory,
+                                                                                       @RequestParam(required = false) String keyword,
+                                                                                       @RequestParam(required = false, defaultValue = "0") Integer offset,
+                                                                                       @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
         List<BasicCarpartsProductDTO> productList = null;
         if(StringUtils.isNotBlank(productCategory)){
             productList = carpartsProductService.queryCarpartsProductListByCategoryCode(productCategory);
         }
-        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.queryStockBizStockDetailDTOList(Constants.PRODUCT_TYPE_FITTINGS,null, productList, keyword, offset, pageSize));
-    }
-
-    /**
-     * 根据商品code查询某个零配件的问题件库存（平台用）
-     * @param productNo 商品编号
-     * @param offset 起始数
-     * @param pageSize 每页数量
-     * @return
-     * @exception
-     * @author weijb
-     * @date 2018-08-15 08:59:51
-     */
-    @ApiOperation(value = "根据商品code查询某个零配件的问题件库存（平台用）",notes = "【魏俊标】")
-    @GetMapping("/getproblemfittingsstock")
-    @ApiImplicitParams({@ApiImplicitParam(name = "productNo", value = "商品编号", required = false, paramType = "query"),
-            @ApiImplicitParam(name = "keyword", value = "关键字", required = false, paramType = "query"),
-            @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
-            @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
-    public StatusDto<Page<StockBizStockDetailDTO>> getProdectfittingsStockDetailByCode(@RequestParam(required = false) String productNo,
-                                                                                       @RequestParam(required = false) String keyword,
-                                                                                       @RequestParam(required = false, defaultValue = "0") Integer offset,
-                                                                                       @RequestParam(required = false, defaultValue = "20") Integer pageSize){
-        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.getProdectStockBizStockDetailByCode(Constants.PRODUCT_TYPE_FITTINGS,productNo, offset, pageSize));
+        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.querySelfStockBizStockDetailDTOList(Constants.PRODUCT_TYPE_FITTINGS,null, productList, keyword, offset, pageSize));
     }
 }

@@ -21,10 +21,10 @@ import javax.annotation.Resource;
  * @version v1.0.0
  * @date 2018-08-15 18:51:51
  */
-@Api(tags = "问题件申请管理（平台端）")
+@Api(tags = "问题件申请管理（服务中心端）")
 @RestController
-@RequestMapping("/platform/problemallocateapply")
-public class ProblemAllocateApplyController extends BaseController {
+@RequestMapping("/platform/serviceproblemallocateapply")
+public class ServiceProblemAllocateApplyController extends BaseController {
     @Resource
     private ProblemAllocateApply problemAllocateApply;
 
@@ -51,7 +51,7 @@ public class ProblemAllocateApplyController extends BaseController {
                                                                                 @RequestParam(required = false) String applyNo,
                                                                                 @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                                 @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
-        return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.queryProblemApplyList(applyType, applyStatus, applyNo, offset, pageSize));
+        return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.querySelfProblemApplyList(applyType, applyStatus, applyNo, offset, pageSize));
     }
 
     /**
@@ -76,7 +76,7 @@ public class ProblemAllocateApplyController extends BaseController {
                                                                                    @RequestParam(required = false) String applyNo,
                                                                                    @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                                    @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
-        return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.queryProblemHandleList(applyType, applyStatus, applyNo, offset, pageSize));
+        return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.querySelfProblemHandleList(applyType, applyStatus, applyNo, offset, pageSize));
     }
 
     /**
