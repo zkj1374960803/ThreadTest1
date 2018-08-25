@@ -42,13 +42,25 @@ public class PaymentServiceImpl implements PaymentService {
      */
     @Override
     public StatusDto paymentCompletion(String applyNo){
-        String status = BizAllocateApply.ApplyStatusEnum.WAITDELIVERY.name();// 等待发货
-        // 支付成功之后，如果是采购，则状态为平台待入库
-        if(applyNo.equals(BizAllocateApply.AllocateApplyTypeEnum.PURCHASE.name())){
-            status = BizAllocateApply.ApplyStatusEnum.INSTORE.name();// 等待平台入库
+        try {
+            // 根据申请单获取申请单详情
+            BizAllocateApply ba = bizAllocateApplyDao.getByNo(applyNo);
+            // 只有申请提交和等待付款的状态才可以撤销
+            if ( !ba.getApplyStatus().equals(BizAllocateApply.ApplyStatusEnum.WAITINGPAYMENT.name())) {
+                throw new CommonException("0", "只有待付款的申请才可以支付！");
+            }
+            String status = BizAllocateApply.ApplyStatusEnum.WAITDELIVERY.name();// 等待发货
+            // 支付成功之后，如果是采购，则状态为平台待入库
+            if(applyNo.equals(BizAllocateApply.AllocateApplyTypeEnum.PURCHASE.name())){
+                status = BizAllocateApply.ApplyStatusEnum.INSTORE.name();// 等待平台入库
+            }
+            //更新申请单状态
+            bizAllocateApplyDao.updateApplyOrderStatus(applyNo, status);
+            return StatusDto.buildSuccessStatusDto("支付成功！");
+
+        } catch (Exception e) {
+            logger.error("支付失败！", e);
+            throw e;
         }
-        //更新申请单状态
-        bizAllocateApplyDao.updateApplyOrderStatus(applyNo, status);
-        return StatusDto.buildSuccessStatusDto("支付成功！");
     }
 }

@@ -43,7 +43,7 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @author weijb
      * @date 2018-08-14 21:59:51
      */
-    public Page<ProblemAllocateapplyDetailDTO> queryProblemApplyList(String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
+    public Page<ProblemAllocateapplyDetailDTO> queryProblemApplyList(String userOrgCode, String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
@@ -66,6 +66,10 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             //根据编号或名称查询
             sql.append(" AND apply_no = :applyNo ");
         }
+        if(StringUtils.isNotBlank(userOrgCode)){
+            param.put("userOrgCode", userOrgCode);
+            sql.append(" AND applyorg_no = :userOrgCode ");
+        }
 
         sql.append(" ORDER BY create_time DESC");
         Page<ProblemAllocateapplyDetailDTO> DTOS = super.queryPageForBean(ProblemAllocateapplyDetailDTO.class, sql.toString(), param,offset,pageSize);
@@ -82,7 +86,7 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @author weijb
      * @date 2018-08-15 18:51:51
      */
-    public Page<ProblemAllocateapplyDetailDTO> queryProblemHandleList(String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
+    public Page<ProblemAllocateapplyDetailDTO> queryProblemHandleList(String userOrgCode, String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
@@ -108,6 +112,10 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             param.put("applyNo", applyNo);
             //根据编号或名称查询
             sql.append(" AND t1.apply_no = :applyNo ");
+        }
+        if(StringUtils.isNotBlank(userOrgCode)){
+            param.put("userOrgCode", userOrgCode);
+            sql.append(" AND t1.applyorg_no = :userOrgCode ");
         }
 
         sql.append(" ORDER BY t1.create_time DESC");
