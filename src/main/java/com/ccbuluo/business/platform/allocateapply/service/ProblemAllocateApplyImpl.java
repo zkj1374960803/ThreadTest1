@@ -45,6 +45,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
 
     /**
      * 问题件申请列表
+     *   @param type 物料或是零配件
      * @param applyType 申请类型
      * @param applyStatus 申请状态
      * @param applyNo 申请单号
@@ -54,11 +55,12 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
      * @date 2018-08-14 21:59:51
      */
     @Override
-    public Page<ProblemAllocateapplyDetailDTO> queryProblemApplyList(String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
-        return problemAllocateApplyDao.queryProblemApplyList(null,applyType, applyStatus, applyNo, offset, pageSize);
+    public Page<ProblemAllocateapplyDetailDTO> queryProblemApplyList(String type,String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
+        return problemAllocateApplyDao.queryProblemApplyList(type,null,applyType, applyStatus, applyNo, offset, pageSize);
     }
     /**
      * 问题件申请列表
+     *  @param type 物料或是零配件
      * @param applyType 申请类型
      * @param applyStatus 申请状态
      * @param applyNo 申请单号
@@ -68,10 +70,10 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
      * @date 2018-08-14 21:59:51
      */
     @Override
-    public Page<ProblemAllocateapplyDetailDTO> querySelfProblemApplyList(String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
+    public Page<ProblemAllocateapplyDetailDTO> querySelfProblemApplyList(String type,String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
         // 获取用户的组织机构
         String userOrgCode = getUserOrgCode();
-        return problemAllocateApplyDao.queryProblemApplyList(userOrgCode,applyType, applyStatus, applyNo, offset, pageSize);
+        return problemAllocateApplyDao.queryProblemApplyList(type,userOrgCode,applyType, applyStatus, applyNo, offset, pageSize);
     }
     /**
      * 获取用户的组织机构
@@ -96,6 +98,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
     }
     /**
      * 问题件处理列表
+     *  @param type 物料或是零配件
      * @param applyType 申请类型
      * @param applyStatus 申请状态
      * @param applyNo 申请单号
@@ -105,11 +108,12 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
      * @date 2018-08-15 18:51:51
      */
     @Override
-    public Page<ProblemAllocateapplyDetailDTO> queryProblemHandleList(String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
-        return problemAllocateApplyDao.queryProblemHandleList(null,applyType, applyStatus, applyNo, offset, pageSize);
+    public Page<ProblemAllocateapplyDetailDTO> queryProblemHandleList(String type,String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
+        return problemAllocateApplyDao.queryProblemHandleList(type,null,applyType, applyStatus, applyNo, offset, pageSize);
     }
     /**
      * 问题件处理列表
+     *  @param type 物料或是零配件
      * @param applyType 申请类型
      * @param applyStatus 申请状态
      * @param applyNo 申请单号
@@ -119,10 +123,10 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
      * @date 2018-08-15 18:51:51
      */
     @Override
-    public Page<ProblemAllocateapplyDetailDTO> querySelfProblemHandleList(String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
+    public Page<ProblemAllocateapplyDetailDTO> querySelfProblemHandleList(String type,String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
         // 获取用户的组织机构
         String userOrgCode = getUserOrgCode();
-        return problemAllocateApplyDao.queryProblemHandleList(userOrgCode, applyType, applyStatus, applyNo, offset, pageSize);
+        return problemAllocateApplyDao.queryProblemHandleList(type,userOrgCode, applyType, applyStatus, applyNo, offset, pageSize);
     }
 
     /**

@@ -62,41 +62,6 @@ public class ServiceProblemStockDetailController extends BaseController {
     }
 
     /**
-     * 根据商品code查询某个商品在当前登录机构的问题件库存
-     * @param productNo 商品编号
-     * @param offset 起始数
-     * @param pageSize 每页数量
-     * @exception
-     * @author weijb
-     * @date 2018-08-15 08:59:51
-     */
-    @ApiOperation(value = "根据商品code查询某个商品在当前登录机构的问题件库存",notes = "【魏俊标】")
-    @GetMapping("/getselfprodectstock")
-    @ApiImplicitParams({@ApiImplicitParam(name = "productNo", value = "商品编号", required = false, paramType = "query"),
-            @ApiImplicitParam(name = "keyword", value = "关键字", required = false, paramType = "query"),
-            @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
-            @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
-    public StatusDto<Page<StockBizStockDetailDTO>> getSelfProdectStockBizStockDetailByCode(@RequestParam(required = false) String productNo,
-                                                             @RequestParam(required = false) String keyword,
-                                                             @RequestParam(required = false, defaultValue = "0") Integer offset,
-                                                             @RequestParam(required = false, defaultValue = "20") Integer pageSize){
-        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.getSelfProdectStockBizStockDetailByCode(productNo, offset, pageSize));
-    }
-    /**
-     * 查询问题库存详情
-     * @param id 库存批次id
-     * @return StatusDto
-     * @author weijb
-     * @date 2018-08-23 16:02:58
-     */
-    @ApiOperation(value = "查询问题库存详情", notes = "【魏俊标】")
-    @GetMapping("/problemdetail/{id}")
-    @ApiImplicitParam(name = "id", value = "库存批次id", required = true, paramType = "path")
-    public StatusDto<ProblemStockBizStockDetailDTO> getProblemStockDetail(@PathVariable Long id){
-        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.getProblemStockDetail(id));
-    }
-
-    /**
      * 本机构零配件问题库存列表（服务中心端用）
      * @param productCategory 零配件分类
      * @param keyword 关键字
@@ -112,13 +77,29 @@ public class ServiceProblemStockDetailController extends BaseController {
             @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
             @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
     public StatusDto<Page<StockBizStockDetailDTO>> querySelffittingsStockList(@RequestParam(required = false) String productCategory,
-                                                                                       @RequestParam(required = false) String keyword,
-                                                                                       @RequestParam(required = false, defaultValue = "0") Integer offset,
-                                                                                       @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
+                                                                              @RequestParam(required = false) String keyword,
+                                                                              @RequestParam(required = false, defaultValue = "0") Integer offset,
+                                                                              @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
         List<BasicCarpartsProductDTO> productList = null;
         if(StringUtils.isNotBlank(productCategory)){
             productList = carpartsProductService.queryCarpartsProductListByCategoryCode(productCategory);
         }
         return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.querySelfStockBizStockDetailDTOList(Constants.PRODUCT_TYPE_FITTINGS,null, productList, keyword, offset, pageSize));
     }
+
+    /**
+     * 查询问题库存详情
+     * @param id 库存批次id
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-23 16:02:58
+     */
+    @ApiOperation(value = "查询问题库存详情", notes = "【魏俊标】")
+    @GetMapping("/problemdetail/{id}")
+    @ApiImplicitParam(name = "id", value = "库存批次id", required = true, paramType = "path")
+    public StatusDto<ProblemStockBizStockDetailDTO> getProblemStockDetail(@PathVariable Long id){
+        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.getProblemStockDetail(id));
+    }
+
+
 }

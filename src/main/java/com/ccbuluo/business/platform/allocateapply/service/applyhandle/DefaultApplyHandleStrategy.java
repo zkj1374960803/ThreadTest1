@@ -422,6 +422,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             BizInstockplanDetail instockplanPlatform = new BizInstockplanDetail();
             // 平台入库计划
             instockplanPlatform = buildBizInstockplanDetail(ad, applyType);
+            instockplanPlatform.setCostPrice(BigDecimal.ZERO);//  平台采购类型的成本价在生成入库计划的时候是0，等入库回调的时候再回填
             // 根据平台的no查询平台的仓库
             List<QueryStorehouseDTO> list = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
             String repositoryNo = "";
@@ -561,7 +562,6 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         // 采购
         if(AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType)){
             inPlan.setInstockType(InstockTypeEnum.PURCHASE.toString());// 交易类型
-            inPlan.setCostPrice(BigDecimal.ZERO);//  平台采购类型的成本价在生成入库计划的时候是0，等入库回调的时候再回填
         }
         // 换货
         if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) || AllocateApplyTypeEnum.REFUND.toString().equals(applyType) ){
