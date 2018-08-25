@@ -307,7 +307,7 @@ public class StockAdjustServiceImpl implements StockAdjustService{
                 List<Map<String, Long>> list = Lists.newArrayList();
                 // 根据商品编号查询库存，和盘库后的实际数量做对比，进行记录
                 List<BizStockDetail> bizStockDetailList = stockDetailService.queryStockDetailByProductNo(item.getProductNo(), userHolder.getLoggedUser().getOrganization().getOrgCode());
-                // 相差的数量
+                // 相差的数量=实际数量-应有数量
                 long differenceNum = item.getActualNum() - item.getPerfectNum();
                 for (BizStockDetail bizStockDetail : bizStockDetailList) {
                     BizStockDetail bizStockDetail1 = new BizStockDetail();
@@ -326,7 +326,7 @@ public class StockAdjustServiceImpl implements StockAdjustService{
                         bizStockDetail1.preUpdate(userHolder.getLoggedUserId());
                         bizStockDetailList1.add(bizStockDetail1);
                         break;
-                    } else {// 现有库存小于盘库后输入的库存,更新为0
+                    } else {
                         Map<String, Long> map = Maps.newHashMap();
                         map.put("stockId", bizStockDetail.getId());
                         map.put("differenceNum", validStock * -1);
@@ -352,6 +352,7 @@ public class StockAdjustServiceImpl implements StockAdjustService{
         // 保存盘库详单
         return bizStockAdjustdetailDao.saveAdjustDetail(bizStockAdjustdetailList);
     }
+
 
     /**
      *
