@@ -294,7 +294,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         param.put("productType", productType);
 
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT id,product_no,product_type,product_categoryname,product_name,IFNULL(SUM(valid_stock + occupy_stock),0) AS dueNum")
+        sql.append(" SELECT id,product_no,product_type,product_categoryname,product_name,SUM(IFNULL(valid_stock,0) + IFNULL(occupy_stock,0)) AS dueNum")
             .append("  FROM biz_stock_detail WHERE org_no = :orgCode AND product_type = :productType");
         if (null != equipmentCodes && equipmentCodes.size() > 0) {
             param.put("equipmentCodes", equipmentCodes);
