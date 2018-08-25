@@ -1,17 +1,22 @@
 package com.ccbuluo.business.platform.stockdetail.service;
 
+import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
+import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
+import com.ccbuluo.business.platform.equipment.dto.DetailBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dto.ProblemStockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 功能描述（1）
@@ -27,6 +32,8 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
     private ProblemStockDetailDao problemStockDetailDao;
     @Autowired
     private UserHolder userHolder;
+    @Autowired
+    private BizServiceEquipmentDao bizServiceEquipmentDao;
 
     /**
      * 带条件分页查询所有零配件的问题库存
@@ -44,7 +51,12 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
         if(null != productList && productList.size() > 0){
             codes = getCodes(productList);
         }
-        return problemStockDetailDao.queryStockBizStockDetailDTOList(type,"", productCategory, codes, keyword,offset, pageSize);
+        List<String> productNames = null;
+        if(StringUtils.isNotBlank(productCategory)){
+            List<DetailBizServiceEquipmentDTO> equis = bizServiceEquipmentDao.queryEqupmentByEquiptype(Long.valueOf(productCategory));
+            productNames = equis.stream().map(DetailBizServiceEquipmentDTO::getEquipName).collect(Collectors.toList());;
+        }
+        return problemStockDetailDao.queryStockBizStockDetailDTOList(type,"", productNames, codes, keyword,offset, pageSize);
     }
     /**
      * 带条件分页查询本机构所有零配件的问题库存
@@ -63,7 +75,12 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
             codes = getCodes(productList);
         }
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
-        return problemStockDetailDao.queryStockBizStockDetailDTOList(type,orgCode, productCategory, codes, keyword,offset, pageSize);
+        List<String> productNames = null;
+        if(StringUtils.isNotBlank(productCategory)){
+            List<DetailBizServiceEquipmentDTO> equis = bizServiceEquipmentDao.queryEqupmentByEquiptype(Long.valueOf(productCategory));
+            productNames = equis.stream().map(DetailBizServiceEquipmentDTO::getEquipName).collect(Collectors.toList());;
+        }
+        return problemStockDetailDao.queryStockBizStockDetailDTOList(type,orgCode, productNames, codes, keyword,offset, pageSize);
     }
 
     /**

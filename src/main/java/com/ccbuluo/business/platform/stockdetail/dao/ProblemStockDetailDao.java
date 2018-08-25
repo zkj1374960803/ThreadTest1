@@ -37,14 +37,14 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
      * 带条件分页查询本机构所有零配件的问题库存
      *  @param type 物料或是零配件
      * @param orgCode 组织机构code
-     * @param productCategory 物料类型
+     * @param productNames 物料名称
      * @param codes 零配件codes
      * @param offset 起始数
      * @param pageSize 每页数量
      * @author weijb
      * @date 2018-08-14 21:59:51
      */
-    public Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(String type, String orgCode, String productCategory, List<String> codes, String keyword, Integer offset, Integer pageSize){
+    public Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(String type, String orgCode, List<String> productNames, List<String> codes, String keyword, Integer offset, Integer pageSize){
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
@@ -54,9 +54,9 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
                 .append(" LEFT JOIN biz_instock_order t3 on t1.trade_no=t3.trade_docno ")
                 .append(" WHERE t1.delete_flag = :deleteFlag and t1.problem_stock>0 ");
         // 物料类型
-        if (StringUtils.isNotBlank(productCategory)) {
-            param.put("productCategory", productCategory);
-            sql.append(" AND t1.product_categoryname = :productCategory ");
+        if (null != productNames && productNames.size() > 0) {
+            param.put("productNames", productNames);
+            sql.append(" AND t1.product_name IN(:productNames)");
         }
         // 零配件codes
         if (null != codes && codes.size() > 0) {
@@ -98,11 +98,6 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
      * @date 2018-08-15 08:59:51
      */
     public Page<StockBizStockDetailDTO> getProdectStockBizStockDetailByCode(String type, String orgCode, String productNo, Integer offset, Integer pageSize){
-        // 用于调试TODO--------start
-        orgCode = "SC000001";
-        productNo = "FP000004600";
-        // 用于调试TODO--------end
-
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT t1.id,t1.product_no,t1.product_name,t1.product_type,t1.product_unit,SUM(t1.problem_stock) as problem_stock,t2.checked_time as outstock_time,t3.checked_time as instock_time ")
                 .append(" FROM biz_stock_detail t1 LEFT JOIN biz_outstock_order t2 on t1.trade_no=t2.trade_docno ")
@@ -149,11 +144,6 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
      * @date 2018-08-23 16:59:51
      */
     public List<StockDetailDTO> queryProblemStockBizStockList(String orgCode, String productNo){
-
-        // 用于调试TODO--------start
-        orgCode = "SC000001";
-        productNo = "FP000004600";
-        // 用于调试TODO--------end
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         param.put("orgCode", orgCode);
