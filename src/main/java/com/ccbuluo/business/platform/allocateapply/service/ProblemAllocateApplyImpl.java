@@ -163,7 +163,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
     public FindAllocateApplyDTO getProblemdetailDetail(String applyNo){
         FindAllocateApplyDTO allocateApplyDTO = allocateApplyServiceImpl.findDetail(applyNo);
         // 获取出库人和出库时间
-        ProblemAllocateapplyDetailDTO info = problemAllocateApplyDao.queryProblemApplyInfo(applyNo, allocateApplyDTO.getApplyorgNo());
+        ProblemAllocateapplyDetailDTO info = problemAllocateApplyDao.queryProblemApplyInfo(applyNo, allocateApplyDTO.getProcessOrgno());
         if(null != info){
             String outOperatorName = getUserNameByUuid(info.getOutstockOperator());
             String inOperatorName = getUserNameByUuid(info.getInstockOperator());

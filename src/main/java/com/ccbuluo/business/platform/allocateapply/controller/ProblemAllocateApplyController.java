@@ -31,31 +31,6 @@ public class ProblemAllocateApplyController extends BaseController {
 
 
     /**
-     * 物料问题件申请列表
-     * @param applyType 申请类型
-     * @param applyStatus 申请状态
-     * @param applyNo 申请单号
-     * @param offset 起始数
-     * @param pageSize 每页数量
-     * @author weijb
-     * @date 2018-08-15 18:51:51
-     */
-    @ApiOperation(value = "物料问题件申请列表",notes = "【魏俊标】")
-    @GetMapping("/applylist")
-    @ApiImplicitParams({@ApiImplicitParam(name = "applyType", value = "申请类型", required = false, paramType = "query"),
-            @ApiImplicitParam(name = "applyStatus", value = "申请状态", required = false, paramType = "query"),
-            @ApiImplicitParam(name = "applyNo", value = "申请单号", required = false, paramType = "query"),
-            @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
-            @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
-    public StatusDto<Page<ProblemAllocateapplyDetailDTO>> queryProblemApplyList(@RequestParam(required = false) String applyType,
-                                                                                @RequestParam(required = false) String applyStatus,
-                                                                                @RequestParam(required = false) String applyNo,
-                                                                                @RequestParam(required = false, defaultValue = "0") Integer offset,
-                                                                                @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
-        return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.queryProblemApplyList(Constants.PRODUCT_TYPE_EQUIPMENT,applyType, applyStatus, applyNo, offset, pageSize));
-    }
-
-    /**
      * 物料问题件处理列表
      * @param applyType 申请类型
      * @param applyStatus 申请状态
@@ -78,31 +53,6 @@ public class ProblemAllocateApplyController extends BaseController {
                                                                                    @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                                    @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
         return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.queryProblemHandleList(Constants.PRODUCT_TYPE_EQUIPMENT,applyType, applyStatus, applyNo, offset, pageSize));
-    }
-
-    /**
-     * 零配件问题件申请列表
-     * @param applyType 申请类型
-     * @param applyStatus 申请状态
-     * @param applyNo 申请单号
-     * @param offset 起始数
-     * @param pageSize 每页数量
-     * @author weijb
-     * @date 2018-08-15 18:51:51
-     */
-    @ApiOperation(value = "零配件问题件申请列表",notes = "【魏俊标】")
-    @GetMapping("/applyfittingslist")
-    @ApiImplicitParams({@ApiImplicitParam(name = "applyType", value = "申请类型", required = false, paramType = "query"),
-            @ApiImplicitParam(name = "applyStatus", value = "申请状态", required = false, paramType = "query"),
-            @ApiImplicitParam(name = "applyNo", value = "申请单号", required = false, paramType = "query"),
-            @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
-            @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
-    public StatusDto<Page<ProblemAllocateapplyDetailDTO>> queryfittingsProblemApplyList(@RequestParam(required = false) String applyType,
-                                                                                @RequestParam(required = false) String applyStatus,
-                                                                                @RequestParam(required = false) String applyNo,
-                                                                                @RequestParam(required = false, defaultValue = "0") Integer offset,
-                                                                                @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
-        return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.queryProblemApplyList(Constants.PRODUCT_TYPE_FITTINGS,applyType, applyStatus, applyNo, offset, pageSize));
     }
 
     /**
@@ -130,19 +80,6 @@ public class ProblemAllocateApplyController extends BaseController {
         return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.queryProblemHandleList(Constants.PRODUCT_TYPE_FITTINGS,applyType, applyStatus, applyNo, offset, pageSize));
     }
 
-    /**
-     * 查询退换货申请单详情
-     * @param applyNo 申请单号
-     * @return StatusDto
-     * @author weijb
-     * @date 2018-08-20 20:02:58
-     */
-    @ApiOperation(value = "查询退换货申请单详情（申请）", notes = "【魏俊标】")
-    @GetMapping("/problemApplydetail/{applyNo}")
-    @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
-    public StatusDto<FindAllocateApplyDTO> getProblemdetailApplyDetail(@PathVariable String applyNo){
-        return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.getProblemdetailApplyDetail(applyNo));
-    }
 
     /**
      * 查询退换货处理申请单详情（处理）
