@@ -563,11 +563,13 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         if(data == null){
             throw new CommonException(Constants.ERROR_CODE, "根据code查询服务中心，数据异常！");
         }
-        List<QueryStorehouseDTO> queryStorehouseDTOList = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(data.getOrgCode());
         String orgName = data.getOrgName();
         String orgCode = data.getOrgCode();
         map.put("orgName", orgName);
         map.put("orgCode", orgCode);
+
+        String userOrgCode = getUserOrgCode();
+        List<QueryStorehouseDTO> queryStorehouseDTOList = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(userOrgCode);
         if(queryStorehouseDTOList != null && queryStorehouseDTOList.size() > 0){
             QueryStorehouseDTO queryStorehouseDTO = queryStorehouseDTOList.get(0);
             String storehouseCode = queryStorehouseDTO.getStorehouseCode();
@@ -575,7 +577,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             map.put("storehouseCode", storehouseCode);
             map.put("storehouseName", storehouseName);
         }
-
         return map;
     }
 
