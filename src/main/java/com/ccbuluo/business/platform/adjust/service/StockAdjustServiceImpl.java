@@ -325,7 +325,7 @@ public class StockAdjustServiceImpl implements StockAdjustService{
                         bizStockDetail1.setVersionNo(bizStockDetail.getVersionNo() + Constants.LONG_FLAG_ONE);
                         bizStockDetail1.preUpdate(userHolder.getLoggedUserId());
                         bizStockDetailList1.add(bizStockDetail1);
-                        continue;
+                        break;
                     } else {// 现有库存小于盘库后输入的库存,更新为0
                         Map<String, Long> map = Maps.newHashMap();
                         map.put("stockId", bizStockDetail.getId());
