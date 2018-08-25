@@ -43,7 +43,7 @@ public interface StockAdjustService {
      * @author liuduo
      * @date 2018-08-14 17:43:53
      */
-    List<StockAdjustListDTO> queryAdjustList(Long equipTypeId, String equipmentcode);
+    List<StockAdjustListDTO> queryAdjustList(Long equipTypeId, String equipmentcode, String productType);
 
     /**
      * 保存盘库
@@ -62,7 +62,7 @@ public interface StockAdjustService {
      * @author liuduo
      * @date 2018-08-15 09:23:53
      */
-    List<StockAdjustListDTO> queryAdjustListByCategoryCode(String categoryCode, String productCode);
+    List<StockAdjustListDTO> queryAdjustListByCategoryCode(String categoryCode, String productCode, String productType);
 
     /**
      * 查询盘库单列表

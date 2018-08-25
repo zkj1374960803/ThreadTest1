@@ -245,6 +245,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     private void updateApplyOrderStatus(String applyNo, FindAllocateApplyDTO detail, List<BizOutstockplanDetail> bizOutstockplanDetailList) {
         List<BizOutstockplanDetail> collect = bizOutstockplanDetailList.stream().filter(item -> item.getPlanStatus().equals(StockPlanStatusEnum.COMPLETE.name())).collect(Collectors.toList());
         String applyType = detail.getApplyType();
+        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         if (StringUtils.isNotBlank(applyType)) {
             // 判断本次交易的出库计划是否全部完成
             if (bizOutstockplanDetailList.size() == collect.size()) {
@@ -252,22 +253,24 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                     case PLATFORMALLOCATE:
                     case PURCHASE:
                     case SAMELEVEL:
-                    case DIRECTALLOCATE:
-                        if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+                        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
                             allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.WAITINGRECEIPT.toString());
                         } else {
                             allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.INSTORE.toString());
                         }
                         break;
+                    case DIRECTALLOCATE:
+                        allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.WAITINGRECEIPT.toString());
+                        break;
                     case BARTER:
-                        if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+                        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
                             allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REPLACEWAITIN.toString());
                         } else {
                             allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.PRODRETURNED.toString());
                         }
                         break;
                     case REFUND:
-                        if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+                        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
                             allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.WAITINGREFUND.toString());
                         } else {
                             allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.PRODRETURNED.toString());

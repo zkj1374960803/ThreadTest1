@@ -218,6 +218,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                 applyHandleContext.platformInstockCallback(applyNo);
             }
             String applyType = detail.getApplyType();
+            String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
             if (StringUtils.isNotBlank(applyType)) {
                 // 更改申请单状态
                 switch (Enum.valueOf(BizAllocateApply.AllocateApplyTypeEnum.class, applyType)) {
@@ -225,21 +226,21 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                     case PLATFORMALLOCATE:
                     case SAMELEVEL:
                     case DIRECTALLOCATE:
-                        if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+                        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
                             allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.OUTSTORE.toString());
                         } else {
                             allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.CONFIRMRECEIPT.toString());
                         }
                         break;
                     case BARTER:
-                        if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+                        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
                             allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.PLATFORMOUTBOUND.toString());
                         } else {
                             allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REPLACECOMPLETED.toString());
                         }
                         break;
                     case REFUND:
-                        if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+                        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
                             allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.PLATFORMOUTBOUND.toString());
                         }
                         break;
@@ -486,6 +487,8 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                     bizStockDetail.setProblemStock(item.getInstockNum());
                 }
                 stockDetailService.updateValidStock(bizStockDetail, versionNoById1);
+                item.setInstockPlanid(id);
+                bizInstockorderDetailList1.add(item);
             } else {
                 BizStockDetail bizStockDetail = new BizStockDetail();
                 bizStockDetail.setRepositoryNo(inRepositoryNo);
