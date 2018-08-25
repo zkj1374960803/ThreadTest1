@@ -134,13 +134,13 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             // 根据处理机构类型判断
             if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(allocateApplyDTO.getProcessOrgno())){
                 allocateApplyDTO.setApplyType(AllocateApplyTypeEnum.PLATFORMALLOCATE.name());
-                allocateApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
             }else {
                 allocateApplyDTO.setApplyType(AllocateApplyTypeEnum.SAMELEVEL.name());
             }
         }
         // 如果申请机构和处理机构是同一人，说明创建和处理是一起做的，则处理已经完成了
         if (allocateApplyDTO.getApplyorgNo().equals(allocateApplyDTO.getProcessOrgno())) {
+            allocateApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
             allocateApplyDTO.setApplyProcessor(loggedUserId);
             allocateApplyDTO.setProcessTime(new Date());
         }
@@ -276,8 +276,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }
         }
         allocateApplyDTO.setQueryAllocateapplyDetailDTO(queryAllocateapplyDetailDTOS);
-        // 供应商名称查询
-
         return allocateApplyDTO;
     }
 
