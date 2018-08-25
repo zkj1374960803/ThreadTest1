@@ -72,16 +72,7 @@ public class QueryAllocateapplyDetailDTO {
      */
     @ApiModelProperty(name = "supplierName", value = "供应商的名称")
     private String supplierName;
-    @ApiModelProperty(name = "refundAddress", value = "收货地址")
-    private String refundAddress;
 
-    public String getRefundAddress() {
-        return refundAddress;
-    }
-
-    public void setRefundAddress(String refundAddress) {
-        this.refundAddress = refundAddress;
-    }
 
     public Long getId() {
         return id;

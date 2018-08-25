@@ -147,6 +147,27 @@ public class FindAllocateApplyDTO {
     @ApiModelProperty(name = "transportorderNo", value = "物流单号", hidden = true)
     private String transportorderNo;
 
+    @ApiModelProperty(name = "refundAddress", value = "收货地址")
+    private String refundAddress;
+    @ApiModelProperty(name = "remark", value = "备注")
+    private String remark;
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public String getRefundAddress() {
+        return refundAddress;
+    }
+
+    public void setRefundAddress(String refundAddress) {
+        this.refundAddress = refundAddress;
+    }
+
 
     public String getOrgType() {
         return orgType;
