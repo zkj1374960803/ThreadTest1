@@ -487,6 +487,8 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                     bizStockDetail.setProblemStock(item.getInstockNum());
                 }
                 stockDetailService.updateValidStock(bizStockDetail, versionNoById1);
+                item.setInstockPlanid(id);
+                bizInstockorderDetailList1.add(item);
             } else {
                 BizStockDetail bizStockDetail = new BizStockDetail();
                 bizStockDetail.setRepositoryNo(inRepositoryNo);
