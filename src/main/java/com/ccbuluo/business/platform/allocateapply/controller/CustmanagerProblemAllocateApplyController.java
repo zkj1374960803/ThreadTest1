@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.allocateapply.controller;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.ProblemAllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.allocateapply.service.ProblemAllocateApply;
@@ -51,7 +52,7 @@ public class CustmanagerProblemAllocateApplyController extends BaseController {
                                                                                 @RequestParam(required = false) String applyNo,
                                                                                 @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                                 @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
-        return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.querySelfProblemApplyList(applyType, applyStatus, applyNo, offset, pageSize));
+        return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.querySelfProblemApplyList(Constants.PRODUCT_TYPE_EQUIPMENT, applyType, applyStatus, applyNo, offset, pageSize));
     }
 
     /**
@@ -76,7 +77,56 @@ public class CustmanagerProblemAllocateApplyController extends BaseController {
                                                                                    @RequestParam(required = false) String applyNo,
                                                                                    @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                                    @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
-        return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.querySelfProblemHandleList(applyType, applyStatus, applyNo, offset, pageSize));
+        return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.querySelfProblemHandleList(Constants.PRODUCT_TYPE_EQUIPMENT, applyType, applyStatus, applyNo, offset, pageSize));
+    }
+    /**
+     * 零配件问题件申请列表
+     * @param applyType 申请类型
+     * @param applyStatus 申请状态
+     * @param applyNo 申请单号
+     * @param offset 起始数
+     * @param pageSize 每页数量
+     * @author weijb
+     * @date 2018-08-15 18:51:51
+     */
+    @ApiOperation(value = "零配件问题件申请列表",notes = "【魏俊标】")
+    @GetMapping("/applyfittingslist")
+    @ApiImplicitParams({@ApiImplicitParam(name = "applyType", value = "申请类型", required = false, paramType = "query"),
+            @ApiImplicitParam(name = "applyStatus", value = "申请状态", required = false, paramType = "query"),
+            @ApiImplicitParam(name = "applyNo", value = "申请单号", required = false, paramType = "query"),
+            @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
+            @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
+    public StatusDto<Page<ProblemAllocateapplyDetailDTO>> queryProblemApplyfittingsList(@RequestParam(required = false) String applyType,
+                                                                                        @RequestParam(required = false) String applyStatus,
+                                                                                        @RequestParam(required = false) String applyNo,
+                                                                                        @RequestParam(required = false, defaultValue = "0") Integer offset,
+                                                                                        @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
+        return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.querySelfProblemApplyList(Constants.PRODUCT_TYPE_FITTINGS,applyType, applyStatus, applyNo, offset, pageSize));
+    }
+
+    /**
+     * 零配件问题件处理列表
+     * @param applyType 申请类型
+     * @param applyStatus 申请状态
+     * @param applyNo 申请单号
+     * @param offset 起始数
+     * @param pageSize 每页数量
+     * @author weijb
+     * @date 2018-08-15 18:51:51
+     */
+    @ApiOperation(value = "零配件问题件处理列表",notes = "【魏俊标】")
+    @GetMapping("/handlefittingslist")
+    @ApiImplicitParams({@ApiImplicitParam(name = "applyType", value = "申请类型", required = false, paramType = "query"),
+            @ApiImplicitParam(name = "applyStatus", value = "申请状态", required = false, paramType = "query"),
+            @ApiImplicitParam(name = "applyNo", value = "申请单号", required = false, paramType = "query"),
+            @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
+            @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
+    public StatusDto<Page<ProblemAllocateapplyDetailDTO>> queryProblemHandlefittingsList(@RequestParam(required = false) String applyType,
+                                                                                         @RequestParam(required = false) String applyStatus,
+                                                                                         @RequestParam(required = false) String applyNo,
+                                                                                         @RequestParam(required = false, defaultValue = "0") Integer offset,
+                                                                                         @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
+        return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.querySelfProblemHandleList(Constants.PRODUCT_TYPE_FITTINGS,applyType, applyStatus, applyNo, offset, pageSize));
     }
 
     /**

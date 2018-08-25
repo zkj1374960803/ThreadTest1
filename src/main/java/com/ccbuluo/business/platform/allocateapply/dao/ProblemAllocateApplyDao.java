@@ -35,6 +35,7 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
 
     /**
      * 问题件申请列表
+     * @param type 物料或是零配件
      * @param applyType 申请类型
      * @param applyStatus 申请状态
      * @param applyNo 申请单号
@@ -43,7 +44,7 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @author weijb
      * @date 2018-08-14 21:59:51
      */
-    public Page<ProblemAllocateapplyDetailDTO> queryProblemApplyList(String userOrgCode, String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
+    public Page<ProblemAllocateapplyDetailDTO> queryProblemApplyList(String type, String userOrgCode, String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
@@ -70,6 +71,11 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             param.put("userOrgCode", userOrgCode);
             sql.append(" AND applyorg_no = :userOrgCode ");
         }
+        // 区分零配件和物料
+        if (StringUtils.isNotBlank(type)) {
+            param.put("type", type);
+            sql.append(" AND product_type = :type ");
+        }
 
         sql.append(" ORDER BY create_time DESC");
         Page<ProblemAllocateapplyDetailDTO> DTOS = super.queryPageForBean(ProblemAllocateapplyDetailDTO.class, sql.toString(), param,offset,pageSize);
@@ -78,6 +84,7 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
 
     /**
      * 问题件处理列表
+     * @param type 物料或是零配件
      * @param applyType 申请类型
      * @param applyStatus 申请状态
      * @param applyNo 申请单号
@@ -86,7 +93,7 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @author weijb
      * @date 2018-08-15 18:51:51
      */
-    public Page<ProblemAllocateapplyDetailDTO> queryProblemHandleList(String userOrgCode, String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
+    public Page<ProblemAllocateapplyDetailDTO> queryProblemHandleList(String type, String userOrgCode, String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
@@ -116,6 +123,11 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         if(StringUtils.isNotBlank(userOrgCode)){
             param.put("userOrgCode", userOrgCode);
             sql.append(" AND t1.applyorg_no = :userOrgCode ");
+        }
+        // 区分零配件和物料
+        if (StringUtils.isNotBlank(type)) {
+            param.put("type", type);
+            sql.append(" AND t1.product_type = :type ");
         }
 
         sql.append(" ORDER BY t1.create_time DESC");
