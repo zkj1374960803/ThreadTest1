@@ -87,7 +87,7 @@ public class BizInstockorderDetailDao extends BaseDao<BizInstockorderDetail> {
 
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT bid.instock_orderno,bid.product_no,bid.product_name,bid.product_categoryname,bid.supplier_no,")
-            .append(" bss.supplier_name,bid.instock_num,bid.cost_price,bid.unit FROM biz_instockorder_detail AS bid")
+            .append(" bss.supplier_name,bid.instock_num,bid.cost_price,bid.unit,bid.stock_type FROM biz_instockorder_detail AS bid")
             .append(" LEFT JOIN biz_service_supplier AS bss ON bss.supplier_code = bid.supplier_no")
             .append("  WHERE bid.instock_orderno = :instockNo");
 
