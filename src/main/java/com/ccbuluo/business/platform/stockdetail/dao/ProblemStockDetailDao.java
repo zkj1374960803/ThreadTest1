@@ -91,6 +91,11 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
      * @date 2018-08-15 08:59:51
      */
     public Page<StockBizStockDetailDTO> getProdectStockBizStockDetailByCode(String orgCode, String productNo, Integer offset, Integer pageSize){
+        // 用于调试TODO--------start
+        orgCode = "SC000001";
+        productNo = "FP000004600";
+        // 用于调试TODO--------end
+
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT t1.id,t1.product_no,t1.product_name,t1.product_type,t1.product_unit,SUM(t1.problem_stock) as problem_stock,t2.checked_time as outstock_time,t3.checked_time as instock_time ")
                 .append(" FROM biz_stock_detail t1 LEFT JOIN biz_outstock_order t2 on t1.trade_no=t2.trade_docno ")
@@ -132,6 +137,11 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
      * @date 2018-08-23 16:59:51
      */
     public List<StockDetailDTO> queryProblemStockBizStockList(String orgCode, String productNo){
+
+        // 用于调试TODO--------start
+        orgCode = "SC000001";
+        productNo = "FP000004600";
+        // 用于调试TODO--------end
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         param.put("orgCode", orgCode);
@@ -140,7 +150,7 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
 
         sql.append("SELECT t1.id,t1.trade_no,t2.instock_time,t1.supplier_no,t1.problem_stock,t1.product_unit ")
                 .append(" FROM biz_stock_detail t1 LEFT JOIN biz_instock_order t2 on t1.trade_no=t2.trade_docno ")
-                .append(" WHERE t1.delete_flag = :deleteFlag and t1.product_no = :productNo and t1.org_no= :orgCode and t1.problem_stock>0 and t2.instock_orgno = :orgCode ");
+                .append(" WHERE t1.delete_flag = :deleteFlag and t1.product_no = :productNo and t1.org_no= :orgCode and t1.problem_stock>0 ");
         return super.queryListBean(StockDetailDTO.class, sql.toString(), param);
     }
 }
