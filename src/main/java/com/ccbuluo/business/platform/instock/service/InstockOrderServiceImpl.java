@@ -483,7 +483,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                 if (item.getStockType().equals(BizStockDetail.StockTypeEnum.VALIDSTOCK.toString())) {
                     bizStockDetail.setValidStock(item.getInstockNum());
                 } else if (item.getStockType().equals(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.toString())) {
-                    bizStockDetail.setProblemStock(item.getProblemNum());
+                    bizStockDetail.setProblemStock(item.getInstockNum());
                 }
                 stockDetailService.updateValidStock(bizStockDetail, versionNoById1);
             } else {
