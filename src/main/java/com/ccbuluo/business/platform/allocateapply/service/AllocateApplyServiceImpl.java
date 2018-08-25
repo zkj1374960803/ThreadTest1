@@ -18,6 +18,7 @@ import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
+import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.BusinessUser;
 import com.ccbuluo.core.entity.Organization;
@@ -522,6 +523,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         return bizAllocateapplyDetailDao.getEquipMent(equipCode);
     }
 
+
     /**
      * 查询客户经理关联的服务中心
      *
@@ -531,18 +533,38 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      * @date 2018-08-24 17:37:13
      */
     @Override
-    public BasicUserOrganization findCustManagerServiceCenter(String useruuid) throws IOException {
+    public Map<String, String> findCustManagerServiceCenter(String useruuid) throws IOException {
         if(StringUtils.isBlank(useruuid)){
             String loggedUserId = userHolder.getLoggedUserId();
             useruuid = loggedUserId;
         }
+        HashMap<String, String> map = Maps.newHashMap();
         // 查询客户经理的详情
         BizServiceCustmanager bizServiceCustmanager = bizServiceCustmanagerDao.queryCustManagerByUuid(useruuid);
+        if(bizServiceCustmanager == null){
+            throw new CommonException(Constants.ERROR_CODE, "此用户不是客户经理");
+        }
         String servicecenterCode = bizServiceCustmanager.getServicecenterCode();
         StatusDtoThriftBean<BasicUserOrganization> orgByCode = basicUserOrganizationService.findOrgByCode(servicecenterCode);
         StatusDto<BasicUserOrganization> resolve = StatusDtoThriftUtils.resolve(orgByCode, BasicUserOrganization.class);
         BasicUserOrganization data = resolve.getData();
-        return data;
+        if(data == null){
+            throw new CommonException(Constants.ERROR_CODE, "根据code查询服务中心，数据异常！");
+        }
+        List<QueryStorehouseDTO> queryStorehouseDTOList = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(data.getOrgCode());
+        String orgName = data.getOrgName();
+        String orgCode = data.getOrgCode();
+        map.put("orgName", orgName);
+        map.put("orgCode", orgCode);
+        if(queryStorehouseDTOList != null && queryStorehouseDTOList.size() > 0){
+            QueryStorehouseDTO queryStorehouseDTO = queryStorehouseDTOList.get(0);
+            String storehouseCode = queryStorehouseDTO.getStorehouseCode();
+            String storehouseName = queryStorehouseDTO.getStorehouseName();
+            map.put("storehouseCode", storehouseCode);
+            map.put("storehouseName", storehouseName);
+        }
+
+        return map;
     }
 
     /**

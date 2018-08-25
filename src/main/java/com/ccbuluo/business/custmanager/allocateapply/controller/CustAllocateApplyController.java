@@ -204,7 +204,7 @@ public class CustAllocateApplyController extends BaseController {
     @GetMapping("/findcustmanagerservicecenter")
     @ApiOperation(value = "查询客户经理关联的服务中心", notes = "【张康健】")
     @ApiImplicitParam(name = "useruuid", value = "用户uuid", required = false, paramType = "query")
-    public StatusDto<BasicUserOrganization> findCustManagerServiceCenter(String useruuid) throws IOException {
+    public StatusDto<Map<String, String>> findCustManagerServiceCenter(String useruuid) throws IOException {
         return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.findCustManagerServiceCenter(useruuid));
     }
 
