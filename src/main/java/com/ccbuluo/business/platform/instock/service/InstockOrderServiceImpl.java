@@ -480,7 +480,11 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                 Integer versionNoById1 = stockDetailService.getVersionNoById(id);
                 BizStockDetail bizStockDetail = new BizStockDetail();
                 bizStockDetail.setId(id);
-                bizStockDetail.setValidStock(item.getInstockNum());
+                if (item.getStockType().equals(BizStockDetail.StockTypeEnum.VALIDSTOCK.toString())) {
+                    bizStockDetail.setValidStock(item.getInstockNum());
+                } else if (item.getStockType().equals(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.toString())) {
+                    bizStockDetail.setProblemStock(item.getProblemNum());
+                }
                 stockDetailService.updateValidStock(bizStockDetail, versionNoById1);
             } else {
                 BizStockDetail bizStockDetail = new BizStockDetail();
