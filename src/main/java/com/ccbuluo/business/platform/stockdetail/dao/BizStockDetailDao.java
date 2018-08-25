@@ -124,8 +124,8 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         params.put("versionNo", versionNo + Constants.FLAG_ONE);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE `biz_stock_detail` SET valid_stock = :validStock + IFNULL(valid_stock,0),version_no = version_no+1")
-            .append(" WHERE id = :id AND :versionNo > version_no");
+        sql.append("UPDATE `biz_stock_detail` SET valid_stock = :validStock + IFNULL(valid_stock,0),problem_stock = :problemStock + IFNULL(problem_stock,0),")
+            .append("  version_no = version_no+1 WHERE id = :id AND :versionNo > version_no");
 
         updateForBean(sql.toString(), bizStockDetail);
     }
@@ -288,13 +288,14 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author liuduo
      * @date 2018-08-14 17:43:53
      */
-    public List<StockAdjustListDTO> queryAdjustList(List<String> equipmentCodes, String orgCode) {
+    public List<StockAdjustListDTO> queryAdjustList(List<String> equipmentCodes, String orgCode, String productType) {
         Map<String, Object> param = Maps.newHashMap();
         param.put("orgCode", orgCode);
+        param.put("productType", productType);
 
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT id,product_no,product_type,product_categoryname,product_name,IFNULL(SUM(valid_stock + occupy_stock),0) AS dueNum")
-            .append("  FROM biz_stock_detail WHERE org_no = :orgCode ");
+        sql.append(" SELECT id,product_no,product_type,product_categoryname,product_name,SUM(IFNULL(valid_stock,0) + IFNULL(occupy_stock,0)) AS dueNum")
+            .append("  FROM biz_stock_detail WHERE org_no = :orgCode AND product_type = :productType");
         if (null != equipmentCodes && equipmentCodes.size() > 0) {
             param.put("equipmentCodes", equipmentCodes);
             sql.append(" AND product_no IN(:equipmentCodes)");

@@ -132,8 +132,8 @@ public class StockDetailServiceImpl implements StockDetailService{
      * @date 2018-08-14 17:43:53
      */
     @Override
-    public List<StockAdjustListDTO> queryAdjustList(List<String> equipmentCodes, String orgCode) {
-        return bizStockDetailDao.queryAdjustList(equipmentCodes, orgCode);
+    public List<StockAdjustListDTO> queryAdjustList(List<String> equipmentCodes, String orgCode, String productType) {
+        return bizStockDetailDao.queryAdjustList(equipmentCodes, orgCode, productType);
     }
 
     /**

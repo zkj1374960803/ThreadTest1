@@ -98,7 +98,7 @@ public interface StockDetailService {
      * @author liuduo
      * @date 2018-08-14 17:43:53
      */
-    List<StockAdjustListDTO> queryAdjustList(List<String> equipmentCodes, String orgCode);
+    List<StockAdjustListDTO> queryAdjustList(List<String> equipmentCodes, String orgCode, String productType);
 
     /**
      * 根据商品编码查询库存

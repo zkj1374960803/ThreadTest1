@@ -83,17 +83,12 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     }
 
     /**
-     * 问题件处理列表
-     * @param type 物料或是零配件
-     * @param applyType 申请类型
-     * @param applyStatus 申请状态
-     * @param applyNo 申请单号
-     * @param offset 起始数
-     * @param pageSize 每页数量
+     *  查询出入库时间
+     * @param applyNos 申请单编号
      * @author weijb
      * @date 2018-08-15 18:51:51
      */
-    public Page<ProblemAllocateapplyDetailDTO> queryProblemHandleList(String type, String userOrgCode, String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
+    public List<QueryAllocateApplyListDTO> queryProblemHandleList(List<String> applyNos){
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
@@ -103,36 +98,13 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
                 .append(" LEFT JOIN biz_instock_order t3 on t1.apply_no=t3.trade_docno ")
                 .append(" WHERE t1.delete_flag = :deleteFlag and t1.apply_type in('BARTER','REFUND')");
 
-
-        // 申请类型
-        if (StringUtils.isNotBlank(applyType)) {
-            param.put("applyType", applyType);
-            sql.append(" AND t1.apply_type = :applyType ");
-        }
-        // 申请状态
-        if (StringUtils.isNotBlank(applyStatus)) {
-            param.put("applyStatus", applyStatus);
-            sql.append(" AND t1.apply_status = :applyStatus  ");
-        }
-        // 商品编号
-        if (StringUtils.isNotBlank(applyNo)) {
-            param.put("applyNo", applyNo);
+        // 申请编号
+        if (null != applyNos && applyNos.size() > 0 ) {
+            param.put("applyNos", applyNos);
             //根据编号或名称查询
-            sql.append(" AND t1.apply_no = :applyNo ");
+            sql.append(" AND t1.apply_no in (:applyNos)");
         }
-        if(StringUtils.isNotBlank(userOrgCode)){
-            param.put("userOrgCode", userOrgCode);
-            sql.append(" AND t1.applyorg_no = :userOrgCode ");
-        }
-        // 区分零配件和物料
-        if (StringUtils.isNotBlank(type)) {
-            param.put("type", type);
-            sql.append(" AND t1.product_type = :type ");
-        }
-
-        sql.append(" ORDER BY t1.create_time DESC");
-        Page<ProblemAllocateapplyDetailDTO> DTOS = super.queryPageForBean(ProblemAllocateapplyDetailDTO.class, sql.toString(), param,offset,pageSize);
-        return DTOS;
+        return queryListBean(QueryAllocateApplyListDTO.class, sql.toString(), param);
     }
 
     /**

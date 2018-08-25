@@ -1,9 +1,13 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
+import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.constants.OrganizationTypeEnum;
+import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.ProblemAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.ProblemAllocateapplyDetailDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
 import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
 import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.core.common.UserHolder;
@@ -14,13 +18,20 @@ import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftBean;
+import com.ccbuluo.http.StatusDtoThriftList;
 import com.ccbuluo.http.StatusDtoThriftUtils;
+import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
+import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
+import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 功能描述（1）
@@ -42,6 +53,10 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
     private InnerUserInfoService innerUserInfoService;
     @Autowired
     UserHolder userHolder;
+    @Resource
+    BizAllocateApplyDao bizAllocateApplyDao;
+    @ThriftRPCClient("UserCoreSerService")
+    private BasicUserOrganizationService basicUserOrganizationService;
 
     /**
      * 问题件申请列表
@@ -70,10 +85,20 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
      * @date 2018-08-14 21:59:51
      */
     @Override
-    public Page<ProblemAllocateapplyDetailDTO> querySelfProblemApplyList(String type,String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
+    public Page<QueryAllocateApplyListDTO> querySelfProblemApplyList(String type,String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
+        Page<ProblemAllocateapplyDetailDTO> result = new Page<ProblemAllocateapplyDetailDTO>();
         // 获取用户的组织机构
         String userOrgCode = getUserOrgCode();
-        return problemAllocateApplyDao.queryProblemApplyList(type,userOrgCode,applyType, applyStatus, applyNo, offset, pageSize);
+        // 查询分页的申请列表
+        Page<QueryAllocateApplyListDTO> page = bizAllocateApplyDao.findApplyList(type, applyType, applyStatus, applyNo, offset, pageSize, userOrgCode);
+        List<QueryAllocateApplyListDTO> rows = page.getRows();
+        List<String> applyNos = null;
+        if(rows != null){
+            // 查出申请单号
+            applyNos = rows.stream().map(QueryAllocateApplyListDTO::getApplyNo).collect(Collectors.toList());
+            rows = problemAllocateApplyDao.queryProblemHandleList(applyNos);
+        }
+        return page;
     }
     /**
      * 获取用户的组织机构
@@ -99,7 +124,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
     /**
      * 问题件处理列表
      *  @param type 物料或是零配件
-     * @param applyType 申请类型
+     * @param processType 申请类型
      * @param applyStatus 申请状态
      * @param applyNo 申请单号
      * @param offset 起始数
@@ -108,25 +133,46 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
      * @date 2018-08-15 18:51:51
      */
     @Override
-    public Page<ProblemAllocateapplyDetailDTO> queryProblemHandleList(String type,String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
-        return problemAllocateApplyDao.queryProblemHandleList(type,null,applyType, applyStatus, applyNo, offset, pageSize);
+    public Page<QueryAllocateApplyListDTO> queryProblemHandleList(String type,String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
+        String userOrgCode = getUserOrgCode();
+        List<String> orgCodesByOrgType = getOrgCodesByOrgType(OrganizationTypeEnum.PLATFORM.name());
+        // 如果类型是空的话，全部类型，查询所有的申请数据
+        Page<QueryAllocateApplyListDTO> page;
+        page = bizAllocateApplyDao.findProcessHandleList(processType, type,orgCodesByOrgType, applyStatus, applyNo, offset, pageSize, userOrgCode);
+        List<QueryAllocateApplyListDTO> rows = page.getRows();
+        List<String> applyNos = null;
+        if(rows != null){
+            // 查出申请单号
+            applyNos = rows.stream().map(QueryAllocateApplyListDTO::getApplyNo).collect(Collectors.toList());
+            rows = problemAllocateApplyDao.queryProblemHandleList(applyNos);
+        }
+        return page;
     }
     /**
-     * 问题件处理列表
-     *  @param type 物料或是零配件
-     * @param applyType 申请类型
-     * @param applyStatus 申请状态
-     * @param applyNo 申请单号
-     * @param offset 起始数
-     * @param pageSize 每页数量
-     * @author weijb
-     * @date 2018-08-15 18:51:51
+     *  根据类型查询服务中心的code
+     * @param type 机构的类型
+     * @return List<String> 机构的code
+     * @author zhangkangjian
+     * @date 2018-08-20 16:17:55
      */
-    @Override
-    public Page<ProblemAllocateapplyDetailDTO> querySelfProblemHandleList(String type,String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
-        // 获取用户的组织机构
-        String userOrgCode = getUserOrgCode();
-        return problemAllocateApplyDao.queryProblemHandleList(type,userOrgCode, applyType, applyStatus, applyNo, offset, pageSize);
+    private List<String> getOrgCodesByOrgType(String type) {
+        if(StringUtils.isBlank(type)){
+            return Collections.emptyList();
+        }
+        if(OrganizationTypeEnum.PLATFORM.name().equals(type)){
+            return List.of(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+        }
+        QueryOrgDTO orgDTO = new QueryOrgDTO();
+        orgDTO.setOrgType(type);
+        orgDTO.setStatus(Constants.FREEZE_STATUS_YES);
+        StatusDtoThriftList<BasicUserOrganization> basicUserOrganization = basicUserOrganizationService.queryOrgListByOrgType(type, true);
+        StatusDto<List<BasicUserOrganization>> resolve = StatusDtoThriftUtils.resolve(basicUserOrganization, BasicUserOrganization.class);
+        List<BasicUserOrganization> data = resolve.getData();
+        List<String> orgCode = null;
+        if(data != null && data.size() > 0){
+            orgCode = data.stream().map(BasicUserOrganization::getOrgCode).collect(Collectors.toList());
+        }
+        return orgCode;
     }
 
     /**

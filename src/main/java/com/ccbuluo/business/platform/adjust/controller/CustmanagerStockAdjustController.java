@@ -79,11 +79,13 @@ public class CustmanagerStockAdjustController extends BaseController {
      */
     @ApiOperation(value = "新增盘库时用的列表", notes = "【刘铎】")
     @ApiImplicitParams({@ApiImplicitParam(name = "equipTypeId", value = "物料类型id",  required = false, paramType = "query", dataType = "int"),
-        @ApiImplicitParam(name = "equipmentcode", value = "物料编号",  required = false, paramType = "query")})
+        @ApiImplicitParam(name = "equipmentcode", value = "物料编号",  required = false, paramType = "query"),
+        @ApiImplicitParam(name = "productType", value = "商品类型（物料）",  required = true, paramType = "query")})
     @GetMapping("/queryadjustlist")
     public StatusDto<List<StockAdjustListDTO>> queryAdjustList(@RequestParam(required = false) Long equipTypeId,
-                                                               @RequestParam(required = false) String equipmentcode) {
-        return StatusDto.buildDataSuccessStatusDto(stockAdjustService.queryAdjustList(equipTypeId, equipmentcode));
+                                                               @RequestParam(required = false) String equipmentcode,
+                                                               @RequestParam String productType) {
+        return StatusDto.buildDataSuccessStatusDto(stockAdjustService.queryAdjustList(equipTypeId, equipmentcode, productType));
     }
 
 
@@ -126,11 +128,13 @@ public class CustmanagerStockAdjustController extends BaseController {
      */
     @ApiOperation(value = "新增盘库时用的列表中根据分类查询列表", notes = "【刘铎】")
     @ApiImplicitParams({@ApiImplicitParam(name = "categoryCode", value = "零配件分类code",  required = false, paramType = "query", dataType = "int"),
-        @ApiImplicitParam(name = "productCode", value = "商品编号",  required = false, paramType = "query")})
+        @ApiImplicitParam(name = "productCode", value = "商品编号",  required = false, paramType = "query"),
+        @ApiImplicitParam(name = "productType", value = "商品类型（备件）",  required = true, paramType = "query")})
     @GetMapping("/queryadjustlistbycategorycode")
     public StatusDto<List<StockAdjustListDTO>> queryAdjustListByCategoryCode(@RequestParam(required = false) String categoryCode,
-                                                               @RequestParam(required = false) String productCode) {
-        return StatusDto.buildDataSuccessStatusDto(stockAdjustService.queryAdjustListByCategoryCode(categoryCode, productCode));
+                                                                             @RequestParam(required = false) String productCode,
+                                                                             @RequestParam String productType) {
+        return StatusDto.buildDataSuccessStatusDto(stockAdjustService.queryAdjustListByCategoryCode(categoryCode, productCode, productType));
     }
 
     /**
