@@ -151,5 +151,5 @@ public interface AllocateApplyService {
      * @author zhangkangjian
      * @date 2018-08-24 17:37:13
      */
-    BasicUserOrganization findCustManagerServiceCenter(String useruuid) throws IOException;
+    Map<String, String> findCustManagerServiceCenter(String useruuid) throws IOException;
 }
