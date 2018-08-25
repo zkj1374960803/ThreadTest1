@@ -72,7 +72,6 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
             Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, BizAllocateApply.AllocateApplyTypeEnum.BARTER, relOrdstockOccupies);
             // 调用自动出库
-            //todo 参数传错了
             outstockOrderService.autoSaveOutstockOrder(applyNo, pir.getLeft());
             // 批量保存出库计划详情
             bizOutstockplanDetailDao.batchOutstockplanDetail(pir.getLeft());
