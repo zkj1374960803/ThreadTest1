@@ -161,16 +161,18 @@ public class StockAdjustController extends BaseController {
     @ApiOperation(value = "盘库单列表", notes = "【刘铎】")
     @ApiImplicitParams({@ApiImplicitParam(name = "adjustResult", value = "盘库结果（有差异、无差异）",  required = false, paramType = "query", dataType = "int"),
         @ApiImplicitParam(name = "adjustSource", value = "盘库单来源(传code)",  required = false, paramType = "query"),
+        @ApiImplicitParam(name = "productType", value = "商品类型（物料或者备件）",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "keyWord", value = "关键字（盘库单号/服务中心/客户经理）",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "起始数",  required = true, paramType = "query", dataType = "int"),
         @ApiImplicitParam(name = "pagesize", value = "每页数",  required = true, paramType = "query", dataType = "int")})
     @GetMapping("/queryadjuststocklist")
     public StatusDto<Page<SearchStockAdjustListDTO>> queryAdjustStockList(@RequestParam(required = false) Integer adjustResult,
                                                                           @RequestParam(required = false) String adjustSource,
+                                                                          @RequestParam(required = false) String productType,
                                                                           @RequestParam(required = false) String keyWord,
                                                                           @RequestParam(defaultValue = "0") Integer offset,
                                                                           @RequestParam(defaultValue = "10") Integer pagesize) {
-        return StatusDto.buildDataSuccessStatusDto(stockAdjustService.queryAdjustStockList(adjustResult, adjustSource, keyWord, offset, pagesize));
+        return StatusDto.buildDataSuccessStatusDto(stockAdjustService.queryAdjustStockList(adjustResult, adjustSource, keyWord, productType, offset, pagesize));
     }
 
 

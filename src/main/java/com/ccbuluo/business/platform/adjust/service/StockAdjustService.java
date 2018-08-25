@@ -75,7 +75,7 @@ public interface StockAdjustService {
      * @author liuduo
      * @date 2018-08-15 11:03:46
      */
-    Page<SearchStockAdjustListDTO> queryAdjustStockList(Integer adjustResult, String adjustSource, String keyWord, Integer offset, Integer pagesize);
+    Page<SearchStockAdjustListDTO> queryAdjustStockList(Integer adjustResult, String adjustSource, String keyWord, String productType, Integer offset, Integer pagesize);
 
     /**
      * 根据盘库单号查询盘库详情
