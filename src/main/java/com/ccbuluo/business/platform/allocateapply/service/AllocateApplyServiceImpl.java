@@ -229,7 +229,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             throw new CommonException(Constants.ERROR_CODE, "根据申请编号查询详情数据异常！");
         }
         // 查询组织架构的名字
-        StatusDtoThriftBean<BasicUserOrganization> outstockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getOutstockOrgno());
+            StatusDtoThriftBean<BasicUserOrganization> outstockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getOutstockOrgno());
         StatusDtoThriftBean<BasicUserOrganization> instockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getInstockOrgno());
         StatusDtoThriftBean<BasicUserOrganization> applyorgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getApplyorgNo());
         StatusDto<BasicUserOrganization> outstockOrgNameresolve = StatusDtoThriftUtils.resolve(outstockOrgName, BasicUserOrganization.class);
@@ -276,6 +276,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }
         }
         allocateApplyDTO.setQueryAllocateapplyDetailDTO(queryAllocateapplyDetailDTOS);
+        // 供应商名称查询
+
         return allocateApplyDTO;
     }
 
@@ -291,6 +293,18 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         String userOrgCode = getUserOrgCode();
         // 查询分页的申请列表
         Page<QueryAllocateApplyListDTO> page = bizAllocateApplyDao.findApplyList(productType, processType, applyStatus, applyNo, offset, pageSize, userOrgCode);
+        List<QueryAllocateApplyListDTO> rows = page.getRows();
+        if(rows != null){
+            List<String> outstockOrgno = rows.stream().map(QueryAllocateApplyListDTO::getOutstockOrgno).collect(Collectors.toList());
+            Map<String, BasicUserOrganization> organizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(outstockOrgno);
+            rows.stream().forEach(a ->{
+                BasicUserOrganization organization = organizationMap.get(a.getOutstockOrgno());
+                if(organization != null){
+                    a.setOutstockOrgname(organization.getOrgName());
+                }
+            });
+
+        }
         return page;
     }
 

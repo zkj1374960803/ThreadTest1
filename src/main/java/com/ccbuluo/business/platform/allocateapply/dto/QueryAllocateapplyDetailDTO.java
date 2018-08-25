@@ -73,6 +73,7 @@ public class QueryAllocateapplyDetailDTO {
     @ApiModelProperty(name = "supplierName", value = "供应商的名称")
     private String supplierName;
 
+
     public Long getId() {
         return id;
     }

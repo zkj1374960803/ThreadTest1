@@ -140,7 +140,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     public FindAllocateApplyDTO findDetail(String applyNo) {
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.process_orgtype,a.process_orgno,a.apply_type,a.apply_no,a.applyorg_no,a.apply_status,a.applyer_name,b.storehouse_name,b.storehouse_address, ")
-            .append(" a.create_time,a.process_type,b.servicecenter_code as 'instockOrgno',a.outstock_orgno,a.in_repository_no as 'inRepositoryNo' ")
+            .append(" a.create_time,a.process_type,b.servicecenter_code as 'instockOrgno',a.outstock_orgno,a.in_repository_no as 'inRepositoryNo',a.refund_address,a.remark ")
             .append(" FROM biz_allocate_apply a LEFT JOIN biz_service_storehouse b ON a.in_repository_no = b.storehouse_code ")
             .append(" WHERE a.apply_no = :applyNo ");
         HashMap<String, Object> map = Maps.newHashMap();
@@ -177,7 +177,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         HashMap<String, Object> map = Maps.newHashMap();
 
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.apply_status,a.process_type,a.process_orgtype as 'orgType' ")
+        sql.append(" SELECT a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.apply_status,a.process_type,a.process_orgtype as 'orgType',a.outstock_orgno ")
             .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(userOrgCode)){
             map.put("userOrgCode", userOrgCode);
