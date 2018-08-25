@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.allocateapply.service;
 
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.ProblemAllocateapplyDetailDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
 import com.ccbuluo.db.Page;
 
 /**
@@ -37,7 +38,7 @@ public interface ProblemAllocateApply {
      * @author weijb
      * @date 2018-08-14 21:59:51
      */
-    Page<ProblemAllocateapplyDetailDTO> querySelfProblemApplyList(String type,String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize);
+    Page<QueryAllocateApplyListDTO> querySelfProblemApplyList(String type,String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize);
     /**
      * 问题件处理列表
      * @param type 物料或是零配件
@@ -49,19 +50,7 @@ public interface ProblemAllocateApply {
      * @author weijb
      * @date 2018-08-15 18:51:51
      */
-    Page<ProblemAllocateapplyDetailDTO> queryProblemHandleList(String type,String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize);
-    /**
-     * 问题件处理列表
-     *  @param type 物料或是零配件
-     * @param applyType 申请类型
-     * @param applyStatus 申请状态
-     * @param applyNo 申请单号
-     * @param offset 起始数
-     * @param pageSize 每页数量
-     * @author weijb
-     * @date 2018-08-15 18:51:51
-     */
-    Page<ProblemAllocateapplyDetailDTO> querySelfProblemHandleList(String type,String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize);
+    Page<QueryAllocateApplyListDTO> queryProblemHandleList(String type, String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize);
 
     /**
      * 查询退换货申请单详情(申请)

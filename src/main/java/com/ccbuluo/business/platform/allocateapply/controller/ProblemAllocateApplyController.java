@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.allocateapply.controller;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.ProblemAllocateapplyDetailDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
 import com.ccbuluo.business.platform.allocateapply.service.ProblemAllocateApply;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
@@ -47,7 +48,7 @@ public class ProblemAllocateApplyController extends BaseController {
             @ApiImplicitParam(name = "applyNo", value = "申请单号", required = false, paramType = "query"),
             @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
             @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
-    public StatusDto<Page<ProblemAllocateapplyDetailDTO>> queryProblemHandleList(@RequestParam(required = false) String applyType,
+    public StatusDto<Page<QueryAllocateApplyListDTO>> queryProblemHandleList(@RequestParam(required = false) String applyType,
                                                                                    @RequestParam(required = false) String applyStatus,
                                                                                    @RequestParam(required = false) String applyNo,
                                                                                    @RequestParam(required = false, defaultValue = "0") Integer offset,
@@ -72,11 +73,11 @@ public class ProblemAllocateApplyController extends BaseController {
             @ApiImplicitParam(name = "applyNo", value = "申请单号", required = false, paramType = "query"),
             @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
             @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
-    public StatusDto<Page<ProblemAllocateapplyDetailDTO>> queryfittingsProblemHandleList(@RequestParam(required = false) String applyType,
-                                                                                 @RequestParam(required = false) String applyStatus,
-                                                                                 @RequestParam(required = false) String applyNo,
-                                                                                 @RequestParam(required = false, defaultValue = "0") Integer offset,
-                                                                                 @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
+    public StatusDto<Page<QueryAllocateApplyListDTO>> queryfittingsProblemHandleList(@RequestParam(required = false) String applyType,
+                                                                                     @RequestParam(required = false) String applyStatus,
+                                                                                     @RequestParam(required = false) String applyNo,
+                                                                                     @RequestParam(required = false, defaultValue = "0") Integer offset,
+                                                                                     @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
         return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.queryProblemHandleList(Constants.PRODUCT_TYPE_FITTINGS,applyType, applyStatus, applyNo, offset, pageSize));
     }
 
