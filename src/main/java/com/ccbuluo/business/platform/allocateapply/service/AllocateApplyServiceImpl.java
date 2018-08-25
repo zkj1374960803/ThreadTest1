@@ -18,6 +18,7 @@ import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
+import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.BusinessUser;
 import com.ccbuluo.core.entity.Organization;
@@ -472,12 +473,12 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         QueryOrgDTO orgDTO = new QueryOrgDTO();
         orgDTO.setOrgType(type);
         orgDTO.setStatus(Constants.FREEZE_STATUS_YES);
-        StatusDtoThriftList<QueryOrgDTO> queryOrgDTO = basicUserOrganizationService.queryOrgAndWorkInfo(orgDTO);
-        StatusDto<List<QueryOrgDTO>> queryOrgDTOResolve = StatusDtoThriftUtils.resolve(queryOrgDTO, QueryOrgDTO.class);
-        List<QueryOrgDTO> data = queryOrgDTOResolve.getData();
+        StatusDtoThriftList<BasicUserOrganization> basicUserOrganization = basicUserOrganizationService.queryOrgListByOrgType(type, true);
+        StatusDto<List<BasicUserOrganization>> resolve = StatusDtoThriftUtils.resolve(basicUserOrganization, BasicUserOrganization.class);
+        List<BasicUserOrganization> data = resolve.getData();
         List<String> orgCode = null;
         if(data != null && data.size() > 0){
-            orgCode = data.stream().map(QueryOrgDTO::getOrgCode).collect(Collectors.toList());
+            orgCode = data.stream().map(BasicUserOrganization::getOrgCode).collect(Collectors.toList());
         }
         return orgCode;
     }
@@ -521,8 +522,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     public Boolean getEquipMent(String equipCode) {
         return bizAllocateapplyDetailDao.getEquipMent(equipCode);
     }
-//    @Resource
-//    BizServiceCustmanagerDao bizServiceCustmanagerDao;
+
+
     /**
      * 查询客户经理关联的服务中心
      *
@@ -540,15 +541,29 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         HashMap<String, String> map = Maps.newHashMap();
         // 查询客户经理的详情
         BizServiceCustmanager bizServiceCustmanager = bizServiceCustmanagerDao.queryCustManagerByUuid(useruuid);
+        if(bizServiceCustmanager == null){
+            throw new CommonException(Constants.ERROR_CODE, "此用户不是客户经理");
+        }
         String servicecenterCode = bizServiceCustmanager.getServicecenterCode();
         StatusDtoThriftBean<BasicUserOrganization> orgByCode = basicUserOrganizationService.findOrgByCode(servicecenterCode);
         StatusDto<BasicUserOrganization> resolve = StatusDtoThriftUtils.resolve(orgByCode, BasicUserOrganization.class);
         BasicUserOrganization data = resolve.getData();
-        if(data != null){
-            String orgName = data.getOrgName();
-            String orgCode = data.getOrgCode();
-            map.put(orgCode, orgName);
+        if(data == null){
+            throw new CommonException(Constants.ERROR_CODE, "根据code查询服务中心，数据异常！");
         }
+        List<QueryStorehouseDTO> queryStorehouseDTOList = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(data.getOrgCode());
+        String orgName = data.getOrgName();
+        String orgCode = data.getOrgCode();
+        map.put("orgName", orgName);
+        map.put("orgCode", orgCode);
+        if(queryStorehouseDTOList != null && queryStorehouseDTOList.size() > 0){
+            QueryStorehouseDTO queryStorehouseDTO = queryStorehouseDTOList.get(0);
+            String storehouseCode = queryStorehouseDTO.getStorehouseCode();
+            String storehouseName = queryStorehouseDTO.getStorehouseName();
+            map.put("storehouseCode", storehouseCode);
+            map.put("storehouseName", storehouseName);
+        }
+
         return map;
     }
 

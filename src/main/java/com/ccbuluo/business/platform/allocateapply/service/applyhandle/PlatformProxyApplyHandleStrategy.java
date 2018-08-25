@@ -78,7 +78,7 @@ public class PlatformProxyApplyHandleStrategy extends DefaultApplyHandleStrategy
             }
             //获取卖方机构code
             String sellerOrgNo = getProductOrgNo(ba);
-            //查询库存列表
+            // 查询库存列表
             List<BizStockDetail> stockDetails = getStockDetailList(sellerOrgNo, details);
             if(null == stockDetails || stockDetails.size() == 0){
                 return StatusDto.buildFailureStatusDto("库存为空！");

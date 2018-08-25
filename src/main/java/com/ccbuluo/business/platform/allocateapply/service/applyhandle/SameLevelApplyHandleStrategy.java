@@ -63,9 +63,9 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
                 throw new CommonException("0", "申请单为空！");
             }
             // 构建占用库存和订单占用库存关系
-            //获取卖方机构code
+            // 获取卖方机构code
             String productOrgNo = getProductOrgNo(ba);
-            //查询库存列表
+            // 查询库存列表
             List<BizStockDetail> stockDetails = getStockDetailList(productOrgNo, details);
             if(null == stockDetails || stockDetails.size() == 0){
                 throw new CommonException("0", "库存为空！");

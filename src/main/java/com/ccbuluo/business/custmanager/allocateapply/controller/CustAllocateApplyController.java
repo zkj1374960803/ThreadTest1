@@ -8,6 +8,7 @@ import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
+import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -203,9 +204,8 @@ public class CustAllocateApplyController extends BaseController {
     @GetMapping("/findcustmanagerservicecenter")
     @ApiOperation(value = "查询客户经理关联的服务中心", notes = "【张康健】")
     @ApiImplicitParam(name = "useruuid", value = "用户uuid", required = false, paramType = "query")
-    public StatusDto<Map<String,String>> findCustManagerServiceCenter(String useruuid) throws IOException {
-        Map<String,String> map = allocateApplyServiceImpl.findCustManagerServiceCenter(useruuid);
-        return StatusDto.buildDataSuccessStatusDto(map);
+    public StatusDto<Map<String, String>> findCustManagerServiceCenter(String useruuid) throws IOException {
+        return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.findCustManagerServiceCenter(useruuid));
     }
 
 
