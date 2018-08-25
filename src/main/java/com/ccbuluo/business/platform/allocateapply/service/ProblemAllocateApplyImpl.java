@@ -5,6 +5,7 @@ import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.OrganizationTypeEnum;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.ProblemAllocateApplyDao;
+import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.ProblemAllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
@@ -29,8 +30,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -93,10 +96,18 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         Page<QueryAllocateApplyListDTO> page = bizAllocateApplyDao.findApplyList(type, applyType, applyStatus, applyNo, offset, pageSize, userOrgCode);
         List<QueryAllocateApplyListDTO> rows = page.getRows();
         List<String> applyNos = null;
+        List<QueryAllocateApplyListDTO> applyList = new ArrayList<QueryAllocateApplyListDTO>();
         if(rows != null){
             // 查出申请单号
             applyNos = rows.stream().map(QueryAllocateApplyListDTO::getApplyNo).collect(Collectors.toList());
-            rows = problemAllocateApplyDao.queryProblemHandleList(applyNos);
+            applyList = problemAllocateApplyDao.queryProblemHandleList(applyNos);
+        }
+        for(QueryAllocateApplyListDTO apply : rows){
+            Optional<QueryAllocateApplyListDTO> applyFilter = applyList.stream() .filter(applyDetail -> apply.getApplyNo().equals(applyDetail.getApplyNo())) .findFirst();
+            if (applyFilter.isPresent()) {
+                apply.setInstockTime(applyFilter.get().getInstockTime());
+                apply.setOutstockTime(applyFilter.get().getOutstockTime());
+            }
         }
         return page;
     }
@@ -140,11 +151,19 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         Page<QueryAllocateApplyListDTO> page;
         page = bizAllocateApplyDao.findProcessHandleList(processType, type,orgCodesByOrgType, applyStatus, applyNo, offset, pageSize, userOrgCode);
         List<QueryAllocateApplyListDTO> rows = page.getRows();
+        List<QueryAllocateApplyListDTO> applyList = new ArrayList<QueryAllocateApplyListDTO>();
         List<String> applyNos = null;
         if(rows != null){
             // 查出申请单号
             applyNos = rows.stream().map(QueryAllocateApplyListDTO::getApplyNo).collect(Collectors.toList());
-            rows = problemAllocateApplyDao.queryProblemHandleList(applyNos);
+            applyList = problemAllocateApplyDao.queryProblemHandleList(applyNos);
+        }
+        for(QueryAllocateApplyListDTO apply : rows){
+            Optional<QueryAllocateApplyListDTO> applyFilter = applyList.stream() .filter(applyDetail -> apply.getApplyNo().equals(applyDetail.getApplyNo())) .findFirst();
+            if (applyFilter.isPresent()) {
+                apply.setInstockTime(applyFilter.get().getInstockTime());
+                apply.setOutstockTime(applyFilter.get().getOutstockTime());
+            }
         }
         return page;
     }
