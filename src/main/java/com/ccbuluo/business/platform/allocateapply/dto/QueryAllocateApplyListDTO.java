@@ -55,6 +55,29 @@ public class QueryAllocateApplyListDTO {
     @ApiModelProperty(name = "processType", value = "平台决定的处理类型(注：TRANSFER调拨、PURCHASE采购)")
     private String processType;
 
+
+    @ApiModelProperty(name = "outstockOrgno", value = "出库机构code")
+    private String outstockOrgno;
+
+    @ApiModelProperty(name = "outstockOrgname", value = "出库机构name")
+    private String outstockOrgname;
+
+    public String getOutstockOrgname() {
+        return outstockOrgname;
+    }
+
+    public void setOutstockOrgname(String outstockOrgname) {
+        this.outstockOrgname = outstockOrgname;
+    }
+
+    public String getOutstockOrgno() {
+        return outstockOrgno;
+    }
+
+    public void setOutstockOrgno(String outstockOrgno) {
+        this.outstockOrgno = outstockOrgno;
+    }
+
     public String getProcessType() {
         return processType;
     }
