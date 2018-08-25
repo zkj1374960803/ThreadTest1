@@ -26,6 +26,17 @@ public interface ProblemAllocateApply {
      */
     Page<ProblemAllocateapplyDetailDTO> queryProblemApplyList(String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize);
     /**
+     * 问题件申请列表
+     * @param applyType 申请类型
+     * @param applyStatus 申请状态
+     * @param applyNo 申请单号
+     * @param offset 起始数
+     * @param pageSize 每页数量
+     * @author weijb
+     * @date 2018-08-14 21:59:51
+     */
+    Page<ProblemAllocateapplyDetailDTO> querySelfProblemApplyList(String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize);
+    /**
      * 问题件处理列表
      * @param applyType 申请类型
      * @param applyStatus 申请状态
@@ -36,6 +47,17 @@ public interface ProblemAllocateApply {
      * @date 2018-08-15 18:51:51
      */
     Page<ProblemAllocateapplyDetailDTO> queryProblemHandleList(String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize);
+    /**
+     * 问题件处理列表
+     * @param applyType 申请类型
+     * @param applyStatus 申请状态
+     * @param applyNo 申请单号
+     * @param offset 起始数
+     * @param pageSize 每页数量
+     * @author weijb
+     * @date 2018-08-15 18:51:51
+     */
+    Page<ProblemAllocateapplyDetailDTO> querySelfProblemHandleList(String applyType, String applyStatus, String applyNo, Integer offset, Integer pageSize);
 
     /**
      * 查询退换货申请单详情(申请)

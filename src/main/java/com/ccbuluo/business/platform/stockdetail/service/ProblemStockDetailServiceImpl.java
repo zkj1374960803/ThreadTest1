@@ -30,7 +30,8 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
 
     /**
      * 带条件分页查询所有零配件的问题库存
-     * @param productType 物料类型
+     * @param type 物料或是零配件
+     * @param productCategory 物料类型
      * @param productList 商品
      * @param offset 起始数
      * @param pageSize 每页数量
@@ -38,16 +39,17 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
      * @date 2018-08-14 21:59:51
      */
     @Override
-    public Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(String productType, List<BasicCarpartsProductDTO> productList, String keyword, Integer offset, Integer pageSize){
+    public Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(String type, String productCategory, List<BasicCarpartsProductDTO> productList, String keyword, Integer offset, Integer pageSize){
         List<String> codes = new ArrayList<String>();
         if(null != productList && productList.size() > 0){
             codes = getCodes(productList);
         }
-        return problemStockDetailDao.queryStockBizStockDetailDTOList("", productType, codes, keyword,offset, pageSize);
+        return problemStockDetailDao.queryStockBizStockDetailDTOList(type,"", productCategory, codes, keyword,offset, pageSize);
     }
     /**
      * 带条件分页查询本机构所有零配件的问题库存
-     * @param productType 物料类型
+     * @param type 物料或是零配件
+     * @param productCategory 物料类型
      * @param productList 商品
      * @param offset 起始数
      * @param pageSize 每页数量
@@ -55,17 +57,18 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
      * @date 2018-08-14 21:59:51
      */
     @Override
-    public Page<StockBizStockDetailDTO> querySelfStockBizStockDetailDTOList(String productType, List<BasicCarpartsProductDTO> productList, String keyword, Integer offset, Integer pageSize){
+    public Page<StockBizStockDetailDTO> querySelfStockBizStockDetailDTOList(String type, String productCategory, List<BasicCarpartsProductDTO> productList, String keyword, Integer offset, Integer pageSize){
         List<String> codes = new ArrayList<String>();
         if(null != productList && productList.size() > 0){
             codes = getCodes(productList);
         }
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
-        return problemStockDetailDao.queryStockBizStockDetailDTOList(orgCode, productType, codes, keyword,offset, pageSize);
+        return problemStockDetailDao.queryStockBizStockDetailDTOList(type,orgCode, productCategory, codes, keyword,offset, pageSize);
     }
 
     /**
      * 根据物料code查询某个物料的问题件库存
+     *  @param type 物料或是零配件
      * @param productNo 商品编号
      * @param offset 起始数
      * @param pageSize 每页数量
@@ -75,8 +78,8 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
      * @date 2018-08-15 08:59:51
      */
     @Override
-    public Page<StockBizStockDetailDTO> getProdectStockBizStockDetailByCode(String productNo, Integer offset, Integer pageSize){
-        return problemStockDetailDao.getProdectStockBizStockDetailByCode("", productNo, offset, pageSize);
+    public Page<StockBizStockDetailDTO> getProdectStockBizStockDetailByCode(String type, String productNo, Integer offset, Integer pageSize){
+        return problemStockDetailDao.getProdectStockBizStockDetailByCode(type, "", productNo, offset, pageSize);
     }
 
     /**
@@ -92,7 +95,7 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
     @Override
     public Page<StockBizStockDetailDTO> getSelfProdectStockBizStockDetailByCode(String productNo, Integer offset, Integer pageSize){
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
-        return problemStockDetailDao.getProdectStockBizStockDetailByCode(orgCode, productNo, offset, pageSize);
+        return problemStockDetailDao.getProdectStockBizStockDetailByCode(null,orgCode, productNo, offset, pageSize);
     }
 
     /**
