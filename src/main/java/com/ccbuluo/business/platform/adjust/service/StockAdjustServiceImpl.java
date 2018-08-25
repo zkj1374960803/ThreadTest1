@@ -207,7 +207,7 @@ public class StockAdjustServiceImpl implements StockAdjustService{
      * @date 2018-08-15 11:03:46
      */
     @Override
-    public Page<SearchStockAdjustListDTO> queryAdjustStockList(Integer adjustResult, String adjustSource, String keyWord, Integer offset, Integer pagesize) {
+    public Page<SearchStockAdjustListDTO> queryAdjustStockList(Integer adjustResult, String adjustSource, String keyWord, String productType, Integer offset, Integer pagesize) {
         // 获取当前登录人的机构
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         // 先根据keyword查询服务中心或者客户经理是否存在
@@ -215,12 +215,12 @@ public class StockAdjustServiceImpl implements StockAdjustService{
             StatusDtoThriftBean<OrgWorkplaceDTO> byCode = orgService.getByCode(keyWord);
             OrgWorkplaceDTO resolve = StatusDtoThriftUtils.resolve(byCode, OrgWorkplaceDTO.class).getData();
             if (null != resolve && null != resolve.getOrgCode()) {
-                return editAdjustOrder(adjustResult, adjustSource, offset, pagesize, resolve.getOrgCode(), orgCode);
+                return editAdjustOrder(adjustResult, adjustSource, offset, pagesize, resolve.getOrgCode(), orgCode, productType);
             } else {
-                return editAdjustOrder(adjustResult, adjustSource, offset, pagesize, keyWord, orgCode);
+                return editAdjustOrder(adjustResult, adjustSource, offset, pagesize, keyWord, orgCode, productType);
             }
         }
-        return editAdjustOrder(adjustResult, adjustSource, offset, pagesize, keyWord, orgCode);
+        return editAdjustOrder(adjustResult, adjustSource, offset, pagesize, keyWord, orgCode, productType);
     }
 
     /**
@@ -269,8 +269,8 @@ public class StockAdjustServiceImpl implements StockAdjustService{
      * @author liuduo
      * @date 2018-08-15 11:03:46
      */
-    private Page<SearchStockAdjustListDTO> editAdjustOrder(Integer adjustResult, String adjustSource, Integer offset, Integer pagesize, String keyWord, String orgCode) {
-        Page<SearchStockAdjustListDTO> adjustListDTOPage = bizStockAdjustDao.queryAdjustStockList(adjustResult, adjustSource, keyWord, offset, pagesize, orgCode);
+    private Page<SearchStockAdjustListDTO> editAdjustOrder(Integer adjustResult, String adjustSource, Integer offset, Integer pagesize, String keyWord, String orgCode, String productType) {
+        Page<SearchStockAdjustListDTO> adjustListDTOPage = bizStockAdjustDao.queryAdjustStockList(adjustResult, adjustSource, keyWord, offset, pagesize, orgCode, productType);
         if (null != adjustListDTOPage && null != adjustListDTOPage.getRows()) {
             List<SearchStockAdjustListDTO> rows = adjustListDTOPage.getRows();
             List<String> orgCodes = rows.stream().map(SearchStockAdjustListDTO::getAdjustOrgno).distinct().collect(Collectors.toList());
