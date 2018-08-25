@@ -4,6 +4,7 @@ import com.ccbuluo.business.entity.BizOutstockOrder;
 import com.ccbuluo.business.entity.BizOutstockorderDetail;
 import com.ccbuluo.business.entity.BizOutstockplanDetail;
 import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
+import com.ccbuluo.business.platform.outstock.dto.SaveOutstockorderDetailDTO;
 import com.ccbuluo.business.platform.outstock.service.OutstockOrderService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
@@ -30,24 +31,16 @@ public class CustmanagerOutstockOrderController extends BaseController {
 
     /**
      * 保存出库单
-     * @param applyNo 申请单号
-     * @param outRepositoryNo 出库仓库编号
-     * @param transportorderNo 物流单号
-     * @param bizOutstockorderDetailList 出库单详单
+     * @param saveOutstockorderDetailDTO 出库单信息
      * @return 是否保存成功
      * @author liuduo
      * @date 2018-08-07 15:15:07
      */
     @ApiOperation(value = "出库单新增", notes = "【刘铎】")
-    @ApiImplicitParams({@ApiImplicitParam(name = "applyNo", value = "申请单号",  required = true, paramType = "query"),
-        @ApiImplicitParam(name = "outRepositoryNo", value = "出库仓库编号",  required = true, paramType = "query"),
-        @ApiImplicitParam(name = "transportorderNo", value = "物流单号",  required = false, paramType = "query")})
     @PostMapping("/save")
-    public StatusDto<String> saveOutstockOrder(@RequestParam String applyNo,
-                                               @RequestParam String outRepositoryNo,
-                                               @RequestParam(required = false) String transportorderNo,
-                                               @ApiParam(name = "出库单详单集合", value = "传入json格式", required = true)@RequestBody List<BizOutstockorderDetail> bizOutstockorderDetailList) {
-        return outstockOrderService.saveOutstockOrder(applyNo, outRepositoryNo, transportorderNo, bizOutstockorderDetailList);
+    public StatusDto<String> saveOutstockOrder( @ApiParam(name = "出库单详单集合", value = "传入json格式", required = true)@RequestBody SaveOutstockorderDetailDTO saveOutstockorderDetailDTO) {
+        return outstockOrderService.saveOutstockOrder(saveOutstockorderDetailDTO.getApplyNo(), saveOutstockorderDetailDTO.getOutRepositoryNo(),
+            saveOutstockorderDetailDTO.getTransportorderNo(), saveOutstockorderDetailDTO.getBizOutstockorderDetailList());
     }
 
     /**
