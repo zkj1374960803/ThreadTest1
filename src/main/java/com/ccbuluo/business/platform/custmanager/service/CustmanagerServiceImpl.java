@@ -208,8 +208,10 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         if(!custManagerCode.isSuccess()){
             throw new CommonException(custManagerCode.getCode(), "生成客户经理组织架构编号失败！");
         }
-        buo.setOrgCode(custManagerCode.getData());
+        String code = custManagerCode.getData();
+        buo.setOrgCode(code);
         // 创建用户和组织架构
+        userInfoDTO.setOrgCode(code);
         StatusDto<String> orgAndUser = innerUserInfoService.createOrgAndUser(buo, userInfoDTO);
         if(!orgAndUser.isSuccess()){
             throw new CommonException(orgAndUser.getCode(), orgAndUser.getMessage());
