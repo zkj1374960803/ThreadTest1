@@ -157,7 +157,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     public List<QueryAllocateapplyDetailDTO> queryAllocateapplyDetail(String applyNo) {
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.id,a.apply_no,a.product_no,a.product_type,a.product_categoryname, ")
-            .append("  a.apply_num,a.unit,a.sell_price,a.cost_price,a.supplier_no,b.supplier_name,c.equip_name as 'productName' ")
+            .append("  a.apply_num,a.unit,a.sell_price,a.cost_price,a.supplier_no,b.supplier_name,c.equip_name as 'productName',a.refund_address ")
             .append("  FROM biz_allocateapply_detail a LEFT JOIN  biz_service_supplier b ON a.supplier_no = b.supplier_code ")
             .append("  LEFT JOIN biz_service_equipment c ON a.product_no = c.equip_code  ")
             .append(" WHERE a.delete_flag = :deleteFlag AND a.apply_no = :applyNo");

@@ -276,6 +276,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }
         }
         allocateApplyDTO.setQueryAllocateapplyDetailDTO(queryAllocateapplyDetailDTOS);
+        // 供应商名称查询
+
         return allocateApplyDTO;
     }
 
