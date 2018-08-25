@@ -181,7 +181,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(userOrgCode)){
             map.put("userOrgCode", userOrgCode);
-            sql.append(" AND a.applyorg_no = :userOrgCode ");
+            sql.append(" AND (a.applyorg_no = :userOrgCode or a.instock_orgno = :userOrgCode) ");
         }
         if(StringUtils.isNotBlank(processType)){
             map.put("processType", processType);
