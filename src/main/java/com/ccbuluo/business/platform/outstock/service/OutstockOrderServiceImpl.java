@@ -254,9 +254,9 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                     case PURCHASE:
                     case SAMELEVEL:
                         if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-                            allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.WAITINGRECEIPT.toString());
-                        } else {
                             allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.INSTORE.toString());
+                        } else {
+                            allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.WAITINGRECEIPT.toString());
                         }
                         break;
                     case DIRECTALLOCATE:
