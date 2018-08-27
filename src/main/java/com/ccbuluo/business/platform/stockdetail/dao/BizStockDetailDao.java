@@ -122,7 +122,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         params.put("bizStockDetail", bizStockDetail);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE `biz_stock_detail` SET valid_stock = :validStock + IFNULL(valid_stock,0),problem_stock = :problemStock + IFNULL(problem_stock,0),")
+        sql.append("UPDATE `biz_stock_detail` SET valid_stock = IFNULL(:validStock,0) + IFNULL(valid_stock,0),problem_stock = IFNULL(:problemStock,0) + IFNULL(problem_stock,0),")
             .append("  version_no = version_no+1 WHERE id = :id AND :versionNo > version_no");
 
         updateForBean(sql.toString(), bizStockDetail);
