@@ -101,8 +101,8 @@ public class BizInstockOrderDao extends BaseDao<BizInstockOrder> {
         params.put("instockNo", instockNo);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,instock_orderno,trade_docno,instock_type,instock_time,instock_operator FROM biz_instock_order")
-            .append(" WHERE instock_orderno = :instockNo");
+        sql.append("SELECT id,instock_orderno,trade_docno,instock_type,instock_time,instock_operator,transportorder_no")
+            .append("  FROM biz_instock_order WHERE instock_orderno = :instockNo");
 
         return findForBean(BizInstockOrderDTO.class, sql.toString(), params);
     }
