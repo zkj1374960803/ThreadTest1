@@ -2,9 +2,11 @@ package com.ccbuluo.business.platform.custmanager.service;
 
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.constants.OrganizationTypeEnum;
 import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.entity.BizServiceStorehouse;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryCustManagerListDTO;
+import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.carmanage.dto.CusmanagerCarCountDTO;
 import com.ccbuluo.business.platform.carmanage.service.BasicCarcoreInfoService;
 import com.ccbuluo.business.platform.custmanager.dao.BizServiceCustmanagerDao;
@@ -25,6 +27,7 @@ import com.ccbuluo.http.*;
 import com.ccbuluo.json.JsonUtils;
 import com.ccbuluo.merchandiseintf.carparts.category.service.CarpartsCategoryService;
 import com.ccbuluo.usercoreintf.dto.BasicUserOrganizationDTO;
+import com.ccbuluo.usercoreintf.dto.QueryNameByUseruuidsDTO;
 import com.ccbuluo.usercoreintf.dto.QueryServiceCenterListDTO;
 import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
 import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
@@ -77,6 +80,8 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     BasicCarcoreInfoService basicCarcoreInfoService;
     @Resource
     private StoreHouseService storeHouseService;
+    @Resource(name = "allocateApplyServiceImpl")
+    private AllocateApplyService allocateApplyService;
 
     /**
      * 创建客户经理
@@ -275,7 +280,9 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     public StatusDto<Page<QueryUserListDTO>> queryUserList(UserInfoDTO userInfoDTO) {
         userInfoDTO.setAppId(SystemPropertyHolder.getBaseAppid());
         userInfoDTO.setSecretId(SystemPropertyHolder.getBaseSecret());
-        userInfoDTO.setOrgCode(BusinessPropertyHolder.ORGCODE_TOP_CUSMANAGER);
+//        userInfoDTO.setOrgCode(BusinessPropertyHolder.ORGCODE_TOP_CUSMANAGER);
+        List<String> orgCodeList = allocateApplyService.getOrgCodesByOrgType(OrganizationTypeEnum.PLATFORM.name());
+        userInfoDTO.setOrgCodes(orgCodeList);
         // 排序字段
         userInfoDTO.setSortField(Constants.SORT_FIELD_OPERATE);
         //查询用户信息
@@ -426,18 +433,52 @@ public class CustmanagerServiceImpl implements CustmanagerService{
      */
     @Override
     public Page<QueryCustManagerListDTO> queryCustManagerList(QueryCustManagerListDTO queryCustManagerListDTO) {
+        // 查询客户经理的信息
         Page<QueryCustManagerListDTO> queryCustManagerListDTOPage = bizServiceCustmanagerDao.queryCustManagerList(queryCustManagerListDTO);
+        // 查询服务中心的信息
         StatusDtoThriftList<QueryServiceCenterListDTO> queryServiceCenterList = orgService.queryServiceCenter(null, null, null, null);
         StatusDto<List<QueryServiceCenterListDTO>> resolve = StatusDtoThriftUtils.resolve(queryServiceCenterList, QueryServiceCenterListDTO.class);
         List<QueryServiceCenterListDTO> data = resolve.getData();
+        if(data == null){
+            data = Collections.emptyList();
+        }
+
+        // list 转map
         Map<String, QueryServiceCenterListDTO> map = data.stream().collect(Collectors.toMap(QueryServiceCenterListDTO::getServiceCenterCode, a -> a,(k1,k2)->k1));
         List<QueryCustManagerListDTO> rows = queryCustManagerListDTOPage.getRows();
-        rows.stream().forEach(a -> {
-            QueryServiceCenterListDTO queryServiceCenterListDTO = map.get(a.getServiceCenter());
-            if(queryServiceCenterListDTO != null){
-                a.setServiceCenterName(queryServiceCenterListDTO.getServiceCenterName());
-            }
-        });
+        if(rows != null){
+            List<String> useruudis = rows.stream().map(QueryCustManagerListDTO::getUseruuid).collect(Collectors.toList());
+            // 查询用户的名字
+            StatusDtoThriftList<QueryNameByUseruuidsDTO> name = innerUserInfoService.queryNameByUseruuids(useruudis);
+            StatusDto<List<QueryNameByUseruuidsDTO>> nameResolve = StatusDtoThriftUtils.resolve(name, QueryNameByUseruuidsDTO.class);
+//            List<QueryNameByUseruuidsDTO> nameDto = Optional.ofNullable(nameResolve.getData()).orElse(new ArrayList<QueryNameByUseruuidsDTO>());
+//            Map<String, QueryNameByUseruuidsDTO> namemap = nameDto.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, a -> a,(k1,k2)->k1));
+//
+//            rows.stream().forEach(a -> {
+//                QueryServiceCenterListDTO queryServiceCenterListDTO = map.get(a.getServiceCenter());
+//                QueryNameByUseruuidsDTO queryNameByUseruuidsDTO = namemap.get(a.getUseruuid());
+//                if(queryNameByUseruuidsDTO != null){
+//                    a.setName(queryNameByUseruuidsDTO.getName());
+//                }
+//                if(queryServiceCenterListDTO != null){
+//                    a.setServiceCenterName(queryServiceCenterListDTO.getServiceCenterName());
+//                }
+//            });
+            // todo
+            Optional.ofNullable(nameResolve.getData()).ifPresent(a -> {
+                Map<String, QueryNameByUseruuidsDTO> collect = a.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, b -> b, (k1, k2) -> k1));
+                rows.stream().forEach(c -> {
+                    QueryServiceCenterListDTO queryServiceCenterListDTO = map.get(c.getServiceCenter());
+                    QueryNameByUseruuidsDTO queryNameByUseruuidsDTO = collect.get(c.getUseruuid());
+                    if (queryNameByUseruuidsDTO != null) {
+                        c.setName(queryNameByUseruuidsDTO.getName());
+                    }
+                    if (queryServiceCenterListDTO != null) {
+                        c.setServiceCenterName(queryServiceCenterListDTO.getServiceCenterName());
+                    }
+                });
+            });
+        }
         return queryCustManagerListDTOPage;
     }
 
