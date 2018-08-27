@@ -544,7 +544,9 @@ public class InstockOrderServiceImpl implements InstockOrderService {
             }
             item.setInstockOrderno(instockOrderno);
             item.preInsert(userHolder.getLoggedUserId());
-            bizInstockorderDetailList1.add(item);
+            if (item.getInstockNum() > 0) {
+                bizInstockorderDetailList1.add(item);
+            }
         });
         return instockorderDetailService.save(bizInstockorderDetailList1);
     }
