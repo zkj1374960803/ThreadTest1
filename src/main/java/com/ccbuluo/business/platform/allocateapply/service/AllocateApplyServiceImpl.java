@@ -16,6 +16,7 @@ import com.ccbuluo.business.platform.custmanager.dao.BizServiceCustmanagerDao;
 import com.ccbuluo.business.platform.custmanager.dto.CustManagerDetailDTO;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
+import com.ccbuluo.business.platform.instock.service.InstockOrderService;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
@@ -75,6 +76,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     BizServiceCustmanagerDao bizServiceCustmanagerDao;
     @Resource(name = "custmanagerServiceImpl")
     CustmanagerService custmanagerServiceImpl;
+    @Resource(name = "instockOrderServiceImpl")
+    private InstockOrderService instockOrderService;
 
 
     /**
@@ -193,7 +196,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             a.setApplyNo(allocateApplyDTO.getApplyNo());
             a.setOperator(loggedUserId);
             a.setCreator(loggedUserId);
-            if(AllocateApplyTypeEnum.BARTER.name().equals(processType) || AllocateApplyTypeEnum.REFUND.equals(processType)){
+            if(AllocateApplyTypeEnum.BARTER.name().equals(processType) || AllocateApplyTypeEnum.REFUND.name().equals(processType)){
                 a.setStockType(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.name());
             }else {
                 a.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
@@ -599,8 +602,20 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public Page<QueryPendingMaterialsDTO> queryPendingMaterials(String completeStatus, String keyword, Integer offset, Integer pageSize) {
-        String loggedUserId = userHolder.getLoggedUserId();
-        return bizAllocateapplyDetailDao.queryPendingMaterials(completeStatus, keyword, loggedUserId, offset, pageSize);
+        return bizAllocateapplyDetailDao.queryPendingMaterials(completeStatus, keyword, userHolder.getLoggedUserId(), offset, pageSize);
+    }
+
+    /**
+     * @param id
+     * @param productNo
+     * @return
+     * @throws
+     * @author zhangkangjian
+     * @date 2018-08-27 15:01:24
+     */
+    @Override
+    public void receivingmaterials(Long id, String productNo) {
+//        instockOrderService.autoSaveInstockOrder()
     }
 
     /**

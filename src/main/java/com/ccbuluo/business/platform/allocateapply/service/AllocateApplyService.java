@@ -165,4 +165,13 @@ public interface AllocateApplyService {
      * @date 2018-08-25 20:40:35
      */
     Page<QueryPendingMaterialsDTO> queryPendingMaterials(String completeStatus, String keyword, Integer offset, Integer pageSize);
+    /**
+     *  
+     * @param 
+     * @exception 
+     * @return 
+     * @author zhangkangjian
+     * @date 2018-08-27 15:03:16
+     */
+    void receivingmaterials(Long id, String productNo);
 }

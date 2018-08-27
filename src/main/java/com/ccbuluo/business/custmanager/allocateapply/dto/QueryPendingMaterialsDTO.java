@@ -46,14 +46,14 @@ public class QueryPendingMaterialsDTO {
      * 领取状态
      */
     @ApiModelProperty(name = "completeStatus", value = "领取状态")
-    private Long completeStatus;
+    private String completeStatus;
 
 
-    public Long getCompleteStatus() {
+    public String getCompleteStatus() {
         return completeStatus;
     }
 
-    public void setCompleteStatus(Long completeStatus) {
+    public void setCompleteStatus(String completeStatus) {
         this.completeStatus = completeStatus;
     }
 

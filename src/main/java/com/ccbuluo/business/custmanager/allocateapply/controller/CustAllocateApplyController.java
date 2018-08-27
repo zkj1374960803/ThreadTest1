@@ -4,6 +4,7 @@ import com.ccbuluo.business.custmanager.allocateapply.dto.QueryPendingMaterialsD
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
+import com.ccbuluo.business.platform.instock.service.InstockOrderService;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
@@ -30,6 +31,7 @@ public class CustAllocateApplyController extends BaseController {
     private AllocateApplyService allocateApplyServiceImpl;
     @Resource(name = "custmanagerServiceImpl")
     private CustmanagerService custmanagerService;
+
 
     /**
      * 创建物料或者零配件申请
@@ -229,6 +231,21 @@ public class CustAllocateApplyController extends BaseController {
         return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.queryPendingMaterials(completeStatus, keyword, offset, pageSize));
     }
 
+    /**
+     * 客户经理领取物料
+     * @param id 入库计划的id
+     * @return StatusDto<String>
+     * @author zhangkangjian
+     * @date 2018-08-27 14:53:10
+     */
+    @PostMapping("/receivingmaterials")
+    @ApiOperation(value = "客户经理领取物料", notes = "【张康健】")
+    @ApiImplicitParam(name = "id", value = "客户经理领取物料", required = false, paramType = "query")
+    public StatusDto<String> receivingmaterials(Long id, String productNo){
+        allocateApplyServiceImpl.receivingmaterials(id, productNo);
+        return StatusDto.buildSuccessStatusDto();
+
+    }
 
 
 
