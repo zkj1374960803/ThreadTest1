@@ -36,15 +36,15 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
     /**
      * 带条件分页查询本机构所有零配件的问题库存
      *  @param type 物料或是零配件
+     *  @param type 物料或是零配件
      * @param orgCode 组织机构code
-     * @param productNames 物料名称
-     * @param codes 零配件codes
+     * @param productNames 物料或是零配件名称
      * @param offset 起始数
      * @param pageSize 每页数量
      * @author weijb
      * @date 2018-08-14 21:59:51
      */
-    public Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(String type, String orgCode, List<String> productNames, List<String> codes, String keyword, Integer offset, Integer pageSize){
+    public Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(boolean category, String type, String orgCode, List<String> productNames, String keyword, Integer offset, Integer pageSize){
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
@@ -57,11 +57,6 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
         if (null != productNames && productNames.size() > 0) {
             param.put("productNames", productNames);
             sql.append(" AND t1.product_name IN(:productNames)");
-        }
-        // 零配件codes
-        if (null != codes && codes.size() > 0) {
-            param.put("codes", codes);
-            sql.append(" AND t1.product_no IN(:codes) ");
         }
         // 关键字查询
         if (StringUtils.isNotBlank(keyword)) {
@@ -81,7 +76,12 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
         }
 
         sql.append(" GROUP BY t1.product_no ORDER BY t1.create_time DESC");
-        Page<StockBizStockDetailDTO> DTOS = super.queryPageForBean(StockBizStockDetailDTO.class, sql.toString(), param,offset,pageSize);
+        Page<StockBizStockDetailDTO> DTOS = new Page<StockBizStockDetailDTO>();
+        // 如果选择了类型，并且这个类型下没有查询到商品就返回null
+        if(category && (null == productNames || productNames.size() == 0)){
+            return DTOS;
+        }
+        DTOS = super.queryPageForBean(StockBizStockDetailDTO.class, sql.toString(), param,offset,pageSize);
         return DTOS;
     }
 

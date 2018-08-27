@@ -58,7 +58,11 @@ public class ServiceProblemStockDetailController extends BaseController {
                                                                                    @RequestParam(required = false) String keyword,
                                                                                    @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                                    @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
-        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.querySelfStockBizStockDetailDTOList(Constants.PRODUCT_TYPE_EQUIPMENT,productCategory, null, keyword, offset, pageSize));
+        boolean category = false;
+        if(StringUtils.isNotBlank(productCategory)){
+            category = true;
+        }
+        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.querySelfStockBizStockDetailDTOList(category, Constants.PRODUCT_TYPE_EQUIPMENT,productCategory, null, keyword, offset, pageSize));
     }
 
     /**
@@ -81,10 +85,12 @@ public class ServiceProblemStockDetailController extends BaseController {
                                                                               @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                               @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
         List<BasicCarpartsProductDTO> productList = null;
+        boolean category = false;
         if(StringUtils.isNotBlank(productCategory)){
+            category = true;
             productList = carpartsProductService.queryCarpartsProductListByCategoryCode(productCategory);
         }
-        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.querySelfStockBizStockDetailDTOList(Constants.PRODUCT_TYPE_FITTINGS,null, productList, keyword, offset, pageSize));
+        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.querySelfStockBizStockDetailDTOList(category, Constants.PRODUCT_TYPE_FITTINGS,null, productList, keyword, offset, pageSize));
     }
 
     /**

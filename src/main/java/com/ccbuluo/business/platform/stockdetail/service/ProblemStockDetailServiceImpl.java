@@ -46,17 +46,17 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
      * @date 2018-08-14 21:59:51
      */
     @Override
-    public Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(String type, String productCategory, List<BasicCarpartsProductDTO> productList, String keyword, Integer offset, Integer pageSize){
-        List<String> codes = new ArrayList<String>();
-        if(null != productList && productList.size() > 0){
-            codes = getCodes(productList);
-        }
+    public Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(boolean category, String type, String productCategory, List<BasicCarpartsProductDTO> productList, String keyword, Integer offset, Integer pageSize){
         List<String> productNames = null;
+        if(null != productList && productList.size() > 0){
+            productNames = productList.stream().map(BasicCarpartsProductDTO::getCarpartsName).collect(Collectors.toList());
+        }
+
         if(StringUtils.isNotBlank(productCategory)){
             List<DetailBizServiceEquipmentDTO> equis = bizServiceEquipmentDao.queryEqupmentByEquiptype(Long.valueOf(productCategory));
-            productNames = equis.stream().map(DetailBizServiceEquipmentDTO::getEquipName).collect(Collectors.toList());;
+            productNames = equis.stream().map(DetailBizServiceEquipmentDTO::getEquipName).collect(Collectors.toList());
         }
-        return problemStockDetailDao.queryStockBizStockDetailDTOList(type,"", productNames, codes, keyword,offset, pageSize);
+        return problemStockDetailDao.queryStockBizStockDetailDTOList(category, type,"", productNames, keyword,offset, pageSize);
     }
     /**
      * 带条件分页查询本机构所有零配件的问题库存
@@ -69,18 +69,17 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
      * @date 2018-08-14 21:59:51
      */
     @Override
-    public Page<StockBizStockDetailDTO> querySelfStockBizStockDetailDTOList(String type, String productCategory, List<BasicCarpartsProductDTO> productList, String keyword, Integer offset, Integer pageSize){
-        List<String> codes = new ArrayList<String>();
+    public Page<StockBizStockDetailDTO> querySelfStockBizStockDetailDTOList(boolean category, String type, String productCategory, List<BasicCarpartsProductDTO> productList, String keyword, Integer offset, Integer pageSize){
+        List<String> productNames = null;
         if(null != productList && productList.size() > 0){
-            codes = getCodes(productList);
+            productNames = productList.stream().map(BasicCarpartsProductDTO::getCarpartsName).collect(Collectors.toList());
         }
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
-        List<String> productNames = null;
         if(StringUtils.isNotBlank(productCategory)){
             List<DetailBizServiceEquipmentDTO> equis = bizServiceEquipmentDao.queryEqupmentByEquiptype(Long.valueOf(productCategory));
             productNames = equis.stream().map(DetailBizServiceEquipmentDTO::getEquipName).collect(Collectors.toList());;
         }
-        return problemStockDetailDao.queryStockBizStockDetailDTOList(type,orgCode, productNames, codes, keyword,offset, pageSize);
+        return problemStockDetailDao.queryStockBizStockDetailDTOList(category, type,orgCode, productNames, keyword,offset, pageSize);
     }
 
     /**
@@ -113,17 +112,6 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
     public Page<StockBizStockDetailDTO> getSelfProdectStockBizStockDetailByCode(String productNo, Integer offset, Integer pageSize){
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         return problemStockDetailDao.getProdectStockBizStockDetailByCode(null,orgCode, productNo, offset, pageSize);
-    }
-
-    /**
-     *  获取商品codes
-     */
-    private List<String> getCodes(List<BasicCarpartsProductDTO> productList){
-        List<String> codes = new ArrayList<String>();
-        for(BasicCarpartsProductDTO bp : productList){
-            codes.add(bp.getCarpartsCode());
-        }
-        return codes;
     }
 
     /**
