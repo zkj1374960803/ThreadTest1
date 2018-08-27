@@ -79,15 +79,13 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
         return super.queryListBean(BizInstockplanDetail.class, sql.toString(), params);
     }
 
-
     /**
      * 根据id查询入库计划
      * @param id 申请单编号
      * @return 入库计划
-     * @author liuduo
+     * @author zhangkangjian
      * @date 2018-08-08 11:14:56
      */
-    // todo
     public BizInstockplanDetail queryListById(Long id) {
         if(Objects.isNull(id)){
             return new BizInstockplanDetail();
@@ -99,8 +97,7 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
             .append("trade_no,supplier_no,instock_repository_no,cost_price,")
             .append("IFNULL(plan_instocknum,0) AS planInstocknum,IFNULL(actual_instocknum,0) AS actualInstocknum,complete_status,complete_time,")
             .append("outstock_planid")
-            .append(" FROM biz_instockplan_detail WHERE trade_no= :applyNo")
-            .append(" AND complete_status = :completeStatus AND instock_repository_no = :inRepositoryNo");
+            .append(" FROM biz_instockplan_detail WHERE id = :id");
         return findForBean(BizInstockplanDetail.class, sql.toString(), params);
     }
 

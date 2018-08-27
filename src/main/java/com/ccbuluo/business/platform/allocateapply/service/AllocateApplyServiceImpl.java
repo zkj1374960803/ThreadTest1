@@ -5,6 +5,7 @@ import com.ccbuluo.business.custmanager.allocateapply.dto.QueryPendingMaterialsD
 import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.entity.BizAllocateApply.AllocateApplyTypeEnum;
 import com.ccbuluo.business.entity.BizAllocateApply.ApplyStatusEnum;
+import com.ccbuluo.business.entity.BizInstockplanDetail;
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
@@ -16,6 +17,8 @@ import com.ccbuluo.business.platform.custmanager.dao.BizServiceCustmanagerDao;
 import com.ccbuluo.business.platform.custmanager.dto.CustManagerDetailDTO;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
+import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
+import com.ccbuluo.business.platform.instock.dao.BizInstockOrderDao;
 import com.ccbuluo.business.platform.instock.service.InstockOrderService;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
@@ -78,7 +81,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     CustmanagerService custmanagerServiceImpl;
     @Resource(name = "instockOrderServiceImpl")
     private InstockOrderService instockOrderService;
-
+    @Resource
+    private BizInstockplanDetailDao bizInstockplanDetailDao;
 
     /**
      * 创建物料或者零配件申请
@@ -615,10 +619,10 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public void receivingmaterials(Long id, String productNo) {
-
-
-
-//        instockOrderService.autoSaveInstockOrder()
+        Assert.isTrue(id == null, "必填参数异常！");
+        Assert.isTrue(StringUtils.isBlank(productNo), "必填参数异常！");
+        BizInstockplanDetail bizInstockplanDetail = bizInstockplanDetailDao.queryListById(id);
+        instockOrderService.autoSaveInstockOrder(bizInstockplanDetail.getSupplierNo(), bizInstockplanDetail.getInstockRepositoryNo(), List.of(bizInstockplanDetail));
     }
 
     /**
