@@ -9,7 +9,7 @@ import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHand
 import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
 import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.business.platform.outstock.dto.OutstockorderDetailDTO;
-import com.ccbuluo.business.platform.outstock.dto.updatePlanStatusDTO;
+import com.ccbuluo.business.platform.outstock.dto.UpdatePlanStatusDTO;
 import com.ccbuluo.business.platform.outstockplan.service.OutStockPlanService;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dto.UpdateStockBizStockDetailDTO;
@@ -406,16 +406,16 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     private void updatePlanStatus(List<BizOutstockplanDetail> bizOutstockplanDetailList) {
         List<BizOutstockplanDetail> bizOutstockplanDetails = Lists.newArrayList();
         List<Long> ids = bizOutstockplanDetailList.stream().map(BizOutstockplanDetail::getId).collect(Collectors.toList());
-        List<updatePlanStatusDTO> versionNoById = outStockPlanService.getVersionNoById(ids);
-        Map<Long, updatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(updatePlanStatusDTO::getId, Function.identity()));
+        List<UpdatePlanStatusDTO> versionNoById = outStockPlanService.getVersionNoById(ids);
+        Map<Long, UpdatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(UpdatePlanStatusDTO::getId, Function.identity()));
         bizOutstockplanDetailList.forEach(item -> {
             if (item.getActualOutstocknum() >= item.getPlanOutstocknum()) {
-                updatePlanStatusDTO updatePlanStatusDTO = collect.get(item.getId());
+                UpdatePlanStatusDTO UpdatePlanStatusDTO = collect.get(item.getId());
                 BizOutstockplanDetail bizOutstockplanDetail = new BizOutstockplanDetail();
                 bizOutstockplanDetail.setId(item.getId());
                 bizOutstockplanDetail.setPlanStatus(StockPlanStatusEnum.COMPLETE.name());
                 bizOutstockplanDetail.setCompleteTime(new Date());
-                bizOutstockplanDetail.setVersionNo(updatePlanStatusDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
+                bizOutstockplanDetail.setVersionNo(UpdatePlanStatusDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
                 bizOutstockplanDetail.preUpdate(userHolder.getLoggedUserId());
                 bizOutstockplanDetails.add(bizOutstockplanDetail);
             }
@@ -433,14 +433,14 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     private void updateActualOutstocknum(List<BizOutstockorderDetail> bizOutstockorderDetailList1) {
         List<BizOutstockplanDetail> bizOutstockplanDetails = Lists.newArrayList();
         List<Long> ids = bizOutstockorderDetailList1.stream().map(BizOutstockorderDetail::getOutstockPlanid).collect(Collectors.toList());
-        List<updatePlanStatusDTO> versionNoById = outStockPlanService.getVersionNoById(ids);
-        Map<Long, updatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(updatePlanStatusDTO::getId, Function.identity()));
+        List<UpdatePlanStatusDTO> versionNoById = outStockPlanService.getVersionNoById(ids);
+        Map<Long, UpdatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(UpdatePlanStatusDTO::getId, Function.identity()));
         bizOutstockorderDetailList1.forEach(item -> {
-            updatePlanStatusDTO updatePlanStatusDTO = collect.get(item.getOutstockPlanid());
+            UpdatePlanStatusDTO UpdatePlanStatusDTO = collect.get(item.getOutstockPlanid());
             BizOutstockplanDetail bizOutstockplanDetail = new BizOutstockplanDetail();
             bizOutstockplanDetail.setId(item.getOutstockPlanid());
             bizOutstockplanDetail.setActualOutstocknum(item.getOutstockNum());
-            bizOutstockplanDetail.setVersionNo(updatePlanStatusDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
+            bizOutstockplanDetail.setVersionNo(UpdatePlanStatusDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
             bizOutstockplanDetail.preUpdate(userHolder.getLoggedUserId());
             bizOutstockplanDetails.add(bizOutstockplanDetail);
         });

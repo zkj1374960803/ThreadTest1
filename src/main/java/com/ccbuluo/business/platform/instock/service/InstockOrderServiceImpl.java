@@ -10,7 +10,7 @@ import com.ccbuluo.business.platform.inputstockplan.service.InputStockPlanServic
 import com.ccbuluo.business.platform.instock.dao.BizInstockOrderDao;
 import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
 import com.ccbuluo.business.platform.instock.dto.InstockorderDetailDTO;
-import com.ccbuluo.business.platform.outstock.dto.updatePlanStatusDTO;
+import com.ccbuluo.business.platform.outstock.dto.UpdatePlanStatusDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.service.StockDetailService;
 import com.ccbuluo.business.platform.storehouse.service.StoreHouseService;
@@ -25,7 +25,6 @@ import com.ccbuluo.usercoreintf.dto.QueryNameByUseruuidsDTO;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -374,16 +373,16 @@ public class InstockOrderServiceImpl implements InstockOrderService {
     private void updateCompleteStatus(List<BizInstockplanDetail> bizInstockplanDetails) {
         List<BizInstockplanDetail> bizInstockplanDetailList = new ArrayList<>();
         List<Long> ids = bizInstockplanDetails.stream().map(BizInstockplanDetail::getId).collect(Collectors.toList());
-        List<updatePlanStatusDTO> versionNoById = inputStockPlanService.getVersionNoById(ids);
-        Map<Long, updatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(updatePlanStatusDTO::getId, Function.identity()));
+        List<UpdatePlanStatusDTO> versionNoById = inputStockPlanService.getVersionNoById(ids);
+        Map<Long, UpdatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(UpdatePlanStatusDTO::getId, Function.identity()));
         bizInstockplanDetails.forEach(item -> {
             if (item.getActualInstocknum() >= item.getPlanInstocknum()) {
-                updatePlanStatusDTO updatePlanStatusDTO = collect.get(item.getId());
+                UpdatePlanStatusDTO UpdatePlanStatusDTO = collect.get(item.getId());
                 BizInstockplanDetail bizInstockplanDetail = new BizInstockplanDetail();
                 bizInstockplanDetail.setId(item.getId());
                 bizInstockplanDetail.setCompleteStatus(StockPlanStatusEnum.COMPLETE.name());
                 bizInstockplanDetail.setCompleteTime(new Date());
-                bizInstockplanDetail.setVersionNo(updatePlanStatusDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
+                bizInstockplanDetail.setVersionNo(UpdatePlanStatusDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
                 bizInstockplanDetail.preUpdate(userHolder.getLoggedUserId());
                 bizInstockplanDetailList.add(bizInstockplanDetail);
             }
@@ -403,10 +402,10 @@ public class InstockOrderServiceImpl implements InstockOrderService {
     private void updateInstockplan(List<BizInstockorderDetail> bizInstockorderDetailList) {
         List<BizInstockplanDetail> bizInstockplanDetailList = new ArrayList<>();
         List<Long> ids = bizInstockorderDetailList.stream().map(BizInstockorderDetail::getInstockPlanid).collect(Collectors.toList());
-        List<updatePlanStatusDTO> versionNoById = inputStockPlanService.getVersionNoById(ids);
-        Map<Long, updatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(updatePlanStatusDTO::getId, Function.identity()));
+        List<UpdatePlanStatusDTO> versionNoById = inputStockPlanService.getVersionNoById(ids);
+        Map<Long, UpdatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(UpdatePlanStatusDTO::getId, Function.identity()));
         bizInstockorderDetailList.forEach(item -> {
-            updatePlanStatusDTO updatePlanStatusDTO = collect.get(item.getInstockPlanid());
+            UpdatePlanStatusDTO updatePlanStatusDTO = collect.get(item.getInstockPlanid());
             BizInstockplanDetail bizInstockplanDetail = new BizInstockplanDetail();
             bizInstockplanDetail.setId(item.getInstockPlanid());
             bizInstockplanDetail.setActualInstocknum(item.getInstockNum());
@@ -468,13 +467,13 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         // 根据入库详单的  供应商、商品、仓库、批次号  查询在库存中有无记录，有则更新，无则新增
         List<BizInstockorderDetail> bizInstockorderDetailList1 = Lists.newArrayList();
 //        List<Long> ids = bizInstockorderDetailList.stream().map(BizInstockorderDetail::getInstockPlanid).collect(Collectors.toList());
-//        List<updatePlanStatusDTO> versionNoById = inputStockPlanService.getVersionNoById(ids);
-//        Map<Long, updatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(updatePlanStatusDTO::getId, Function.identity()));
+//        List<UpdatePlanStatusDTO> versionNoById = inputStockPlanService.getVersionNoById(ids);
+//        Map<Long, UpdatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(UpdatePlanStatusDTO::getId, Function.identity()));
         // 根据仓库编号查询机构号
         String orgCodeByStoreHouseCode = storeHouseService.getOrgCodeByStoreHouseCode(inRepositoryNo);
         List<Long> stockIds = Lists.newArrayList();
         bizInstockorderDetailList.forEach(item -> {
-//            updatePlanStatusDTO updatePlanStatusDTO = collect.get(item.getInstockPlanid());
+//            UpdatePlanStatusDTO UpdatePlanStatusDTO = collect.get(item.getInstockPlanid());
             Long id = stockDetailService.getByinstockorderDeatil(item.getSupplierNo(), item.getProductNo(), item.getCostPrice(), inRepositoryNo, applyNo);
             if (null != id) {
                 // 根据id查询乐观锁
@@ -487,8 +486,6 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                     bizStockDetail.setProblemStock(item.getInstockNum());
                 }
                 stockDetailService.updateValidStock(bizStockDetail, versionNoById1);
-                item.setInstockPlanid(id);
-                bizInstockorderDetailList1.add(item);
             } else {
                 BizStockDetail bizStockDetail = new BizStockDetail();
                 bizStockDetail.setRepositoryNo(inRepositoryNo);

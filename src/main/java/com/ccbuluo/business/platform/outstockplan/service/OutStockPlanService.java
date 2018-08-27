@@ -2,7 +2,7 @@ package com.ccbuluo.business.platform.outstockplan.service;
 
 
 import com.ccbuluo.business.entity.BizOutstockplanDetail;
-import com.ccbuluo.business.platform.outstock.dto.updatePlanStatusDTO;
+import com.ccbuluo.business.platform.outstock.dto.UpdatePlanStatusDTO;
 
 import java.util.List;
 
@@ -41,7 +41,7 @@ public interface OutStockPlanService {
      * @author liuduo
      * @date 2018-08-10 16:43:38
      */
-    List<updatePlanStatusDTO> getVersionNoById(List<Long> ids);
+    List<UpdatePlanStatusDTO> getVersionNoById(List<Long> ids);
 
 
     /**

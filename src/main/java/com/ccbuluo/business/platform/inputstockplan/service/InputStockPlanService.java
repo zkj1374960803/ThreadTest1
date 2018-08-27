@@ -2,8 +2,7 @@ package com.ccbuluo.business.platform.inputstockplan.service;
 
 
 import com.ccbuluo.business.entity.BizInstockplanDetail;
-import com.ccbuluo.business.platform.outstock.dto.updatePlanStatusDTO;
-import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.business.platform.outstock.dto.UpdatePlanStatusDTO;
 
 import java.util.List;
 
@@ -32,7 +31,7 @@ public interface InputStockPlanService {
      * @author liuduo
      * @date 2018-08-08 19:31:38
      */
-    List<updatePlanStatusDTO> getVersionNoById(List<Long> ids);
+    List<UpdatePlanStatusDTO> getVersionNoById(List<Long> ids);
 
     /**
      * 更新入库佳话中的实际入库数量
