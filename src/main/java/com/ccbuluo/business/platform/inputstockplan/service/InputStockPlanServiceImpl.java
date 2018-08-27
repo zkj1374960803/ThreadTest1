@@ -3,8 +3,7 @@ package com.ccbuluo.business.platform.inputstockplan.service;
 
 import com.ccbuluo.business.entity.BizInstockplanDetail;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
-import com.ccbuluo.business.platform.outstock.dto.updatePlanStatusDTO;
-import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.business.platform.outstock.dto.UpdatePlanStatusDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +42,7 @@ public class InputStockPlanServiceImpl implements InputStockPlanService {
      * @date 2018-08-08 19:31:38
      */
     @Override
-    public List<updatePlanStatusDTO> getVersionNoById(List<Long> ids) {
+    public List<UpdatePlanStatusDTO> getVersionNoById(List<Long> ids) {
         return bizInstockplanDetailDao.getVersionNoById(ids);
     }
 
@@ -79,7 +78,11 @@ public class InputStockPlanServiceImpl implements InputStockPlanService {
      */
     @Override
     public List<BizInstockplanDetail> queryInstockplan(String applyNo,  String inRepositoryNo, String productType) {
-        return bizInstockplanDetailDao.queryInstockplan(applyNo, inRepositoryNo, productType);
+        List<BizInstockplanDetail> bizInstockplanDetails = bizInstockplanDetailDao.queryInstockplan(applyNo, inRepositoryNo, productType);
+        bizInstockplanDetails.forEach(item -> {
+            item.setShouldInstocknum(item.getPlanInstocknum() - item.getActualInstocknum());
+        });
+        return bizInstockplanDetails;
     }
 
     /**

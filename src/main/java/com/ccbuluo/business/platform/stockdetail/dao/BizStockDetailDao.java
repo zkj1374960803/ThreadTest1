@@ -114,17 +114,15 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
     /**
      * 修改有效库存
      * @param bizStockDetail 库存明细
-     * @param versionNo 版本号
      * @author liuduo
      * @date 2018-08-08 15:24:09
      */
-    public void updateValidStock(BizStockDetail bizStockDetail, Integer versionNo) {
+    public void updateValidStock(BizStockDetail bizStockDetail) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("bizStockDetail", bizStockDetail);
-        params.put("versionNo", versionNo + Constants.FLAG_ONE);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE `biz_stock_detail` SET valid_stock = :validStock + IFNULL(valid_stock,0),problem_stock = :problemStock + IFNULL(problem_stock,0),")
+        sql.append("UPDATE `biz_stock_detail` SET valid_stock = IFNULL(:validStock,0) + IFNULL(valid_stock,0),problem_stock = IFNULL(:problemStock,0) + IFNULL(problem_stock,0),")
             .append("  version_no = version_no+1 WHERE id = :id AND :versionNo > version_no");
 
         updateForBean(sql.toString(), bizStockDetail);

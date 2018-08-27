@@ -34,11 +34,10 @@ public interface StockDetailService {
     /**
     * 修改有效库存
     * @param bizStockDetail 库存明细
-    * @param versionNo 版本号
     * @author liuduo
     * @date 2018-08-08 15:24:09
     */
-    void updateValidStock(BizStockDetail bizStockDetail, Integer versionNo);
+    void updateValidStock(BizStockDetail bizStockDetail);
 
     /**
      * 保存库存明细
