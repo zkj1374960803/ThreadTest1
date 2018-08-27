@@ -165,13 +165,14 @@ public interface AllocateApplyService {
      * @date 2018-08-25 20:40:35
      */
     Page<QueryPendingMaterialsDTO> queryPendingMaterials(String completeStatus, String keyword, Integer offset, Integer pageSize);
+
     /**
-     *  
-     * @param 
-     * @exception 
-     * @return 
+     * 客户经理领取物料
+     * @param id 入库计划的id
+     * @param productNo 商品的编号
+     * @return StatusDto<String>
      * @author zhangkangjian
-     * @date 2018-08-27 15:03:16
+     * @date 2018-08-27 14:53:10
      */
     void receivingmaterials(Long id, String productNo);
 }

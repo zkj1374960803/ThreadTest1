@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  *  dao
@@ -76,6 +77,31 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
             .append(" AND complete_status = :completeStatus AND instock_repository_no = :inRepositoryNo");
 
         return super.queryListBean(BizInstockplanDetail.class, sql.toString(), params);
+    }
+
+
+    /**
+     * 根据id查询入库计划
+     * @param id 申请单编号
+     * @return 入库计划
+     * @author liuduo
+     * @date 2018-08-08 11:14:56
+     */
+    // todo
+    public BizInstockplanDetail queryListById(Long id) {
+        if(Objects.isNull(id)){
+            return new BizInstockplanDetail();
+        }
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("id", id);
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,instock_type,product_no,product_name,product_type,product_categoryname,")
+            .append("trade_no,supplier_no,instock_repository_no,cost_price,")
+            .append("IFNULL(plan_instocknum,0) AS planInstocknum,IFNULL(actual_instocknum,0) AS actualInstocknum,complete_status,complete_time,")
+            .append("outstock_planid")
+            .append(" FROM biz_instockplan_detail WHERE trade_no= :applyNo")
+            .append(" AND complete_status = :completeStatus AND instock_repository_no = :inRepositoryNo");
+        return findForBean(BizInstockplanDetail.class, sql.toString(), params);
     }
 
     /**

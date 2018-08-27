@@ -234,13 +234,17 @@ public class CustAllocateApplyController extends BaseController {
     /**
      * 客户经理领取物料
      * @param id 入库计划的id
+     * @param productNo 商品的编号
      * @return StatusDto<String>
      * @author zhangkangjian
      * @date 2018-08-27 14:53:10
      */
     @PostMapping("/receivingmaterials")
     @ApiOperation(value = "客户经理领取物料", notes = "【张康健】")
-    @ApiImplicitParam(name = "id", value = "客户经理领取物料", required = false, paramType = "query")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "id", value = "客户经理领取物料", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "productNo", value = "商品的编号", required = true, paramType = "query")
+    })
     public StatusDto<String> receivingmaterials(Long id, String productNo){
         allocateApplyServiceImpl.receivingmaterials(id, productNo);
         return StatusDto.buildSuccessStatusDto();

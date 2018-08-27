@@ -606,15 +606,18 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     }
 
     /**
-     * @param id
-     * @param productNo
-     * @return
-     * @throws
+     * 客户经理领取物料
+     * @param id 入库计划的id
+     * @param productNo 商品的编号
+     * @return StatusDto<String>
      * @author zhangkangjian
-     * @date 2018-08-27 15:01:24
+     * @date 2018-08-27 14:53:10
      */
     @Override
     public void receivingmaterials(Long id, String productNo) {
+
+
+
 //        instockOrderService.autoSaveInstockOrder()
     }
 
