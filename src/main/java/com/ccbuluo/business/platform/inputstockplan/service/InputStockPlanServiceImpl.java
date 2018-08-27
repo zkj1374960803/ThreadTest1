@@ -78,7 +78,11 @@ public class InputStockPlanServiceImpl implements InputStockPlanService {
      */
     @Override
     public List<BizInstockplanDetail> queryInstockplan(String applyNo,  String inRepositoryNo, String productType) {
-        return bizInstockplanDetailDao.queryInstockplan(applyNo, inRepositoryNo, productType);
+        List<BizInstockplanDetail> bizInstockplanDetails = bizInstockplanDetailDao.queryInstockplan(applyNo, inRepositoryNo, productType);
+        bizInstockplanDetails.forEach(item -> {
+            item.setShouldInstocknum(item.getPlanInstocknum() - item.getActualInstocknum());
+        });
+        return bizInstockplanDetails;
     }
 
     /**

@@ -70,6 +70,11 @@ public class BizInstockplanDetail extends AftersaleCommonEntity{
     @ApiModelProperty(name = "planInstocknum", value = "计划入库数量")
     private Long planInstocknum;
     /**
+     * 应入数量
+     */
+    @ApiModelProperty(name = "shouldInstocknum", value = "应入数量")
+    private Long shouldInstocknum;
+    /**
      * 实际入库数量
      */
     @ApiModelProperty(name = "actualInstocknum", value = "实际入库数量")
@@ -281,5 +286,13 @@ public class BizInstockplanDetail extends AftersaleCommonEntity{
 
     public void setStockType(String stockType) {
         this.stockType = stockType;
+    }
+
+    public Long getShouldInstocknum() {
+        return shouldInstocknum;
+    }
+
+    public void setShouldInstocknum(Long shouldInstocknum) {
+        this.shouldInstocknum = shouldInstocknum;
     }
 }
