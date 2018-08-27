@@ -195,7 +195,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         // 6、如果是平台端，则把库存明细中的有效库存更新到占用库存
 //        updateOccupyStockById(stockIds);
         // 7、如果是平台入库后则改变申请单状态为 平台待出库，如果是机构入库后则改变申请单的状态为  确认收货
-        List<BizInstockplanDetail> bizInstockplanDetails3 = inputStockPlanService.queryListByApplyNo(applyNo, StockPlanStatusEnum.COMPLETE.name(), inRepositoryNo);
+        List<BizInstockplanDetail> bizInstockplanDetails3 = inputStockPlanService.queryListByApplyNoAndInReNo(applyNo, inRepositoryNo);
         List<BizInstockplanDetail> collect = bizInstockplanDetails3.stream().filter(item -> item.getCompleteStatus().equals(StockPlanStatusEnum.COMPLETE.name())).collect(Collectors.toList());
         updateApplyStatus(applyNo, detail, bizInstockplanDetails3, collect);
     }

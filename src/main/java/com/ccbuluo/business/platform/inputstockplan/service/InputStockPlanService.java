@@ -34,7 +34,7 @@ public interface InputStockPlanService {
     List<UpdatePlanStatusDTO> getVersionNoById(List<Long> ids);
 
     /**
-     * 更新入库佳话中的实际入库数量
+     * 更新入库计划中的实际入库数量
      * @param bizInstockplanDetailList 入库计划
      * @author liuduo
      * @date 2018-08-08 20:17:42
@@ -76,4 +76,14 @@ public interface InputStockPlanService {
      * @date 2018-08-13 15:20:27
      */
     List<String> getByApplyNo(String applyNo, String orgCode);
+
+    /**
+     * 根据申请单号和入库仓库查询入库计划
+     * @param applyNo 申请单号
+     * @param inRepositoryNo 入库仓库
+     * @return 入库计划
+     * @author liuduo
+     * @date 2018-08-11 13:17:42
+     */
+    List<BizInstockplanDetail> queryListByApplyNoAndInReNo(String applyNo, String inRepositoryNo);
 }
