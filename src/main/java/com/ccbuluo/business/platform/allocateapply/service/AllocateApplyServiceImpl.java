@@ -188,7 +188,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     private void batchInsertForapplyDetailList(AllocateApplyDTO allocateApplyDTO, String loggedUserId, String processType) {
         List<AllocateapplyDetailDTO> allocateapplyDetailList = allocateApplyDTO.getAllocateapplyDetailList();
         // 过滤掉申请数量小于零的
-        List<AllocateapplyDetailDTO> filterAllocateapply = allocateapplyDetailList.stream().filter(dto ->dto.getApplyNum() > 0).collect(Collectors.toList());
+        List<AllocateapplyDetailDTO> filterAllocateapply = allocateapplyDetailList.stream().filter(dto -> dto.getApplyNum() > 0).collect(Collectors.toList());
         filterAllocateapply.stream().forEach(a -> {
             a.setApplyNo(allocateApplyDTO.getApplyNo());
             a.setOperator(loggedUserId);
@@ -199,7 +199,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                 a.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
             }
         });
-        bizAllocateApplyDao.batchInsertForapplyDetailList(allocateapplyDetailList);
+        bizAllocateApplyDao.batchInsertForapplyDetailList(filterAllocateapply);
     }
 
     /**

@@ -151,12 +151,13 @@ public class BizAllocateapplyDetailDao extends BaseDao<AllocateapplyDetailDTO> {
      */
     public Page<QueryPendingMaterialsDTO> queryPendingMaterials(String completeStatus, String keyword, String loggedUserId, Integer offset, Integer pageSize) {
         Map<String, Object> map = Maps.newHashMap();
-//        map.put();
+        map.put("productType", Constants.PRODUCT_TYPE_EQUIPMENT);
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.id,a.product_no,a.product_name,a.product_categoryname,c.supplier_name,a.plan_instocknum as 'productNum',a.complete_status ")
             .append(" FROM biz_instockplan_detail a LEFT JOIN biz_allocate_apply b ON a.trade_no = b.apply_no ")
             .append(" LEFT JOIN biz_service_supplier c ON a.supplier_no = c.supplier_code ")
-            .append(" WHERE 1 = 1  ");
+            .append(" WHERE  a.product_type = :productType ");
+
         if(StringUtils.isNotBlank(loggedUserId)){
             map.put("applyer", loggedUserId);
             sql.append(" AND b.applyer = :applyer ");
