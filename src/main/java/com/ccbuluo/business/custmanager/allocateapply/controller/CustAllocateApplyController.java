@@ -242,7 +242,7 @@ public class CustAllocateApplyController extends BaseController {
     @PostMapping("/receivingmaterials")
     @ApiOperation(value = "客户经理领取物料", notes = "【张康健】")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "id", value = "客户经理领取物料", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "id", value = "id", required = true, paramType = "query"),
         @ApiImplicitParam(name = "productNo", value = "商品的编号", required = true, paramType = "query")
     })
     public StatusDto<String> receivingmaterials(Long id, String productNo){
