@@ -48,6 +48,19 @@ public class QueryPendingMaterialsDTO {
     @ApiModelProperty(name = "completeStatus", value = "领取状态")
     private String completeStatus;
 
+    /**
+     * 备注
+     */
+    @ApiModelProperty(name = "remark", value = "备注")
+    private String remark;
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
 
     public String getCompleteStatus() {
         return completeStatus;

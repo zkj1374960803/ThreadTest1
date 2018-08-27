@@ -161,6 +161,7 @@ public class BizServiceCustmanagerDao extends BaseDao<BizServiceCustmanager> {
         if(StringUtils.isNotBlank(queryCustManagerListDTO.getServiceCenter())){
             sql.append(" AND b.servicecenter_code = :serviceCenter");
         }
+        sql.append(" group by a.user_uuid ");
         return queryPageForBean(QueryCustManagerListDTO.class, sql.toString(), queryCustManagerListDTO, queryCustManagerListDTO.getOffset(), queryCustManagerListDTO.getPageSize());
     }
 
