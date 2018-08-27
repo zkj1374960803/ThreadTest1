@@ -2,14 +2,12 @@ package com.ccbuluo.business.platform.outstockplan.service;
 
 
 import com.ccbuluo.business.entity.BizOutstockplanDetail;
-import com.ccbuluo.business.platform.outstock.dto.updatePlanStatusDTO;
+import com.ccbuluo.business.platform.outstock.dto.UpdatePlanStatusDTO;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import javax.annotation.Resource;
 
 /**
@@ -57,7 +55,7 @@ public class OutStockPlanServiceImpl implements OutStockPlanService {
      * @date 2018-08-10 16:43:38
      */
     @Override
-    public List<updatePlanStatusDTO> getVersionNoById(List<Long> ids) {
+    public List<UpdatePlanStatusDTO> getVersionNoById(List<Long> ids) {
         return bizOutstockplanDetailDao.getVersionNoById(ids);
     }
 

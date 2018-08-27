@@ -2,7 +2,7 @@ package com.ccbuluo.business.platform.outstockplan.dao;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizOutstockplanDetail;
-import com.ccbuluo.business.platform.outstock.dto.updatePlanStatusDTO;
+import com.ccbuluo.business.platform.outstock.dto.UpdatePlanStatusDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -113,13 +113,13 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
      * @author liuduo
      * @date 2018-08-10 16:43:38
      */
-    public List<updatePlanStatusDTO> getVersionNoById(List<Long> ids) {
+    public List<UpdatePlanStatusDTO> getVersionNoById(List<Long> ids) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("ids", ids);
 
         String sql = "SELECT id,version_no FROM biz_outstockplan_detail WHERE id IN(:ids)";
 
-        return queryListBean(updatePlanStatusDTO.class, sql, params);
+        return queryListBean(UpdatePlanStatusDTO.class, sql, params);
     }
 
     /**

@@ -10,9 +10,9 @@ import io.swagger.annotations.ApiModelProperty;
  * @version V1.0.0
  */
 @ApiModel(value = "修改出库计划的状态", description = "")
-public class updatePlanStatusDTO {
+public class UpdatePlanStatusDTO {
     /**
-     * 
+     *
      */
     @ApiModelProperty(name = "id", value = "")
     private Long id;
