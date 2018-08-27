@@ -109,4 +109,17 @@ public class InputStockPlanServiceImpl implements InputStockPlanService {
     public List<String> getByApplyNo(String applyNo, String orgCode) {
         return bizInstockplanDetailDao.getByApplyNo(applyNo, orgCode);
     }
+
+    /**
+     * 根据申请单号和入库仓库查询入库计划
+     * @param applyNo 申请单号
+     * @param inRepositoryNo 入库仓库
+     * @return 入库计划
+     * @author liuduo
+     * @date 2018-08-11 13:17:42
+     */
+    @Override
+    public List<BizInstockplanDetail> queryListByApplyNoAndInReNo(String applyNo, String inRepositoryNo) {
+        return bizInstockplanDetailDao.queryListByApplyNoAndInReNo(applyNo, inRepositoryNo);
+    }
 }

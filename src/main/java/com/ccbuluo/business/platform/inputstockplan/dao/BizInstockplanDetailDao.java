@@ -246,4 +246,28 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
                 .append(" FROM biz_instockplan_detail WHERE trade_no= :applyNo AND instock_orgno= :instockOrgno");
         return super.queryListBean(BizInstockplanDetail.class, sql.toString(), params);
     }
+
+    /**
+     * 根据申请单号和入库仓库查询入库计划
+     * @param applyNo 申请单号
+     * @param inRepositoryNo 入库仓库
+     * @return 入库计划
+     * @author liuduo
+     * @date 2018-08-11 13:17:42
+     */
+    public List<BizInstockplanDetail> queryListByApplyNoAndInReNo(String applyNo, String inRepositoryNo) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("inRepositoryNo", inRepositoryNo);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,instock_type,product_no,product_name,product_type,product_categoryname,")
+            .append("trade_no,supplier_no,instock_repository_no,cost_price,")
+            .append("IFNULL(plan_instocknum,0) AS planInstocknum,IFNULL(actual_instocknum,0) AS actualInstocknum,complete_status,complete_time,")
+            .append("outstock_planid")
+            .append(" FROM biz_instockplan_detail WHERE trade_no= :applyNo")
+            .append(" AND instock_repository_no = :inRepositoryNo");
+
+        return super.queryListBean(BizInstockplanDetail.class, sql.toString(), params);
+    }
 }
