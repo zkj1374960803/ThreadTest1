@@ -166,7 +166,8 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
 
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT bod.id,bod.outstock_type,bod.product_no,bod.product_name,bod.product_type,bod.product_categoryname,bod.plan_status,bod.out_orgno,")
-            .append(" bod.supplier_no,bss.supplier_name,bod.plan_outstocknum,bod.cost_price,bod.sales_price,bod.product_unit,bod.out_repository_no,bod.stock_type,")
+            .append(" bod.supplier_no,bss.supplier_name,IFNULL(bod.plan_outstocknum,0) AS planOutstocknum,IFNULL(bod.actual_outstocknum,0) AS actualOutstocknum,")
+            .append(" bod.plan_outstocknum,bod.cost_price,bod.sales_price,bod.product_unit,bod.out_repository_no,bod.stock_type,")
             .append(" bsss.storehouse_name FROM biz_outstockplan_detail AS bod")
             .append("  LEFT JOIN biz_service_supplier AS bss ON bss.supplier_code = bod.supplier_no")
             .append("  LEFT JOIN biz_service_storehouse AS bsss ON bsss.storehouse_code = bod.out_repository_no")
