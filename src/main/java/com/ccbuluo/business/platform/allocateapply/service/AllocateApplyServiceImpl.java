@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
 import com.ccbuluo.business.constants.*;
+import com.ccbuluo.business.custmanager.allocateapply.dto.QueryPendingMaterialsDTO;
 import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.entity.BizAllocateApply.AllocateApplyTypeEnum;
 import com.ccbuluo.business.entity.BizAllocateApply.ApplyStatusEnum;
@@ -46,7 +47,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- *
+ * 申请管理
  * @author zhangkangjian
  * @date 2018-08-07 14:29:54
  */
@@ -109,10 +110,16 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             allocateApplyDTO.setProcessOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
             allocateApplyDTO.setProcessOrgtype(OrganizationTypeEnum.PLATFORM.name());
         }else{
+            // 遗漏的处理类型补充
             allocateApplyDTO.setProcessOrgno(allocateApplyDTO.getOutstockOrgno());
-            allocateApplyDTO.setProcessOrgtype(allocateApplyDTO.getOutstockOrgtype());
-        }
+            String outstockOrgtype = allocateApplyDTO.getOutstockOrgtype();
+            if(StringUtils.isBlank(outstockOrgtype)){
+                allocateApplyDTO.setProcessOrgtype(OrganizationTypeEnum.PLATFORM.name());
+            }else {
+                allocateApplyDTO.setProcessOrgtype(outstockOrgtype);
+            }
 
+        }
 
         // 根据处理类型，设置申请的类型、各种相关机构、状态等属性
         String processType = allocateApplyDTO.getProcessType();
@@ -165,7 +172,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
 
         // 已经自动处理了，调用 申请构建计划的方法
         if(allocateApplyDTO.getApplyorgNo().equals(allocateApplyDTO.getProcessOrgno()) || AllocateApplyTypeEnum.BARTER.name().equals(processType)
-            || AllocateApplyTypeEnum.REFUND.equals(processType)){
+            || AllocateApplyTypeEnum.REFUND.name().equals(processType)){
             applyHandleContext.applyHandle(allocateApplyDTO.getApplyNo());
         }
 
@@ -578,6 +585,22 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             map.put("storehouseName", storehouseName);
         }
         return map;
+    }
+
+    /**
+     * 查询客户经理待领取的物料
+     * @param completeStatus 状态（DOING待领取，COMPLETE已领取）
+     * @param keyword     物料编号/物料名称
+     * @param offset      偏移量
+     * @param pageSize    每页显示的数量
+     * @return Page<QueryPendingMaterialsDTO>
+     * @author zhangkangjian
+     * @date 2018-08-25 20:40:35
+     */
+    @Override
+    public Page<QueryPendingMaterialsDTO> queryPendingMaterials(String completeStatus, String keyword, Integer offset, Integer pageSize) {
+        String loggedUserId = userHolder.getLoggedUserId();
+        return bizAllocateapplyDetailDao.queryPendingMaterials(completeStatus, keyword, loggedUserId, offset, pageSize);
     }
 
     /**

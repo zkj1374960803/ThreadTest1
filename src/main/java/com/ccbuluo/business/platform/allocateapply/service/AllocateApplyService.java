@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
+import com.ccbuluo.business.custmanager.allocateapply.dto.QueryPendingMaterialsDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
@@ -152,4 +153,16 @@ public interface AllocateApplyService {
      * @date 2018-08-24 17:37:13
      */
     Map<String, String> findCustManagerServiceCenter(String useruuid) throws IOException;
+
+    /**
+     * 查询客户经理待领取的物料
+     * @param completeStatus 状态（DOING待领取，COMPLETE已领取）
+     * @param keyword 物料编号/物料名称
+     * @param offset 偏移量
+     * @param pageSize 每页显示的数量
+     * @return Page<QueryPendingMaterialsDTO>
+     * @author zhangkangjian
+     * @date 2018-08-25 20:40:35
+     */
+    Page<QueryPendingMaterialsDTO> queryPendingMaterials(String completeStatus, String keyword, Integer offset, Integer pageSize);
 }

@@ -1,10 +1,13 @@
 package com.ccbuluo.business.platform.allocateapply.dao;
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.custmanager.allocateapply.dto.QueryPendingMaterialsDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
 import com.ccbuluo.dao.BaseDao;
+import com.ccbuluo.db.Page;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -133,4 +136,40 @@ public class BizAllocateapplyDetailDao extends BaseDao<AllocateapplyDetailDTO> {
 
         return findForObject(sql, params, Boolean.class);
     }
+
+
+
+    /**
+     * 查询客户经理待领取的物料
+     * @param completeStatus 状态（PENDING待领取，CONFIRMRECEIPT已领取）
+     * @param keyword     物料编号/物料名称
+     * @param offset      偏移量
+     * @param pageSize    每页显示的数量
+     * @return List<QueryPendingMaterialsDTO>
+     * @author zhangkangjian
+     * @date 2018-08-25 20:40:35
+     */
+    public Page<QueryPendingMaterialsDTO> queryPendingMaterials(String completeStatus, String keyword, String loggedUserId, Integer offset, Integer pageSize) {
+        Map<String, Object> map = Maps.newHashMap();
+//        map.put();
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT a.id,a.product_no,a.product_name,a.product_categoryname,c.supplier_name,a.plan_instocknum as 'productNum',a.complete_status ")
+            .append(" FROM biz_instockplan_detail a LEFT JOIN biz_allocate_apply b ON a.trade_no = b.apply_no ")
+            .append(" LEFT JOIN biz_service_supplier c ON a.supplier_no = c.supplier_code ")
+            .append(" WHERE 1 = 1  ");
+        if(StringUtils.isNotBlank(loggedUserId)){
+            map.put("applyer", loggedUserId);
+            sql.append(" AND b.applyer = :applyer ");
+        }
+        if(StringUtils.isNotBlank(completeStatus)){
+            map.put("completeStatus", completeStatus);
+            sql.append(" AND a.complete_status = :completeStatus ");
+        }
+        if(StringUtils.isNotBlank(keyword)){
+            map.put("keyword", keyword);
+            sql.append(" AND (a.product_no like concat('%',:keyword,'%') or a.product_name like concat('%',:keyword,'%')) ");
+        }
+        return queryPageForBean(QueryPendingMaterialsDTO.class, sql.toString(), map, offset, pageSize);
+    }
+
 }

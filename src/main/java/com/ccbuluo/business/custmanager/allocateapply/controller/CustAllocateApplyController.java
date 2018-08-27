@@ -1,5 +1,6 @@
 package com.ccbuluo.business.custmanager.allocateapply.controller;
 
+import com.ccbuluo.business.custmanager.allocateapply.dto.QueryPendingMaterialsDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
@@ -8,7 +9,6 @@ import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
-import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -192,8 +192,7 @@ public class CustAllocateApplyController extends BaseController {
     public StatusDto<List<StockBizStockDetailDTO>> queryProblemStockList(String orgCode, String productType) {
         return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.queryProblemStockList(orgCode, productType));
     }
-    
-    
+
     /**
      * 查询客户经理关联的服务中心
      * @param useruuid
@@ -206,6 +205,28 @@ public class CustAllocateApplyController extends BaseController {
     @ApiImplicitParam(name = "useruuid", value = "用户uuid", required = false, paramType = "query")
     public StatusDto<Map<String, String>> findCustManagerServiceCenter(String useruuid) throws IOException {
         return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.findCustManagerServiceCenter(useruuid));
+    }
+
+    /**
+     * 查询客户经理待领取的物料
+     * @param completeStatus  "状态（PENDING待领取，CONFIRMRECEIPT已领取）
+     * @param keyword 物料编号/物料名称
+     * @param offset 偏移量
+     * @param pageSize 每页显示的数量
+     * @return StatusDto<List<QueryPendingMaterialsDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-25 20:40:35
+     */
+    @GetMapping("/querypendingmaterials")
+    @ApiOperation(value = "查询客户经理待领取的物料", notes = "【张康健】")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "completeStatus", value = "状态（DOING待领取，COMPLETE已领取）", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "keyword", value = "物料编号/物料名称", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query")
+    })
+    public StatusDto<Page<QueryPendingMaterialsDTO>> queryPendingMaterials(String completeStatus, String keyword, Integer offset, Integer pageSize){
+        return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.queryPendingMaterials(completeStatus, keyword, offset, pageSize));
     }
 
 
