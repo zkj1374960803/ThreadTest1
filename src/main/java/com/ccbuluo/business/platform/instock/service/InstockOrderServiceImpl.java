@@ -564,7 +564,16 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         Date date = new Date();
         bizInstockOrder.setInstockOrderno(instockOrderno);
         bizInstockOrder.setTradeDocno(bizAllocateApply.getApplyNo());
-        bizInstockOrder.setInRepositoryNo(bizAllocateApply.getInRepositoryNo());
+        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+            // 查询当前登录人的机构的仓库（第一个）
+            List<BizServiceStorehouse> storehousrByCode = storeHouseService.getStorehousrByCode(orgCode);
+            if (!storehousrByCode.isEmpty()) {
+                bizInstockOrder.setInRepositoryNo(storehousrByCode.get(0).getStorehouseCode());
+            }
+        } else {
+            bizInstockOrder.setInRepositoryNo(bizAllocateApply.getInRepositoryNo());
+        }
         bizInstockOrder.setInstockOperator(userHolder.getLoggedUserId());
         // 根据仓库code查询机构code
         String orgCodeByStoreHouseCode = storeHouseService.getOrgCodeByStoreHouseCode(inRepositoryNo);
