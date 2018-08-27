@@ -433,9 +433,23 @@ public class CustmanagerServiceImpl implements CustmanagerService{
      */
     @Override
     public Page<QueryCustManagerListDTO> queryCustManagerList(QueryCustManagerListDTO queryCustManagerListDTO) {
+        UserInfoDTO user = new UserInfoDTO();
+        user.setAppId(SystemPropertyHolder.getBaseAppid());
+        user.setSecretId(SystemPropertyHolder.getBaseSecret());
+        user.setOrgCode(queryCustManagerListDTO.getServiceCenter());
+        user.setName(queryCustManagerListDTO.getName());
+        user.setOffset(queryCustManagerListDTO.getOffset());
+        user.setPageSize(999999);
+        user.setSortField(Constants.SORT_FIELD_OPERATE);
+        StatusDtoThriftPage<UserInfoDTO> userList = innerUserInfoService.queryUserList(user);
+        StatusDto<Page<UserInfoDTO>> resolve1 = StatusDtoThriftUtils.resolve(userList, UserInfoDTO.class);
+        Page<UserInfoDTO> data1 = resolve1.getData();
+        List<UserInfoDTO> rows1 = data1.getRows();
+//        List<String> useruudis1 = rows1.stream().map(UserInfoDTO::getUseruuid).collect(Collectors.toList());
+        Map<String, UserInfoDTO> userInfoDTOMap = rows1.stream().collect(Collectors.toMap(UserInfoDTO::getUseruuid, a -> a,(k1,k2)->k1));
+
         // 查询客户经理的信息
         Page<QueryCustManagerListDTO> queryCustManagerListDTOPage = bizServiceCustmanagerDao.queryCustManagerList(queryCustManagerListDTO);
-        // 查询服务中心的信息
         StatusDtoThriftList<QueryServiceCenterListDTO> queryServiceCenterList = orgService.queryServiceCenter(null, null, null, null);
         StatusDto<List<QueryServiceCenterListDTO>> resolve = StatusDtoThriftUtils.resolve(queryServiceCenterList, QueryServiceCenterListDTO.class);
         List<QueryServiceCenterListDTO> data = resolve.getData();
@@ -450,7 +464,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             List<String> useruudis = rows.stream().map(QueryCustManagerListDTO::getUseruuid).collect(Collectors.toList());
             // 查询用户的名字
             StatusDtoThriftList<QueryNameByUseruuidsDTO> name = innerUserInfoService.queryNameByUseruuids(useruudis);
-            StatusDto<List<QueryNameByUseruuidsDTO>> nameResolve = StatusDtoThriftUtils.resolve(name, QueryNameByUseruuidsDTO.class);
+             StatusDto<List<QueryNameByUseruuidsDTO>> nameResolve = StatusDtoThriftUtils.resolve(name, QueryNameByUseruuidsDTO.class);
 //            List<QueryNameByUseruuidsDTO> nameDto = Optional.ofNullable(nameResolve.getData()).orElse(new ArrayList<QueryNameByUseruuidsDTO>());
 //            Map<String, QueryNameByUseruuidsDTO> namemap = nameDto.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, a -> a,(k1,k2)->k1));
 //
@@ -468,6 +482,10 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             Optional.ofNullable(nameResolve.getData()).ifPresent(a -> {
                 Map<String, QueryNameByUseruuidsDTO> collect = a.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, b -> b, (k1, k2) -> k1));
                 rows.stream().forEach(c -> {
+                    UserInfoDTO userInfoDTO = userInfoDTOMap.get(c.getUseruuid());
+                    if(userInfoDTO != null){
+                        c.setOrgCode(userInfoDTO.getOrgCode());
+                    }
                     QueryServiceCenterListDTO queryServiceCenterListDTO = map.get(c.getServiceCenter());
                     QueryNameByUseruuidsDTO queryNameByUseruuidsDTO = collect.get(c.getUseruuid());
                     if (queryNameByUseruuidsDTO != null) {
