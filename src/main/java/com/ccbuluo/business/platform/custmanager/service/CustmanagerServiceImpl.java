@@ -436,9 +436,10 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         UserInfoDTO user = new UserInfoDTO();
         user.setAppId(SystemPropertyHolder.getBaseAppid());
         user.setSecretId(SystemPropertyHolder.getBaseSecret());
-        user.setOrgCode(queryCustManagerListDTO.getServiceCenter());
-        user.setName(queryCustManagerListDTO.getName());
-        user.setOffset(queryCustManagerListDTO.getOffset());
+//        user.setOrgCode(queryCustManagerListDTO.getServiceCenter());
+//        user.setName(queryCustManagerListDTO.getName());
+        user.setOrgCode("FO000106");
+        user.setOffset(0);
         user.setPageSize(999999);
         user.setSortField(Constants.SORT_FIELD_OPERATE);
         StatusDtoThriftPage<UserInfoDTO> userList = innerUserInfoService.queryUserList(user);
