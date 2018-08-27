@@ -243,7 +243,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             throw new CommonException(Constants.ERROR_CODE, "根据申请编号查询详情数据异常！");
         }
         // 查询组织架构的名字
-            StatusDtoThriftBean<BasicUserOrganization> outstockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getOutstockOrgno());
+        StatusDtoThriftBean<BasicUserOrganization> outstockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getOutstockOrgno());
         StatusDtoThriftBean<BasicUserOrganization> instockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getInstockOrgno());
         StatusDtoThriftBean<BasicUserOrganization> applyorgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getApplyorgNo());
         StatusDto<BasicUserOrganization> outstockOrgNameresolve = StatusDtoThriftUtils.resolve(outstockOrgName, BasicUserOrganization.class);
@@ -619,10 +619,11 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public void receivingmaterials(Long id, String productNo) {
-        Assert.isTrue(id == null, "必填参数异常！");
-        Assert.isTrue(StringUtils.isBlank(productNo), "必填参数异常！");
+        Assert.isTrue(id != null, "必填参数异常！");
+        Assert.isTrue(StringUtils.isNotBlank(productNo), "必填参数异常！");
         BizInstockplanDetail bizInstockplanDetail = bizInstockplanDetailDao.queryListById(id);
-        instockOrderService.autoSaveInstockOrder(bizInstockplanDetail.getSupplierNo(), bizInstockplanDetail.getInstockRepositoryNo(), List.of(bizInstockplanDetail));
+        bizInstockplanDetail.setActualInstocknum(bizInstockplanDetail.getPlanInstocknum());
+        instockOrderService.autoSaveInstockOrder(bizInstockplanDetail.getTradeNo(), bizInstockplanDetail.getInstockRepositoryNo(), List.of(bizInstockplanDetail));
     }
 
     /**
