@@ -46,13 +46,12 @@ public class StockDetailServiceImpl implements StockDetailService{
     /**
      * 修改有效库存
      * @param bizStockDetail 库存明细
-     * @param versionNo 版本号
      * @author liuduo
      * @date 2018-08-08 15:24:09
      */
     @Override
-    public void updateValidStock(BizStockDetail bizStockDetail, Integer versionNo) {
-        bizStockDetailDao.updateValidStock(bizStockDetail, versionNo);
+    public void updateValidStock(BizStockDetail bizStockDetail) {
+        bizStockDetailDao.updateValidStock(bizStockDetail);
     }
 
     /**
