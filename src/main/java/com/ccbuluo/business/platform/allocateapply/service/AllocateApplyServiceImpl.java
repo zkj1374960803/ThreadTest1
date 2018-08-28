@@ -165,6 +165,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             allocateApplyDTO.setOutstockOrgtype(OrganizationTypeEnum.PLATFORM.name());
         }else {
             allocateApplyDTO.setOutstockOrgtype(outOrgType);
+            allocateApplyDTO.setProcessOrgtype(outOrgType);
         }
         // 如果是退款类型，没有入库机构，不需要查询类型
         if(!AllocateApplyTypeEnum.REFUND.name().equals(processType)){
