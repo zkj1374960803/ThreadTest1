@@ -38,10 +38,10 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
     @Resource
     OutstockOrderService outstockOrderService;
-    /*@Resource
+    @Resource
     private BizAllocateTradeorderDao bizAllocateTradeorderDao;
     @Resource
-    private BizStockDetailDao bizStockDetailDao;*/
+    private BizStockDetailDao bizStockDetailDao;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -86,12 +86,12 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 只有正常件才保存库存和占用关系
             if(BizStockDetail.StockTypeEnum.VALIDSTOCK.name().equals(stockType)){
                 // 保存占用库存
-                /*int flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
+                int flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
                 if(flag == 0){// 更新失败
                     throw new CommonException("0", "更新占用库存失败！");
                 }
                 // 保存订单占用库存关系
-                bizAllocateTradeorderDao.batchInsertRelOrdstockOccupy(relOrdstockOccupies);*/
+                bizAllocateTradeorderDao.batchInsertRelOrdstockOccupy(relOrdstockOccupies);
             }
         } catch (Exception e) {
             logger.error("提交失败！", e);
@@ -128,7 +128,7 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
         // 平台入库
         instockplanPlatform(inList,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
         // 平台出库
-        outstockplanPlatform(outList,relOrdstockOccupies,stockDetails,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
+//        outstockplanPlatform(outList,relOrdstockOccupies,stockDetails,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
         // 买方入库（换货：买方机构的入库要以出库的数据来构建（不同批次，不同价格）（问题件库存））
         instockplanPurchaser(inList,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
         return Pair.of(outList, inList);

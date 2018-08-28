@@ -73,6 +73,12 @@ public class QueryAllocateApplyListDTO {
     @ApiModelProperty(name = "outstockTime", value = "出库时间", hidden = true)
     private Date outstockTime;
 
+    /**
+     * 仓库编号
+     */
+    @ApiModelProperty(name = "inRepositoryNo", value = "仓库编号", hidden = true)
+    private Date inRepositoryNo;
+
     public String getOutstockOrgname() {
         return outstockOrgname;
     }
@@ -174,5 +180,13 @@ public class QueryAllocateApplyListDTO {
 
     public void setOutstockTime(Date outstockTime) {
         this.outstockTime = outstockTime;
+    }
+
+    public Date getInRepositoryNo() {
+        return inRepositoryNo;
+    }
+
+    public void setInRepositoryNo(Date inRepositoryNo) {
+        this.inRepositoryNo = inRepositoryNo;
     }
 }
