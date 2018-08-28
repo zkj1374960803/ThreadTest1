@@ -81,10 +81,15 @@ public class InstockOrderServiceImpl implements InstockOrderService {
     @Override
     public List<String> queryApplyNo(String productType) {
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+        List<String> status = Lists.newArrayList();
         if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-            return allocateApplyService.queryApplyNo(ApplyStatusEnum.INSTORE.toString(), orgCode, productType, Constants.STATUS_FLAG_ZERO);
+            status.add(ApplyStatusEnum.INSTORE.name());
+            status.add(BizAllocateApply.ReturnApplyStatusEnum.PRODRETURNED.name());
+            return allocateApplyService.queryApplyNo(status, orgCode, productType, Constants.STATUS_FLAG_ZERO);
         }
-        return allocateApplyService.queryApplyNo(ApplyStatusEnum.WAITINGRECEIPT.toString(), orgCode, productType, Constants.STATUS_FLAG_ZERO);
+        status.add(ApplyStatusEnum.WAITINGRECEIPT.name());
+        status.add(BizAllocateApply.ReturnApplyStatusEnum.REPLACEWAITIN.name());
+        return allocateApplyService.queryApplyNo(status, orgCode, productType, Constants.STATUS_FLAG_ZERO);
     }
 
     /**
