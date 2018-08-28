@@ -406,7 +406,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
             BizInstockplanDetail bizInstockplanDetail = new BizInstockplanDetail();
             bizInstockplanDetail.setId(item.getInstockPlanid());
             bizInstockplanDetail.setActualInstocknum(item.getInstockNum());
-            bizInstockplanDetail.setVersionNo(versionNo);
+            bizInstockplanDetail.setVersionNo(versionNo + Constants.LONG_FLAG_ONE);
             bizInstockplanDetail.setCostPrice(item.getCostPrice());
             bizInstockplanDetail.preUpdate(userHolder.getLoggedUserId());
             int i = inputStockPlanService.updateActualInstockNum(bizInstockplanDetail);
