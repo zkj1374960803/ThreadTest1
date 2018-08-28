@@ -464,7 +464,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
      * @author weijb
      * @date 2018-08-11 13:35:41
      */
-    private BizOutstockplanDetail buildBizOutstockplanDetail(AllocateapplyDetailBO ad, String applyType,BizStockDetail bd){
+    protected BizOutstockplanDetail buildBizOutstockplanDetail(AllocateapplyDetailBO ad, String applyType,BizStockDetail bd){
         BizOutstockplanDetail outPlan = new BizOutstockplanDetail();
         // 调拨
         if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType)  || AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType) ){
@@ -567,9 +567,15 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             inPlan.setInstockType(InstockTypeEnum.PURCHASE.toString());// 交易类型
         }
         // 换货
-        if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) || AllocateApplyTypeEnum.REFUND.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType)){
             inPlan.setInstockType(InstockTypeEnum.BARTER.toString());// 交易类型
-            inPlan.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());// 库存类型 （问题件再次入库的时候应该是有效库存）
+            inPlan.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());// 库存类型 （问题件申请机构入库的时候应该是有效库存）
+            inPlan.setCostPrice(BigDecimal.ZERO);// 成本价(退货和换货的成本价是零)
+        }
+        // 退货
+        if(AllocateApplyTypeEnum.REFUND.toString().equals(applyType) ){
+            inPlan.setInstockType(InstockTypeEnum.BARTER.toString());// 交易类型
+            inPlan.setStockType(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.name());// 库存类型 （问题件平台入库的时候应该是问题库存）
             inPlan.setCostPrice(BigDecimal.ZERO);// 成本价(退货和换货的成本价是零)
         }
         return inPlan;

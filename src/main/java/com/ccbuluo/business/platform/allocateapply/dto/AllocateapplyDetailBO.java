@@ -138,6 +138,12 @@ public class AllocateapplyDetailBO {
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
 
+    /**
+     * 申请机构
+     */
+    @ApiModelProperty(name = "applyorgNo", value = "申请机构")
+    private String applyorgNo;
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -328,5 +334,13 @@ public class AllocateapplyDetailBO {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getApplyorgNo() {
+        return applyorgNo;
+    }
+
+    public void setApplyorgNo(String applyorgNo) {
+        this.applyorgNo = applyorgNo;
     }
 }
