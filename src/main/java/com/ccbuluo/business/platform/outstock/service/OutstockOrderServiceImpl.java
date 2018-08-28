@@ -87,7 +87,6 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
             FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
             List<BizOutstockOrder> bizOutstockOrderList = Lists.newArrayList();
             List<BizOutstockorderDetail> bizOutstockorderDetailList = Lists.newArrayList();
-            List<BizOutstockorderDetail> bizOutstockorderDetailList1 = Lists.newArrayList();
             Date date = new Date();
             for (String outRepositoryNo : collect.keySet()) {
                 List<BizOutstockplanDetail> bizOutstockplanDetails = collect.get(outRepositoryNo);
@@ -137,6 +136,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 }
                 // 更改库存
                 // 根据出库单号查询出库单详单
+                List<BizOutstockorderDetail> bizOutstockorderDetailList1 = outstockorderDetailService.queryByApplyNo(outstockNo);
                 updateOccupyStock(bizOutstockorderDetailList1, bizOutstockplanDetailList);
                 // 4、更新出库计划中的实际出库数量
                 updateActualOutstocknum(bizOutstockorderDetailList1);
