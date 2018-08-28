@@ -243,7 +243,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      */
     public int updateOccupyStock(List<BizStockDetail> bizStockDetails) {
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_stock_detail SET occupy_stock = :occupyStock,version_no = version_no+1,")
+        sql.append("UPDATE biz_stock_detail SET occupy_stock = IFNULL(occupy_stock,0) - IFNULL(:outstockNum,0),problem_stock = IFNULL(problem_stock,0) - IFNULL(:outstockNum,0),version_no = version_no+1,")
             .append(" operator = :operator,operate_time = :operateTime WHERE id = :id AND :versionNo > version_no");
 
         return batchUpdateForListBean(sql.toString(), bizStockDetails);

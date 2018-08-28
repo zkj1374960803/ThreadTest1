@@ -72,7 +72,8 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
 
     /**
      * 自动保存出库单
-     * @param applyNo                    申请单号
+     *
+     * @param applyNo                   申请单号
      * @param bizOutstockplanDetailList 出库计划
      * @return 是否保存成功
      * @author liuduo
@@ -80,7 +81,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public StatusDto<String> autoSaveOutstockOrder(String applyNo,  List<BizOutstockplanDetail> bizOutstockplanDetailList) {
+    public StatusDto<String> autoSaveOutstockOrder(String applyNo, List<BizOutstockplanDetail> bizOutstockplanDetailList) {
         try {
             Map<String, List<BizOutstockplanDetail>> collect = bizOutstockplanDetailList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getOutRepositoryNo));
             // 根据申请单号查询基本信息
@@ -209,10 +210,11 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
 
     /**
      * 复核库存和计划
-     * @param applyNo 申请单号
-     * @param outRepositoryNo 出库仓库编号
-     * @param outstockNo 出库单编号
-     * @param detail 申请单详情
+     *
+     * @param applyNo                   申请单号
+     * @param outRepositoryNo           出库仓库编号
+     * @param outstockNo                出库单编号
+     * @param detail                    申请单详情
      * @param bizOutstockplanDetailList 出库计划集合
      * @author liuduo
      * @date 2018-08-20 13:57:35
@@ -301,7 +303,8 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
 
     /**
      * 根据申请单号查询出库计划
-     * @param applyNo 申请单号
+     *
+     * @param applyNo     申请单号
      * @param productType 商品类型
      * @return 出库计划
      * @author liuduo
@@ -385,6 +388,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
 
     /**
      * 根据申请单号查询出库仓库
+     *
      * @param applyNo 申请单号
      * @return 入库仓库
      * @author liuduo
@@ -452,7 +456,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     /**
      * 更改占用库存
      *
-     * @param bizOutstockplanDetailList   出库计划
+     * @param bizOutstockplanDetailList  出库计划
      * @param bizOutstockorderDetailList 出库单详单
      * @author liuduo
      * @date 2018-08-09 19:25:36
@@ -479,35 +483,17 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 if (updateStockBizStockDetailDTO != null) {
                     BizStockDetail bizStockDetail = new BizStockDetail();
                     if (item.getStockType().equals(BizStockDetail.StockTypeEnum.VALIDSTOCK.toString())) {
-                        occupyStock = updateStockBizStockDetailDTO.getOccupyStock();// 库存明细中的占用库存数量
-                        if (occupyStock <= outstockNum) {
-                            bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
-                            bizStockDetail.setOccupyStock(Constants.LONG_FLAG_ZERO);
-                            bizStockDetail.setVersionNo(versionNo);
-                            bizStockDetail.preUpdate(userHolder.getLoggedUserId());
-                            bizStockDetails.add(bizStockDetail);
-                        } else {
-                            bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
-                            bizStockDetail.setOccupyStock(occupyStock - outstockNum);
-                            bizStockDetail.setVersionNo(versionNo);
-                            bizStockDetail.preUpdate(userHolder.getLoggedUserId());
-                            bizStockDetails.add(bizStockDetail);
-                        }
+                        bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
+                        bizStockDetail.setOccupyStock(outstockNum);
+                        bizStockDetail.setVersionNo(versionNo);
+                        bizStockDetail.preUpdate(userHolder.getLoggedUserId());
+                        bizStockDetails.add(bizStockDetail);
                     } else if (item.getStockType().equals(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.toString())) {
-                        occupyStock = updateStockBizStockDetailDTO.getProblemStock();// 库存明细中的问题件库存数量
-                        if (occupyStock <= outstockNum) {
-                            bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
-                            bizStockDetail.setProblemStock(Constants.LONG_FLAG_ZERO);
-                            bizStockDetail.setVersionNo(versionNo);
-                            bizStockDetail.preUpdate(userHolder.getLoggedUserId());
-                            bizStockDetails.add(bizStockDetail);
-                        } else {
-                            bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
-                            bizStockDetail.setProblemStock(occupyStock - outstockNum);
-                            bizStockDetail.setVersionNo(versionNo);
-                            bizStockDetail.preUpdate(userHolder.getLoggedUserId());
-                            bizStockDetails.add(bizStockDetail);
-                        }
+                        bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
+                        bizStockDetail.setProblemStock(outstockNum);
+                        bizStockDetail.setVersionNo(versionNo);
+                        bizStockDetail.preUpdate(userHolder.getLoggedUserId());
+                        bizStockDetails.add(bizStockDetail);
                     }
                 }
 
