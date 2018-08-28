@@ -436,13 +436,28 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     @Override
     public Page<QueryCustManagerListDTO> queryCustManagerList(QueryCustManagerListDTO queryCustManagerListDTO) {
         // 查询客户经理的信息
+
         Page<QueryCustManagerListDTO> queryCustManagerListDTOPage = bizServiceCustmanagerDao.queryCustManagerList(queryCustManagerListDTO);
         List<QueryCustManagerListDTO> rows = queryCustManagerListDTOPage.getRows();
         Map<String, BasicUserOrganization> organizationMap;
         if(rows != null){
+            // 查询客户经理的信息
+            List<String> useruudis = rows.stream().map(QueryCustManagerListDTO::getUseruuid).collect(Collectors.toList());
+            UserInfoDTO userInfoDTO = new UserInfoDTO();
+            userInfoDTO.setUseruuids(useruudis);
+            StatusDtoThriftList<UserInfoDTO> userInfoDTOList = innerUserInfoService.queryUserListByOrgCode(userInfoDTO);
+            StatusDto<List<UserInfoDTO>> userInfoStatusDto = StatusDtoThriftUtils.resolve(userInfoDTOList, UserInfoDTO.class);
+            List<UserInfoDTO> data = userInfoStatusDto.getData();
+            List<UserInfoDTO> userInfoList = Optional.ofNullable(data).orElse(Collections.EMPTY_LIST);
+            Map<String, UserInfoDTO> userInfoMap = userInfoList.stream().collect(Collectors.toMap(UserInfoDTO::getUseruuid, a -> a,(k1,k2)->k1));
+
             List<String> orgCodeList = rows.stream().map(QueryCustManagerListDTO::getServiceCenter).collect(Collectors.toList());
             organizationMap = orgService.queryOrganizationByOrgCodes(orgCodeList);
             rows.stream().forEach(c -> {
+                UserInfoDTO userInfoDTO1 = userInfoMap.get(c.getUseruuid());
+                if(userInfoDTO1 != null){
+                    c.setOrgCode(userInfoDTO1.getOrgCode());
+                }
                 BasicUserOrganization basicUserOrganization = organizationMap.get(c.getServiceCenter());
                 if (basicUserOrganization != null) {
                     c.setServiceCenterName(basicUserOrganization.getOrgName());
