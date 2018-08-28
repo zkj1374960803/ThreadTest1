@@ -379,7 +379,11 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
             sql.append(" AND a.org_no in (:orgDTOList) ");
         }
         sql.append(" GROUP BY a.product_no ");
-        return findForBean(FindProductDetailDTO.class, sql.toString(), map);
+        FindProductDetailDTO forBean = findForBean(FindProductDetailDTO.class, sql.toString(), map);
+        if(forBean == null){
+            return new FindProductDetailDTO();
+        }
+        return forBean;
     }
     /**
      * 查询可调拨库存的数量
@@ -406,7 +410,12 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
             sql.append(" AND a.org_no in (:orgDTOList) ");
         }
         sql.append(" GROUP BY a.product_no ");
-        return namedParameterJdbcTemplate.queryForObject(sql.toString(), map, Long.class);
+        try {
+            return namedParameterJdbcTemplate.queryForObject(sql.toString(), map, Long.class);
+        }catch (Exception e){
+            return 0L;
+        }
+
     }
 
     /**
@@ -433,7 +442,11 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
             sql.append(" AND a.org_no in (:orgDTOList) ");
         }
         sql.append(" GROUP BY a.product_no ");
-        return findForBean(FindProductDetailDTO.class, sql.toString(), map);
+        FindProductDetailDTO forBean = findForBean(FindProductDetailDTO.class, sql.toString(), map);
+        if(forBean == null){
+            return new FindProductDetailDTO();
+        }
+        return forBean;
     }
     /**
      * 查询损坏件
@@ -459,7 +472,11 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
             sql.append(" AND a.org_no in (:orgDTOList) ");
         }
         sql.append(" GROUP BY a.product_no ");
-        return findForBean(FindProductDetailDTO.class, sql.toString(), map);
+        FindProductDetailDTO forBean = findForBean(FindProductDetailDTO.class, sql.toString(), map);
+        if(forBean == null){
+            return new FindProductDetailDTO();
+        }
+        return forBean;
     }
 
 
