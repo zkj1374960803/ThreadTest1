@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
 import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
+import com.ccbuluo.business.constants.InstockTypeEnum;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 换货申请处理
@@ -38,10 +40,10 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
     @Resource
     OutstockOrderService outstockOrderService;
-    /*@Resource
+    @Resource
     private BizAllocateTradeorderDao bizAllocateTradeorderDao;
     @Resource
-    private BizStockDetailDao bizStockDetailDao;*/
+    private BizStockDetailDao bizStockDetailDao;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -86,12 +88,12 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 只有正常件才保存库存和占用关系
             if(BizStockDetail.StockTypeEnum.VALIDSTOCK.name().equals(stockType)){
                 // 保存占用库存
-                /*int flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
+                int flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
                 if(flag == 0){// 更新失败
                     throw new CommonException("0", "更新占用库存失败！");
                 }
                 // 保存订单占用库存关系
-                bizAllocateTradeorderDao.batchInsertRelOrdstockOccupy(relOrdstockOccupies);*/
+                bizAllocateTradeorderDao.batchInsertRelOrdstockOccupy(relOrdstockOccupies);
             }
         } catch (Exception e) {
             logger.error("提交失败！", e);
@@ -123,14 +125,67 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
     public Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> buildOutAndInstockplanDetail(List<AllocateapplyDetailBO> details, List<BizStockDetail> stockDetails, BizAllocateApply.AllocateApplyTypeEnum applyTypeEnum, List<RelOrdstockOccupy> relOrdstockOccupies){
         List<BizOutstockplanDetail> outList = new ArrayList<BizOutstockplanDetail>();
         List<BizInstockplanDetail> inList = new ArrayList<BizInstockplanDetail>();
-        // 买方出库
-        outstockplanPurchaser(outList,relOrdstockOccupies,stockDetails,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
+        // 申请方出库
+        problemOutstockplanPurchaser(outList,relOrdstockOccupies,stockDetails,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
         // 平台入库
         instockplanPlatform(inList,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
         // 平台出库
-        outstockplanPlatform(outList,relOrdstockOccupies,stockDetails,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
-        // 买方入库（换货：买方机构的入库要以出库的数据来构建（不同批次，不同价格）（问题件库存））
-        instockplanPurchaser(inList,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
+//        outstockplanPlatform(outList,relOrdstockOccupies,stockDetails,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
+        // 申请方入库（换货：买方机构的入库要以出库的数据来构建（不同批次，不同价格）（问题件库存））
+        problemInstockplanPurchaser(inList,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
         return Pair.of(outList, inList);
+    }
+
+    /**
+     *买方出库
+     * @param outList 出库计划list
+     * @param relOrdstockOccupies 库存和占用库存关系
+     * @param stockDetails 库存
+     * @param applyType 申请类型
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    public void problemOutstockplanPurchaser(List<BizOutstockplanDetail> outList, List<RelOrdstockOccupy> relOrdstockOccupies, List<BizStockDetail> stockDetails,List<AllocateapplyDetailBO> details, String applyType){
+        // 买方出库计划
+        for(RelOrdstockOccupy ro : relOrdstockOccupies){
+            BizOutstockplanDetail outstockplanPurchaser = new BizOutstockplanDetail();
+            for(BizStockDetail bd : stockDetails){
+                if(ro.getStockId().intValue() == bd.getId().intValue()){// 关系库存批次id和库存批次id相等
+                    AllocateapplyDetailBO detail = new AllocateapplyDetailBO();
+                    Optional<AllocateapplyDetailBO> applyFilter = details.stream() .filter(applyDetail -> bd.getProductNo().equals(applyDetail.getProductNo())) .findFirst();
+                    if (applyFilter.isPresent()) {
+                        detail = applyFilter.get();
+                    }
+                    outstockplanPurchaser = buildBizOutstockplanDetail(detail, applyType,bd);
+                    outstockplanPurchaser.setStockType(ro.getStockType());// 库存类型(在创建占用关系的时候赋值)
+                    outstockplanPurchaser.setPlanOutstocknum(ro.getOccupyNum());// 计划出库数量applyNum
+                    outstockplanPurchaser.setOutRepositoryNo(bd.getRepositoryNo());// 仓库code
+                    outstockplanPurchaser.setOutOrgno(detail.getApplyorgNo());// 换货的时候是申请方机构出货
+                    outstockplanPurchaser.setStockId(bd.getId());// 库存编号id
+                    outstockplanPurchaser.setCostPrice(bd.getCostPrice());// 成本价
+                    outList.add(outstockplanPurchaser);
+                    continue;
+                }
+            }
+        }
+    }
+
+    /**
+     * 申请方入库
+     * @param details 申请详细
+     * @param applyType 申请类型
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    public void problemInstockplanPurchaser(List<BizInstockplanDetail> inList, List<AllocateapplyDetailBO> details, String applyType){
+        // 买入方入库计划
+        for(AllocateapplyDetailBO ad : details){
+            BizInstockplanDetail instockplanPurchaser = new BizInstockplanDetail();
+            instockplanPurchaser = buildBizInstockplanDetail(ad, applyType);
+            instockplanPurchaser.setInstockType(InstockTypeEnum.TRANSFER.toString());// 交易类型（只有平台是采购，机构是调拨）
+            instockplanPurchaser.setInstockRepositoryNo(ad.getInRepositoryNo());// 入库仓库编号
+            instockplanPurchaser.setInstockOrgno(ad.getApplyorgNo());// 申请方入机构编号
+            inList.add(instockplanPurchaser);
+        }
     }
 }

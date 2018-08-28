@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 退货申请处理
@@ -89,12 +90,14 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
             Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, BizAllocateApply.AllocateApplyTypeEnum.REFUND, relOrdstockOccupies);
             // 保存生成订单
             bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
-            // 调用自动出库
-            outstockOrderService.autoSaveOutstockOrder(applyType, pir.getLeft());
             // 批量保存出库计划详情
             bizOutstockplanDetailDao.batchOutstockplanDetail(pir.getLeft());
             // 批量保存入库计划详情
             bizInstockplanDetailDao.batchInsertInstockplanDetail(pir.getRight());
+            // 查询出库计划
+            List<BizOutstockplanDetail> outstockPlans = bizOutstockplanDetailDao.getOutstockplansByApplyNo(applyNo);
+            // 调用自动出库
+            outstockOrderService.autoSaveOutstockOrder(applyNo, outstockPlans);
             String stockType = getStockType(details);
             // 只有正常件才保存库存和占用关系
             if(BizStockDetail.StockTypeEnum.VALIDSTOCK.name().equals(stockType)){
@@ -138,9 +141,43 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
         List<BizOutstockplanDetail> outList = new ArrayList<BizOutstockplanDetail>();
         List<BizInstockplanDetail> inList = new ArrayList<BizInstockplanDetail>();
         // 买方出库
-        outstockplanPurchaser(outList,relOrdstockOccupies,stockDetails,details, BizAllocateApply.AllocateApplyTypeEnum.REFUND.toString());
+        problemOutstockplanPurchaser(outList,relOrdstockOccupies,stockDetails,details, BizAllocateApply.AllocateApplyTypeEnum.REFUND.toString());
         // 平台入库
         instockplanPlatform(inList,details, BizAllocateApply.AllocateApplyTypeEnum.REFUND.toString());
         return Pair.of(outList, inList);
+    }
+
+    /**
+     * 问题件买方出库
+     * @param outList 出库计划list
+     * @param relOrdstockOccupies 库存和占用库存关系
+     * @param stockDetails 库存
+     * @param applyType 申请类型
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    private void problemOutstockplanPurchaser(List<BizOutstockplanDetail> outList, List<RelOrdstockOccupy> relOrdstockOccupies, List<BizStockDetail> stockDetails,List<AllocateapplyDetailBO> details, String applyType){
+        // 申请方出库计划
+        for(RelOrdstockOccupy ro : relOrdstockOccupies){
+            BizOutstockplanDetail outstockplanPurchaser = new BizOutstockplanDetail();
+            for(BizStockDetail bd : stockDetails){
+                if(ro.getStockId().intValue() == bd.getId().intValue()){// 关系库存批次id和库存批次id相等
+                    AllocateapplyDetailBO detail = new AllocateapplyDetailBO();
+                    Optional<AllocateapplyDetailBO> applyFilter = details.stream() .filter(applyDetail -> bd.getProductNo().equals(applyDetail.getProductNo())) .findFirst();
+                    if (applyFilter.isPresent()) {
+                        detail = applyFilter.get();
+                    }
+                    outstockplanPurchaser = buildBizOutstockplanDetail(detail, applyType,bd);
+                    outstockplanPurchaser.setStockType(ro.getStockType());// 库存类型(在创建占用关系的时候赋值)
+                    outstockplanPurchaser.setPlanOutstocknum(ro.getOccupyNum());// 计划出库数量applyNum
+                    outstockplanPurchaser.setOutRepositoryNo(bd.getRepositoryNo());// 仓库code
+                    outstockplanPurchaser.setOutOrgno(detail.getApplyorgNo());// 卖方机构code(退货的时候为申请机构)
+                    outstockplanPurchaser.setStockId(bd.getId());// 库存编号id
+                    outstockplanPurchaser.setCostPrice(bd.getCostPrice());// 成本价
+                    outList.add(outstockplanPurchaser);
+                    continue;
+                }
+            }
+        }
     }
 }

@@ -7,7 +7,7 @@ package com.ccbuluo.business.constants;
  * @date 2018-08-07 20:47:33
  */
 public enum InstockTypeEnum {
-    TRANSFER("调拨入库"),PURCHASE("采购入库"),BARTER("换货入库");
+    TRANSFER("调拨入库"),PURCHASE("采购入库"),BARTER("退换货入库");
 
     InstockTypeEnum(String label){
         this.label = label;

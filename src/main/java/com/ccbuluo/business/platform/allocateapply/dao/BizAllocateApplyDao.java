@@ -203,6 +203,43 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         sql.append(" GROUP BY a.apply_no order by a.operate_time DESC");
         return queryPageForBean(QueryAllocateApplyListDTO.class, sql.toString(), map, offset, pageSize);
     }
+
+    /**
+     * 问题件查询申请列表
+     * @param userOrgCode 用户机构
+     * @return Page<QueryAllocateApplyListDTO> 分页的信息
+     * @author zhangkangjian
+     * @date 2018-08-09 10:36:34
+     */
+    public Page<QueryAllocateApplyListDTO> findProblemApplyList(String productType, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode) {
+        HashMap<String, Object> map = Maps.newHashMap();
+
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.apply_status,a.process_type,a.process_orgtype as 'orgType',a.outstock_orgno ")
+                .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE a.apply_type='REFUND' or a.apply_type='BARTER' ");
+        if(StringUtils.isNotBlank(userOrgCode)){
+            map.put("userOrgCode", userOrgCode);
+            sql.append(" AND (a.applyorg_no = :userOrgCode or a.instock_orgno = :userOrgCode) ");
+        }
+        if(StringUtils.isNotBlank(processType)){
+            map.put("processType", processType);
+            sql.append(" AND a.process_type = :processType ");
+        }
+        if(StringUtils.isNotBlank(applyStatus)){
+            map.put("applyStatus", applyStatus);
+            sql.append(" AND a.apply_status = :applyStatus ");
+        }
+        if(StringUtils.isNotBlank(applyNo)){
+            map.put("applyNo", applyNo);
+            sql.append(" AND a.apply_no = :applyNo ");
+        }
+        if(StringUtils.isNotBlank(productType)){
+            map.put("productType", productType);
+            sql.append(" AND b.product_type = :productType ");
+        }
+        sql.append(" GROUP BY a.apply_no order by a.operate_time DESC");
+        return queryPageForBean(QueryAllocateApplyListDTO.class, sql.toString(), map, offset, pageSize);
+    }
     /**
      * 查询处理列表
      * @param userOrgCode 用户机构
@@ -251,6 +288,46 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.process_type,a.apply_status ")
                 .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE 1 = 1 ");
+        if(StringUtils.isNotBlank(processType)){
+            map.put("processType", processType);
+            sql.append(" AND a.process_type = :processType ");
+        }
+        if(StringUtils.isNotBlank(userOrgCode)){
+            map.put("userOrgCode", userOrgCode);
+            sql.append(" AND (a.outstock_orgno = :userOrgCode or process_orgno = :userOrgCode) ");
+        }
+        if(orgCodesByOrgType != null && orgCodesByOrgType.size() > 0){
+            map.put("orgCodesByOrgType", orgCodesByOrgType);
+            sql.append(" AND a.applyorg_no in (:orgCodesByOrgType)  ");
+        }
+        if(StringUtils.isNotBlank(applyStatus)){
+            map.put("applyStatus", applyStatus);
+            sql.append(" AND a.apply_status = :applyStatus ");
+        }
+        if(StringUtils.isNotBlank(applyNo)){
+            map.put("applyNo", applyNo);
+            sql.append(" AND a.apply_no = :applyNo ");
+        }
+        if(StringUtils.isNotBlank(productType)){
+            map.put("productType", productType);
+            sql.append(" AND b.product_type = :productType ");
+        }
+        sql.append(" GROUP BY a.apply_no order by a.operate_time DESC");
+        return queryPageForBean(QueryAllocateApplyListDTO.class, sql.toString(), map, offset, pageSize);
+    }
+
+    /**
+     * 查询问题件处理列表
+     * @param userOrgCode 用户机构
+     * @return Page<QueryAllocateApplyListDTO> 分页的信息
+     * @author weijb
+     * @date 2018-08-09 10:36:34
+     */
+    public Page<QueryAllocateApplyListDTO> findProblemProcessHandleList(String processType, String productType,List<String> orgCodesByOrgType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode) {
+        HashMap<String, Object> map = Maps.newHashMap();
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.process_type,a.apply_status,a.in_repository_no ")
+                .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE a.apply_type='REFUND' or a.apply_type='BARTER' ");
         if(StringUtils.isNotBlank(processType)){
             map.put("processType", processType);
             sql.append(" AND a.process_type = :processType ");
@@ -394,16 +471,16 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @author liuduo
      * @date 2018-08-11 12:56:39
      */
-    public List<String> queryApplyNo(String applyNoStatus, String orgCode, String productType, Integer stockType) {
+    public List<String> queryApplyNo(List<String> status, String orgCode, String productType, Integer stockType) {
         Map<String, Object> params = Maps.newHashMap();
-        params.put("applyNoStatus", applyNoStatus);
+        params.put("status", status);
         params.put("productType", productType);
         params.put("stockType", stockType);
         params.put("orgCode", orgCode);
 
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT DISTINCT baa.apply_no FROM biz_allocate_apply AS baa LEFT JOIN biz_allocateapply_detail AS bad ON bad.apply_no = baa.apply_no")
-            .append("  WHERE baa.apply_status = :applyNoStatus AND bad.product_type = :productType");
+            .append("  WHERE baa.apply_status IN(:status) AND bad.product_type = :productType");
         // 如果是平台入库、出库
         if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
             sql.append(" AND baa.process_orgno = :orgCode");

@@ -65,6 +65,11 @@ public class BizStockDetail extends AftersaleCommonEntity{
     @ApiModelProperty(name = "validStock", value = "")
     private Long validStock;
     /**
+     * 出库数量
+     */
+    @ApiModelProperty(name = "outstockNum", value = "")
+    private Long outstockNum;
+    /**
      * 占用库存
      */
     @ApiModelProperty(name = "occupyStock", value = "")
@@ -286,6 +291,14 @@ public class BizStockDetail extends AftersaleCommonEntity{
 
     public void setProductUnit(String productUnit) {
         this.productUnit = productUnit;
+    }
+
+    public Long getOutstockNum() {
+        return outstockNum;
+    }
+
+    public void setOutstockNum(Long outstockNum) {
+        this.outstockNum = outstockNum;
     }
 
     /**

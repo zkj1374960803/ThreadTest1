@@ -105,6 +105,26 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
 
         return queryListBean(BizOutstockplanDetail.class, sql.toString(), params);
     }
+    /**
+     * 根据申请单号查询出库计划
+     * @param applyNo 申请单号
+     * @return 出库计划
+     * @author weijb
+     * @date 2018-08-09 14:38:57
+     */
+    public List<BizOutstockplanDetail> getOutstockplansByApplyNo(String applyNo) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,outstock_type,stock_id,product_no,product_type,trade_no,")
+                .append("supplier_no,apply_detail_id,cost_price,sales_price,out_repository_no,")
+                .append("plan_outstocknum,actual_outstocknum,plan_status,complete_time,")
+                .append("creator,create_time,operator,operate_time,delete_flag,remark,version_no,")
+                .append("product_categoryname,out_orgno,stock_type FROM biz_outstockplan_detail WHERE trade_no= :applyNo");
+
+        return queryListBean(BizOutstockplanDetail.class, sql.toString(), params);
+    }
 
     /**
      * 根据出库计划id查询版本号（乐观锁）

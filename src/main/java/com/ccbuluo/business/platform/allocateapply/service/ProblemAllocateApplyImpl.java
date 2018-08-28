@@ -93,7 +93,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         // 获取用户的组织机构
         String userOrgCode = getUserOrgCode();
         // 查询分页的申请列表
-        Page<QueryAllocateApplyListDTO> page = bizAllocateApplyDao.findApplyList(type, applyType, applyStatus, applyNo, offset, pageSize, userOrgCode);
+        Page<QueryAllocateApplyListDTO> page = bizAllocateApplyDao.findProblemApplyList(type, applyType, applyStatus, applyNo, offset, pageSize, userOrgCode);
         List<QueryAllocateApplyListDTO> rows = page.getRows();
         List<String> applyNos = null;
         List<QueryAllocateApplyListDTO> applyList = new ArrayList<QueryAllocateApplyListDTO>();
@@ -149,7 +149,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         List<String> orgCodesByOrgType = getOrgCodesByOrgType(OrganizationTypeEnum.PLATFORM.name());
         // 如果类型是空的话，全部类型，查询所有的申请数据
         Page<QueryAllocateApplyListDTO> page;
-        page = bizAllocateApplyDao.findProcessHandleList(processType, type,orgCodesByOrgType, applyStatus, applyNo, offset, pageSize, userOrgCode);
+        page = bizAllocateApplyDao.findProblemProcessHandleList(processType, type,orgCodesByOrgType, applyStatus, applyNo, offset, pageSize, userOrgCode);
         List<QueryAllocateApplyListDTO> rows = page.getRows();
         List<QueryAllocateApplyListDTO> applyList = new ArrayList<QueryAllocateApplyListDTO>();
         List<String> applyNos = null;

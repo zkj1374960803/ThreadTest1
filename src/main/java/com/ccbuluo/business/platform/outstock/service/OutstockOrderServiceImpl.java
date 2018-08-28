@@ -125,7 +125,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                     bizOutstockorderDetail.setProductCategoryname(outstockplanDetail.getProductCategoryname());
                     bizOutstockorderDetail.setSupplierNo(outstockplanDetail.getSupplierNo());
                     bizOutstockorderDetail.setOutstockNum(outstockplanDetail.getPlanOutstocknum());
-                    bizOutstockorderDetail.setStockType(outstockplanDetail.getOutstockType());
+                    bizOutstockorderDetail.setStockType(outstockplanDetail.getStockType());
                     bizOutstockorderDetail.setUnit(outstockplanDetail.getProductUnit());
                     bizOutstockorderDetail.setCostPrice(outstockplanDetail.getCostPrice());
                     bizOutstockorderDetail.setActualPrice(outstockplanDetail.getSalesPrice());
@@ -184,7 +184,6 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
             FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
             if (!(detail.getApplyStatus().equals(ApplyStatusEnum.WAITDELIVERY.name())
                 || detail.getApplyStatus().equals(ApplyStatusEnum.OUTSTORE.name())
-                || detail.getApplyStatus().equals(BizAllocateApply.ReturnApplyStatusEnum.PRODRETURNED.name())
                 || detail.getApplyStatus().equals(BizAllocateApply.ReturnApplyStatusEnum.PLATFORMOUTBOUND.name()))) {
                 throw new CommonException("2004", "该申请单已经出库，请核对！");
             }
@@ -295,10 +294,14 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     @Override
     public List<String> queryApplyNo(String productType) {
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+        List<String> status = Lists.newArrayList();
         if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-            return allocateApplyService.queryApplyNo(ApplyStatusEnum.OUTSTORE.toString(), orgCode, productType, Constants.STATUS_FLAG_ONE);
+            status.add(ApplyStatusEnum.OUTSTORE.name());
+            status.add(BizAllocateApply.ReturnApplyStatusEnum.PLATFORMOUTBOUND.name());
+            return allocateApplyService.queryApplyNo(status, orgCode, productType, Constants.STATUS_FLAG_ONE);
         }
-        return allocateApplyService.queryApplyNo(ApplyStatusEnum.WAITDELIVERY.toString(), orgCode, productType, Constants.STATUS_FLAG_ONE);
+        status.add(ApplyStatusEnum.WAITDELIVERY.name());
+        return allocateApplyService.queryApplyNo(status, orgCode, productType, Constants.STATUS_FLAG_ONE);
     }
 
     /**
