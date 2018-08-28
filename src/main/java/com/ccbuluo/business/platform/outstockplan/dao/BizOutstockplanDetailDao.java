@@ -124,16 +124,16 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
 
     /**
      * 更改出库计划的实际出库数量
-     * @param bizOutstockplanDetails 出库计划
+     * @param bizOutstockplanDetail 出库计划
      * @author liuduo
      * @date 2018-08-10 16:48:48
      */
-    public int updateActualOutstocknum(List<BizOutstockplanDetail> bizOutstockplanDetails) {
+    public int updateActualOutstocknum(BizOutstockplanDetail bizOutstockplanDetail) {
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE biz_outstockplan_detail SET actual_outstocknum = :actualOutstocknum + IFNULL(actual_outstocknum,0),")
             .append(" version_no = version_no+1,operator = :operator,operate_time = :operateTime WHERE id = :id AND :versionNo > version_no");
 
-        return batchUpdateForListBean(sql.toString(), bizOutstockplanDetails);
+        return updateForBean(sql.toString(), bizOutstockplanDetail);
     }
 
     /**

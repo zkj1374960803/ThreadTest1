@@ -119,19 +119,16 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
 
     /**
      * 更新入库计划中的实际入库数量
-     * @param bizInstockplanDetailList 入库计划
+     * @param bizInstockplanDetail 入库计划
      * @author liuduo
      * @date 2018-08-08 20:17:42
      */
-    public int updateActualInstockNum(List<BizInstockplanDetail> bizInstockplanDetailList) {
-        Map<String, Object> params = Maps.newHashMap();
-        params.put("bizInstockplanDetailList", bizInstockplanDetailList);
-
+    public int updateActualInstockNum(BizInstockplanDetail bizInstockplanDetail) {
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE biz_instockplan_detail SET actual_instocknum = :actualInstocknum + IFNULL(actual_instocknum,0),cost_price = :costPrice,")
             .append(" version_no = version_no+1,operator = :operator,operate_time = :operateTime WHERE id = :id AND :versionNo > version_no");
 
-        return batchUpdateForListBean(sql.toString(), bizInstockplanDetailList);
+        return updateForBean(sql.toString(), bizInstockplanDetail);
     }
 
     /**

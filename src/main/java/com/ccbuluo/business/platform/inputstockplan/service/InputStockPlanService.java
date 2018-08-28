@@ -35,11 +35,11 @@ public interface InputStockPlanService {
 
     /**
      * 更新入库计划中的实际入库数量
-     * @param bizInstockplanDetailList 入库计划
+     * @param bizInstockplanDetail 入库计划
      * @author liuduo
      * @date 2018-08-08 20:17:42
      */
-    int updateActualInstockNum(List<BizInstockplanDetail> bizInstockplanDetailList);
+    int updateActualInstockNum(BizInstockplanDetail bizInstockplanDetail);
 
     /**
      * 修改入库计划的完成状态

@@ -389,10 +389,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
             }
         });
         if (!bizInstockplanDetailList.isEmpty()) {
-            int status = inputStockPlanService.updateCompleteStatus(bizInstockplanDetailList);
-            if (bizInstockplanDetailList.size() != status) {
-                throw new CommonException("1002", "生成入库单失败！");
-            }
+            inputStockPlanService.updateCompleteStatus(bizInstockplanDetailList);
         }
     }
 
@@ -404,7 +401,6 @@ public class InstockOrderServiceImpl implements InstockOrderService {
      * @date 2018-08-08 20:29:20
      */
     private void updateInstockplan(List<BizInstockorderDetail> bizInstockorderDetailList) {
-        List<BizInstockplanDetail> bizInstockplanDetailList = new ArrayList<>();
         List<Long> ids = bizInstockorderDetailList.stream().map(BizInstockorderDetail::getInstockPlanid).collect(Collectors.toList());
         List<UpdatePlanStatusDTO> versionNoById = inputStockPlanService.getVersionNoById(ids);
         Map<Long, UpdatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(UpdatePlanStatusDTO::getId, Function.identity()));
@@ -417,14 +413,12 @@ public class InstockOrderServiceImpl implements InstockOrderService {
             bizInstockplanDetail.setVersionNo(versionNo);
             bizInstockplanDetail.setCostPrice(item.getCostPrice());
             bizInstockplanDetail.preUpdate(userHolder.getLoggedUserId());
-            bizInstockplanDetailList.add(bizInstockplanDetail);
-        });
-        if (!bizInstockplanDetailList.isEmpty()) {
-            int stauts = inputStockPlanService.updateActualInstockNum(bizInstockplanDetailList);
-            if (bizInstockplanDetailList.size() != stauts) {
+            int i = inputStockPlanService.updateActualInstockNum(bizInstockplanDetail);
+            if (i != Constants.STATUS_FLAG_ONE) {
+                logger.error("修改入库计划的实际入库数量失败！");
                 throw new CommonException("1002", "生成入库单失败！");
             }
-        }
+        });
     }
 
     /**

@@ -46,11 +46,11 @@ public interface OutStockPlanService {
 
     /**
      * 更改出库计划的实际出库数量
-     * @param bizOutstockplanDetails 出库计划
+     * @param bizOutstockplanDetail 出库计划
      * @author liuduo
      * @date 2018-08-10 16:48:48
      */
-    int updateActualOutstocknum(List<BizOutstockplanDetail> bizOutstockplanDetails);
+    int updateActualOutstocknum(BizOutstockplanDetail bizOutstockplanDetail);
 
     /**
      * 更新出库计划中的状态和完成时间

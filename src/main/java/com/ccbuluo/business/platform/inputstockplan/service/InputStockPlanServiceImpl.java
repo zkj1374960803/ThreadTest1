@@ -48,13 +48,13 @@ public class InputStockPlanServiceImpl implements InputStockPlanService {
 
     /**
      * 更新入库佳话中的实际入库数量
-     * @param bizInstockplanDetailList 入库计划
+     * @param bizInstockplanDetail 入库计划
      * @author liuduo
      * @date 2018-08-08 20:17:42
      */
     @Override
-    public int updateActualInstockNum(List<BizInstockplanDetail> bizInstockplanDetailList) {
-        return bizInstockplanDetailDao.updateActualInstockNum(bizInstockplanDetailList);
+    public int updateActualInstockNum(BizInstockplanDetail bizInstockplanDetail) {
+        return bizInstockplanDetailDao.updateActualInstockNum(bizInstockplanDetail);
     }
 
     /**
