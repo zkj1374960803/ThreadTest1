@@ -410,17 +410,21 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         Map<Long, UpdatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(UpdatePlanStatusDTO::getId, Function.identity()));
         bizOutstockplanDetailList.forEach(item -> {
             if (item.getActualOutstocknum() >= item.getPlanOutstocknum()) {
-                UpdatePlanStatusDTO UpdatePlanStatusDTO = collect.get(item.getId());
+                UpdatePlanStatusDTO updatePlanStatusDTO = collect.get(item.getId());
+                Long versionNo = updatePlanStatusDTO.getVersionNo() + Constants.LONG_FLAG_ONE;
                 BizOutstockplanDetail bizOutstockplanDetail = new BizOutstockplanDetail();
                 bizOutstockplanDetail.setId(item.getId());
                 bizOutstockplanDetail.setPlanStatus(StockPlanStatusEnum.COMPLETE.name());
                 bizOutstockplanDetail.setCompleteTime(new Date());
-                bizOutstockplanDetail.setVersionNo(UpdatePlanStatusDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
+                bizOutstockplanDetail.setVersionNo(versionNo);
                 bizOutstockplanDetail.preUpdate(userHolder.getLoggedUserId());
                 bizOutstockplanDetails.add(bizOutstockplanDetail);
             }
         });
-        outStockPlanService.updatePlanStatus(bizOutstockplanDetails);
+        int status = outStockPlanService.updatePlanStatus(bizOutstockplanDetails);
+        if (bizOutstockplanDetails.size() != status) {
+            throw new CommonException("2001", "生成出库单失败！");
+        }
     }
 
     /**
@@ -436,15 +440,19 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         List<UpdatePlanStatusDTO> versionNoById = outStockPlanService.getVersionNoById(ids);
         Map<Long, UpdatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(UpdatePlanStatusDTO::getId, Function.identity()));
         bizOutstockorderDetailList1.forEach(item -> {
-            UpdatePlanStatusDTO UpdatePlanStatusDTO = collect.get(item.getOutstockPlanid());
+            UpdatePlanStatusDTO updatePlanStatusDTO = collect.get(item.getOutstockPlanid());
+            Long versionNo = updatePlanStatusDTO.getVersionNo() + Constants.LONG_FLAG_ONE;
             BizOutstockplanDetail bizOutstockplanDetail = new BizOutstockplanDetail();
             bizOutstockplanDetail.setId(item.getOutstockPlanid());
             bizOutstockplanDetail.setActualOutstocknum(item.getOutstockNum());
-            bizOutstockplanDetail.setVersionNo(UpdatePlanStatusDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
+            bizOutstockplanDetail.setVersionNo(versionNo);
             bizOutstockplanDetail.preUpdate(userHolder.getLoggedUserId());
             bizOutstockplanDetails.add(bizOutstockplanDetail);
         });
-        outStockPlanService.updateActualOutstocknum(bizOutstockplanDetails);
+        int status = outStockPlanService.updateActualOutstocknum(bizOutstockplanDetails);
+        if (bizOutstockplanDetails.size() != status) {
+            throw new CommonException("2001", "生成出库单失败！");
+        }
     }
 
     /**
@@ -470,6 +478,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
             // 如果根据出库单中的出库计划id取到出库计划，那么则说明可以更改库存明细中的占用库存
             if (bizOutstockplanDetail != null) {
                 UpdateStockBizStockDetailDTO updateStockBizStockDetailDTO = collect2.get(bizOutstockplanDetail.getStockId());
+                long versionNo = updateStockBizStockDetailDTO.getVersionNo() + Constants.LONG_FLAG_ONE;
                 // 拿出出库数量，与库存明细进行计算，并更新出库单的实际出库数量
                 Long outstockNum = item.getOutstockNum();// 出库单上的出库数量
                 Long occupyStock;
@@ -480,13 +489,13 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                         if (occupyStock <= outstockNum) {
                             bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
                             bizStockDetail.setOccupyStock(Constants.LONG_FLAG_ZERO);
-                            bizStockDetail.setVersionNo(updateStockBizStockDetailDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
+                            bizStockDetail.setVersionNo(versionNo);
                             bizStockDetail.preUpdate(userHolder.getLoggedUserId());
                             bizStockDetails.add(bizStockDetail);
                         } else {
                             bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
                             bizStockDetail.setOccupyStock(occupyStock - outstockNum);
-                            bizStockDetail.setVersionNo(updateStockBizStockDetailDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
+                            bizStockDetail.setVersionNo(versionNo);
                             bizStockDetail.preUpdate(userHolder.getLoggedUserId());
                             bizStockDetails.add(bizStockDetail);
                         }
@@ -495,13 +504,13 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                         if (occupyStock <= outstockNum) {
                             bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
                             bizStockDetail.setProblemStock(Constants.LONG_FLAG_ZERO);
-                            bizStockDetail.setVersionNo(updateStockBizStockDetailDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
+                            bizStockDetail.setVersionNo(versionNo);
                             bizStockDetail.preUpdate(userHolder.getLoggedUserId());
                             bizStockDetails.add(bizStockDetail);
                         } else {
                             bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
                             bizStockDetail.setProblemStock(occupyStock - outstockNum);
-                            bizStockDetail.setVersionNo(updateStockBizStockDetailDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
+                            bizStockDetail.setVersionNo(versionNo);
                             bizStockDetail.preUpdate(userHolder.getLoggedUserId());
                             bizStockDetails.add(bizStockDetail);
                         }
@@ -511,7 +520,10 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
             }
         });
         // 更新库存明细中的占用库存
-        stockDetailService.updateOccupyStock(bizStockDetails);
+        int status = stockDetailService.updateOccupyStock(bizStockDetails);
+        if (bizStockDetails.size() != status) {
+            throw new CommonException("2001", "生成出库单失败！");
+        }
     }
 
     /**

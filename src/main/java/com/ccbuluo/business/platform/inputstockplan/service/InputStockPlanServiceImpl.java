@@ -53,8 +53,8 @@ public class InputStockPlanServiceImpl implements InputStockPlanService {
      * @date 2018-08-08 20:17:42
      */
     @Override
-    public void updateActualInstockNum(List<BizInstockplanDetail> bizInstockplanDetailList) {
-        bizInstockplanDetailDao.updateActualInstockNum(bizInstockplanDetailList);
+    public int updateActualInstockNum(List<BizInstockplanDetail> bizInstockplanDetailList) {
+        return bizInstockplanDetailDao.updateActualInstockNum(bizInstockplanDetailList);
     }
 
     /**
@@ -64,8 +64,8 @@ public class InputStockPlanServiceImpl implements InputStockPlanService {
      * @date 2018-08-09 11:16:12
      */
     @Override
-    public void updateCompleteStatus(List<BizInstockplanDetail> bizInstockplanDetailList) {
-        bizInstockplanDetailDao.updateCompleteStatus(bizInstockplanDetailList);
+    public int updateCompleteStatus(List<BizInstockplanDetail> bizInstockplanDetailList) {
+        return bizInstockplanDetailDao.updateCompleteStatus(bizInstockplanDetailList);
     }
 
     /**

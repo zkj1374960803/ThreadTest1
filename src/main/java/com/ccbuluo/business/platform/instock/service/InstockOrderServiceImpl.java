@@ -377,18 +377,22 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         Map<Long, UpdatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(UpdatePlanStatusDTO::getId, Function.identity()));
         bizInstockplanDetails.forEach(item -> {
             if (item.getActualInstocknum() >= item.getPlanInstocknum()) {
-                UpdatePlanStatusDTO UpdatePlanStatusDTO = collect.get(item.getId());
+                UpdatePlanStatusDTO updatePlanStatusDTO = collect.get(item.getId());
+                Long versionNo = updatePlanStatusDTO.getVersionNo() + Constants.LONG_FLAG_ONE;
                 BizInstockplanDetail bizInstockplanDetail = new BizInstockplanDetail();
                 bizInstockplanDetail.setId(item.getId());
                 bizInstockplanDetail.setCompleteStatus(StockPlanStatusEnum.COMPLETE.name());
                 bizInstockplanDetail.setCompleteTime(new Date());
-                bizInstockplanDetail.setVersionNo(UpdatePlanStatusDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
+                bizInstockplanDetail.setVersionNo(versionNo);
                 bizInstockplanDetail.preUpdate(userHolder.getLoggedUserId());
                 bizInstockplanDetailList.add(bizInstockplanDetail);
             }
         });
         if (!bizInstockplanDetailList.isEmpty()) {
-            inputStockPlanService.updateCompleteStatus(bizInstockplanDetailList);
+            int status = inputStockPlanService.updateCompleteStatus(bizInstockplanDetailList);
+            if (bizInstockplanDetailList.size() != status) {
+                throw new CommonException("1002", "生成入库单失败！");
+            }
         }
     }
 
@@ -406,16 +410,20 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         Map<Long, UpdatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(UpdatePlanStatusDTO::getId, Function.identity()));
         bizInstockorderDetailList.forEach(item -> {
             UpdatePlanStatusDTO updatePlanStatusDTO = collect.get(item.getInstockPlanid());
+            Long versionNo = updatePlanStatusDTO.getVersionNo() + Constants.LONG_FLAG_ONE;
             BizInstockplanDetail bizInstockplanDetail = new BizInstockplanDetail();
             bizInstockplanDetail.setId(item.getInstockPlanid());
             bizInstockplanDetail.setActualInstocknum(item.getInstockNum());
-            bizInstockplanDetail.setVersionNo(updatePlanStatusDTO.getVersionNo() + Constants.LONG_FLAG_ONE);
+            bizInstockplanDetail.setVersionNo(versionNo);
             bizInstockplanDetail.setCostPrice(item.getCostPrice());
             bizInstockplanDetail.preUpdate(userHolder.getLoggedUserId());
             bizInstockplanDetailList.add(bizInstockplanDetail);
         });
         if (!bizInstockplanDetailList.isEmpty()) {
-            inputStockPlanService.updateActualInstockNum(bizInstockplanDetailList);
+            int stauts = inputStockPlanService.updateActualInstockNum(bizInstockplanDetailList);
+            if (bizInstockplanDetailList.size() != stauts) {
+                throw new CommonException("1002", "生成入库单失败！");
+            }
         }
     }
 
@@ -478,15 +486,22 @@ public class InstockOrderServiceImpl implements InstockOrderService {
             if (null != id) {
                 // 根据id查询乐观锁
                 Integer versionNoById1 = stockDetailService.getVersionNoById(id);
+                long versionNo = versionNoById1 + Constants.LONG_FLAG_ONE;
                 BizStockDetail bizStockDetail = new BizStockDetail();
                 bizStockDetail.setId(id);
-                bizStockDetail.setVersionNo(versionNoById1 + Constants.LONG_FLAG_ONE);
+                bizStockDetail.setVersionNo(versionNo);
                 if (item.getStockType().equals(BizStockDetail.StockTypeEnum.VALIDSTOCK.toString())) {
                     bizStockDetail.setValidStock(item.getInstockNum());
                 } else if (item.getStockType().equals(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.toString())) {
                     bizStockDetail.setProblemStock(item.getInstockNum());
                 }
                 stockDetailService.updateValidStock(bizStockDetail);
+                // 把库存id回填到入库详单中
+                BizInstockorderDetail bizInstockorderDetail = new BizInstockorderDetail();
+                bizInstockorderDetail.setId(item.getId());
+                bizInstockorderDetail.setStockId(id);
+                bizInstockorderDetail.preUpdate(userHolder.getLoggedUserId());
+                bizInstockorderDetailList1.add(bizInstockorderDetail);
             } else {
                 BizStockDetail bizStockDetail = new BizStockDetail();
                 bizStockDetail.setRepositoryNo(inRepositoryNo);

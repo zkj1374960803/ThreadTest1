@@ -96,8 +96,8 @@ public class StockDetailServiceImpl implements StockDetailService{
      * @date 2018-08-09 19:14:33
      */
     @Override
-    public void updateOccupyStock(List<BizStockDetail> bizStockDetails) {
-        bizStockDetailDao.updateOccupyStock(bizStockDetails);
+    public int updateOccupyStock(List<BizStockDetail> bizStockDetails) {
+        return bizStockDetailDao.updateOccupyStock(bizStockDetails);
     }
 
     /**

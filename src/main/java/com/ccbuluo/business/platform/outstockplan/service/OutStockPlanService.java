@@ -50,7 +50,7 @@ public interface OutStockPlanService {
      * @author liuduo
      * @date 2018-08-10 16:48:48
      */
-    void updateActualOutstocknum(List<BizOutstockplanDetail> bizOutstockplanDetails);
+    int updateActualOutstocknum(List<BizOutstockplanDetail> bizOutstockplanDetails);
 
     /**
      * 更新出库计划中的状态和完成时间
@@ -58,7 +58,7 @@ public interface OutStockPlanService {
      * @author liuduo
      * @date 2018-08-10 17:46:26
      */
-    void updatePlanStatus(List<BizOutstockplanDetail> bizOutstockplanDetails);
+    int updatePlanStatus(List<BizOutstockplanDetail> bizOutstockplanDetails);
 
     /**
      * 根据申请单号查询出库计划

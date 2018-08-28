@@ -123,7 +123,7 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
      * @author liuduo
      * @date 2018-08-08 20:17:42
      */
-    public void updateActualInstockNum(List<BizInstockplanDetail> bizInstockplanDetailList) {
+    public int updateActualInstockNum(List<BizInstockplanDetail> bizInstockplanDetailList) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("bizInstockplanDetailList", bizInstockplanDetailList);
 
@@ -131,7 +131,7 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
         sql.append("UPDATE biz_instockplan_detail SET actual_instocknum = :actualInstocknum + IFNULL(actual_instocknum,0),cost_price = :costPrice,")
             .append(" version_no = version_no+1,operator = :operator,operate_time = :operateTime WHERE id = :id AND :versionNo > version_no");
 
-        batchUpdateForListBean(sql.toString(), bizInstockplanDetailList);
+        return batchUpdateForListBean(sql.toString(), bizInstockplanDetailList);
     }
 
     /**
@@ -140,7 +140,7 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
      * @author liuduo
      * @date 2018-08-09 11:16:12
      */
-    public void updateCompleteStatus(List<BizInstockplanDetail> bizInstockplanDetailList) {
+    public int updateCompleteStatus(List<BizInstockplanDetail> bizInstockplanDetailList) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("bizInstockplanDetailList", bizInstockplanDetailList);
 
@@ -148,7 +148,7 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
         sql.append("UPDATE biz_instockplan_detail SET complete_status = :completeStatus,version_no = version_no+1,operator = :operator,")
             .append(" operate_time = :operateTime,complete_time = :completeTime WHERE id = :id AND :versionNo > version_no");
 
-        batchUpdateForListBean(sql.toString(), bizInstockplanDetailList);
+        return batchUpdateForListBean(sql.toString(), bizInstockplanDetailList);
     }
 
     /**
