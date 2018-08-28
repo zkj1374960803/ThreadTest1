@@ -66,8 +66,8 @@ public class OutStockPlanServiceImpl implements OutStockPlanService {
      * @date 2018-08-10 16:48:48
      */
     @Override
-    public void updateActualOutstocknum(List<BizOutstockplanDetail> bizOutstockplanDetails) {
-        bizOutstockplanDetailDao.updateActualOutstocknum(bizOutstockplanDetails);
+    public int updateActualOutstocknum(List<BizOutstockplanDetail> bizOutstockplanDetails) {
+        return bizOutstockplanDetailDao.updateActualOutstocknum(bizOutstockplanDetails);
     }
 
     /**
@@ -77,8 +77,8 @@ public class OutStockPlanServiceImpl implements OutStockPlanService {
      * @date 2018-08-10 17:46:26
      */
     @Override
-    public void updatePlanStatus(List<BizOutstockplanDetail> bizOutstockplanDetails) {
-        bizOutstockplanDetailDao.updatePlanStatus(bizOutstockplanDetails);
+    public int updatePlanStatus(List<BizOutstockplanDetail> bizOutstockplanDetails) {
+        return bizOutstockplanDetailDao.updatePlanStatus(bizOutstockplanDetails);
     }
 
     /**

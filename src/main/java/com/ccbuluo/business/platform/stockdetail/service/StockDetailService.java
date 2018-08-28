@@ -71,7 +71,7 @@ public interface StockDetailService {
      * @author liuduo
      * @date 2018-08-09 19:14:33
      */
-    void updateOccupyStock(List<BizStockDetail> bizStockDetails);
+    int updateOccupyStock(List<BizStockDetail> bizStockDetails);
 
     /**
      * 把库存明细中的有效库存更新库到占用库存

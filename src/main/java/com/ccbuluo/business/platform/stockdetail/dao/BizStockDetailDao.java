@@ -241,12 +241,12 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author liuduo
      * @date 2018-08-09 19:14:33
      */
-    public void updateOccupyStock(List<BizStockDetail> bizStockDetails) {
+    public int updateOccupyStock(List<BizStockDetail> bizStockDetails) {
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE biz_stock_detail SET occupy_stock = :occupyStock,version_no = version_no+1,")
             .append(" operator = :operator,operate_time = :operateTime WHERE id = :id AND :versionNo > version_no");
 
-        batchUpdateForListBean(sql.toString(), bizStockDetails);
+        return batchUpdateForListBean(sql.toString(), bizStockDetails);
     }
 
     /**

@@ -128,12 +128,12 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
      * @author liuduo
      * @date 2018-08-10 16:48:48
      */
-    public void updateActualOutstocknum(List<BizOutstockplanDetail> bizOutstockplanDetails) {
+    public int updateActualOutstocknum(List<BizOutstockplanDetail> bizOutstockplanDetails) {
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE biz_outstockplan_detail SET actual_outstocknum = :actualOutstocknum + IFNULL(actual_outstocknum,0),")
             .append(" version_no = version_no+1,operator = :operator,operate_time = :operateTime WHERE id = :id AND :versionNo > version_no");
 
-        batchUpdateForListBean(sql.toString(), bizOutstockplanDetails);
+        return batchUpdateForListBean(sql.toString(), bizOutstockplanDetails);
     }
 
     /**
@@ -142,12 +142,12 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
      * @author liuduo
      * @date 2018-08-10 17:46:26
      */
-    public void updatePlanStatus(List<BizOutstockplanDetail> bizOutstockplanDetails) {
+    public int updatePlanStatus(List<BizOutstockplanDetail> bizOutstockplanDetails) {
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE biz_outstockplan_detail SET plan_status = :planStatus,complete_time = :completeTime,version_no = version_no+1,")
             .append(" operator = :operator,operate_time = :operateTime WHERE id = :id AND :versionNo > version_no");
 
-        batchUpdateForListBean(sql.toString(), bizOutstockplanDetails);
+        return batchUpdateForListBean(sql.toString(), bizOutstockplanDetails);
     }
 
     /**

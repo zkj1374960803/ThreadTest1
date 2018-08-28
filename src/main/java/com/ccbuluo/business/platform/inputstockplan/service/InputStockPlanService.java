@@ -39,7 +39,7 @@ public interface InputStockPlanService {
      * @author liuduo
      * @date 2018-08-08 20:17:42
      */
-    void updateActualInstockNum(List<BizInstockplanDetail> bizInstockplanDetailList);
+    int updateActualInstockNum(List<BizInstockplanDetail> bizInstockplanDetailList);
 
     /**
      * 修改入库计划的完成状态
@@ -47,7 +47,7 @@ public interface InputStockPlanService {
      * @author liuduo
      * @date 2018-08-09 11:16:12
      */
-    void updateCompleteStatus(List<BizInstockplanDetail> bizInstockplanDetailList);
+    int updateCompleteStatus(List<BizInstockplanDetail> bizInstockplanDetailList);
 
     /**
      * 根据申请单号查询入库计划
