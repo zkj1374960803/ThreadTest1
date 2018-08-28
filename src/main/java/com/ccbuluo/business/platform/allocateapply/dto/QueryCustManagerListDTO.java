@@ -28,16 +28,6 @@ public class QueryCustManagerListDTO {
     private Integer pageSize;
     @ApiModelProperty(name = "useruuid", value = "uuid")
     private String useruuid;
-    @ApiModelProperty(name = "orgCode", value = "机构code")
-    private String orgCode;
-
-    public String getOrgCode() {
-        return orgCode;
-    }
-
-    public void setOrgCode(String orgCode) {
-        this.orgCode = orgCode;
-    }
 
     public String getUseruuid() {
         return useruuid;

@@ -198,7 +198,7 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
      */
     public int batchInsertInstockplanDetail(String applyNo){
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_instockplan_detail SET delete_flag = :deleteFlag  WHERE doc_no= :applyNo ");
+        sql.append("UPDATE biz_instockplan_detail SET delete_flag = :deleteFlag  WHERE trade_no= :applyNo ");
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNo", applyNo);
         params.put("deleteFlag", Constants.DELETE_FLAG_DELETE);

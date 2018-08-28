@@ -179,7 +179,7 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
      */
     public int deleteAllocateTradeorderByApplyNo(String applyNo){
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_allocate_tradeorder SET delete_flag = :deleteFlag  WHERE doc_no= :applyNo ");
+        sql.append("UPDATE biz_allocate_tradeorder SET delete_flag = :deleteFlag  WHERE apply_no= :applyNo ");
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNo", applyNo);
         params.put("deleteFlag", Constants.DELETE_FLAG_DELETE);

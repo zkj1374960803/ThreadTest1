@@ -316,6 +316,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
                 if(ro.getStockId().intValue() == bd.getId().intValue()){// 关系库存批次id和库存批次id相等
                     AllocateapplyDetailBO ad = getAllocateapplyDetailBO(details, bd.getProductNo());
                     outstockplanSeller = buildBizOutstockplanDetail(ad, applyType,bd);
+                    outstockplanSeller.setStockType(ro.getStockType());// 库存类型(在创建占用关系的时候赋值)
                     outstockplanSeller.setPlanOutstocknum(ro.getOccupyNum());// 计划出库数量applyNum
                     outstockplanSeller.setOutOrgno(ad.getOutstockOrgno());// 卖方机构编号
                     outstockplanSeller.setOutRepositoryNo(bd.getRepositoryNo());// 卖方仓库编号（根据机构和商品编号查询的库存）
@@ -368,6 +369,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
                 if(ro.getStockId().intValue() == bd.getId().intValue()){// 关系库存批次id和库存批次id相等
                     AllocateapplyDetailBO ad = getAllocateapplyDetailBO(details, bd.getProductNo());
                     outstockplanPlatform = buildBizOutstockplanDetail(ad, applyType,bd);
+                    outstockplanPlatform.setStockType(ro.getStockType());// 库存类型(在创建占用关系的时候赋值)
                     outstockplanPlatform.setOutRepositoryNo(repositoryNo);// 平台仓库编号
                     outstockplanPlatform.setPlanOutstocknum(ro.getOccupyNum());// 计划出库数量applyNum
                     outstockplanPlatform.setOutOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 平台code
@@ -397,6 +399,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
                 if(ro.getStockId().intValue() == bd.getId().intValue()){// 关系库存批次id和库存批次id相等
                     AllocateapplyDetailBO ad = getAllocateapplyDetailBO(details, bd.getProductNo());
                     outstockplanPurchaser = buildBizOutstockplanDetail(ad, applyType,bd);
+                    outstockplanPurchaser.setStockType(ro.getStockType());// 库存类型(在创建占用关系的时候赋值)
                     outstockplanPurchaser.setPlanOutstocknum(ro.getOccupyNum());// 计划出库数量applyNum
                     outstockplanPurchaser.setOutRepositoryNo(bd.getRepositoryNo());// 仓库code
                     outstockplanPurchaser.setOutOrgno(ad.getOutstockOrgno());// 卖方机构code
@@ -464,7 +467,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     private BizOutstockplanDetail buildBizOutstockplanDetail(AllocateapplyDetailBO ad, String applyType,BizStockDetail bd){
         BizOutstockplanDetail outPlan = new BizOutstockplanDetail();
         // 调拨
-        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType)  || AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType) ){
             outPlan.setOutstockType(OutstockTypeEnum.TRANSFER.toString());// 交易类型
         }
         // 换货
@@ -472,7 +475,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             outPlan.setOutstockType(OutstockTypeEnum.BARTER.toString());// 交易类型
         }
         // 退货
-        if(AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) ){
+        if(AllocateApplyTypeEnum.REFUND.toString().equals(applyType) ){
             outPlan.setOutstockType(OutstockTypeEnum.REFUND.toString());// 交易类型
         }
 
@@ -487,7 +490,6 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         outPlan.setSalesPrice(ad.getSellPrice());// 销售价
         outPlan.setPlanStatus(StockPlanStatusEnum.DOING.toString());// 出库计划的状态（计划执行中）
         outPlan.preInsert(userHolder.getLoggedUserId());
-        outPlan.setStockType(ad.getStockType());// 库存类型
         outPlan.setRemark(ad.getRemark());// 备注
         return outPlan;
     }
@@ -504,15 +506,15 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         BizOutstockplanDetail outPlan = new BizOutstockplanDetail();
         // 调拨和平台采购都属于调拨出库
         if(AllocateApplyTypeEnum.PLATFORMALLOCATE.toString().equals(applyType) || AllocateApplyTypeEnum.SAMELEVEL.toString().equals(applyType) || AllocateApplyTypeEnum.PURCHASE.toString().equals(applyType)){
-            outPlan.setOutstockType(OutstockTypeEnum.TRANSFER.toString());// 交易类型
+            outPlan.setOutstockType(OutstockTypeEnum.TRANSFER.toString());// 出库类型
         }
         // 换货
         if(AllocateApplyTypeEnum.BARTER.toString().equals(applyType) ){
-            outPlan.setOutstockType(OutstockTypeEnum.BARTER.toString());// 交易类型
+            outPlan.setOutstockType(OutstockTypeEnum.BARTER.toString());// 出库类型
         }
         // 退货
         if(AllocateApplyTypeEnum.REFUND.toString().equals(applyType) ){
-            outPlan.setOutstockType(OutstockTypeEnum.REFUND.toString());// 交易类型
+            outPlan.setOutstockType(OutstockTypeEnum.REFUND.toString());// 出库类型
         }
         outPlan.setProductNo(in.getProductNo());// 商品编号
         outPlan.setProductType(in.getProductType());// 商品类型
@@ -524,6 +526,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         AllocateapplyDetailBO ad = getAllocateapplyDetailBO(details, in.getProductNo());
         outPlan.setApplyDetailId(ad.getId());//申请单详单id
         outPlan.setSalesPrice(ad.getSellPrice());// 销售价
+        outPlan.setStockType(ad.getStockType());// 库存类型(在创建占用关系的时候赋值)
         outPlan.setPlanStatus(StockPlanStatusEnum.DOING.toString());// 出库计划的状态（计划执行中）
         outPlan.preInsert(userHolder.getLoggedUserId());
         outPlan.setStockType(in.getStockType());// 库存类型
@@ -572,43 +575,43 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         return inPlan;
     }
 
-    /**
-     * 构建占用库存和订单占用库存关系
-     * @param details 申请单详情
-     * @param stockDetails 库存列表
-     * @param applyType 申请类型
-     * @author weijb
-     * @date 2018-08-08 17:55:41
-     */
-    public Pair<List<BizStockDetail>, List<RelOrdstockOccupy>>  buildStockAndRelOrdEntity(List<AllocateapplyDetailBO> details, List<BizStockDetail> stockDetails, String applyType){
-        //订单占用库存关系
-        List<RelOrdstockOccupy> relOrdstockOccupies = new ArrayList<RelOrdstockOccupy>();
-        Map<String,Long> map = getProductStock(details);
-        for(BizStockDetail ad : stockDetails){// 遍历库存
-            Long applyNum = map.get(ad.getProductNo());
-            if(applyNum.intValue() == 0){// 说明申请商品的数据已经出库完成了
-                continue;
-            }
-            //占用库存
-            Long occupyStockNum = convertStockDetail(details, ad,map);
-            //构建订单占用库存关系
-            RelOrdstockOccupy ro = new RelOrdstockOccupy();
-            ro.setOrderType(applyType);//订单类型(调拨，采购不占用库存)
-            Optional<AllocateapplyDetailBO> applyFilter = details.stream() .filter(applyDetail -> ad.getProductNo().equals(applyDetail.getProductNo())) .findFirst();
-            if (applyFilter.isPresent()) {
-                AllocateapplyDetailBO applyDetail = applyFilter.get();
-                ro.setDocNo(applyDetail.getApplyNo());//申请单号
-            }
-            ro.setStockId(ad.getId());//库存id
-            ro.setOccupyNum(occupyStockNum);//占用数量
-            ro.setOccupyStatus(StockPlanStatusEnum.DOING.toString());//占用状态occupy_status
-            Date time = new Date();
-            ro.setOccupyStarttime(time);//占用开始时间
-            ro.preInsert(userHolder.getLoggedUserId());
-            relOrdstockOccupies.add(ro);
-        }
-        return Pair.of(stockDetails, relOrdstockOccupies);
-    }
+//    /**
+//     * 构建占用库存和订单占用库存关系
+//     * @param details 申请单详情
+//     * @param stockDetails 库存列表
+//     * @param applyType 申请类型
+//     * @author weijb
+//     * @date 2018-08-08 17:55:41
+//     */
+//    public Pair<List<BizStockDetail>, List<RelOrdstockOccupy>>  buildStockAndRelOrdEntity(List<AllocateapplyDetailBO> details, List<BizStockDetail> stockDetails, String applyType){
+//        //订单占用库存关系
+//        List<RelOrdstockOccupy> relOrdstockOccupies = new ArrayList<RelOrdstockOccupy>();
+//        Map<String,Long> map = getProductStock(details);
+//        for(BizStockDetail ad : stockDetails){// 遍历库存
+//            Long applyNum = map.get(ad.getProductNo());
+//            if(applyNum.intValue() == 0){// 说明申请商品的数据已经出库完成了
+//                continue;
+//            }
+//            //占用库存
+//            Long occupyStockNum = convertStockDetail(details, ad,map);
+//            //构建订单占用库存关系
+//            RelOrdstockOccupy ro = new RelOrdstockOccupy();
+//            ro.setOrderType(applyType);//订单类型(调拨，采购不占用库存)
+//            Optional<AllocateapplyDetailBO> applyFilter = details.stream() .filter(applyDetail -> ad.getProductNo().equals(applyDetail.getProductNo())) .findFirst();
+//            if (applyFilter.isPresent()) {
+//                AllocateapplyDetailBO applyDetail = applyFilter.get();
+//                ro.setDocNo(applyDetail.getApplyNo());//申请单号
+//            }
+//            ro.setStockId(ad.getId());//库存id
+//            ro.setOccupyNum(occupyStockNum);//占用数量
+//            ro.setOccupyStatus(StockPlanStatusEnum.DOING.toString());//占用状态occupy_status
+//            Date time = new Date();
+//            ro.setOccupyStarttime(time);//占用开始时间
+//            ro.preInsert(userHolder.getLoggedUserId());
+//            relOrdstockOccupies.add(ro);
+//        }
+//        return Pair.of(stockDetails, relOrdstockOccupies);
+//    }
 
     private Map<String,Long> getProductStock(List<AllocateapplyDetailBO> details){
         Map<String, Long> map = new HashMap<String, Long>();
@@ -633,48 +636,48 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         return detailsCopy;
     }
 
-    /**
-     * 遍历库存并转换可用库存
-     * @param details 申请单详情
-     * @param stockDetail 库存对象
-     * @author weijb
-     * @date 2018-08-08 17:55:41
-     */
-    private Long convertStockDetail(List<AllocateapplyDetailBO> details, BizStockDetail stockDetail, Map<String,Long> map){
-        Long occupyStockNum = 0L;//占用数量
-        for(AllocateapplyDetailBO ad : details){
-            if(ad.getProductNo().equals(stockDetail.getProductNo())){// 找到对应商品
-                // 调拨申请数量
-                Long applyNum = map.get(ad.getProductNo());
-                // 有效库存
-                Long validStock = stockDetail.getValidStock();
-                if(validStock.intValue() == applyNum.intValue()){// 如果本批次的库存正好等于要调拨的数量
-                    validStock = 0L;// 剩余库存为零
-                    map.put(ad.getProductNo(), 0L);//需要调拨的数量也设置为零
-                    //记录占用数量
-                    occupyStockNum = validStock;
-                }
-                if(validStock.intValue() < applyNum.intValue()){// 如果本批次的库存缺少
-                    map.put(ad.getProductNo(), applyNum - validStock);// 下次再有库存过来的时候，就会减去剩下的调拨商品数量
-                    //记录占用数量
-                    occupyStockNum = validStock;// 占用了全部可用库存
-                    validStock = 0L;// 剩余库存为零
-                }
-                if(validStock.intValue() > applyNum.intValue()){// 如果本批次的库存充足
-                    validStock = validStock - applyNum;// 剩余库存为零
-                    map.put(ad.getProductNo(), 0L);//需要调拨的数量也设置为零,下次再有库存过来的时候就不操作了
-                    //记录占用数量
-                    occupyStockNum = applyNum;
-                }
-                // 占用库存
-                stockDetail.setOccupyStock(occupyStockNum);
-                // 有效库存
-                stockDetail.setValidStock(validStock);
-                break;
-            }
-        }
-        return occupyStockNum;
-    }
+//    /**
+//     * 遍历库存并转换可用库存
+//     * @param details 申请单详情
+//     * @param stockDetail 库存对象
+//     * @author weijb
+//     * @date 2018-08-08 17:55:41
+//     */
+//    private Long convertStockDetail(List<AllocateapplyDetailBO> details, BizStockDetail stockDetail, Map<String,Long> map){
+//        Long occupyStockNum = 0L;//占用数量
+//        for(AllocateapplyDetailBO ad : details){
+//            if(ad.getProductNo().equals(stockDetail.getProductNo())){// 找到对应商品
+//                // 调拨申请数量
+//                Long applyNum = map.get(ad.getProductNo());
+//                // 有效库存
+//                Long validStock = stockDetail.getValidStock();
+//                if(validStock.intValue() == applyNum.intValue()){// 如果本批次的库存正好等于要调拨的数量
+//                    validStock = 0L;// 剩余库存为零
+//                    map.put(ad.getProductNo(), 0L);//需要调拨的数量也设置为零
+//                    //记录占用数量
+//                    occupyStockNum = validStock;
+//                }
+//                if(validStock.intValue() < applyNum.intValue()){// 如果本批次的库存缺少
+//                    map.put(ad.getProductNo(), applyNum - validStock);// 下次再有库存过来的时候，就会减去剩下的调拨商品数量
+//                    //记录占用数量
+//                    occupyStockNum = validStock;// 占用了全部可用库存
+//                    validStock = 0L;// 剩余库存为零
+//                }
+//                if(validStock.intValue() > applyNum.intValue()){// 如果本批次的库存充足
+//                    validStock = validStock - applyNum;// 剩余库存为零
+//                    map.put(ad.getProductNo(), 0L);//需要调拨的数量也设置为零,下次再有库存过来的时候就不操作了
+//                    //记录占用数量
+//                    occupyStockNum = applyNum;
+//                }
+//                // 占用库存
+//                stockDetail.setOccupyStock(occupyStockNum);
+//                // 有效库存
+//                stockDetail.setValidStock(validStock);
+//                break;
+//            }
+//        }
+//        return occupyStockNum;
+//    }
 
     /**
      * 根据订单获取商品所在仓库所属的机构编号
@@ -826,5 +829,125 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             outstockplanDetails.add(outstockplanPlatform);
         }
         return outstockplanDetails;
+    }
+
+    /**
+     * 构建占用库存和订单占用库存关系(不管是正常申请和退换货申请，每个申请单都有可能存在正常件和问题件)
+     * @param details 申请单详情
+     * @param stockDetails 库存列表
+     * @param applyType 申请类型
+     * @param relOrdstockOccupies 订单占用库存关系
+     * @author weijb
+     * @date 2018-08-08 17:55:41
+     */
+    public List<BizStockDetail>  buildStockAndRelOrdEntity(List<AllocateapplyDetailBO> details, List<BizStockDetail> stockDetails, String applyType, List<RelOrdstockOccupy> relOrdstockOccupies){
+        for(AllocateapplyDetailBO detail : details){
+            // 申请个数
+            Long applyNum = detail.getApplyNum();
+            // 申请商品的数据已经出库完成了
+            if(applyNum.intValue() == 0){
+                continue;
+            }
+            //占用库存
+            convertStockDetail(stockDetails,detail,applyNum,applyType, relOrdstockOccupies);
+        }
+        Map<String,Long> map = getProductStock(details);
+        return stockDetails;
+    }
+
+    /**
+     * 遍历库存并转换可用库存(不管是正常申请和退换货申请，每个申请单都有可能存在正常件和问题件)
+     * @param detail 申请单详情
+     * @param stockDetail 库存对象
+     * @param applyType 申请类型
+     * @param relOrdstockOccupies 订单占用库存关系
+     * 申请数量
+     * @author weijb
+     * @date 2018-08-08 17:55:41
+     */
+    private Long convertStockDetail(List<BizStockDetail> stockDetail,AllocateapplyDetailBO detail, Long applyNum, String applyType, List<RelOrdstockOccupy> relOrdstockOccupies){
+        //占用数量
+        Long occupyStockNum = 0L;
+        // 被占用库存（有效库存或问题库存）
+        Long validStock = 0L;
+        // 库存的id已经被排序（先入先出）
+        for(BizStockDetail stock : stockDetail){
+            if(applyNum.intValue() == 0){
+                break;
+            }
+            // 找到对应商品
+            if(stock.getProductNo().equals(detail.getProductNo())){
+                // 问题件
+                if(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.name().equals(detail.getStockType())){
+                    validStock = stock.getProblemStock();
+                }else if(BizStockDetail.StockTypeEnum.VALIDSTOCK.name().equals(detail.getStockType())){// 正常件
+                    validStock = stock.getValidStock();
+                }
+                // 如果本批次的库存正好等于要调拨的数量
+                if(validStock.intValue() == applyNum.intValue()){
+                    // 剩余库存为零
+                    //记录占用数量
+                    occupyStockNum = validStock;
+                    validStock = 0L;
+                    applyNum = 0L;
+                }else if(validStock.intValue() < applyNum.intValue()){// 如果本批次的库存缺少
+                    // 下次再有库存过来的时候，就会减去剩下的调拨商品数量
+                    applyNum = applyNum - validStock;
+                    // 记录占用数量，占用了全部可用库存
+                    occupyStockNum = validStock;
+                    // 剩余库存为零
+                    validStock = 0L;
+                }else if(validStock.intValue() > applyNum.intValue()){// 如果本批次的库存充足
+                    // 剩余库存为零
+                    validStock = validStock - applyNum;
+                    //需要调拨的数量也设置为零,下次再有库存过来的时候就不操作了
+                    //记录占用数量
+                    occupyStockNum = applyNum;
+                    applyNum = 0L;
+                }
+                // 只有正常件的时候才保存占用库存
+                if(BizStockDetail.StockTypeEnum.VALIDSTOCK.name().equals(detail.getStockType())){
+                    // 占用库存
+                    stock.setOccupyStock(occupyStockNum);
+                    // 有效库存(在保存的时候会用有效库存减去占用库存)
+                }
+                //构建订单占用库存关系
+                RelOrdstockOccupy ro = new RelOrdstockOccupy();
+                ro.setOrderType(applyType);
+                //申请单号
+                ro.setDocNo(detail.getApplyNo());
+                //库存id
+                ro.setStockId(stock.getId());
+                //占用数量
+                ro.setOccupyNum(occupyStockNum);
+                //占用状态occupy_status
+                ro.setOccupyStatus(StockPlanStatusEnum.DOING.toString());
+                Date time = new Date();
+                //占用开始时间
+                ro.setOccupyStarttime(time);
+                ro.preInsert(userHolder.getLoggedUserId());
+                // 库存类型
+                ro.setStockType(detail.getStockType());
+                relOrdstockOccupies.add(ro);
+            }
+        }
+        return applyNum;
+    }
+
+    /**
+     *  获取详单的库存类型（正常件或是问题件）
+     * @param details 申请单详细
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-08-27 17:11:35
+     */
+    public String getStockType(List<AllocateapplyDetailBO> details){
+        Optional<AllocateapplyDetailBO> applyFilter = details.stream() .filter(applyDetail -> BizStockDetail.StockTypeEnum.VALIDSTOCK.name().equals(applyDetail.getStockType())) .findFirst();
+        if (applyFilter.isPresent()) {
+            return BizStockDetail.StockTypeEnum.VALIDSTOCK.name();
+        }else {
+            return BizStockDetail.StockTypeEnum.PROBLEMSTOCK.name();
+        }
     }
 }

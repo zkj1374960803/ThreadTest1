@@ -49,9 +49,9 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
 
-        sql.append("SELECT t1.id,t1.product_no,t1.product_name,t1.product_type,t1.product_unit,SUM(t1.problem_stock) as problem_stock,t1.product_categoryname,t2.checked_time as outstock_time,t3.checked_time as instock_time ")
-                .append(" FROM biz_stock_detail t1 LEFT JOIN biz_outstock_order t2 on t1.trade_no=t2.trade_docno ")
-                .append(" LEFT JOIN biz_instock_order t3 on t1.trade_no=t3.trade_docno ")
+        sql.append("SELECT t1.id,t1.product_no,t1.product_name,t1.product_type,t1.product_unit,t1.problem_stock as problem_stock,t1.product_categoryname,t2.checked_time as outstock_time,t3.checked_time as instock_time ")
+                .append(" from (SELECT id,product_no,product_name,product_type,product_unit,SUM(problem_stock) as problem_stock,product_categoryname,trade_no,create_time,org_no,delete_flag FROM biz_stock_detail WHERE delete_flag = 0 and problem_stock>0 and org_no = 'FW000922' GROUP BY product_no) as t1  ")
+                .append(" LEFT JOIN biz_outstock_order t2 on t1.trade_no=t2.trade_docno LEFT JOIN biz_instock_order t3 on t1.trade_no=t3.trade_docno  ")
                 .append(" WHERE t1.delete_flag = :deleteFlag and t1.problem_stock>0 ");
         // 物料类型
         if (null != productNames && productNames.size() > 0) {
@@ -76,13 +76,11 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
         }
 
         sql.append(" GROUP BY t1.product_no ORDER BY t1.create_time DESC");
-        Page<StockBizStockDetailDTO> DTOS = new Page<StockBizStockDetailDTO>();
         // 如果选择了类型，并且这个类型下没有查询到商品就返回null
         if(category && (null == productNames || productNames.size() == 0)){
-            return DTOS;
+            return new Page<>(offset,pageSize);
         }
-        DTOS = super.queryPageForBean(StockBizStockDetailDTO.class, sql.toString(), param,offset,pageSize);
-        return DTOS;
+        return super.queryPageForBean(StockBizStockDetailDTO.class, sql.toString(), param,offset,pageSize);
     }
 
     /**

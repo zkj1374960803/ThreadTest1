@@ -60,6 +60,11 @@ public class RelOrdstockOccupy extends AftersaleCommonEntity{
      */
     @ApiModelProperty(name = "outstockOrgno", value = "卖方机构的编号", hidden = true)
     private String outstockOrgno;
+    /**
+     *  库存类型
+     */
+    @ApiModelProperty(name = "stockType", value = "库存类型（正常库存、问题库存、报损件库存，等等）")
+    private String stockType;
 
     public String getOrderType() {
         return orderType;
@@ -133,4 +138,11 @@ public class RelOrdstockOccupy extends AftersaleCommonEntity{
         this.outstockOrgno = outstockOrgno;
     }
 
+    public String getStockType() {
+        return stockType;
+    }
+
+    public void setStockType(String stockType) {
+        this.stockType = stockType;
+    }
 }

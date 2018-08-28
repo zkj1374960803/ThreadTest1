@@ -91,12 +91,14 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
         try {
             // 根据申请单编号查询订单占用库存关系表
             List<RelOrdstockOccupy> list = bizAllocateTradeorderDao.getRelOrdstockOccupyByApplyNo(applyNo);
-            //根据订单占用库存关系构建库存list
-            List<BizStockDetail> stockDetails = buildBizStockDetail(list);
-            // 还原被占用的库存
-            int flag = bizStockDetailDao.batchUpdateStockDetil(stockDetails);
-            if(flag == 0){// 更新失败
-                throw new CommonException("0", "还原占用库存失败！");
+            if(null != list && list.size() > 0){
+                //根据订单占用库存关系构建库存list
+                List<BizStockDetail> stockDetails = buildBizStockDetail(list);
+                // 还原被占用的库存
+                int flag = bizStockDetailDao.batchUpdateStockDetil(stockDetails);
+                if(flag == 0){// 更新失败
+                    throw new CommonException("0", "还原占用库存失败！");
+                }
             }
             // 删除订单
             bizAllocateTradeorderDao.deleteAllocateTradeorderByApplyNo(applyNo);

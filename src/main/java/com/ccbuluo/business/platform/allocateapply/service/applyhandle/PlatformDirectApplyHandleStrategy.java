@@ -69,26 +69,29 @@ public class PlatformDirectApplyHandleStrategy extends DefaultApplyHandleStrateg
             if(null == stockDetails || stockDetails.size() == 0){
                 throw new CommonException("0", "库存为空！");
             }
-            // 构建占用库存和订单占用库存关系
-            Pair<List<BizStockDetail>, List<RelOrdstockOccupy>> pair = buildStockAndRelOrdEntity(details,stockDetails,applyType);
-            List<BizStockDetail> stockDetailList = pair.getLeft();
             // 构建订单占用库存关系
-            List<RelOrdstockOccupy> relOrdstockOccupies = pair.getRight();
+            List<RelOrdstockOccupy> relOrdstockOccupies = new ArrayList<RelOrdstockOccupy>();
+            // 构建占用库存和订单占用库存关系
+            List<BizStockDetail> stockDetailList = buildStockAndRelOrdEntity(details,stockDetails,applyType,relOrdstockOccupies);
             // 保存生成订单
             bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
             Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, BizAllocateApply.AllocateApplyTypeEnum.DIRECTALLOCATE, relOrdstockOccupies);
-            // 保存占用库存
-            int flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
-            if(flag == 0){// 更新失败
-                throw new CommonException("0", "更新占用库存失败！");
-            }
             // 批量保存出库计划详情
             bizOutstockplanDetailDao.batchOutstockplanDetail(pir.getLeft());
             // 批量保存入库计划详情
             bizInstockplanDetailDao.batchInsertInstockplanDetail(pir.getRight());
-            // 保存订单占用库存关系
-            bizAllocateTradeorderDao.batchInsertRelOrdstockOccupy(relOrdstockOccupies);
+            String stockType = getStockType(details);
+            // 只有正常件才保存库存和占用关系
+            if(BizStockDetail.StockTypeEnum.VALIDSTOCK.name().equals(stockType)){
+                // 保存占用库存
+                int flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
+                if(flag == 0){// 更新失败
+                    throw new CommonException("0", "更新占用库存失败！");
+                }
+                // 保存订单占用库存关系
+                bizAllocateTradeorderDao.batchInsertRelOrdstockOccupy(relOrdstockOccupies);
+            }
         } catch (Exception e) {
             logger.error("提交失败！", e);
             throw e;

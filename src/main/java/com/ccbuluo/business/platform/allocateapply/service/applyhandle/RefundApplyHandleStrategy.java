@@ -9,6 +9,7 @@ import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.outstock.service.OutstockOrderService;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
+import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.http.StatusDto;
 import org.slf4j.Logger;
@@ -40,6 +41,8 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
     OutstockOrderService outstockOrderService;
     @Resource
     private BizAllocateTradeorderDao bizAllocateTradeorderDao;
+    /*@Resource
+    private BizStockDetailDao bizStockDetailDao;*/
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -60,21 +63,28 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
             if(null == details || details.size() == 0){
                 throw new CommonException("0", "申请单为空！");
             }
-            // 构建生成订单(调拨)
-            List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyNo,null,null);
             //获取申请方机构code
             String applyorgNo = getProductOrgNo(ba);
+            // 构建生成订单(调拨)
+            List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyType,null,null);
+            // 退货只生成一个订单
+            if(null != list && list.size() >0 ){
+                // 卖方机构为申请机构
+                list.get(0).setSellerOrgno(applyorgNo);
+                // 买方机构为平台
+                list.get(0).setPurchaserOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+            }
+
             //查询库存列表
-            // 查询库存列表(平台的库存列表)
-            List<BizStockDetail> stockDetails = getProblemStockDetailList(applyorgNo, details);
+            // 查询库存列表
+            List<BizStockDetail> stockDetails = getStockDetailList(applyorgNo, details);
             if(null == stockDetails || stockDetails.size() == 0){
                 throw new CommonException("0", "库存为空！");
             }
-            // 构建占用库存和订单占用库存关系
-            Pair<List<BizStockDetail>, List<RelOrdstockOccupy>> pair = buildStockAndRelOrdEntity(details,stockDetails,applyType);
-            List<BizStockDetail> stockDetailList = pair.getLeft();
             // 构建订单占用库存关系
-            List<RelOrdstockOccupy> relOrdstockOccupies = pair.getRight();
+            List<RelOrdstockOccupy> relOrdstockOccupies = new ArrayList<RelOrdstockOccupy>();
+            // 构建占用库存和订单占用库存关系
+            List<BizStockDetail> stockDetailList = buildStockAndRelOrdEntity(details,stockDetails,applyType,relOrdstockOccupies);
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
             Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, BizAllocateApply.AllocateApplyTypeEnum.REFUND, relOrdstockOccupies);
             // 保存生成订单
@@ -85,6 +95,18 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
             bizOutstockplanDetailDao.batchOutstockplanDetail(pir.getLeft());
             // 批量保存入库计划详情
             bizInstockplanDetailDao.batchInsertInstockplanDetail(pir.getRight());
+            String stockType = getStockType(details);
+            // 只有正常件才保存库存和占用关系
+            if(BizStockDetail.StockTypeEnum.VALIDSTOCK.name().equals(stockType)){
+                // 保存占用库存
+                //int flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
+                int flag = 0;
+                if(flag == 0){// 更新失败
+                    throw new CommonException("0", "更新占用库存失败！");
+                }
+                // 保存订单占用库存关系
+                bizAllocateTradeorderDao.batchInsertRelOrdstockOccupy(relOrdstockOccupies);
+            }
         } catch (Exception e) {
             logger.error("提交失败！", e);
             throw e;

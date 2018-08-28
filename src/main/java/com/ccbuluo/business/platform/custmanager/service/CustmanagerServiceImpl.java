@@ -435,6 +435,22 @@ public class CustmanagerServiceImpl implements CustmanagerService{
      */
     @Override
     public Page<QueryCustManagerListDTO> queryCustManagerList(QueryCustManagerListDTO queryCustManagerListDTO) {
+        UserInfoDTO user = new UserInfoDTO();
+        user.setAppId(SystemPropertyHolder.getBaseAppid());
+        user.setSecretId(SystemPropertyHolder.getBaseSecret());
+//        user.setOrgCode(queryCustManagerListDTO.getServiceCenter());
+//        user.setName(queryCustManagerListDTO.getName());
+        user.setOrgCode("FO000106");
+        user.setOffset(0);
+        user.setPageSize(999999);
+        user.setSortField(Constants.SORT_FIELD_OPERATE);
+        StatusDtoThriftPage<UserInfoDTO> userList = innerUserInfoService.queryUserList(user);
+        StatusDto<Page<UserInfoDTO>> resolve1 = StatusDtoThriftUtils.resolve(userList, UserInfoDTO.class);
+        Page<UserInfoDTO> data1 = resolve1.getData();
+        List<UserInfoDTO> rows1 = data1.getRows();
+//        List<String> useruudis1 = rows1.stream().map(UserInfoDTO::getUseruuid).collect(Collectors.toList());
+        Map<String, UserInfoDTO> userInfoDTOMap = rows1.stream().collect(Collectors.toMap(UserInfoDTO::getUseruuid, a -> a,(k1,k2)->k1));
+
         // 查询客户经理的信息
         Page<QueryCustManagerListDTO> queryCustManagerListDTOPage = bizServiceCustmanagerDao.queryCustManagerList(queryCustManagerListDTO);
         List<QueryCustManagerListDTO> rows = queryCustManagerListDTOPage.getRows();
