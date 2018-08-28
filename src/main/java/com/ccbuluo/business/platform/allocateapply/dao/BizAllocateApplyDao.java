@@ -470,16 +470,16 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @author liuduo
      * @date 2018-08-11 12:56:39
      */
-    public List<String> queryApplyNo(String applyNoStatus, String orgCode, String productType, Integer stockType) {
+    public List<String> queryApplyNo(List<String> status, String orgCode, String productType, Integer stockType) {
         Map<String, Object> params = Maps.newHashMap();
-        params.put("applyNoStatus", applyNoStatus);
+        params.put("status", status);
         params.put("productType", productType);
         params.put("stockType", stockType);
         params.put("orgCode", orgCode);
 
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT DISTINCT baa.apply_no FROM biz_allocate_apply AS baa LEFT JOIN biz_allocateapply_detail AS bad ON bad.apply_no = baa.apply_no")
-            .append("  WHERE baa.apply_status = :applyNoStatus AND bad.product_type = :productType");
+            .append("  WHERE baa.apply_status IN(:status) AND bad.product_type = :productType");
         // 如果是平台入库、出库
         if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
             sql.append(" AND baa.process_orgno = :orgCode");

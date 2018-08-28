@@ -295,10 +295,14 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     @Override
     public List<String> queryApplyNo(String productType) {
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+        List<String> status = Lists.newArrayList();
         if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-            return allocateApplyService.queryApplyNo(ApplyStatusEnum.OUTSTORE.toString(), orgCode, productType, Constants.STATUS_FLAG_ONE);
+            status.add(ApplyStatusEnum.OUTSTORE.name());
+            status.add(BizAllocateApply.ReturnApplyStatusEnum.PLATFORMOUTBOUND.name());
+            return allocateApplyService.queryApplyNo(status, orgCode, productType, Constants.STATUS_FLAG_ONE);
         }
-        return allocateApplyService.queryApplyNo(ApplyStatusEnum.WAITDELIVERY.toString(), orgCode, productType, Constants.STATUS_FLAG_ONE);
+        status.add(ApplyStatusEnum.WAITDELIVERY.name());
+        return allocateApplyService.queryApplyNo(status, orgCode, productType, Constants.STATUS_FLAG_ONE);
     }
 
     /**
