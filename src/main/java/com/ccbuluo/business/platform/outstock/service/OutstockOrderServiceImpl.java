@@ -125,7 +125,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                     bizOutstockorderDetail.setProductCategoryname(outstockplanDetail.getProductCategoryname());
                     bizOutstockorderDetail.setSupplierNo(outstockplanDetail.getSupplierNo());
                     bizOutstockorderDetail.setOutstockNum(outstockplanDetail.getPlanOutstocknum());
-                    bizOutstockorderDetail.setStockType(outstockplanDetail.getOutstockType());
+                    bizOutstockorderDetail.setStockType(outstockplanDetail.getStockType());
                     bizOutstockorderDetail.setUnit(outstockplanDetail.getProductUnit());
                     bizOutstockorderDetail.setCostPrice(outstockplanDetail.getCostPrice());
                     bizOutstockorderDetail.setActualPrice(outstockplanDetail.getSalesPrice());
