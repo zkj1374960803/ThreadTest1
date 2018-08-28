@@ -541,7 +541,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
      * @author weijb
      * @date 2018-08-11 13:35:41
      */
-    private BizInstockplanDetail buildBizInstockplanDetail(AllocateapplyDetailBO ad, String applyType){
+    protected BizInstockplanDetail buildBizInstockplanDetail(AllocateapplyDetailBO ad, String applyType){
         BizInstockplanDetail inPlan = new BizInstockplanDetail();
 
         inPlan.setProductNo(ad.getProductNo());// 商品编号
