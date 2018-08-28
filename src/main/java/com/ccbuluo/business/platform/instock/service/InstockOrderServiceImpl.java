@@ -373,7 +373,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
     private void updateCompleteStatus(List<BizInstockplanDetail> bizInstockplanDetails) {
         List<BizInstockplanDetail> bizInstockplanDetailList = new ArrayList<>();
         List<Long> ids = bizInstockplanDetails.stream().map(BizInstockplanDetail::getId).collect(Collectors.toList());
-        List<UpdatePlanStatusDTO> versionNoById = inputStockPlanService.getVersionNoById(ids);
+        List<UpdatePlanStatusDTO> versionNoById = inputStockPlanService.getVersionNoByIds(ids);
         Map<Long, UpdatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(UpdatePlanStatusDTO::getId, Function.identity()));
         bizInstockplanDetails.forEach(item -> {
             if (item.getActualInstocknum() >= item.getPlanInstocknum()) {
@@ -401,12 +401,8 @@ public class InstockOrderServiceImpl implements InstockOrderService {
      * @date 2018-08-08 20:29:20
      */
     private void updateInstockplan(List<BizInstockorderDetail> bizInstockorderDetailList) {
-        List<Long> ids = bizInstockorderDetailList.stream().map(BizInstockorderDetail::getInstockPlanid).collect(Collectors.toList());
-        List<UpdatePlanStatusDTO> versionNoById = inputStockPlanService.getVersionNoById(ids);
-        Map<Long, UpdatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(UpdatePlanStatusDTO::getId, Function.identity()));
         bizInstockorderDetailList.forEach(item -> {
-            UpdatePlanStatusDTO updatePlanStatusDTO = collect.get(item.getInstockPlanid());
-            Long versionNo = updatePlanStatusDTO.getVersionNo() + Constants.LONG_FLAG_ONE;
+            Long versionNo = inputStockPlanService.getVersionNoById(item.getInstockPlanid());
             BizInstockplanDetail bizInstockplanDetail = new BizInstockplanDetail();
             bizInstockplanDetail.setId(item.getInstockPlanid());
             bizInstockplanDetail.setActualInstocknum(item.getInstockNum());

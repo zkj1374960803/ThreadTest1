@@ -26,12 +26,12 @@ public interface InputStockPlanService {
 
     /**
      * 根据入库计划id查询版本号
-     * @param ids 入库计划id
+     * @param id 入库计划id
      * @return 版本号
      * @author liuduo
      * @date 2018-08-08 19:31:38
      */
-    List<UpdatePlanStatusDTO> getVersionNoById(List<Long> ids);
+    Long getVersionNoById(Long id);
 
     /**
      * 更新入库计划中的实际入库数量
@@ -86,4 +86,14 @@ public interface InputStockPlanService {
      * @date 2018-08-11 13:17:42
      */
     List<BizInstockplanDetail> queryListByApplyNoAndInReNo(String applyNo, String inRepositoryNo);
+
+    /**
+     * 根据入库计划id查询版本号
+     * @param ids 入库计划id
+     * @return 入库计划的版本号（乐观锁）
+     * @author liuduo
+     * @date 2018-08-28 15:03:22
+     */
+    List<UpdatePlanStatusDTO> getVersionNoByIds(List<Long> ids);
+
 }

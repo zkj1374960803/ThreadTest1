@@ -103,18 +103,18 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
 
     /**
      * 根据入库计划id查询版本号
-     * @param ids 入库计划id
+     * @param id 入库计划id
      * @return 版本号
      * @author liuduo
      * @date 2018-08-08 19:31:38
      */
-    public List<UpdatePlanStatusDTO> getVersionNoById(List<Long> ids) {
+    public Long getVersionNoById(Long id) {
         Map<String, Object> params = Maps.newHashMap();
-        params.put("ids", ids);
+        params.put("id", id);
 
-        String sql = "SELECT id,version_no FROM biz_instockplan_detail WHERE id IN(:ids)";
+        String sql = "SELECT version_no FROM biz_instockplan_detail WHERE id = :id";
 
-        return queryListBean(UpdatePlanStatusDTO.class, sql, params);
+        return findForObject(sql, params, Long.class);
     }
 
     /**
@@ -266,5 +266,21 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
             .append(" AND instock_repository_no = :inRepositoryNo");
 
         return super.queryListBean(BizInstockplanDetail.class, sql.toString(), params);
+    }
+
+    /**
+     * 根据入库计划id查询版本号
+     * @param ids 入库计划id
+     * @return 入库计划的版本号（乐观锁）
+     * @author liuduo
+     * @date 2018-08-28 15:03:22
+     */
+    public List<UpdatePlanStatusDTO> getVersionNoByIds(List<Long> ids) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("ids", ids);
+
+        String sql = "SELECT id,version_no FROM biz_instockplan_detail WHERE id IN(:ids)";
+
+        return queryListBean(UpdatePlanStatusDTO.class, sql, params);
     }
 }

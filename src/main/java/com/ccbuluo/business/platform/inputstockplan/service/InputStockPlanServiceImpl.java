@@ -36,14 +36,14 @@ public class InputStockPlanServiceImpl implements InputStockPlanService {
 
     /**
      * 根据入库计划id查询版本号
-     * @param ids 入库计划id
+     * @param id 入库计划id
      * @return 版本号
      * @author liuduo
      * @date 2018-08-08 19:31:38
      */
     @Override
-    public List<UpdatePlanStatusDTO> getVersionNoById(List<Long> ids) {
-        return bizInstockplanDetailDao.getVersionNoById(ids);
+    public Long getVersionNoById(Long id) {
+        return bizInstockplanDetailDao.getVersionNoById(id);
     }
 
     /**
@@ -121,5 +121,17 @@ public class InputStockPlanServiceImpl implements InputStockPlanService {
     @Override
     public List<BizInstockplanDetail> queryListByApplyNoAndInReNo(String applyNo, String inRepositoryNo) {
         return bizInstockplanDetailDao.queryListByApplyNoAndInReNo(applyNo, inRepositoryNo);
+    }
+
+    /**
+     * 根据入库计划id查询版本号
+     * @param ids 入库计划id
+     * @return 入库计划的版本号（乐观锁）
+     * @author liuduo
+     * @date 2018-08-28 15:03:22
+     */
+    @Override
+    public List<UpdatePlanStatusDTO> getVersionNoByIds(List<Long> ids) {
+        return bizInstockplanDetailDao.getVersionNoByIds(ids);
     }
 }

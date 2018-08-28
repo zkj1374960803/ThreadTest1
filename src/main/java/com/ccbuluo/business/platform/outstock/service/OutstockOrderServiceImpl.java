@@ -432,6 +432,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      * @date 2018-08-10 16:48:48
      */
     private void updateActualOutstocknum(List<BizOutstockorderDetail> bizOutstockorderDetailList1) {
+        List<BizOutstockplanDetail> bizOutstockplanDetails = Lists.newArrayList();
         List<Long> ids = bizOutstockorderDetailList1.stream().map(BizOutstockorderDetail::getOutstockPlanid).collect(Collectors.toList());
         List<UpdatePlanStatusDTO> versionNoById = outStockPlanService.getVersionNoById(ids);
         Map<Long, UpdatePlanStatusDTO> collect = versionNoById.stream().collect(Collectors.toMap(UpdatePlanStatusDTO::getId, Function.identity()));
@@ -443,12 +444,9 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
             bizOutstockplanDetail.setActualOutstocknum(item.getOutstockNum());
             bizOutstockplanDetail.setVersionNo(versionNo);
             bizOutstockplanDetail.preUpdate(userHolder.getLoggedUserId());
-            int i = outStockPlanService.updateActualOutstocknum(bizOutstockplanDetail);
-            if (i != Constants.STATUS_FLAG_ONE) {
-                logger.error("修改出库计划的实际出库数量失败！");
-                throw new CommonException("2001", "生成出库单失败！");
-            }
+            bizOutstockplanDetails.add(bizOutstockplanDetail);
         });
+        outStockPlanService.updateActualOutstocknum(bizOutstockplanDetails);
     }
 
     /**
