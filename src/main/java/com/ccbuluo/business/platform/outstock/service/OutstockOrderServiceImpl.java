@@ -252,14 +252,14 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 switch (Enum.valueOf(BizAllocateApply.AllocateApplyTypeEnum.class, applyType)) {
                     case PLATFORMALLOCATE:
                     case PURCHASE:
-                    case SAMELEVEL:
                         if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-                            allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.INSTORE.toString());
-                        } else {
                             allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.WAITINGRECEIPT.toString());
+                        } else {
+                            allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.INSTORE.toString());
                         }
                         break;
                     case DIRECTALLOCATE:
+                    case SAMELEVEL:
                         allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.WAITINGRECEIPT.toString());
                         break;
                     case BARTER:
