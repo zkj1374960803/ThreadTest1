@@ -42,9 +42,9 @@ public class BizServiceCustmanagerDao extends BaseDao<BizServiceCustmanager> {
      */
     public int saveBizServiceCustmanager(BizServiceCustmanager entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO biz_service_custmanager ( office_phone,receiving_address,")
+        sql.append("INSERT INTO biz_service_custmanager ( manager_name,office_phone,receiving_address,")
             .append("user_uuid,remark,creator,operator,")
-            .append("delete_flag,servicecenter_code ) VALUES (  :officePhone, :receivingAddress, :userUuid,")
+            .append("delete_flag,servicecenter_code ) VALUES (  :name,:officePhone, :receivingAddress, :userUuid,")
             .append(" :remark, :creator,  :operator,  :deleteFlag, :servicecenterCode ")
             .append(" )");
         return super.save(sql.toString(), entity);
@@ -150,13 +150,13 @@ public class BizServiceCustmanagerDao extends BaseDao<BizServiceCustmanager> {
      */
     public Page<QueryCustManagerListDTO> queryCustManagerList(QueryCustManagerListDTO queryCustManagerListDTO) {
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.user_uuid as 'useruuid', a.office_phone,c.cusmanager_name as 'name',c.vin_number,b.servicecenter_code as 'serviceCenter',b.storehouse_code as 'inRepositoryNo' ")
+        sql.append(" SELECT a.user_uuid as 'useruuid', a.office_phone,a.manager_name as 'name',c.vin_number,b.servicecenter_code as 'serviceCenter',b.storehouse_code as 'inRepositoryNo' ")
             .append(" FROM biz_service_custmanager a  ")
             .append(" LEFT JOIN biz_service_storehouse b ON a.servicecenter_code = b.servicecenter_code ")
             .append(" LEFT JOIN biz_service_maintaincar c ON a.user_uuid = c.cusmanager_uuid ")
             .append(" WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(queryCustManagerListDTO.getName())){
-            sql.append(" AND (c.cusmanager_name like concat(:name,'%')  OR c.vin_number like concat(:name,'%'))");
+            sql.append(" AND (a.manager_name like concat(:name,'%')  OR c.vin_number like concat(:name,'%'))");
         }
         if(StringUtils.isNotBlank(queryCustManagerListDTO.getServiceCenter())){
             sql.append(" AND b.servicecenter_code = :serviceCenter");

@@ -38,6 +38,7 @@ import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,6 +117,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             bizServiceCustmanager.setCreator(loggedUserId);
             bizServiceCustmanager.setOperator(loggedUserId);
             bizServiceCustmanager.setUserUuid(useruuid);
+            bizServiceCustmanager.setName(userHolder.getLoggedUser().getName());
             // 手机号校验
             compareRepeat(bizServiceCustmanager.getUserUuid(), bizServiceCustmanager.getOfficePhone(), "office_phone", "biz_service_custmanager", "客户经理办公SIM卡手机号重复！");
             bizServiceCustmanagerDao.saveBizServiceCustmanager(bizServiceCustmanager);
@@ -433,69 +435,18 @@ public class CustmanagerServiceImpl implements CustmanagerService{
      */
     @Override
     public Page<QueryCustManagerListDTO> queryCustManagerList(QueryCustManagerListDTO queryCustManagerListDTO) {
-        UserInfoDTO user = new UserInfoDTO();
-        user.setAppId(SystemPropertyHolder.getBaseAppid());
-        user.setSecretId(SystemPropertyHolder.getBaseSecret());
-//        user.setOrgCode(queryCustManagerListDTO.getServiceCenter());
-//        user.setName(queryCustManagerListDTO.getName());
-        user.setOrgCode("FO000106");
-        user.setOffset(0);
-        user.setPageSize(999999);
-        user.setSortField(Constants.SORT_FIELD_OPERATE);
-        StatusDtoThriftPage<UserInfoDTO> userList = innerUserInfoService.queryUserList(user);
-        StatusDto<Page<UserInfoDTO>> resolve1 = StatusDtoThriftUtils.resolve(userList, UserInfoDTO.class);
-        Page<UserInfoDTO> data1 = resolve1.getData();
-        List<UserInfoDTO> rows1 = data1.getRows();
-//        List<String> useruudis1 = rows1.stream().map(UserInfoDTO::getUseruuid).collect(Collectors.toList());
-        Map<String, UserInfoDTO> userInfoDTOMap = rows1.stream().collect(Collectors.toMap(UserInfoDTO::getUseruuid, a -> a,(k1,k2)->k1));
-
         // 查询客户经理的信息
         Page<QueryCustManagerListDTO> queryCustManagerListDTOPage = bizServiceCustmanagerDao.queryCustManagerList(queryCustManagerListDTO);
-        StatusDtoThriftList<QueryServiceCenterListDTO> queryServiceCenterList = orgService.queryServiceCenter(null, null, null, null);
-        StatusDto<List<QueryServiceCenterListDTO>> resolve = StatusDtoThriftUtils.resolve(queryServiceCenterList, QueryServiceCenterListDTO.class);
-        List<QueryServiceCenterListDTO> data = resolve.getData();
-        if(data == null){
-            data = Collections.emptyList();
-        }
-
-        // list 转map
-        Map<String, QueryServiceCenterListDTO> map = data.stream().collect(Collectors.toMap(QueryServiceCenterListDTO::getServiceCenterCode, a -> a,(k1,k2)->k1));
         List<QueryCustManagerListDTO> rows = queryCustManagerListDTOPage.getRows();
+        Map<String, BasicUserOrganization> organizationMap;
         if(rows != null){
-            List<String> useruudis = rows.stream().map(QueryCustManagerListDTO::getUseruuid).collect(Collectors.toList());
-            // 查询用户的名字
-            StatusDtoThriftList<QueryNameByUseruuidsDTO> name = innerUserInfoService.queryNameByUseruuids(useruudis);
-             StatusDto<List<QueryNameByUseruuidsDTO>> nameResolve = StatusDtoThriftUtils.resolve(name, QueryNameByUseruuidsDTO.class);
-//            List<QueryNameByUseruuidsDTO> nameDto = Optional.ofNullable(nameResolve.getData()).orElse(new ArrayList<QueryNameByUseruuidsDTO>());
-//            Map<String, QueryNameByUseruuidsDTO> namemap = nameDto.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, a -> a,(k1,k2)->k1));
-//
-//            rows.stream().forEach(a -> {
-//                QueryServiceCenterListDTO queryServiceCenterListDTO = map.get(a.getServiceCenter());
-//                QueryNameByUseruuidsDTO queryNameByUseruuidsDTO = namemap.get(a.getUseruuid());
-//                if(queryNameByUseruuidsDTO != null){
-//                    a.setName(queryNameByUseruuidsDTO.getName());
-//                }
-//                if(queryServiceCenterListDTO != null){
-//                    a.setServiceCenterName(queryServiceCenterListDTO.getServiceCenterName());
-//                }
-//            });
-            // todo
-            Optional.ofNullable(nameResolve.getData()).ifPresent(a -> {
-                Map<String, QueryNameByUseruuidsDTO> collect = a.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, b -> b, (k1, k2) -> k1));
-                rows.stream().forEach(c -> {
-                    UserInfoDTO userInfoDTO = userInfoDTOMap.get(c.getUseruuid());
-                    if(userInfoDTO != null){
-                        c.setOrgCode(userInfoDTO.getOrgCode());
-                    }
-                    QueryServiceCenterListDTO queryServiceCenterListDTO = map.get(c.getServiceCenter());
-                    QueryNameByUseruuidsDTO queryNameByUseruuidsDTO = collect.get(c.getUseruuid());
-                    if (queryNameByUseruuidsDTO != null) {
-                        c.setName(queryNameByUseruuidsDTO.getName());
-                    }
-                    if (queryServiceCenterListDTO != null) {
-                        c.setServiceCenterName(queryServiceCenterListDTO.getServiceCenterName());
-                    }
-                });
+            List<String> orgCodeList = rows.stream().map(QueryCustManagerListDTO::getServiceCenter).collect(Collectors.toList());
+            organizationMap = orgService.queryOrganizationByOrgCodes(orgCodeList);
+            rows.stream().forEach(c -> {
+                BasicUserOrganization basicUserOrganization = organizationMap.get(c.getServiceCenter());
+                if (basicUserOrganization != null) {
+                    c.setServiceCenterName(basicUserOrganization.getOrgName());
+                }
             });
         }
         return queryCustManagerListDTOPage;

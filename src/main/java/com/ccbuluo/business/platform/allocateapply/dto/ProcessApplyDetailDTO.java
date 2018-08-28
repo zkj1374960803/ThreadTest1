@@ -47,7 +47,19 @@ public class ProcessApplyDetailDTO {
     @ApiModelProperty(name = "applyNo", value = "调拨申请单编号", hidden = true)
     private String applyNo;
 
+    /**
+     * 供应商
+     */
+    @ApiModelProperty(name = "supplierNo", value = "supplierNo", hidden = true)
+    private String supplierNo;
 
+    public String getSupplierNo() {
+        return supplierNo;
+    }
+
+    public void setSupplierNo(String supplierNo) {
+        this.supplierNo = supplierNo;
+    }
 
     public String getApplyNo() {
         return applyNo;

@@ -329,7 +329,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      */
     public void batchUpdateForApplyDetail(List<ProcessApplyDetailDTO> processApplyDetailDTO) {
         StringBuilder sql = new StringBuilder();
-        sql.append(" UPDATE biz_allocateapply_detail SET apply_num = :applyNum,sell_price = :sellPrice WHERE id = :id ");
+        sql.append(" UPDATE biz_allocateapply_detail SET supplier_no = :supplierNo, apply_num = :applyNum,sell_price = :sellPrice WHERE id = :id ");
         batchUpdateForListBean(sql.toString(), processApplyDetailDTO);
     }
     /**
