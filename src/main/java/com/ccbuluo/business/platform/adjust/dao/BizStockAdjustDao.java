@@ -134,7 +134,7 @@ public class BizStockAdjustDao extends BaseDao<BizStockAdjust> {
         }
         if (StringUtils.isNotBlank(keyWord)) {
             params.put("keyWord", keyWord);
-            sql.append(" AND (bsa.adjust_orgno LIKE CONCAT('%',:keyWord,'%') OR bsa.adjust_docno LIKE CONCAT('%',:keyWord,'%'))");
+            sql.append(" AND (bsa.adjust_orgno IN(:keyWord) OR bsa.adjust_docno LIKE CONCAT('%',:keyWord,'%'))");
         }
         if (StringUtils.isNotBlank(orgCode) && !(orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM))) {
             params.put("orgCode", orgCode);
