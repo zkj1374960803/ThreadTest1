@@ -129,6 +129,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                     bizOutstockorderDetail.setUnit(outstockplanDetail.getProductUnit());
                     bizOutstockorderDetail.setCostPrice(outstockplanDetail.getCostPrice());
                     bizOutstockorderDetail.setActualPrice(outstockplanDetail.getSalesPrice());
+                    bizOutstockorderDetail.preInsert(userHolder.getLoggedUserId());
                     bizOutstockorderDetailList.add(bizOutstockorderDetail);
                 }
                 List<Long> longs = outstockorderDetailService.batchBizOutstockOrderDetail(bizOutstockorderDetailList);
@@ -231,6 +232,8 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         // 6、更改申请单状态
         List<BizOutstockplanDetail> bizOutstockplanDetailList3 = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
         updateApplyOrderStatus(applyNo, detail, bizOutstockplanDetailList3);
+        // 7、更新出库单的复核状态
+        bizOutstockOrderDao.updateChecked(outstockNo, Constants.FLAG_ONE, new Date());
     }
 
 
@@ -552,7 +555,6 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         bizOutstockOrder.setOutstockTime(date);
         bizOutstockOrder.setTransportorderNo(transportorderNo);
         bizOutstockOrder.setChecked(Constants.LONG_FLAG_ZERO);
-        bizOutstockOrder.setCheckedTime(date);
         bizOutstockOrder.preInsert(userHolder.getLoggedUserId());
         return bizOutstockOrderDao.saveEntity(bizOutstockOrder);
     }

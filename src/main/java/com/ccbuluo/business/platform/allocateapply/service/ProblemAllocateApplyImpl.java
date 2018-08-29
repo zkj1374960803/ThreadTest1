@@ -106,7 +106,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             Optional<QueryAllocateApplyListDTO> applyFilter = applyList.stream() .filter(applyDetail -> apply.getApplyNo().equals(applyDetail.getApplyNo())) .findFirst();
             if (applyFilter.isPresent()) {
                 apply.setInstockTime(applyFilter.get().getInstockTime());
-                apply.setOutstockTime(applyFilter.get().getOutstockTime());
+                apply.setOutstockTime(apply.getCreateTime());// (自动出库时间)
             }
         }
         return page;
@@ -162,7 +162,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             Optional<QueryAllocateApplyListDTO> applyFilter = applyList.stream() .filter(applyDetail -> apply.getApplyNo().equals(applyDetail.getApplyNo())) .findFirst();
             if (applyFilter.isPresent()) {
                 apply.setInstockTime(applyFilter.get().getInstockTime());
-                apply.setOutstockTime(applyFilter.get().getOutstockTime());
+                apply.setOutstockTime(apply.getCreateTime());// (自动出库，去创建时间)
             }
         }
         return page;
@@ -209,8 +209,8 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         if(null != info){
             String outOperatorName = getUserNameByUuid(info.getOutstockOperator());
             String inOperatorName = getUserNameByUuid(info.getInstockOperator());
-            allocateApplyDTO.setOutstockOperatorName(outOperatorName);// 出库人
-            allocateApplyDTO.setOutstockTime(info.getOutstockTime());// 出库时间
+            allocateApplyDTO.setOutstockOperatorName(allocateApplyDTO.getApplyerName());// 出库人（自动出库人）
+            allocateApplyDTO.setOutstockTime(allocateApplyDTO.getCreateTime());// 出库时间 （自动出库时间）
             allocateApplyDTO.setInstockOperatorName(inOperatorName); // 入库人
             allocateApplyDTO.setInstockTime(info.getInstockTime());// 入库时间
             allocateApplyDTO.setTransportorderNo(info.getTransportorderNo());// 物流单号
@@ -232,8 +232,8 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         if(null != info){
             String outOperatorName = getUserNameByUuid(info.getOutstockOperator());
             String inOperatorName = getUserNameByUuid(info.getInstockOperator());
-            allocateApplyDTO.setOutstockOperatorName(outOperatorName);// 出库人
-            allocateApplyDTO.setOutstockTime(info.getOutstockTime());// 出库时间
+            allocateApplyDTO.setOutstockOperatorName(allocateApplyDTO.getApplyerName());// 出库人（自动出库人）
+            allocateApplyDTO.setOutstockTime(allocateApplyDTO.getCreateTime());// 出库时间 （自动出库时间）
             allocateApplyDTO.setInstockOperatorName(inOperatorName); // 入库人
             allocateApplyDTO.setInstockTime(info.getInstockTime());// 入库时间
             allocateApplyDTO.setTransportorderNo(info.getTransportorderNo());// 物流单号
