@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.outstock.controller;
 import com.ccbuluo.business.entity.BizOutstockOrder;
 import com.ccbuluo.business.entity.BizOutstockorderDetail;
 import com.ccbuluo.business.entity.BizOutstockplanDetail;
+import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleContext;
 import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.business.platform.outstock.dto.SaveOutstockorderDetailDTO;
 import com.ccbuluo.business.platform.outstock.service.OutstockOrderService;
@@ -10,9 +11,11 @@ import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.*;
+import jdk.jshell.Snippet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -28,6 +31,8 @@ public class OutstockOrderController extends BaseController {
 
     @Autowired
     private OutstockOrderService outstockOrderService;
+    @Autowired
+    private ApplyHandleContext applyHandleContext;
 
     /**
      * 保存出库单
@@ -129,6 +134,24 @@ public class OutstockOrderController extends BaseController {
     @GetMapping("/getbyapplyno")
     public StatusDto<List<String>> getByApplyNo(@RequestParam String applyNo) {
         return StatusDto.buildDataSuccessStatusDto(outstockOrderService.getByApplyNo(applyNo));
+    }
+
+
+    /**
+     * 退款出库的退款金额
+     * @param applyNo 申请单号
+     * @param refundPrice 退款金额
+     * @return 修改是否成功
+     * @author liuduo
+     * @date 2018-08-29 11:26:56
+     */
+    @ApiOperation(value = "退款出库的退款金额", notes = "【刘铎】")
+    @ApiImplicitParams({@ApiImplicitParam(name = "applyNo", value = "申请单号",  required = true, paramType = "query"),
+        @ApiImplicitParam(name = "refundPrice", value = "退款金额",  required = true, paramType = "query", dataType = "int")})
+    @GetMapping("/updaterefundprice")
+    public StatusDto updateRefundPrice(@RequestParam String applyNo,
+                                       @RequestParam BigDecimal refundPrice) {
+        return applyHandleContext.updateTradeorderInfo(applyNo, refundPrice);
     }
 
 }
