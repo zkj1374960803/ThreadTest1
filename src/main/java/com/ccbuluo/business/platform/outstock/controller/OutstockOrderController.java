@@ -148,7 +148,7 @@ public class OutstockOrderController extends BaseController {
     @ApiOperation(value = "退款出库的退款金额", notes = "【刘铎】")
     @ApiImplicitParams({@ApiImplicitParam(name = "applyNo", value = "申请单号",  required = true, paramType = "query"),
         @ApiImplicitParam(name = "refundPrice", value = "退款金额",  required = true, paramType = "query", dataType = "int")})
-    @GetMapping("/updaterefundprice")
+    @PostMapping("/updaterefundprice")
     public StatusDto updateRefundPrice(@RequestParam String applyNo,
                                        @RequestParam BigDecimal refundPrice) {
         return applyHandleContext.updateTradeorderInfo(applyNo, refundPrice);
