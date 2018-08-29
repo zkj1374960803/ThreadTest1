@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -105,5 +106,24 @@ public class BizInstockOrderDao extends BaseDao<BizInstockOrder> {
             .append("  FROM biz_instock_order WHERE instock_orderno = :instockNo");
 
         return findForBean(BizInstockOrderDTO.class, sql.toString(), params);
+    }
+
+    /**
+     * 更改入库单复核状态
+     * @param instockNo 入库单
+     * @param checked 复核状态
+     * @param date 日期
+     * @author liuduo
+     * @date 2018-08-29 15:17:46
+     */
+    public void updateChecked(String instockNo, Integer checked, Date date) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("instockNo", instockNo);
+        params.put("checked", checked);
+        params.put("date", date);
+
+        String sql = "UPDATE biz_instock_order SET checked = :checked AND checked_time = :date WHERE  trade_docno = :instockNo";
+
+        updateForMap(sql, params);
     }
 }

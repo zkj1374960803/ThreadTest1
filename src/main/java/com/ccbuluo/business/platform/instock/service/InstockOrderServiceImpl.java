@@ -204,6 +204,8 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         List<BizInstockplanDetail> bizInstockplanDetails3 = inputStockPlanService.queryListByApplyNoAndInReNo(applyNo, inRepositoryNo);
         List<BizInstockplanDetail> collect = bizInstockplanDetails3.stream().filter(item -> item.getCompleteStatus().equals(StockPlanStatusEnum.COMPLETE.name())).collect(Collectors.toList());
         updateApplyStatus(applyNo, detail, bizInstockplanDetails3, collect);
+        // 8、更新入库单的复核状态
+        bizInstockOrderDao.updateChecked(instockNo, Constants.FLAG_ONE, new Date());
     }
 
     /**
@@ -595,7 +597,6 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         bizInstockOrder.setInstockType(applyHandleContext.getInstockType(bizAllocateApply.getApplyType()));
         bizInstockOrder.setInstockTime(date);
         bizInstockOrder.setChecked(Constants.LONG_FLAG_ZERO);
-        bizInstockOrder.setCheckedTime(date);
         bizInstockOrder.preInsert(userHolder.getLoggedUserId());
         return bizInstockOrderDao.saveEntity(bizInstockOrder);
     }
