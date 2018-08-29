@@ -93,9 +93,9 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
 
-        sql.append("SELECT t1.id,t1.apply_no,t1.apply_type,t1.apply_status ,t2.checked_time as outstock_time,t3.checked_time as instock_time ")
-                .append(" FROM biz_allocate_apply t1 LEFT JOIN biz_outstock_order t2 on t1.apply_no=t2.trade_docno ")
-                .append(" LEFT JOIN biz_instock_order t3 on t1.apply_no=t3.trade_docno ")
+        sql.append("SELECT t1.id,t1.apply_no,t1.apply_type,t1.apply_status ,t3.checked_time as instock_time ")
+                .append(" FROM biz_allocate_apply t1 LEFT JOIN biz_instock_order t3 on t1.apply_no=t3.trade_docno ")
+                .append("  ")
                 .append(" WHERE t1.delete_flag = :deleteFlag and t1.apply_type in('BARTER','REFUND')");
 
         // 申请编号
@@ -138,12 +138,13 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         param.put("orgCode", orgCode);
+        param.put("applyNo", applyNo);
         StringBuilder sql = new StringBuilder();
 
-        sql.append("SELECT t1.id,t1.apply_no,t1.apply_type,t1.apply_status ,t2.checked_time as outstock_time,t3.checked_time as instock_time,t2.outstock_operator,t3.instock_operator,t2.transportorder_no")
-                .append(" FROM biz_allocate_apply t1 LEFT JOIN biz_outstock_order t2 on t1.apply_no=t2.trade_docno ")
-                .append(" LEFT JOIN biz_instock_order t3 on t1.apply_no=t3.trade_docno ")
-                .append(" WHERE t1.delete_flag = :deleteFlag and t1.process_orgno = :orgCode  and t2.outstock_orgno= :orgCode and t3.instock_orgno = :orgCode ");
+        sql.append("SELECT t1.id,t1.apply_no,t1.apply_type,t1.apply_status ,t3.instock_time,t3.instock_operator,t2.transportorder_no")
+                .append(" FROM biz_allocate_apply t1 LEFT JOIN biz_instock_order t3 on t1.apply_no=t3.trade_docno ")
+                .append(" WHERE t1.delete_flag = :deleteFlag and t1.process_orgno = :orgCode  and t2.outstock_orgno= :orgCode and t3.instock_orgno = :orgCode ")
+                .append(" AND t1.apply_no = :applyNo");
         return findForBean(ProblemAllocateapplyDetailDTO.class, sql.toString(), param);
     }
 

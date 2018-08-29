@@ -150,6 +150,10 @@ public class QueryAllocateApplyListDTO {
         this.createTime = createTime;
     }
 
+    public Date getCreateTime() {
+        return createTime;
+    }
+
     public String getApplyerName() {
         return applyerName;
     }
