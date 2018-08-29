@@ -51,6 +51,7 @@ public class PaymentController {
     @GetMapping("/gettotalprice/{applyNo}")
     @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
     public StatusDto<FindAllocateApplyDTO> getTotalPrice(@PathVariable String applyNo){
-        return StatusDto.buildDataSuccessStatusDto(paymentService.getTotalPrice(applyNo));
+        FindAllocateApplyDTO allocate = paymentService.getTotalPrice(applyNo);
+        return StatusDto.buildDataSuccessStatusDto(allocate);
     }
 }

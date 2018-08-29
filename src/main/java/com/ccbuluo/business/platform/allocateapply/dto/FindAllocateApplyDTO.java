@@ -32,7 +32,7 @@ public class FindAllocateApplyDTO {
      * 创建时间
      */
     @ApiModelProperty(name = "createTime", value = "创建时间")
-    private Date createTime;
+    private Date createTime ;
     /**
      * 申请人的uuid
      */

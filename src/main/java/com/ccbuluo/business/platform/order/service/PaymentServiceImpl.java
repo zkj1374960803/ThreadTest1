@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -86,6 +87,7 @@ public class PaymentServiceImpl implements PaymentService {
         List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
         BigDecimal sellTotal = getSellTotal(details);
         BigDecimal costTotal = getCostTotal(details);
+        allocate.setCreateTime(new Date());
         allocate.setSellTotalPrice(sellTotal);
         allocate.setCostTotalPrice(costTotal);
         return allocate;
@@ -123,7 +125,7 @@ public class PaymentServiceImpl implements PaymentService {
         BigDecimal costPrice = BigDecimal.ZERO;
         BigDecimal appNum = BigDecimal.ZERO;
         for(AllocateapplyDetailBO bd : details){
-            if(null != bd.getSellPrice()){
+            if(null != bd.getCostPrice()){
                 //单价
                 costPrice = bd.getCostPrice();
                 // 数量
