@@ -5,6 +5,7 @@ import com.ccbuluo.business.constants.OutstockTypeEnum;
 import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.entity.BizAllocateApply.AllocateApplyTypeEnum;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
+import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.http.StatusDto;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 
 /**
  * 申请处理入口
@@ -38,6 +40,8 @@ public class ApplyHandleContext {
     private RefundApplyHandleStrategy refundApplyHandleStrategy;
     @Resource
     private BarterApplyHandleStrategy barterApplyHandleStrategy;
+    @Resource
+    private BizAllocateTradeorderDao bizAllocateTradeorderDao;
 
 
     /**
@@ -232,5 +236,25 @@ public class ApplyHandleContext {
             logger.error("撤销失败！", e);
             throw e;
         }
+    }
+
+    /**
+     *  更新交易单信息
+     *
+     * @param applyNo 申请单code
+     * @param totalPrice 商品总价
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-29 11:18:52
+     */
+    public StatusDto updateTradeorderInfo(String applyNo, BigDecimal totalPrice) {
+        try {
+            // 保存生成订单
+            bizAllocateTradeorderDao.updateTradeorderInfo(applyNo,totalPrice);
+        } catch (Exception e) {
+            logger.error("更新失败！", e);
+            throw e;
+        }
+        return StatusDto.buildSuccessStatusDto("更新成功！");
     }
 }

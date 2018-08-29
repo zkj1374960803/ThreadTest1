@@ -95,7 +95,7 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 批量保存入库计划详情
             bizInstockplanDetailDao.batchInsertInstockplanDetail(pir.getRight());
             // 查询出库计划
-            List<BizOutstockplanDetail> outstockPlans = bizOutstockplanDetailDao.getOutstockplansByApplyNo(applyNo);
+            List<BizOutstockplanDetail> outstockPlans = bizOutstockplanDetailDao.getOutstockplansByApplyNo(applyNo,applyorgNo);
             // 调用自动出库
             outstockOrderService.autoSaveOutstockOrder(applyNo, outstockPlans);
             String stockType = getStockType(details);

@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -183,6 +184,23 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNo", applyNo);
         params.put("deleteFlag", Constants.DELETE_FLAG_DELETE);
+        return super.updateForMap(sql.toString(), params);
+    }
+
+    /**
+     * 根据申请编号更新交易单的所有商品总价
+     * @param applyNo 申请编号
+     * @return 影响条数
+     * @author liuduo
+     * @date 2018-08-07 11:55:41
+     */
+    public int updateTradeorderInfo(String applyNo, BigDecimal totalPrice) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_allocate_tradeorder SET total_price = :totalPrice")
+                .append(" WHERE apply_no = :applyNo");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("totalPrice", totalPrice);
         return super.updateForMap(sql.toString(), params);
     }
 }
