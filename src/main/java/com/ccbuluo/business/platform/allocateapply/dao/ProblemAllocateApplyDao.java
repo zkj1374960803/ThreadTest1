@@ -95,7 +95,6 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
 
         sql.append("SELECT t1.id,t1.apply_no,t1.apply_type,t1.apply_status ,t3.checked_time as instock_time ")
                 .append(" FROM biz_allocate_apply t1 LEFT JOIN biz_instock_order t3 on t1.apply_no=t3.trade_docno ")
-                .append("  ")
                 .append(" WHERE t1.delete_flag = :deleteFlag and t1.apply_type in('BARTER','REFUND')");
 
         // 申请编号

@@ -106,7 +106,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             Optional<QueryAllocateApplyListDTO> applyFilter = applyList.stream() .filter(applyDetail -> apply.getApplyNo().equals(applyDetail.getApplyNo())) .findFirst();
             if (applyFilter.isPresent()) {
                 apply.setInstockTime(applyFilter.get().getInstockTime());
-                apply.setOutstockTime(applyFilter.get().getOutstockTime());
+                apply.setOutstockTime(apply.getCreateTime());// (自动出库时间)
             }
         }
         return page;
