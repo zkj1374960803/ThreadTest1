@@ -62,6 +62,12 @@ public class QueryAllocateApplyListDTO {
     @ApiModelProperty(name = "outstockOrgname", value = "出库机构name")
     private String outstockOrgname;
 
+    @ApiModelProperty(name = "instockOrgno", value = "入库机构")
+    private String instockOrgno;
+
+    @ApiModelProperty(name = "processOrgno", value = "入库机构")
+    private String processOrgno;
+
     /**
      * 入库时间
      */
@@ -78,6 +84,22 @@ public class QueryAllocateApplyListDTO {
      */
     @ApiModelProperty(name = "inRepositoryNo", value = "仓库编号", hidden = true)
     private Date inRepositoryNo;
+
+    public String getProcessOrgno() {
+        return processOrgno;
+    }
+
+    public void setProcessOrgno(String processOrgno) {
+        this.processOrgno = processOrgno;
+    }
+
+    public String getInstockOrgno() {
+        return instockOrgno;
+    }
+
+    public void setInstockOrgno(String instockOrgno) {
+        this.instockOrgno = instockOrgno;
+    }
 
     public String getOutstockOrgname() {
         return outstockOrgname;
