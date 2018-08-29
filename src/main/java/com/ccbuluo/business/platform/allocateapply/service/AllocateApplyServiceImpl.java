@@ -255,7 +255,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         BasicUserOrganization instockOrgdata = instockOrgNameresolve.getData();
         BasicUserOrganization applyorgNamedata = applyorgNameResolve.getData();
         // 设置来源
-        allocateApplyDTO.setOrgType(applyorgNamedata.getOrgType());
         if (outstockOrgdata != null) {
             String orgName = outstockOrgdata.getOrgName();
             allocateApplyDTO.setOutstockOrgName(orgName);
@@ -267,7 +266,11 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         if(applyorgNamedata != null){
             String orgName = applyorgNamedata.getOrgName();
             String orgType = applyorgNamedata.getOrgType();
-            allocateApplyDTO.setOrgType(orgType);
+            if(StringUtils.isNotBlank(orgType)){
+                allocateApplyDTO.setOrgType(orgType);
+            }else {
+                allocateApplyDTO.setOrgType(OrganizationTypeEnum.PLATFORM.name());
+            }
             allocateApplyDTO.setApplyorgName(orgName);
         }
         // 查询申请单的详单
