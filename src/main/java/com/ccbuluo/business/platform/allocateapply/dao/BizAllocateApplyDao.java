@@ -252,7 +252,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @author zhangkangjian
      * @date 2018-08-09 10:36:34
      */
-    public Page<QueryAllocateApplyListDTO> findProcessApplyList(String productType,List<String> orgCodesByOrgType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode) {
+    public Page<QueryAllocateApplyListDTO> findProcessApplyList(List<String> orgCode, String productType,List<String> orgCodesByOrgType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode) {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.process_orgno,a.instock_orgno,a.outstock_orgno,a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.process_type,a.apply_status ")
@@ -269,10 +269,16 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             map.put("applyStatus", applyStatus);
             sql.append(" AND a.apply_status = :applyStatus ");
         }
-        if(StringUtils.isNotBlank(applyNo)){
+        if(StringUtils.isNotBlank(applyNo) && (orgCode == null || orgCode.size() == 0)){
             map.put("applyNo", applyNo);
             sql.append(" AND a.apply_no = :applyNo ");
         }
+        if(StringUtils.isNotBlank(applyNo) && orgCode != null && orgCode.size() > 0){
+            map.put("applyNo", applyNo);
+            map.put("orgCode", orgCode);
+            sql.append(" AND (a.apply_no = :applyNo OR a.applyorg_no in (:orgCode)) ");
+        }
+
         if(StringUtils.isNotBlank(productType)){
             map.put("productType", productType);
             sql.append(" AND b.product_type = :productType ");
