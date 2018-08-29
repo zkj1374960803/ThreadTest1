@@ -2,6 +2,9 @@ package com.ccbuluo.business.platform.order.service;
 
 import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
+import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
+import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
+import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleStrategy;
 import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
@@ -16,7 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -32,6 +37,8 @@ public class PaymentServiceImpl implements PaymentService {
     Logger logger = LoggerFactory.getLogger(getClass());
     @Resource
     private BizAllocateApplyDao bizAllocateApplyDao;
+    @Resource
+    private BizAllocateapplyDetailDao bizAllocateapplyDetailDao;
 
     /**
      *  支付完成调用接口
@@ -65,5 +72,67 @@ public class PaymentServiceImpl implements PaymentService {
             logger.error("支付失败！", e);
             throw e;
         }
+    }
+    /**
+     *  根据申请单获取总价格
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-29 15:02:58
+     */
+    @Override
+    public FindAllocateApplyDTO getTotalPrice(String applyNo){
+        FindAllocateApplyDTO allocate = new FindAllocateApplyDTO();
+        // 根据申请单获取申请单详情
+        List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
+        BigDecimal sellTotal = getSellTotal(details);
+        BigDecimal costTotal = getCostTotal(details);
+        allocate.setCreateTime(new Date());
+        allocate.setSellTotalPrice(sellTotal);
+        allocate.setCostTotalPrice(costTotal);
+        return allocate;
+    }
+    /**
+     *  计算订单总价（销售价）
+     * @param details 申请详细
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    private BigDecimal getSellTotal(List<AllocateapplyDetailBO> details){
+        BigDecimal bigDecimal = BigDecimal.ZERO;
+        BigDecimal sellPrice = BigDecimal.ZERO;
+        BigDecimal appNum = BigDecimal.ZERO;
+        for(AllocateapplyDetailBO bd : details){
+            if(null != bd.getSellPrice()){
+                //单价
+                sellPrice = bd.getSellPrice();
+                // 数量
+                appNum = BigDecimal.valueOf(bd.getApplyNum());
+            }
+            bigDecimal = bigDecimal.add(sellPrice.multiply(appNum));
+        }
+        return bigDecimal;
+    }
+
+    /**
+     *  计算订单总价(成本价)
+     * @param details 申请详细
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    private BigDecimal getCostTotal(List<AllocateapplyDetailBO> details){
+        BigDecimal bigDecimal = BigDecimal.ZERO;
+        BigDecimal costPrice = BigDecimal.ZERO;
+        BigDecimal appNum = BigDecimal.ZERO;
+        for(AllocateapplyDetailBO bd : details){
+            if(null != bd.getCostPrice()){
+                //单价
+                costPrice = bd.getCostPrice();
+                // 数量
+                appNum = BigDecimal.valueOf(bd.getApplyNum());
+            }
+            bigDecimal = bigDecimal.add(costPrice.multiply(appNum));
+        }
+        return bigDecimal;
     }
 }

@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.allocateapply.dto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class FindAllocateApplyDTO {
      * 创建时间
      */
     @ApiModelProperty(name = "createTime", value = "创建时间")
-    private Date createTime;
+    private Date createTime ;
     /**
      * 申请人的uuid
      */
@@ -151,6 +152,12 @@ public class FindAllocateApplyDTO {
     private String refundAddress;
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
+
+    @ApiModelProperty(name = "costTotalPrice", value = "成本总价")
+    private BigDecimal costTotalPrice;
+
+    @ApiModelProperty(name = "sellTotalPrice", value = "销售总价")
+    private BigDecimal sellTotalPrice;
 
     public String getRemark() {
         return remark;
@@ -364,4 +371,19 @@ public class FindAllocateApplyDTO {
         this.transportorderNo = transportorderNo;
     }
 
+    public BigDecimal getCostTotalPrice() {
+        return costTotalPrice;
+    }
+
+    public void setCostTotalPrice(BigDecimal costTotalPrice) {
+        this.costTotalPrice = costTotalPrice;
+    }
+
+    public BigDecimal getSellTotalPrice() {
+        return sellTotalPrice;
+    }
+
+    public void setSellTotalPrice(BigDecimal sellTotalPrice) {
+        this.sellTotalPrice = sellTotalPrice;
+    }
 }

@@ -39,4 +39,19 @@ public class PaymentController {
     public StatusDto<FindAllocateApplyDTO> paymentCompletion(@PathVariable String applyNo){
         return paymentService.paymentCompletion(applyNo);
     }
+
+    /**
+     *  根据申请单获取总价格
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-29 15:02:58
+     */
+    @ApiOperation(value = "根据申请单获取总价格", notes = "【魏俊标】")
+    @GetMapping("/gettotalprice/{applyNo}")
+    @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
+    public StatusDto<FindAllocateApplyDTO> getTotalPrice(@PathVariable String applyNo){
+        FindAllocateApplyDTO allocate = paymentService.getTotalPrice(applyNo);
+        return StatusDto.buildDataSuccessStatusDto(allocate);
+    }
 }
