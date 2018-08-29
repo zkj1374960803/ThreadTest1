@@ -301,11 +301,25 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      * @date 2018-08-09 10:36:34
      */
     @Override
-    public Page<QueryAllocateApplyListDTO> findApplyList(String productType, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize) {
+    public Page<QueryAllocateApplyListDTO> findApplyList(String productType, String orgType, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize) {
         // 获取用户的组织机构
         String userOrgCode = getUserOrgCode();
+        List<String> orgCodes = getOrgCodesByOrgType(orgType);
         // 查询分页的申请列表
-        Page<QueryAllocateApplyListDTO> page = bizAllocateApplyDao.findApplyList(productType, processType, applyStatus, applyNo, offset, pageSize, userOrgCode);
+        // 如果类型是空的话，全部类型，查询所有的申请数据
+        Page<QueryAllocateApplyListDTO> page;
+        if(StringUtils.isBlank(orgType)){
+            // 查询分页的处理申请列表
+            page = bizAllocateApplyDao.findApplyList(productType,orgCodes, processType, applyStatus, applyNo, offset, pageSize, userOrgCode);
+        }else {
+            // 类型不是空，查不到机构的编码
+            if(orgCodes == null || orgCodes.size() == 0){
+                return new Page<>(offset, pageSize);
+            }else {
+                // 查询分页的处理申请列表
+                page = bizAllocateApplyDao.findApplyList(productType,orgCodes, processType, applyStatus, applyNo, offset, pageSize, userOrgCode);
+            }
+        }
         List<QueryAllocateApplyListDTO> rows = page.getRows();
         if(rows != null){
             List<String> outstockOrgno = rows.stream().map(QueryAllocateApplyListDTO::getOutstockOrgno).collect(Collectors.toList());
@@ -319,28 +333,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
 
         }
         return page;
-    }
-
-    /**
-     * 获取用户的组织机构
-     * @return String 用户的orgCode
-     * @author zhangkangjian
-     * @date 2018-08-09 15:38:41
-     */
-    private String getUserOrgCode() {
-        BusinessUser loggedUser = userHolder.getLoggedUser();
-        if(loggedUser != null){
-            Organization organization = loggedUser.getOrganization();
-            if(organization == null){
-                throw new CommonException(Constants.ERROR_CODE, loggedUser.getName() + ":组织架构数据异常");
-            }
-            String orgCode = organization.getOrgCode();
-            if(StringUtils.isBlank(orgCode)){
-                throw new CommonException(Constants.ERROR_CODE, loggedUser.getName() + ":组织架构数据异常");
-            }
-            return orgCode;
-        }
-        return StringUtils.EMPTY;
     }
 
     /**
@@ -384,6 +376,27 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }
         });
         return page;
+    }
+    /**
+     * 获取用户的组织机构
+     * @return String 用户的orgCode
+     * @author zhangkangjian
+     * @date 2018-08-09 15:38:41
+     */
+    private String getUserOrgCode() {
+        BusinessUser loggedUser = userHolder.getLoggedUser();
+        if(loggedUser != null){
+            Organization organization = loggedUser.getOrganization();
+            if(organization == null){
+                throw new CommonException(Constants.ERROR_CODE, loggedUser.getName() + ":组织架构数据异常");
+            }
+            String orgCode = organization.getOrgCode();
+            if(StringUtils.isBlank(orgCode)){
+                throw new CommonException(Constants.ERROR_CODE, loggedUser.getName() + ":组织架构数据异常");
+            }
+            return orgCode;
+        }
+        return StringUtils.EMPTY;
     }
 
     /**
@@ -519,8 +532,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public List<StockBizStockDetailDTO> queryProblemStockList(String orgCode, String productType) {
-
-
         return bizAllocateApplyDao.queryProblemStockList(orgCode, productType);
     }
 
@@ -641,7 +652,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
 
     /**
      * 根据申请单状态查询申请单
-     * @param applyNoStatus 申请单状态
+     * @param status 申请单状态
      * @return 状态为等待收货的申请单
      * @author liuduo
      * @date 2018-08-11 12:56:39
