@@ -16,6 +16,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
+ * 申请管理（服务中心）
  * @author zhangkangjian
  * @date 2018-08-07 14:10:24
  */
@@ -126,7 +127,7 @@ public class ServiceAllocateApplyController extends BaseController {
     /**
      * 处理申请单
      * @param processApplyDTO json数据格式
-     * @return
+     * @return StatusDto<String>
      * @author zhangkangjian
      * @date 2018-08-10 11:24:53
      */
@@ -184,7 +185,6 @@ public class ServiceAllocateApplyController extends BaseController {
     public StatusDto<List<BasicUserOrganization>> queryTopPlatform(){
         return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.queryTopPlatform());
     }
-
 
 
 }
