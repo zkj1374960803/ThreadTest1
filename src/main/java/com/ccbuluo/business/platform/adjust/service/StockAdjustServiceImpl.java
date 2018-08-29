@@ -212,10 +212,11 @@ public class StockAdjustServiceImpl implements StockAdjustService{
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         // 先根据keyword查询服务中心或者客户经理是否存在
         if (StringUtils.isNotBlank(keyWord)) {
-            StatusDtoThriftBean<OrgWorkplaceDTO> byCode = orgService.getByCode(keyWord);
-            OrgWorkplaceDTO resolve = StatusDtoThriftUtils.resolve(byCode, OrgWorkplaceDTO.class).getData();
-            if (null != resolve && null != resolve.getOrgCode()) {
-                return editAdjustOrder(adjustResult, adjustSource, offset, pagesize, resolve.getOrgCode(), orgCode, productType);
+            StatusDtoThriftList<String> stringStatusDtoThriftList = orgService.queryOrgNameByOrgCode(keyWord);
+            List<String> codes = StatusDtoThriftUtils.resolve(stringStatusDtoThriftList, String.class).getData();
+            String join = StringUtils.join(codes, ",");
+            if (!codes.isEmpty()) {
+                return editAdjustOrder(adjustResult, adjustSource, offset, pagesize, join, orgCode, productType);
             } else {
                 return editAdjustOrder(adjustResult, adjustSource, offset, pagesize, keyWord, orgCode, productType);
             }
