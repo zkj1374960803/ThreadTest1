@@ -77,7 +77,7 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
      */
     public int deleteOutstockplanDetailByApplyNo(String applyNo){
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_outstockplan_detail SET delete_flag = :deleteFlag  WHERE doc_no= :applyNo ");
+        sql.append("UPDATE biz_outstockplan_detail SET delete_flag = :deleteFlag  WHERE trade_no= :applyNo ");
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNo", applyNo);
         params.put("deleteFlag", Constants.DELETE_FLAG_DELETE);
