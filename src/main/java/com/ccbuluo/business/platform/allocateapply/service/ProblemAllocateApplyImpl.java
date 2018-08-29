@@ -145,11 +145,9 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
      */
     @Override
     public Page<QueryAllocateApplyListDTO> queryProblemHandleList(String type,String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
-        String userOrgCode = getUserOrgCode();
-        List<String> orgCodesByOrgType = getOrgCodesByOrgType(OrganizationTypeEnum.PLATFORM.name());
         // 如果类型是空的话，全部类型，查询所有的申请数据
         Page<QueryAllocateApplyListDTO> page;
-        page = bizAllocateApplyDao.findProblemProcessHandleList(processType, type,orgCodesByOrgType, applyStatus, applyNo, offset, pageSize, userOrgCode);
+        page = bizAllocateApplyDao.findProblemProcessHandleList(processType, type, applyStatus, applyNo, offset, pageSize);
         List<QueryAllocateApplyListDTO> rows = page.getRows();
         List<QueryAllocateApplyListDTO> applyList = new ArrayList<QueryAllocateApplyListDTO>();
         List<String> applyNos = null;
@@ -207,7 +205,6 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         // 获取出库人和出库时间
         ProblemAllocateapplyDetailDTO info = problemAllocateApplyDao.getProblemdetailApplyDetail(applyNo, allocateApplyDTO.getApplyorgNo());
         if(null != info){
-            String outOperatorName = getUserNameByUuid(info.getOutstockOperator());
             String inOperatorName = getUserNameByUuid(info.getInstockOperator());
             allocateApplyDTO.setOutstockOperatorName(allocateApplyDTO.getApplyerName());// 出库人（自动出库人）
             allocateApplyDTO.setOutstockTime(allocateApplyDTO.getCreateTime());// 出库时间 （自动出库时间）
@@ -230,7 +227,6 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         // 获取出库人和出库时间
         ProblemAllocateapplyDetailDTO info = problemAllocateApplyDao.queryProblemApplyInfo(applyNo, allocateApplyDTO.getProcessOrgno());
         if(null != info){
-            String outOperatorName = getUserNameByUuid(info.getOutstockOperator());
             String inOperatorName = getUserNameByUuid(info.getInstockOperator());
             allocateApplyDTO.setOutstockOperatorName(allocateApplyDTO.getApplyerName());// 出库人（自动出库人）
             allocateApplyDTO.setOutstockTime(allocateApplyDTO.getCreateTime());// 出库时间 （自动出库时间）

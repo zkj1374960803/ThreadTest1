@@ -83,7 +83,7 @@ public class QueryAllocateApplyListDTO {
      * 仓库编号
      */
     @ApiModelProperty(name = "inRepositoryNo", value = "仓库编号", hidden = true)
-    private Date inRepositoryNo;
+    private String inRepositoryNo;
 
     public String getProcessOrgno() {
         return processOrgno;
@@ -208,11 +208,11 @@ public class QueryAllocateApplyListDTO {
         this.outstockTime = outstockTime;
     }
 
-    public Date getInRepositoryNo() {
+    public String getInRepositoryNo() {
         return inRepositoryNo;
     }
 
-    public void setInRepositoryNo(Date inRepositoryNo) {
+    public void setInRepositoryNo(String inRepositoryNo) {
         this.inRepositoryNo = inRepositoryNo;
     }
 }
