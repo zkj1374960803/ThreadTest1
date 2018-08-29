@@ -71,6 +71,7 @@ public class AllocateApplyController extends BaseController {
     @ApiOperation(value = "查询申请列表", notes = "【张康健】")
     @GetMapping("/list")
     @ApiImplicitParams({
+        @ApiImplicitParam(name = "orgType", value = "申请来源", required = false, paramType = "query"),
         @ApiImplicitParam(name = "processType", value = "平台决定的处理类型(注：TRANSFER调拨、PURCHASE采购)", required = false, paramType = "query"),
         @ApiImplicitParam(name = "applyStatus", value = "申请状态", required = false, paramType = "query"),
         @ApiImplicitParam(name = "productType", value = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）", required = true, paramType = "query"),
@@ -78,8 +79,8 @@ public class AllocateApplyController extends BaseController {
         @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query"),
     })
-    public StatusDto<Page<QueryAllocateApplyListDTO>> list(String productType,String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
-        Page<QueryAllocateApplyListDTO> page = allocateApplyServiceImpl.findApplyList(productType, processType, applyStatus, applyNo, offset, pageSize);
+    public StatusDto<Page<QueryAllocateApplyListDTO>> list(String productType,String orgType, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
+        Page<QueryAllocateApplyListDTO> page = allocateApplyServiceImpl.findApplyList(productType, orgType, processType, applyStatus, applyNo, offset, pageSize);
         return StatusDto.buildDataSuccessStatusDto(page);
     }
 

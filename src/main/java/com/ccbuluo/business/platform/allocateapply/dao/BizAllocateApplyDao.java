@@ -173,7 +173,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @author zhangkangjian
      * @date 2018-08-09 10:36:34
      */
-    public Page<QueryAllocateApplyListDTO> findApplyList(String productType, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode) {
+    public Page<QueryAllocateApplyListDTO> findApplyList(String productType, List<String> orgCodes, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode) {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.process_orgno,a.instock_orgno,a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.apply_status,a.process_type,a.process_orgtype as 'orgType',a.outstock_orgno ")
@@ -183,6 +183,10 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         if(StringUtils.isNotBlank(userOrgCode)){
             map.put("userOrgCode", userOrgCode);
             sql.append(" AND (a.applyorg_no = :userOrgCode or a.instock_orgno = :userOrgCode) ");
+        }
+        if(orgCodes != null && orgCodes.size() > 0){
+            map.put("orgCodes", orgCodes);
+            sql.append(" AND a.applyorg_no in (:orgCodes)  ");
         }
         if(StringUtils.isNotBlank(processType)){
             map.put("processType", processType);
@@ -466,7 +470,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
 
     /**
      * 根据申请单状态查询申请单
-     * @param applyNoStatus 申请单状态
+     * @param status 申请单状态
      * @return 申请单
      * @author liuduo
      * @date 2018-08-11 12:56:39
