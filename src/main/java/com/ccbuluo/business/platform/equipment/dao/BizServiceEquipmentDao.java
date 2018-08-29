@@ -191,6 +191,6 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
 
         String sql = "DELETE FROM biz_service_equipment WHERE equip_code = :equipCode ";
 
-        return updateForBean(sql, params);
+        return updateForMap(sql, params);
     }
 }
