@@ -493,6 +493,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             // 是机构出库
             sql.append(" AND baa.outstock_orgno = :orgCode");
         }
+        sql.append(" ORDER BY baa.operate_time DESC");
 
         return querySingColum(String.class, sql.toString(), params);
     }
