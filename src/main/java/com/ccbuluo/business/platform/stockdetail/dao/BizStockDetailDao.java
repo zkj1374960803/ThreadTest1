@@ -349,8 +349,8 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         map.put("productNo", productNo);
         map.put("productType", productType);
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.id,a.product_no,SUM(ifnull(a.valid_stock,0) + ifnull(a.occupy_stock,0)) AS 'totalStock', ")
-            .append(" SUM(ifnull(a.valid_stock,0) + ifnull(a.occupy_stock,0)) * a.cost_price AS 'totalAmount', ")
+        sql.append(" SELECT a.id,a.product_no,SUM(ifnull(a.valid_stock,0)) AS 'totalStock', ")
+            .append(" SUM(ifnull(a.valid_stock,0)) * a.cost_price AS 'totalAmount', ")
             .append(" a.product_name AS 'productName',a.product_categoryname AS 'productCategoryname',a.product_name AS 'unit' ")
             .append(" FROM biz_stock_detail a WHERE a.product_no = :productNo AND a.product_type = :productType")
             .append(" GROUP BY a.product_no ");
@@ -379,7 +379,11 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
             sql.append(" AND a.org_no in (:orgDTOList) ");
         }
         sql.append(" GROUP BY a.product_no ");
-        return findForBean(FindProductDetailDTO.class, sql.toString(), map);
+        FindProductDetailDTO forBean = findForBean(FindProductDetailDTO.class, sql.toString(), map);
+        if(forBean == null){
+            return new FindProductDetailDTO();
+        }
+        return forBean;
     }
     /**
      * 查询可调拨库存的数量
@@ -406,7 +410,12 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
             sql.append(" AND a.org_no in (:orgDTOList) ");
         }
         sql.append(" GROUP BY a.product_no ");
-        return namedParameterJdbcTemplate.queryForObject(sql.toString(), map, Long.class);
+        try {
+            return namedParameterJdbcTemplate.queryForObject(sql.toString(), map, Long.class);
+        }catch (Exception e){
+            return 0L;
+        }
+
     }
 
     /**
@@ -433,7 +442,11 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
             sql.append(" AND a.org_no in (:orgDTOList) ");
         }
         sql.append(" GROUP BY a.product_no ");
-        return findForBean(FindProductDetailDTO.class, sql.toString(), map);
+        FindProductDetailDTO forBean = findForBean(FindProductDetailDTO.class, sql.toString(), map);
+        if(forBean == null){
+            return new FindProductDetailDTO();
+        }
+        return forBean;
     }
     /**
      * 查询损坏件
@@ -459,7 +472,11 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
             sql.append(" AND a.org_no in (:orgDTOList) ");
         }
         sql.append(" GROUP BY a.product_no ");
-        return findForBean(FindProductDetailDTO.class, sql.toString(), map);
+        FindProductDetailDTO forBean = findForBean(FindProductDetailDTO.class, sql.toString(), map);
+        if(forBean == null){
+            return new FindProductDetailDTO();
+        }
+        return forBean;
     }
 
 
