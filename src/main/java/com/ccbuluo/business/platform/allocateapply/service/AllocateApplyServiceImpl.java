@@ -454,7 +454,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         processApplyDTO.setProcessTime(new Date());
         bizAllocateApplyDao.updateAllocateApply(processApplyDTO);
         // 更新申请单的详单数据
-        batchUpdateForApplyDetail(processApplyDTO, applyNo);
+        bizAllocateApplyDao.batchUpdateForApplyDetail(processApplyDTO.getProcessApplyDetailDTO());
         // 生成出入库计划
         applyHandleContext.applyHandle(processApplyDTO.getApplyNo());
     }
