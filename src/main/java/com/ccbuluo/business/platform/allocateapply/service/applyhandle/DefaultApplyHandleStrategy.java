@@ -889,6 +889,9 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
                 }else if(BizStockDetail.StockTypeEnum.VALIDSTOCK.name().equals(detail.getStockType())){// 正常件
                     validStock = stock.getValidStock();
                 }
+                if(null == validStock){
+                    continue;
+                }
                 // 如果本批次的库存正好等于要调拨的数量
                 if(validStock.intValue() == applyNum.intValue()){
                     // 剩余库存为零

@@ -164,7 +164,7 @@ public class BizOutstockOrderDao extends BaseDao<BizOutstockOrder> {
         params.put("checked", checked);
         params.put("date", date);
 
-        String sql = "UPDATE biz_instock_order SET checked = :checked,checked_time = :date WHERE  trade_docno = :outstockNo";
+        String sql = "UPDATE biz_outstock_order SET checked = :checked,checked_time = :date WHERE  outstockorder_no = :outstockNo";
 
         updateForMap(sql, params);
     }
