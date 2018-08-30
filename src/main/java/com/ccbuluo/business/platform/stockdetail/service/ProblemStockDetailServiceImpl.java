@@ -125,7 +125,24 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
     public ProblemStockBizStockDetailDTO getProblemStockDetail(Long id){
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         ProblemStockBizStockDetailDTO psd = problemStockDetailDao.getProblemStockDetail(id);
+        // 查询本机构下面，本条记录所对应的商品的所有问题库存列表
         psd.setProblemDetailList(problemStockDetailDao.queryProblemStockBizStockList(orgCode, psd.getProductNo()));
+        return psd;
+    }
+
+    /**
+     * 查询问题库存详情(平台用)
+     * @param id 库存批次id
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-23 16:02:58
+     */
+    @Override
+    public ProblemStockBizStockDetailDTO getProblemStockDetailById(Long id){
+        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+        ProblemStockBizStockDetailDTO psd = problemStockDetailDao.getProblemStockDetail(id);
+        // 查询本机构下面，本条记录所对应的商品的所有问题库存列表
+        psd.setProblemDetailList(problemStockDetailDao.queryProblemStockBizStockList("", psd.getProductNo()));
         return psd;
     }
 }

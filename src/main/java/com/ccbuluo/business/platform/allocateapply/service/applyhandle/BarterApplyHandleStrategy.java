@@ -190,7 +190,7 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
         for(AllocateapplyDetailBO ad : details){
             BizInstockplanDetail instockplanPurchaser = new BizInstockplanDetail();
             instockplanPurchaser = buildBizInstockplanDetail(ad, applyType);
-            instockplanPurchaser.setStockType(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.name());// 库存类型(在创建占用关系的时候赋值)
+            instockplanPurchaser.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());// 库存类型(在创建占用关系的时候赋值)
             instockplanPurchaser.setInstockType(InstockTypeEnum.TRANSFER.toString());// 交易类型（只有平台是采购，机构是调拨）
             instockplanPurchaser.setInstockRepositoryNo(ad.getInRepositoryNo());// 入库仓库编号
             instockplanPurchaser.setInstockOrgno(ad.getApplyorgNo());// 申请方入机构编号

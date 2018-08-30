@@ -50,7 +50,12 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
         StringBuilder sql = new StringBuilder();
 
         sql.append("SELECT t1.id,t1.product_no,t1.product_name,t1.product_type,t1.product_unit,t1.problem_stock as problem_stock,t1.product_categoryname,t2.checked_time as outstock_time,t3.checked_time as instock_time ")
-                .append(" from (SELECT id,product_no,product_name,product_type,product_unit,SUM(problem_stock) as problem_stock,product_categoryname,trade_no,create_time,org_no,delete_flag FROM biz_stock_detail WHERE delete_flag = 0 and problem_stock>0 and org_no = 'FW000922' GROUP BY product_no) as t1  ")
+                .append(" from (SELECT id,product_no,product_name,product_type,product_unit,SUM(problem_stock) as problem_stock,product_categoryname,trade_no,create_time,org_no,delete_flag FROM biz_stock_detail WHERE delete_flag = 0 and problem_stock>0 ");
+                if(StringUtils.isNotBlank(orgCode)){
+                    param.put("orgCode", orgCode);
+                    sql.append(" and org_no = :orgCode");
+                }
+                sql.append(" GROUP BY product_no) as t1  ")
                 .append(" LEFT JOIN biz_outstock_order t2 on t1.trade_no=t2.trade_docno LEFT JOIN biz_instock_order t3 on t1.trade_no=t3.trade_docno  ")
                 .append(" WHERE t1.delete_flag = :deleteFlag and t1.problem_stock>0 ");
         // 物料类型
@@ -63,11 +68,6 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
             param.put("keyword", keyword);
             //根据编号或名称查询
             sql.append(" AND (t1.product_no LIKE CONCAT('%',:keyword,'%') OR t1.product_name LIKE CONCAT('%',:keyword,'%'))");
-        }
-        // 组织机构code
-        if (StringUtils.isNotBlank(orgCode)) {
-            param.put("orgCode", orgCode);
-            sql.append(" AND t1.org_no = :orgCode ");
         }
         // 区分零配件和物料
         if (StringUtils.isNotBlank(type)) {
@@ -144,13 +144,17 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
     public List<StockDetailDTO> queryProblemStockBizStockList(String orgCode, String productNo){
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
-        param.put("orgCode", orgCode);
         param.put("productNo", productNo);
         StringBuilder sql = new StringBuilder();
 
         sql.append("SELECT t1.id,t1.trade_no,t2.instock_time,t1.supplier_no,t1.problem_stock,t1.product_unit ")
                 .append(" FROM biz_stock_detail t1 LEFT JOIN biz_instock_order t2 on t1.trade_no=t2.trade_docno ")
-                .append(" WHERE t1.delete_flag = :deleteFlag and t1.product_no = :productNo and t1.org_no= :orgCode and t1.problem_stock>0 ");
+                .append(" WHERE t1.delete_flag = :deleteFlag and t1.product_no = :productNo and t1.problem_stock>0 ");
+        if (StringUtils.isNotBlank(orgCode)) {
+            param.put("orgCode", orgCode);
+            sql.append(" and t1.org_no= :orgCode ");
+        }
+        sql.append(" GROUP BY t1.id ");
         return super.queryListBean(StockDetailDTO.class, sql.toString(), param);
     }
 }
