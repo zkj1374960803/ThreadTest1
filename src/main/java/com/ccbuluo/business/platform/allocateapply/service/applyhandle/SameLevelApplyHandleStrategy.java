@@ -40,8 +40,8 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
     private BizStockDetailDao bizStockDetailDao;
     @Resource
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
-    /*@Resource
-    BizAllocateApplyDao bizAllocateApplyDao;*/
+    @Resource
+    BizAllocateApplyDao bizAllocateApplyDao;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -132,7 +132,7 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 删除入库计划
             bizInstockplanDetailDao.batchInsertInstockplanDetail(applyNo);
             //更新申请单状态(已撤销)
-            //bizAllocateApplyDao.updateApplyOrderStatus(applyNo, BizAllocateApply.ApplyStatusEnum.CANCEL.name());
+            bizAllocateApplyDao.updateApplyOrderStatus(applyNo, BizAllocateApply.ApplyStatusEnum.CANCEL.name());
         } catch (Exception e) {
             logger.error("撤销失败！", e);
             throw e;

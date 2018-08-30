@@ -42,8 +42,6 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
     OutstockOrderService outstockOrderService;
     @Resource
     private BizAllocateTradeorderDao bizAllocateTradeorderDao;
-    /*@Resource
-    private BizStockDetailDao bizStockDetailDao;*/
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
