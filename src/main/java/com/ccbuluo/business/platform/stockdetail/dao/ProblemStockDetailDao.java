@@ -154,7 +154,7 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
             param.put("orgCode", orgCode);
             sql.append(" and t1.org_no= :orgCode ");
         }
-        sql.append(" GROUP BY t1.id ");
+        sql.append(" GROUP BY t1.id  ORDER BY t1.create_time DESC");
         return super.queryListBean(StockDetailDTO.class, sql.toString(), param);
     }
 }
