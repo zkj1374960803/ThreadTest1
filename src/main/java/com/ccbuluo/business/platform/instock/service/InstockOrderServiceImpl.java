@@ -113,7 +113,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
             bizInstockorderDetail.setProductCategoryname(item.getProductCategoryname());
             bizInstockorderDetail.setSupplierNo(item.getSupplierNo());
             bizInstockorderDetail.setInstockNum(item.getActualInstocknum());
-            bizInstockorderDetail.setStockType(item.getInstockType());
+            bizInstockorderDetail.setStockType(item.getStockType());
             bizInstockorderDetail.setUnit(item.getProductUnit());
             bizInstockorderDetail.setCostPrice(item.getCostPrice());
             bizInstockorderDetailList1.add(bizInstockorderDetail);
