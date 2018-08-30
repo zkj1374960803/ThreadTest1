@@ -42,6 +42,12 @@ public class StockDetailDTO extends IdEntity {
     private Long problemStock;
 
     /**
+     * 供应商名字
+     */
+    @ApiModelProperty(name = "supplierName", value = "供应商名字")
+    private String supplierName;
+
+    /**
      * 计量单位
      */
     @ApiModelProperty(name = "productUnit", value = "计量单位")
@@ -85,5 +91,13 @@ public class StockDetailDTO extends IdEntity {
 
     public void setProductUnit(String productUnit) {
         this.productUnit = productUnit;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
     }
 }

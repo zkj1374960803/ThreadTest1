@@ -147,8 +147,9 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
         param.put("productNo", productNo);
         StringBuilder sql = new StringBuilder();
 
-        sql.append("SELECT t1.id,t1.trade_no,t2.instock_time,t1.supplier_no,t1.problem_stock,t1.product_unit ")
+        sql.append("SELECT t1.id,t1.trade_no,t2.instock_time,t1.supplier_no,t1.problem_stock,t1.product_unit,ss.supplier_name ")
                 .append(" FROM biz_stock_detail t1 LEFT JOIN biz_instock_order t2 on t1.trade_no=t2.trade_docno ")
+                .append(" LEFT JOIN  biz_service_supplier ss ON t1.supplier_no = ss.supplier_code ")
                 .append(" WHERE t1.delete_flag = :deleteFlag and t1.product_no = :productNo and t1.problem_stock>0 ");
         if (StringUtils.isNotBlank(orgCode)) {
             param.put("orgCode", orgCode);
