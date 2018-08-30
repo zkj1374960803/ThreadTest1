@@ -444,7 +444,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         }
 
         // 查询版本号（数据库乐观锁）
-        Long versionNo = bizAllocateApplyDao.findVersionNo(processApplyDTO.getApplyNo());
+        String applyNo = processApplyDTO.getApplyNo();
+        Long versionNo = bizAllocateApplyDao.findVersionNo(applyNo);
         processApplyDTO.setVersionNo(versionNo);
         // 处理通过，更新申请单状态
         processApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
@@ -453,9 +454,33 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         processApplyDTO.setProcessTime(new Date());
         bizAllocateApplyDao.updateAllocateApply(processApplyDTO);
         // 更新申请单的详单数据
-        bizAllocateApplyDao.batchUpdateForApplyDetail(processApplyDTO.getProcessApplyDetailDTO());
+        batchUpdateForApplyDetail(processApplyDTO, applyNo);
         // 生成出入库计划
         applyHandleContext.applyHandle(processApplyDTO.getApplyNo());
+    }
+
+    /**
+     *  更新申请单的详单数据
+     * @param processApplyDTO
+     * @param applyNo
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-08-30 11:15:58
+     */
+    private void batchUpdateForApplyDetail(ProcessApplyDTO processApplyDTO, String applyNo) {
+        List<QueryAllocateapplyDetailDTO> queryAllocateapplyDetailDTOS = bizAllocateApplyDao.queryAllocateapplyDetail(applyNo);
+        Optional.ofNullable(queryAllocateapplyDetailDTOS).ifPresent(a ->{
+            Map<Long, QueryAllocateapplyDetailDTO> map = a.stream().collect(Collectors.toMap(QueryAllocateapplyDetailDTO::getId, b -> b,(k1, k2)->k1));
+            List<ProcessApplyDetailDTO> processApplyDetailDTO = processApplyDTO.getProcessApplyDetailDTO();
+            processApplyDetailDTO.stream().forEach(c ->{
+                QueryAllocateapplyDetailDTO queryAllocateapplyDetailDTO = map.get(c.getId());
+                if(queryAllocateapplyDetailDTO != null){
+                    c.setSupplierNo(queryAllocateapplyDetailDTO.getSupplierNo());
+                }
+            });
+        });
+        bizAllocateApplyDao.batchUpdateForApplyDetail(processApplyDTO.getProcessApplyDetailDTO());
     }
 
 
