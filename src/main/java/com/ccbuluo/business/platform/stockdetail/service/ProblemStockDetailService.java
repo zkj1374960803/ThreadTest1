@@ -73,4 +73,13 @@ public interface ProblemStockDetailService {
      * @date 2018-08-23 16:02:58
      */
     ProblemStockBizStockDetailDTO getProblemStockDetail(Long id);
+
+    /**
+     * 查询问题库存详情（平台用）
+     * @param id 库存批次id
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-23 16:02:58
+     */
+    ProblemStockBizStockDetailDTO getProblemStockDetailById(Long id);
 }

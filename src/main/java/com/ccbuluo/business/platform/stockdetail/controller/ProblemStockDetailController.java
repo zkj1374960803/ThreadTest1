@@ -106,7 +106,7 @@ public class ProblemStockDetailController extends BaseController {
     @GetMapping("/problemdetail/{id}")
     @ApiImplicitParam(name = "id", value = "库存批次id", required = true, paramType = "path")
     public StatusDto<ProblemStockBizStockDetailDTO> getProblemStockDetail(@PathVariable Long id){
-        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.getProblemStockDetail(id));
+        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.getProblemStockDetailById(id));
     }
 
 }
