@@ -138,7 +138,6 @@ public class InstockOrderServiceImpl implements InstockOrderService {
             if (!(detail.getApplyStatus().equals(ApplyStatusEnum.WAITINGRECEIPT.name())
                 || detail.getApplyStatus().equals(ApplyStatusEnum.INSTORE.name())
                 || detail.getApplyStatus().equals(BizAllocateApply.ReturnApplyStatusEnum.PRODRETURNED.name())
-                || detail.getApplyStatus().equals(BizAllocateApply.ReturnApplyStatusEnum.WAITINGREFUND.name())
                 || detail.getApplyStatus().equals(BizAllocateApply.ReturnApplyStatusEnum.REPLACEWAITIN.name()))) {
                 throw new CommonException("1004", "该申请单已经入库，请核对！");
             }
