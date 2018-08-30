@@ -255,7 +255,9 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.process_orgno,a.instock_orgno,a.outstock_orgno,a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.process_type,a.apply_status ")
-            .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE 1 = 1 ");
+            .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE ")
+            .append(" a.process_type IN (:processTypeList) ");
+        map.put("processTypeList", List.of(BizAllocateApply.ProcessTypeEnum.TRANSFER.name(), BizAllocateApply.ProcessTypeEnum.PURCHASE.name()));
         if(StringUtils.isNotBlank(userOrgCode)){
             map.put("userOrgCode", userOrgCode);
             sql.append(" AND (a.outstock_orgno = :userOrgCode or process_orgno = :userOrgCode) ");
@@ -328,7 +330,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
 
     /**
      * 查询问题件处理列表
-     * @param userOrgCode 用户机构
+     * @param processType 用户机构
      * @return Page<QueryAllocateApplyListDTO> 分页的信息
      * @author weijb
      * @date 2018-08-09 10:36:34
@@ -409,7 +411,8 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      */
     public void batchUpdateForApplyDetail(List<ProcessApplyDetailDTO> processApplyDetailDTO) {
         StringBuilder sql = new StringBuilder();
-        sql.append(" UPDATE biz_allocateapply_detail SET supplier_no = :supplierNo, apply_num = :applyNum,sell_price = :sellPrice WHERE id = :id ");
+        sql.append(" UPDATE biz_allocateapply_detail SET");
+        sql.append("  supplier_no = :supplierNo, apply_num = :applyNum,sell_price = :sellPrice WHERE id = :id ");
         batchUpdateForListBean(sql.toString(), processApplyDetailDTO);
     }
     /**
