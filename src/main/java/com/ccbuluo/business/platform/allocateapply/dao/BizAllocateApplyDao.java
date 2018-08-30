@@ -543,7 +543,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     public Map<String,Object> queryStockQuantity(String outstockOrgno, String sellerOrgno) {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuffer sql = new StringBuffer();
-        sql.append(" SELECT a.product_no as productNo, SUM(a.valid_stock) as validStock ")
+        sql.append(" SELECT a.product_no as productNo, SUM(ifnull(a.valid_stock,0)) as validStock ")
             .append(" FROM biz_stock_detail a ")
             .append(" WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(outstockOrgno)){
