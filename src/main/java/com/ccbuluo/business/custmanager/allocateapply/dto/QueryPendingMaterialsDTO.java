@@ -18,6 +18,12 @@ public class QueryPendingMaterialsDTO {
     @ApiModelProperty(name = "productNo", value = "商品编号")
     private String productNo;
     /**
+     * 申请单的状态
+     */
+    @ApiModelProperty(name = "applyStatus", value = "申请单的状态")
+    private String applyStatus;
+
+    /**
      * 商品名称
      */
     @ApiModelProperty(name = "productName", value = "商品名称")
@@ -56,6 +62,14 @@ public class QueryPendingMaterialsDTO {
 
     public String getRemark() {
         return remark;
+    }
+
+    public String getApplyStatus() {
+        return applyStatus;
+    }
+
+    public void setApplyStatus(String applyStatus) {
+        this.applyStatus = applyStatus;
     }
 
     public void setRemark(String remark) {
