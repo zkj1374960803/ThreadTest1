@@ -185,6 +185,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
             FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
             if (!(detail.getApplyStatus().equals(ApplyStatusEnum.WAITDELIVERY.name())
                 || detail.getApplyStatus().equals(ApplyStatusEnum.OUTSTORE.name())
+                || detail.getApplyStatus().equals(BizAllocateApply.ReturnApplyStatusEnum.WAITINGREFUND.name())
                 || detail.getApplyStatus().equals(BizAllocateApply.ReturnApplyStatusEnum.PLATFORMOUTBOUND.name()))) {
                 throw new CommonException("2004", "该申请单已经出库，请核对！");
             }
@@ -275,7 +276,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                         break;
                     case REFUND:
                         if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-                            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.WAITINGREFUND.toString());
+                            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REFUNDCOMPLETED.toString());
                         } else {
                             allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.PRODRETURNED.toString());
                         }
