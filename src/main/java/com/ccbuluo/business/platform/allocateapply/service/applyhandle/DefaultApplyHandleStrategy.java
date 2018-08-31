@@ -878,8 +878,9 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         Long validStock = 0L;
         // 库存的id已经被排序（先入先出）
         for(BizStockDetail stock : stockDetail){
-            if(applyNum.intValue() == 0){
-                break;
+            if(applyNum.intValue() == 0 && stock.getProductNo().equals(detail.getProductNo())){
+                stock.setOccupyStock(0L);
+                continue;
             }
             // 找到对应商品
             if(stock.getProductNo().equals(detail.getProductNo())){
