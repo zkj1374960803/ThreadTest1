@@ -160,23 +160,22 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
     }
 
     /**
-     *  根据申请单和组织机构获取商品详情
+     *  根据组织机构获取问题件商品详情
      * @param
      * @exception
      * @return
      * @author weijb
      * @date 2018-09-03 10:22:11
      */
-    public List<StockDetailDTO> queryStockDetailListByAppNo(String orgCode, String applyNo){
+    public List<StockDetailDTO> queryStockDetailListByAppNo(String orgCode){
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
-        param.put("applyNo", applyNo);
         param.put("orgCode", orgCode);
         StringBuilder sql = new StringBuilder();
 
         sql.append("SELECT id,trade_no,product_no,cost_price")
                 .append(" FROM biz_stock_detail ")
-                .append(" WHERE delete_flag = :deleteFlag and trade_no = :applyNo and org_no= :orgCode");
+                .append(" WHERE delete_flag = :deleteFlag and org_no= :orgCode and problem_stock>0");
         sql.append(" GROUP BY id ");
         return super.queryListBean(StockDetailDTO.class, sql.toString(), param);
     }
