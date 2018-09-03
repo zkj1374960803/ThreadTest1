@@ -262,7 +262,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             throw new CommonException(statusDtoRole.getCode(), "客户经理角色不存在！");
         }
         // 组织架构校验
-        userInfoDTO.setOrgCode(BusinessPropertyHolder.ORGCODE_TOP_CUSMANAGER);
+        // userInfoDTO.setOrgCode(BusinessPropertyHolder.ORGCODE_TOP_CUSMANAGER);
         StatusDtoThriftBean<BasicUserOrganization> orgByCode = basicUserOrganizationService.findOrgByCode(userInfoDTO.getOrgCode());
         if(!orgByCode.isSuccess()){
             throw new CommonException(statusDtoRole.getCode(), "组织架构不存在！");
