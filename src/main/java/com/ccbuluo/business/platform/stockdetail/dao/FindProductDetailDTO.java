@@ -16,13 +16,13 @@ public class FindProductDetailDTO {
 
     private Long id;
     @ApiModelProperty(name = "validStock", value = "全部可用库存")
-    private Long validStock;
+    private Long validStock = 0L;
     @ApiModelProperty(name = "transferInventory", value = "可调拨库存")
-    private Long transferInventory;
+    private Long transferInventory = 0L;
     @ApiModelProperty(name = "occupyStock", value = "占用库存")
-    private String occupyStock;
+    private Long occupyStock = 0L;
     @ApiModelProperty(name = "totalStock", value = "总库存", hidden = true)
-    private String totalStock;
+    private Long totalStock = 0L;
     @ApiModelProperty(name = "unit", value = "单位")
     private String unit;
     @ApiModelProperty(name = "totalAmount", value = "总价")
@@ -52,19 +52,19 @@ public class FindProductDetailDTO {
         this.transferInventory = transferInventory;
     }
 
-    public String getOccupyStock() {
+    public Long getOccupyStock() {
         return occupyStock;
     }
 
-    public void setOccupyStock(String occupyStock) {
+    public void setOccupyStock(Long occupyStock) {
         this.occupyStock = occupyStock;
     }
 
-    public String getTotalStock() {
+    public Long getTotalStock() {
         return totalStock;
     }
 
-    public void setTotalStock(String totalStock) {
+    public void setTotalStock(Long totalStock) {
         this.totalStock = totalStock;
     }
 
