@@ -12,6 +12,8 @@ import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.outstock.service.OutstockOrderService;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
+import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
+import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.http.StatusDto;
@@ -47,6 +49,8 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
     private BizAllocateTradeorderDao bizAllocateTradeorderDao;
     @Resource
     private UserHolder userHolder;
+    @Resource
+    private BizServiceStorehouseDao bizServiceStorehouseDao;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -172,6 +176,14 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
                 inPlan.setCostPrice(ad.getSellPrice());
             }
             inPlan.setPlanInstocknum(outstockplan.getPlanOutstocknum());
+            // 根据平台的no查询平台的仓库
+            List<QueryStorehouseDTO> list = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+            String repositoryNo = "";
+            if(null != list && list.size() > 0){
+                repositoryNo = list.get(0).getStorehouseCode();
+            }
+            inPlan.setInstockRepositoryNo(repositoryNo);// 平台仓库编号
+            inPlan.setInstockOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 平台机构编号
             inList.add(inPlan);
         }
     }
