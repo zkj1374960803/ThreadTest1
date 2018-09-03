@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.stockdetail.controller;
+package com.ccbuluo.business.custmanager.stockdetail.controller;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.allocateapply.dto.CheckStockQuantityDTO;
@@ -24,10 +24,10 @@ import java.util.List;
  * @author zhangkangjian
  * @date 2018-08-16 10:23:20
  */
-@Api(tags = "库存管理")
+@Api(tags = "库存管理(客户经理端)")
 @RestController
-@RequestMapping("/platform/stockmanagement")
-public class StockManagementController extends BaseController {
+@RequestMapping("/custmanager/stockmanagement")
+public class CustStockManagementController extends BaseController {
     @Resource(name = "stockManagementServiceImpl")
     private StockManagementService stockManagementService;
     @Resource(name = "allocateApplyServiceImpl")
@@ -171,6 +171,74 @@ public class StockManagementController extends BaseController {
     public StatusDto<List<ProductStockInfoDTO>> checkStockQuantity(@ApiParam(name = "CheckStockQuantityDTO", value = "Json数据", required = true) @RequestBody CheckStockQuantityDTO checkStockQuantityDTO){
         return allocateApplyServiceImpl.checkStockQuantity(checkStockQuantityDTO);
     }
+
+    /**
+     * 查询当前登陆人的物料库存
+     * @param findStockListDTO 查询条件
+     * @return StatusDto<Page<FindStockListDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-31 14:47:54
+     */
+    @ApiOperation(value = "查询当前登陆人的物料库存", notes = "【张康健】")
+    @GetMapping("/findequipmentstocklistbyorgcode")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "equiptypeId", value = "物料类型的id", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "productNo", value = "商品的编号", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query")
+    })
+    public StatusDto<Page<FindStockListDTO>> findEquipmentStockListByOrgCode(@ApiIgnore FindStockListDTO findStockListDTO){
+        findStockListDTO.setProductType(Constants.PRODUCT_TYPE_EQUIPMENT);
+        Page<FindStockListDTO> page = allocateApplyServiceImpl.findEquipmentStockListByOrgCode(findStockListDTO);
+        return StatusDto.buildDataSuccessStatusDto(page);
+    }
+
+    /**
+     * 查看零配件调拨库存
+     * @param findStockListDTO 查询条件
+     * @return StatusDto<Page<FindStockListDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-10 15:45:56
+     */
+    @ApiOperation(value = "查看零配件调拨库存", notes = "【张康健】")
+    @GetMapping("/findfittingsstocklistbyorgcode")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "categoryCode", value = "零配件类型的code", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "productNo", value = "商品的编号", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query")
+    })
+    public StatusDto<Page<FindStockListDTO>> findFittingsStockListByOrgCode(@ApiIgnore FindStockListDTO findStockListDTO){
+        findStockListDTO.setProductType(Constants.PRODUCT_TYPE_FITTINGS);
+        Page<FindStockListDTO> page = allocateApplyServiceImpl.findEquipmentStockListByOrgCode(findStockListDTO);
+        return StatusDto.buildDataSuccessStatusDto(page);
+    }
+
+
+    /**
+     * 查看所有零配件调拨库存
+     * @param findStockListDTO 查询条件
+     * @return StatusDto<Page<FindStockListDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-10 15:45:56
+     */
+    @ApiOperation(value = "查看所有零配件调拨库存", notes = "【张康健】")
+    @GetMapping("/findallfittingsstocklistbyorgcode")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "categoryCode", value = "零配件类型的code", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "productNo", value = "商品的编号", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query")
+    })
+        public StatusDto<Page<FindStockListDTO>> findAllFittingsStockListByOrgCode(@ApiIgnore FindStockListDTO findStockListDTO){
+        findStockListDTO.setProductType(Constants.PRODUCT_TYPE_FITTINGS);
+        Page<FindStockListDTO> page = allocateApplyServiceImpl.findAllFittingsStockListByOrgCode(findStockListDTO);
+        return StatusDto.buildDataSuccessStatusDto(page);
+    }
+
+
+
+
 
 
 

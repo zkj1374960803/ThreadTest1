@@ -175,4 +175,29 @@ public interface AllocateApplyService {
      * @date 2018-08-27 14:53:10
      */
     void receivingmaterials(Long id, String productNo);
+    /**
+     * 查询当前登陆人的物料库存
+     * @param findStockListDTO 查询条件
+     * @return StatusDto<Page<FindStockListDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-31 14:47:54
+     */
+    Page<FindStockListDTO> findEquipmentStockListByOrgCode(FindStockListDTO findStockListDTO);
+
+    /**
+     * 查询当前登陆人的零配件库存
+     * @param findStockListDTO 查询条件
+     * @return StatusDto<Page<FindStockListDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-31 14:47:54
+     */
+    Page<FindStockListDTO> findFittingsStockListByOrgCode(FindStockListDTO findStockListDTO);
+    /**
+     * 查看所有零配件调拨库存
+     * @param findStockListDTO 查询条件
+     * @return StatusDto<Page<FindStockListDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-10 15:45:56
+     */
+    Page<FindStockListDTO> findAllFittingsStockListByOrgCode(FindStockListDTO findStockListDTO);
 }

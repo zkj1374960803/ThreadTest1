@@ -97,7 +97,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         // 参数校验
         checkedRoleCodeAndOrgCode(userInfoDTO);
         // 保存基础用户
-        String useruuid = saveUserAndOrg(userInfoDTO, bizServiceCustmanager.getReceivingAddress());
+        String useruuid = saveUserAndOrg(userInfoDTO, bizServiceCustmanager);
         // 保存客户经理信息
         saveCustManager(bizServiceCustmanager, useruuid);
         return StatusDto.buildSuccessStatusDto();
@@ -117,7 +117,6 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             bizServiceCustmanager.setCreator(loggedUserId);
             bizServiceCustmanager.setOperator(loggedUserId);
             bizServiceCustmanager.setUserUuid(useruuid);
-            bizServiceCustmanager.setName(userHolder.getLoggedUser().getName());
             // 手机号校验
             compareRepeat(bizServiceCustmanager.getUserUuid(), bizServiceCustmanager.getOfficePhone(), "office_phone", "biz_service_custmanager", "客户经理办公SIM卡手机号重复！");
             bizServiceCustmanagerDao.saveBizServiceCustmanager(bizServiceCustmanager);
@@ -181,12 +180,13 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     /**
      *  保存基础用户信息,保存成功返回uuid
      * @param userInfoDTO 用户的信息
+     * @param bizServiceCustmanager
      * @exception CommonException 自定义异常
      * @return StatusDto<String> 状态
      * @author zhangkangjian
      * @date 2018-07-21 12:02:26
      */
-    private String saveUserAndOrg(UserInfoDTO userInfoDTO, String address) {
+    private String saveUserAndOrg(UserInfoDTO userInfoDTO, BizServiceCustmanager bizServiceCustmanager) {
         // 填充用户的默认信息
         String loggedUserId = userHolder.getLoggedUserId();
         userInfoDTO.setUserType(Constants.USER_TYPE_INNER);
@@ -208,7 +208,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         StatusDto<BasicUserOrganization> resolve = StatusDtoThriftUtils.resolve(orgcode, BasicUserOrganization.class);
         // 拿到父级组织架构的id
         buo.setParentId(resolve.getData().getId());
-        buo.setOrgName(userInfoDTO.getName() + "经理");
+        buo.setOrgName(bizServiceCustmanager.getName() + "经理");
         buo.setOrgType(Constants.ORG_TYPE);
         // 生成客户经理组织架构的code
         StatusDto<String> custManagerCode = generateProjectCodeService.grantCode(BizServiceProjectcode.CodePrefixEnum.FO);
@@ -240,11 +240,11 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         StatusDtoThriftBean<UserInfoDTO> userInfo = innerUserInfoService.findUserDetail(orgAndUser.getData());
         StatusDto<UserInfoDTO> userInfoDTOResolve = StatusDtoThriftUtils.resolve(userInfo, UserInfoDTO.class);
         UserInfoDTO data = userInfoDTOResolve.getData();
-        save.setStorehouseName(userInfoDTO.getName() + "仓库");
+        save.setStorehouseName(bizServiceCustmanager.getName() + "仓库");
         save.setServicecenterCode(data.getOrgCode());
-        save.setStorehouseAddress(address);
+        save.setStorehouseAddress(bizServiceCustmanager.getReceivingAddress());
         save.setStorehouseStatus(Constants.LONG_FLAG_ONE);
-        int status = storeHouseService.saveStoreHouse(save);
+        storeHouseService.saveStoreHouse(save);
         return useruuid;
     }
 
@@ -262,7 +262,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             throw new CommonException(statusDtoRole.getCode(), "客户经理角色不存在！");
         }
         // 组织架构校验
-        userInfoDTO.setOrgCode(BusinessPropertyHolder.ORGCODE_TOP_CUSMANAGER);
+        // userInfoDTO.setOrgCode(BusinessPropertyHolder.ORGCODE_TOP_CUSMANAGER);
         StatusDtoThriftBean<BasicUserOrganization> orgByCode = basicUserOrganizationService.findOrgByCode(userInfoDTO.getOrgCode());
         if(!orgByCode.isSuccess()){
             throw new CommonException(statusDtoRole.getCode(), "组织架构不存在！");
