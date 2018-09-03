@@ -1,5 +1,6 @@
 package com.ccbuluo.business.servicecenter.allocateapply.controller;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;

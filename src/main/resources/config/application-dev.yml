@@ -53,6 +53,17 @@ base:
   #客户经理角色code
   custmanagerrolecode: "JS024"
 
+  #小程序基础相关配置
+  mini:
+    #小程序appid [必须]
+    appid: wxc85f2eccf731433a
+    #小程序秘钥   [必须]
+    secret: e45950b1658681e996c95a509e9c455d
+    #小程序对应 商户id [可选]
+    mchId: mchId
+    #小程序对应 商户秘钥 [可选]
+    mchKey: mchKey
+
 #web端配置:
 cookie:
   #cookie的domain,设置访问域
