@@ -44,13 +44,24 @@ base:
   #本系统的secret
   secret: 6c28edbc36214242858fbea49fe58098
   #售后系统顶级机构编号
-    topplatform: "SC000001"
+  topplatform: "SC000001"
   #顶级服务中心code
   topservicecenter: "SC000002"
   #客户经理组织机构
   custmanager: "SC000003"
   #客户经理角色code
   custmanagerrolecode: "JS024"
+
+  #小程序基础相关配置
+  mini:
+    #小程序appid [必须]
+    appid: wxc85f2eccf731433a
+    #小程序秘钥   [必须]
+    secret: e45950b1658681e996c95a509e9c455d
+    #小程序对应 商户id [可选]
+    mchId: mchId
+    #小程序对应 商户秘钥 [可选]
+    mchKey: mchKey
 
 
 cookie:
