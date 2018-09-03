@@ -5,12 +5,11 @@ import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.OrganizationTypeEnum;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.ProblemAllocateApplyDao;
-import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
-import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
-import com.ccbuluo.business.platform.allocateapply.dto.ProblemAllocateapplyDetailDTO;
-import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
 import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
+import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
+import com.ccbuluo.business.platform.stockdetail.dto.StockDetailDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.BusinessUser;
 import com.ccbuluo.core.entity.Organization;
@@ -60,6 +59,8 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
     BizAllocateApplyDao bizAllocateApplyDao;
     @ThriftRPCClient("UserCoreSerService")
     private BasicUserOrganizationService basicUserOrganizationService;
+    @Resource
+    ProblemStockDetailDao problemStockDetailDao;
 
     /**
      * 问题件申请列表
@@ -213,6 +214,8 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             allocateApplyDTO.setInstockTime(info.getInstockTime());// 入库时间
             allocateApplyDTO.setTransportorderNo(info.getTransportorderNo());// 物流单号
         }
+        // 计算成本价格
+        convertCostPrice(allocateApplyDTO);
         return allocateApplyDTO;
     }
     /**
@@ -235,7 +238,26 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             allocateApplyDTO.setInstockTime(info.getInstockTime());// 入库时间
             allocateApplyDTO.setTransportorderNo(info.getTransportorderNo());// 物流单号
         }
+        // 计算成本价格
+        convertCostPrice(allocateApplyDTO);
         return allocateApplyDTO;
+    }
+    /**
+     *  获取成本价格
+     * @param
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-09-03 10:18:33
+     */
+    private void convertCostPrice(FindAllocateApplyDTO allocateApplyDTO){
+        List<StockDetailDTO> list = problemStockDetailDao.queryStockDetailListByAppNo(allocateApplyDTO.getApplyorgNo(),allocateApplyDTO.getApplyNo());
+        for(QueryAllocateapplyDetailDTO applyDetail : allocateApplyDTO.getQueryAllocateapplyDetailDTO()){
+            Optional<StockDetailDTO> applyFilter = list.stream() .filter(stockDetail -> applyDetail.getProductNo().equals(stockDetail.getProductNo())) .findFirst();
+            if (applyFilter.isPresent()) {
+                applyDetail.setCostPrice(applyFilter.get().getCostPrice());
+            }
+        }
     }
 
     /**
