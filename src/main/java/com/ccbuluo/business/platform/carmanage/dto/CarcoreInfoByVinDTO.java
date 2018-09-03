@@ -28,6 +28,12 @@ public class CarcoreInfoByVinDTO {
     @ApiModelProperty(name = "storeName", value = "门店名称")
     private String storeName;
 
+    /**
+     * 车牌号码
+     */
+    @ApiModelProperty(name = "plateNumber", value = "车牌号码")
+    private String plateNumber;
+
     public String getVinNumber() {
         return vinNumber;
     }
@@ -50,5 +56,13 @@ public class CarcoreInfoByVinDTO {
 
     public void setStoreName(String storeName) {
         this.storeName = storeName;
+    }
+
+    public String getPlateNumber() {
+        return plateNumber;
+    }
+
+    public void setPlateNumber(String plateNumber) {
+        this.plateNumber = plateNumber;
     }
 }

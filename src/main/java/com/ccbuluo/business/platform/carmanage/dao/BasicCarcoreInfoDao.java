@@ -351,7 +351,7 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
      * @date 2018-08-01 15:55:14
      */
     public int batchUpdateCarcoreInfoByVin(List<CarcoreInfoByVinDTO> list){
-        String sql = "update basic_carcore_info set store_code=:storeCode, store_name=:storeName, store_assigned=1  where vin_number=:vinNumber";
+        String sql = "update basic_carcore_info set store_code=:storeCode, store_name=:storeName, plate_number=:plateNumber, store_assigned=1  where vin_number=:vinNumber";
         return batchUpdateForListBean(sql, list);
     }
 
