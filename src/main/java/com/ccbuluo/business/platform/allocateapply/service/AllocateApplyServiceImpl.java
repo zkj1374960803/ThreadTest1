@@ -31,6 +31,7 @@ import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.*;
+import com.ccbuluo.merchandiseintf.carparts.category.service.CarpartsCategoryService;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
@@ -72,6 +73,11 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     private InnerUserInfoService innerUserInfoService;
     @ThriftRPCClient("BasicMerchandiseSer")
     private CarpartsProductService carpartsProductService;
+    @ThriftRPCClient("BasicMerchandiseSer")
+    private CarpartsCategoryService carpartsCategoryService;
+//    @ThriftRPCClient("BasicMerchandiseSer")
+//    private CarpartsCategoryService carpartsProductService;
+
     @Resource
     private ApplyHandleContext applyHandleContext;
     @Autowired
@@ -251,28 +257,48 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         StatusDto<BasicUserOrganization> outstockOrgNameresolve = StatusDtoThriftUtils.resolve(outstockOrgName, BasicUserOrganization.class);
         StatusDto<BasicUserOrganization> instockOrgNameresolve = StatusDtoThriftUtils.resolve(instockOrgName, BasicUserOrganization.class);
         StatusDto<BasicUserOrganization> applyorgNameResolve = StatusDtoThriftUtils.resolve(applyorgName, BasicUserOrganization.class);
-        BasicUserOrganization outstockOrgdata = outstockOrgNameresolve.getData();
-        BasicUserOrganization instockOrgdata = instockOrgNameresolve.getData();
-        BasicUserOrganization applyorgNamedata = applyorgNameResolve.getData();
-        // 设置来源
-        if (outstockOrgdata != null) {
-            String orgName = outstockOrgdata.getOrgName();
-            allocateApplyDTO.setOutstockOrgName(orgName);
-        }
-        if (instockOrgdata != null) {
-            String orgName = instockOrgdata.getOrgName();
-            allocateApplyDTO.setInstockOrgName(orgName);
-        }
-        if(applyorgNamedata != null){
-            String orgName = applyorgNamedata.getOrgName();
-            String orgType = applyorgNamedata.getOrgType();
-            if(StringUtils.isNotBlank(orgType)){
-                allocateApplyDTO.setOrgType(orgType);
-            }else {
-                allocateApplyDTO.setOrgType(OrganizationTypeEnum.PLATFORM.name());
-            }
-            allocateApplyDTO.setApplyorgName(orgName);
-        }
+//        BasicUserOrganization outstockOrgdata = outstockOrgNameresolve.getData();
+
+//        BasicUserOrganization organization = Optional.ofNullable(outstockOrgNameresolve.getData()).orElse(new BasicUserOrganization());
+
+        Optional.ofNullable(outstockOrgNameresolve.getData()).ifPresent(a -> allocateApplyDTO.setOutstockOrgName(a.getOrgName()));
+        Optional.ofNullable(instockOrgNameresolve.getData()).ifPresent(a -> allocateApplyDTO.setInstockOrgName(a.getOrgName()));
+        Optional.ofNullable(applyorgNameResolve.getData()).ifPresent(a -> {
+                String orgName = a.getOrgName();
+                String orgType = a.getOrgType();
+                if(StringUtils.isNotBlank(orgType)){
+                    allocateApplyDTO.setOrgType(orgType);
+                }else {
+                    allocateApplyDTO.setOrgType(OrganizationTypeEnum.PLATFORM.name());
+                }
+                allocateApplyDTO.setApplyorgName(orgName);
+        });
+
+//
+//
+//
+//
+//        BasicUserOrganization instockOrgdata = instockOrgNameresolve.getData();
+//        BasicUserOrganization applyorgNamedata = applyorgNameResolve.getData();
+//        // 设置来源
+//        if (outstockOrgdata != null) {
+//            String orgName = outstockOrgdata.getOrgName();
+//            allocateApplyDTO.setOutstockOrgName(orgName);
+//        }
+//        if (instockOrgdata != null) {
+//            String orgName = instockOrgdata.getOrgName();
+//            allocateApplyDTO.setInstockOrgName(orgName);
+//        }
+//        if(applyorgNamedata != null){
+//            String orgName = applyorgNamedata.getOrgName();
+//            String orgType = applyorgNamedata.getOrgType();
+//            if(StringUtils.isNotBlank(orgType)){
+//                allocateApplyDTO.setOrgType(orgType);
+//            }else {
+//                allocateApplyDTO.setOrgType(OrganizationTypeEnum.PLATFORM.name());
+//            }
+//            allocateApplyDTO.setApplyorgName(orgName);
+//        }
         // 查询申请单的详单
         List<QueryAllocateapplyDetailDTO> queryAllocateapplyDetailDTOS = bizAllocateApplyDao.queryAllocateapplyDetail(applyNo);
         if (queryAllocateapplyDetailDTOS != null) {
@@ -281,19 +307,16 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                 // 查询零配件的名称
                 List<String> productNo = queryAllocateapplyDetailDTOS.stream().map(QueryAllocateapplyDetailDTO::getProductNo).collect(Collectors.toList());
                 StatusDtoThriftList<BasicCarpartsProductDTO> basicCarpartsProductDTOList = carpartsProductService.queryCarpartsProductListByCarpartsCodes(productNo);
-                if (basicCarpartsProductDTOList.isSuccess()) {
-                    StatusDto<List<BasicCarpartsProductDTO>> resolve = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOList, BasicCarpartsProductDTO.class);
-                    List<BasicCarpartsProductDTO> basicCarpartsProductList = resolve.getData();
-                    if (basicCarpartsProductList != null) {
-                        Map<String, BasicCarpartsProductDTO> basicCarpartsProductDTOMap = basicCarpartsProductList.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, a -> a, (k1, k2) -> k1));
-                        queryAllocateapplyDetailDTOS.stream().forEach(a -> {
-                            BasicCarpartsProductDTO basicCarpartsProductDTO = basicCarpartsProductDTOMap.get(a.getProductNo());
-                            if (basicCarpartsProductDTO != null) {
-                                a.setProductName(basicCarpartsProductDTO.getCarpartsName());
-                            }
-                        });
-                    }
-                }
+                List<BasicCarpartsProductDTO> basicCarpartsProductList = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOList, BasicCarpartsProductDTO.class).getData();
+                Optional.ofNullable(basicCarpartsProductList).ifPresent(a ->{
+                    Map<String, BasicCarpartsProductDTO> basicCarpartsProductDTOMap = a.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, b -> b, (k1, k2) -> k1));
+                    queryAllocateapplyDetailDTOS.stream().forEach(c -> {
+                        BasicCarpartsProductDTO basicCarpartsProductDTO = basicCarpartsProductDTOMap.get(c.getProductNo());
+                        if (basicCarpartsProductDTO != null) {
+                            c.setProductName(basicCarpartsProductDTO.getCarpartsName());
+                        }
+                    });
+                });
             }
         }
         allocateApplyDTO.setQueryAllocateapplyDetailDTO(queryAllocateapplyDetailDTOS);
@@ -495,19 +518,19 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     public Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO) {
         // 根据分类查询供应商的code
         List<String> productCode = null;
-            List<BasicCarpartsProductDTO> carpartsProductDTOList;
-            if(Constants.PRODUCT_TYPE_EQUIPMENT.equals(findStockListDTO.getProductType())){
-                // 查询类型下所有的code
-                carpartsProductDTOList  = bizAllocateApplyDao.findEquipmentCode(findStockListDTO.getEquiptypeId());
-            }else {
-                // 查询分类下所有商品的code
-                carpartsProductDTOList = carpartsProductService.queryCarpartsProductListByCategoryCode(findStockListDTO.getCategoryCode());
-            }
+        List<BasicCarpartsProductDTO> carpartsProductDTOList;
+        if(Constants.PRODUCT_TYPE_EQUIPMENT.equals(findStockListDTO.getProductType())){
+            // 查询类型下所有的code
+            carpartsProductDTOList  = bizAllocateApplyDao.findEquipmentCode(findStockListDTO.getEquiptypeId());
+        }else {
+            // 查询分类下所有商品的code
+            carpartsProductDTOList = carpartsProductService.queryCarpartsProductListByCategoryCode(findStockListDTO.getCategoryCode());
+        }
 
-            productCode = carpartsProductDTOList.stream().map(BasicCarpartsProductDTO::getCarpartsCode).collect(Collectors.toList());
-            if(productCode == null || productCode.size() == 0){
-                return new Page<FindStockListDTO>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
-            }
+        productCode = carpartsProductDTOList.stream().map(BasicCarpartsProductDTO::getCarpartsCode).collect(Collectors.toList());
+        if(productCode == null || productCode.size() == 0){
+            return new Page<FindStockListDTO>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
+        }
         // 根据类型查询服务中心的code
         List<String> orgCode = null;
         String orgNo = findStockListDTO.getOrgNo();
@@ -673,6 +696,85 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         BizInstockplanDetail bizInstockplanDetail = bizInstockplanDetailDao.queryListById(id);
         bizInstockplanDetail.setActualInstocknum(bizInstockplanDetail.getPlanInstocknum());
         instockOrderService.autoSaveInstockOrder(bizInstockplanDetail.getTradeNo(), bizInstockplanDetail.getInstockRepositoryNo(), List.of(bizInstockplanDetail));
+    }
+
+    /**
+     * 查询当前登陆人的物料库存
+     * @param findStockListDTO 查询条件
+     * @return StatusDto<Page < FindStockListDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-31 14:47:54
+     */
+    @Override
+    public Page<FindStockListDTO> findEquipmentStockListByOrgCode(FindStockListDTO findStockListDTO) {
+        // 根据分类查询供应商的code
+        List<String> productCode = null;
+        List<BasicCarpartsProductDTO> carpartsProductDTOList;
+        if(Constants.PRODUCT_TYPE_EQUIPMENT.equals(findStockListDTO.getProductType())){
+            // 查询类型下所有的code
+            carpartsProductDTOList  = bizAllocateApplyDao.findEquipmentCode(findStockListDTO.getEquiptypeId());
+        }else {
+            // 查询分类下所有商品的code
+            carpartsProductDTOList = carpartsProductService.queryCarpartsProductListByCategoryCode(findStockListDTO.getCategoryCode());
+        }
+
+        productCode = carpartsProductDTOList.stream().map(BasicCarpartsProductDTO::getCarpartsCode).collect(Collectors.toList());
+        if(productCode == null || productCode.size() == 0){
+            return new Page<FindStockListDTO>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
+        }
+        String userOrgCode = getUserOrgCode();
+        Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, List.of(userOrgCode));
+        return page;
+    }
+
+    /**
+     * 查询当前登陆人的零配件库存
+     *
+     * @param findStockListDTO 查询条件
+     * @return StatusDto<Page < FindStockListDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-31 14:47:54
+     */
+    @Override
+    public Page<FindStockListDTO> findFittingsStockListByOrgCode(FindStockListDTO findStockListDTO) {
+        StatusDtoThriftPage<BasicCarpartsProductDTO> basicCarpartsProductDTO = carpartsProductService.queryCarpartsProductList(findStockListDTO.getCategoryCode(), findStockListDTO.getProductName(), findStockListDTO.getOffset(), findStockListDTO.getPageSize());
+        StatusDto<Page<BasicCarpartsProductDTO>> basicCarpartsProductDTOResolve = StatusDtoThriftUtils.resolve(basicCarpartsProductDTO, BasicCarpartsProductDTO.class);
+        Page<BasicCarpartsProductDTO> data = basicCarpartsProductDTOResolve.getData();
+        if(data != null){
+            List<BasicCarpartsProductDTO> rows = data.getRows();
+            Optional.ofNullable(rows).ifPresent(a -> {
+                List<String> categoryCodePaths = a.stream().map(BasicCarpartsProductDTO::getCategoryCodePath).collect(Collectors.toList());
+                categoryCodePaths = new ArrayList<String>(new HashSet<String>(categoryCodePaths));
+                String categoryCodePathStr = StringUtils.join(categoryCodePaths, Constants.COMMA);
+                String[] split = categoryCodePathStr.split(Constants.COMMA);
+                List<String> categoryCodeList = Arrays.asList(split);
+                Set<String> categoryCodeSet = new HashSet<>(categoryCodeList);
+                // 查询分类的名称
+//                carpartsCategoryService.queryCarpartsProductList(categoryCodeSet);
+//                carpartsCategoryService.q
+//                    carpartsProductService.queryCarpartsProductList()
+
+            });
+        }
+
+
+        return null;
+    }
+
+    /**
+     * 查看所有零配件调拨库存
+     *
+     * @param findStockListDTO 查询条件
+     * @return StatusDto<Page < FindStockListDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-10 15:45:56
+     */
+    @Override
+    public Page<FindStockListDTO> findAllFittingsStockListByOrgCode(FindStockListDTO findStockListDTO) {
+
+
+
+        return null;
     }
 
     /**

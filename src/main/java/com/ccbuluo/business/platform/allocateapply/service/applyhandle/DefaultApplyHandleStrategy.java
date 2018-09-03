@@ -878,8 +878,9 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         Long validStock = 0L;
         // 库存的id已经被排序（先入先出）
         for(BizStockDetail stock : stockDetail){
-            if(applyNum.intValue() == 0){
-                break;
+            if(applyNum.intValue() == 0 && stock.getProductNo().equals(detail.getProductNo())){
+                stock.setOccupyStock(0L);
+                continue;
             }
             // 找到对应商品
             if(stock.getProductNo().equals(detail.getProductNo())){
@@ -888,6 +889,9 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
                     validStock = stock.getProblemStock();
                 }else if(BizStockDetail.StockTypeEnum.VALIDSTOCK.name().equals(detail.getStockType())){// 正常件
                     validStock = stock.getValidStock();
+                }
+                if(null == validStock){
+                    continue;
                 }
                 // 如果本批次的库存正好等于要调拨的数量
                 if(validStock.intValue() == applyNum.intValue()){

@@ -157,7 +157,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
                 .append("supplier_no,valid_stock,occupy_stock,problem_stock,damaged_stock,")
                 .append("transit_stock,freeze_stock,seller_orgno,cost_price,instock_planid,")
                 .append("latest_correct_time,creator,create_time,operator,operate_time,")
-                .append("delete_flag,remark,version_no FROM biz_stock_detail WHERE delete_flag = :deleteFlag and org_no= :sellerOrgNo and product_no IN(:codes) and valid_stock > 0")
+                .append("delete_flag,remark,version_no FROM biz_stock_detail WHERE delete_flag = :deleteFlag and org_no= :sellerOrgNo and product_no IN(:codes) and (valid_stock > 0 or problem_stock > 0)")
                 .append(" order by create_time");//先进先出排序取出，按创建时间的正序排列
         Map<String, Object> params = Maps.newHashMap();
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
@@ -370,7 +370,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         map.put("productNo", productNo);
         map.put("productType", productType);
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT ifnull(a.valid_stock,0) as 'validStock',ifnull(a.occupy_stock,0) as 'occupyStock',SUM(ifnull(a.valid_stock,0) + ifnull(a.occupy_stock,0)) AS 'totalStock', ")
+        sql.append(" SELECT SUM(IFNULL(a.valid_stock,0)) AS 'validStock',SUM(IFNULL(a.occupy_stock,0)) AS 'occupyStock',SUM(ifnull(a.valid_stock,0) + ifnull(a.occupy_stock,0)) AS 'totalStock', ")
             .append(" SUM(ifnull(a.valid_stock,0) + ifnull(a.occupy_stock,0)) * a.cost_price AS 'totalAmount',a.product_unit AS 'unit' ")
             .append(" FROM biz_stock_detail a  ")
             .append(" WHERE a.product_no = :productNo AND a.product_type = :productType ");

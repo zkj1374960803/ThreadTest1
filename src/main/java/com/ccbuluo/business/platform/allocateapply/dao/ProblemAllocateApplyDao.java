@@ -85,17 +85,19 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     /**
      *  查询出入库时间
      * @param applyNos 申请单编号
+     * @param userOrgCode 所属机构
      * @author weijb
      * @date 2018-08-15 18:51:51
      */
-    public List<QueryAllocateApplyListDTO> queryProblemHandleList(List<String> applyNos){
+    public List<QueryAllocateApplyListDTO> queryProblemHandleList(List<String> applyNos,String userOrgCode){
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        param.put("userOrgCode", userOrgCode);
         StringBuilder sql = new StringBuilder();
 
-        sql.append("SELECT t1.id,t1.apply_no,t1.apply_type,t1.apply_status ,t3.checked_time as instock_time ")
-                .append(" FROM biz_allocate_apply t1 LEFT JOIN biz_instock_order t3 on t1.apply_no=t3.trade_docno ")
-                .append(" WHERE t1.delete_flag = :deleteFlag and t1.apply_type in('BARTER','REFUND')");
+        sql.append("SELECT t1.id,t1.apply_no,t1.apply_type,t1.apply_status ,t3.checked_time as instock_time,t2.checked_time as outstock_time ")
+                .append(" FROM biz_allocate_apply t1 LEFT JOIN biz_outstock_order t2 on t1.apply_no=t2.trade_docno LEFT JOIN biz_instock_order t3 on t1.apply_no=t3.trade_docno ")
+                .append(" WHERE t1.delete_flag = :deleteFlag and t1.apply_type in('BARTER','REFUND') and t3.instock_orgno = :userOrgCode");
 
         // 申请编号
         if (null != applyNos && applyNos.size() > 0 ) {
@@ -103,6 +105,7 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             //根据编号或名称查询
             sql.append(" AND t1.apply_no in (:applyNos)");
         }
+        sql.append(" GROUP BY t1.apply_no");
         return queryListBean(QueryAllocateApplyListDTO.class, sql.toString(), param);
     }
 

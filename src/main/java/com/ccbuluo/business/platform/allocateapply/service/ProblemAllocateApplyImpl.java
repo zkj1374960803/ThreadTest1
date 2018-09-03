@@ -100,13 +100,13 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         if(rows != null){
             // 查出申请单号
             applyNos = rows.stream().map(QueryAllocateApplyListDTO::getApplyNo).collect(Collectors.toList());
-            applyList = problemAllocateApplyDao.queryProblemHandleList(applyNos);
+            applyList = problemAllocateApplyDao.queryProblemHandleList(applyNos,BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
         }
         for(QueryAllocateApplyListDTO apply : rows){
             Optional<QueryAllocateApplyListDTO> applyFilter = applyList.stream() .filter(applyDetail -> apply.getApplyNo().equals(applyDetail.getApplyNo())) .findFirst();
             if (applyFilter.isPresent()) {
                 apply.setInstockTime(applyFilter.get().getInstockTime());
-                apply.setOutstockTime(apply.getCreateTime());// (自动出库时间)
+                apply.setOutstockTime(applyFilter.get().getOutstockTime());
             }
         }
         return page;
@@ -154,13 +154,14 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         if(rows != null){
             // 查出申请单号
             applyNos = rows.stream().map(QueryAllocateApplyListDTO::getApplyNo).collect(Collectors.toList());
-            applyList = problemAllocateApplyDao.queryProblemHandleList(applyNos);
+            // 查询平台的入库计划
+            applyList = problemAllocateApplyDao.queryProblemHandleList(applyNos,BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
         }
         for(QueryAllocateApplyListDTO apply : rows){
             Optional<QueryAllocateApplyListDTO> applyFilter = applyList.stream() .filter(applyDetail -> apply.getApplyNo().equals(applyDetail.getApplyNo())) .findFirst();
             if (applyFilter.isPresent()) {
                 apply.setInstockTime(applyFilter.get().getInstockTime());
-                apply.setOutstockTime(apply.getCreateTime());// (自动出库，去创建时间)
+                apply.setOutstockTime(applyFilter.get().getOutstockTime());
             }
         }
         return page;
