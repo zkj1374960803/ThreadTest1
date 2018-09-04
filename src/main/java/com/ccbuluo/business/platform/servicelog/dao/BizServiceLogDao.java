@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.order.dao;
+package com.ccbuluo.business.platform.servicelog.dao;
 
 import com.ccbuluo.business.entity.BizServiceLog;
 import com.ccbuluo.dao.BaseDao;
@@ -11,7 +11,7 @@ import java.util.Map;
 
 /**
  *  dao
- * @author Ryze
+ * @author zhangkangjian
  * @date 2018-09-03 15:38:39
  * @version V 1.0.0
  */

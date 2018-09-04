@@ -75,6 +75,36 @@ public class BizServiceLog {
     private String remark;
 
 
+    public enum SubjectTypeEnum{
+        ORDER("订单类型");
+
+        SubjectTypeEnum(String label){
+            this.label = label;
+        }
+
+        private String label;
+
+        public String getLabel(){
+            return label;
+        }
+
+    }
+
+    public enum actionEnum{
+        SAVE("增"),DELETE("删"),UPDATE("改"),SELECT("查");
+
+        actionEnum(String label){
+            this.label = label;
+        }
+
+        private String label;
+
+        public String getLabel(){
+            return label;
+        }
+    }
+
+
     public void setId(Long id) {
         this.id = id;
     }
