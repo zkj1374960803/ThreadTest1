@@ -1,4 +1,4 @@
-package com.ccbuluo.business.custmanager.stockdetail.controller;
+package com.ccbuluo.business.servicecenter.stockdetail.controller;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.allocateapply.dto.CheckStockQuantityDTO;
@@ -24,10 +24,10 @@ import java.util.List;
  * @author zhangkangjian
  * @date 2018-08-16 10:23:20
  */
-@Api(tags = "库存管理(客户经理端)")
+@Api(tags = "库存管理(服务中心端)")
 @RestController
-@RequestMapping("/custmanager/stockmanagement")
-public class CustStockManagementController extends BaseController {
+@RequestMapping("/servicecenter/stockmanagement")
+public class ServiceStockManagementController extends BaseController {
     @Resource(name = "stockManagementServiceImpl")
     private StockManagementService stockManagementService;
     @Resource(name = "allocateApplyServiceImpl")
