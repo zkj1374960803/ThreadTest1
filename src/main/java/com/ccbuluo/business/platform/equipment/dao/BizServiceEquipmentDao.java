@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.equipment.dao;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceEquipment;
+import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
 import com.ccbuluo.business.platform.equipment.dto.DetailBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.equipment.dto.SaveBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.equipment.dto.SaveBizServiceEquiptypeDTO;
@@ -192,5 +193,22 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
         String sql = "DELETE FROM biz_service_equipment WHERE equip_code = :equipCode ";
 
         return updateForMap(sql, params);
+    }
+
+    /**
+     * 根据物料code查询物料
+     * @param equipCode 物料code
+     * @return FindStockListDTO
+     * @author zhangkangjian
+     * @date 2018-09-03 19:30:45
+     */
+    public FindStockListDTO findEqupmentDetail(String equipCode) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("equipCode", equipCode);
+        StringBuffer sql = new StringBuffer();
+        sql.append(" SELECT a.equip_code as 'productNo',a.equip_name as 'productName',a.equip_unit as 'unit',b.type_name as 'productCategoryname'  ")
+            .append(" FROM biz_service_equipment a LEFT JOIN biz_service_equiptype b ON a.equiptype_id = b.id ")
+            .append(" WHERE a.equip_code = :equipCode ");
+        return findForBean(FindStockListDTO.class, sql.toString(), params);
     }
 }
