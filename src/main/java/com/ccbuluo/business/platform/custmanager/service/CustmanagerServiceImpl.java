@@ -15,6 +15,7 @@ import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
 import com.ccbuluo.business.platform.maintaincar.dao.BizServiceMaintaincarDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
+import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.dto.SaveBizServiceStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.service.StoreHouseService;
@@ -85,6 +86,8 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     private StoreHouseService storeHouseService;
     @Resource(name = "allocateApplyServiceImpl")
     private AllocateApplyService allocateApplyService;
+    @Resource
+    private BizServiceStorehouseDao bizServiceStorehouseDao;
 
     /**
      * 创建客户经理
@@ -456,7 +459,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
 
             List<String> orgCodeList = rows.stream().map(QueryCustManagerListDTO::getServiceCenter).collect(Collectors.toList());
             organizationMap = orgService.queryOrganizationByOrgCodes(orgCodeList);
-            List<QueryStorehouseDTO> queryStorehouseDTOList = storeHouseService.queryByCode(collect);
+            List<BizServiceStorehouse> queryStorehouseDTOList = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(collect);
 
             rows.stream().forEach(c -> {
                 UserInfoDTO userInfoDTO1 = userInfoMap.get(c.getUseruuid());
@@ -470,10 +473,10 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             });
 
             Optional.ofNullable(queryStorehouseDTOList).ifPresent(a ->{
-                Map<String, QueryStorehouseDTO> queryStorehouseDTOMap = a.stream().collect(Collectors.toMap(QueryStorehouseDTO::getStorehouseCode, b -> b,(k1,k2)->k1));
+                Map<String, BizServiceStorehouse> queryStorehouseDTOMap = a.stream().collect(Collectors.toMap(BizServiceStorehouse::getServicecenterCode, b -> b,(k1,k2)->k1));
                 rows.stream().forEach(c ->{
                     String orgCode = c.getOrgCode();
-                    QueryStorehouseDTO queryStorehouseDTO = queryStorehouseDTOMap.get(orgCode);
+                    BizServiceStorehouse queryStorehouseDTO = queryStorehouseDTOMap.get(orgCode);
                     if(queryStorehouseDTO != null){
                         c.setInRepositoryNo(queryStorehouseDTO.getStorehouseCode());
                     }
