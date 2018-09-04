@@ -67,51 +67,12 @@ public class StockManagementServiceImpl implements StockManagementService {
         if(findStockDetailDTO == null){
             // 物料
             if(Constants.PRODUCT_TYPE_EQUIPMENT.equals(productType)){
-                FindStockListDTO equpmentDetail = bizServiceEquipmentDao.findEqupmentDetail(productNo);
-                FindStockDetailDTO findStockDetailDTOs = new FindStockDetailDTO();
-                findStockDetailDTOs.setProductNo(equpmentDetail.getProductNo());
-                findStockDetailDTOs.setProductName(equpmentDetail.getProductName());
-                String unit = equpmentDetail.getUnit();
-                if(StringUtils.isNotBlank(unit)){
-                    findStockDetailDTOs.setUnit(ProductUnitEnum.valueOf(unit).getLabel());
-                }else {
-                    findStockDetailDTOs.setUnit(unit);
-                }
-                findStockDetailDTOs.setProductCategoryname(equpmentDetail.getProductCategoryname());
-                findStockDetailDTOs.setDamagedPiece(new FindProductDetailDTO());
-                findStockDetailDTOs.setNormalPiece(new FindProductDetailDTO());
-                findStockDetailDTOs.setProblemPiece(new FindProductDetailDTO());
-                return findStockDetailDTOs;
+                return findEqupmentStockDetail(productNo);
             }else {
-            // 零备件
-                StatusDtoThriftBean<EditBasicCarpartsProductDTO> carpartsProductdetail = carpartsProductService.findCarpartsProductdetail(productNo);
-                StatusDto<EditBasicCarpartsProductDTO> resolve = StatusDtoThriftUtils.resolve(carpartsProductdetail, EditBasicCarpartsProductDTO.class);
-                EditBasicCarpartsProductDTO data = resolve.getData();
-                if(data != null){
-                    FindStockDetailDTO findStockDetailDTOs = new FindStockDetailDTO();
-                    findStockDetailDTOs.setProductNo(data.getCarpartsCode());
-                    findStockDetailDTOs.setProductName(data.getCarpartsName());
-                    String carpartsUnit = data.getCarpartsUnit();
-                    if(StringUtils.isNotBlank(carpartsUnit)){
-                        findStockDetailDTOs.setUnit(ProductUnitEnum.valueOf(carpartsUnit).getLabel());
-                    }else {
-                        findStockDetailDTOs.setUnit(carpartsUnit);
-                    }
-                    StatusDtoThriftList<RelSupplierProductDTO> relSupplierProductDTO = carpartsCategoryService.queryCarpartsByProductCode(List.of(productNo));
-                    StatusDto<List<RelSupplierProductDTO>> resolve1 = StatusDtoThriftUtils.resolve(relSupplierProductDTO, RelSupplierProductDTO.class);
-                    List<RelSupplierProductDTO> data1 = resolve1.getData();
-                    RelSupplierProductDTO relSupplierProductDTO1 = data1.get(0);
-                    String categoryName = relSupplierProductDTO1.getCategoryName();
-                    categoryName.replace(Constants.COMMA, "-");
-                    findStockDetailDTOs.setProductCategoryname(categoryName);
-                    findStockDetailDTOs.setDamagedPiece(new FindProductDetailDTO());
-                    findStockDetailDTOs.setNormalPiece(new FindProductDetailDTO());
-                    findStockDetailDTOs.setProblemPiece(new FindProductDetailDTO());
-                    return findStockDetailDTOs;
-                }
+                // 零配件
+                return findFtingStockDetailDTO(productNo);
             }
         }
-
         // 根据类型查询机构的编号
         List<String> orgDTOList = getQueryOrgDTOByOrgType(type);
         // 查询正常件
@@ -127,6 +88,67 @@ public class StockManagementServiceImpl implements StockManagementService {
         findStockDetailDTO.setProblemPiece(findProblemStock);
         findStockDetailDTO.setDamagedPiece(findDamagedStock);
         return findStockDetailDTO;
+    }
+    /**
+     * 查询零配件的详情
+     * @param productNo 商品的编号
+     * @return FindStockDetailDTO
+     * @author zhangkangjian
+     * @date 2018-09-04 10:02:30
+     */
+    private FindStockDetailDTO findFtingStockDetailDTO(String productNo) {
+        // 零备件
+        StatusDtoThriftBean<EditBasicCarpartsProductDTO> carpartsProductdetail = carpartsProductService.findCarpartsProductdetail(productNo);
+        StatusDto<EditBasicCarpartsProductDTO> resolve = StatusDtoThriftUtils.resolve(carpartsProductdetail, EditBasicCarpartsProductDTO.class);
+        EditBasicCarpartsProductDTO data = resolve.getData();
+        if(data != null){
+            FindStockDetailDTO findStockDetailDTOs = new FindStockDetailDTO();
+            findStockDetailDTOs.setProductNo(data.getCarpartsCode());
+            findStockDetailDTOs.setProductName(data.getCarpartsName());
+            String carpartsUnit = data.getCarpartsUnit();
+            if(StringUtils.isNotBlank(carpartsUnit)){
+                findStockDetailDTOs.setUnit(ProductUnitEnum.valueOf(carpartsUnit).getLabel());
+            }else {
+                findStockDetailDTOs.setUnit(carpartsUnit);
+            }
+            StatusDtoThriftList<RelSupplierProductDTO> relSupplierProductDTO = carpartsCategoryService.queryCarpartsByProductCode(List.of(productNo));
+            StatusDto<List<RelSupplierProductDTO>> resolve1 = StatusDtoThriftUtils.resolve(relSupplierProductDTO, RelSupplierProductDTO.class);
+            List<RelSupplierProductDTO> data1 = resolve1.getData();
+            RelSupplierProductDTO relSupplierProductDTO1 = data1.get(0);
+            String categoryName = relSupplierProductDTO1.getCategoryName();
+            categoryName.replace(Constants.COMMA, "-");
+            findStockDetailDTOs.setProductCategoryname(categoryName);
+            findStockDetailDTOs.setDamagedPiece(new FindProductDetailDTO());
+            findStockDetailDTOs.setNormalPiece(new FindProductDetailDTO());
+            findStockDetailDTOs.setProblemPiece(new FindProductDetailDTO());
+            return findStockDetailDTOs;
+        }
+        return new FindStockDetailDTO();
+    }
+
+    /**
+     *  查询物料的详情
+     * @param productNo 商品的编号
+     * @return FindStockDetailDTO
+     * @author zhangkangjian
+     * @date 2018-09-04 10:03:11
+     */
+    private FindStockDetailDTO findEqupmentStockDetail(String productNo) {
+        FindStockListDTO equpmentDetail = bizServiceEquipmentDao.findEqupmentDetail(productNo);
+        FindStockDetailDTO findStockDetailDTOs = new FindStockDetailDTO();
+        findStockDetailDTOs.setProductNo(equpmentDetail.getProductNo());
+        findStockDetailDTOs.setProductName(equpmentDetail.getProductName());
+        String unit = equpmentDetail.getUnit();
+        if(StringUtils.isNotBlank(unit)){
+            findStockDetailDTOs.setUnit(ProductUnitEnum.valueOf(unit).getLabel());
+        }else {
+            findStockDetailDTOs.setUnit(unit);
+        }
+        findStockDetailDTOs.setProductCategoryname(equpmentDetail.getProductCategoryname());
+        findStockDetailDTOs.setDamagedPiece(new FindProductDetailDTO());
+        findStockDetailDTOs.setNormalPiece(new FindProductDetailDTO());
+        findStockDetailDTOs.setProblemPiece(new FindProductDetailDTO());
+        return findStockDetailDTOs;
     }
 
     /**

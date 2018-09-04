@@ -614,11 +614,12 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     /**
      * 查询商品所有的库存列表
      * @param productCodeList 商品的code
+     * @param userOrgCode
      * @return List<FindStockListDTO>
      * @author zhangkangjian
      * @date 2018-09-03 11:52:05
      */
-    public List<FindStockListDTO> findAllStockList(List<String> productCodeList) {
+    public List<FindStockListDTO> findAllStockList(List<String> productCodeList, String userOrgCode) {
         if(productCodeList == null || productCodeList.size() == 0){
             return Collections.emptyList();
         }
@@ -627,18 +628,24 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.product_no,a.product_name,a.product_categoryname,a.product_unit, ")
             .append(" SUM(IFNULL(a.valid_stock,0) + IFNULL(a.occupy_stock,0) + IFNULL(a.problem_stock,0)) AS 'total' ")
-            .append(" FROM biz_stock_detail a WHERE a.product_no IN (:productCodeList) GROUP BY a.product_no ");
+            .append(" FROM biz_stock_detail a WHERE a.product_no IN (:productCodeList) ");
+        if(StringUtils.isNotBlank(userOrgCode)){
+            map.put("userOrgCode", userOrgCode);
+            sql.append(" AND a.org_no = :userOrgCode ");
+        }
+        sql.append(" GROUP BY a.product_no ");
         return queryListBean(FindStockListDTO.class, sql.toString(), map);
     }
 
     /**
      * 查看所有物料调拨库存
      * @param findStockListDTO 查询条件
+     * @param userOrgCode
      * @return StatusDto<Page < FindStockListDTO>>
      * @author zhangkangjian
      * @date 2018-08-31 14:47:54
      */
-    public Page<FindStockListDTO> findAllEquipmentStockList(FindStockListDTO findStockListDTO) {
+    public Page<FindStockListDTO> findAllEquipmentStockList(FindStockListDTO findStockListDTO, String userOrgCode) {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.equip_code AS 'productNo', a.equip_name AS 'productName',a.equip_unit AS 'unit',c.type_name AS 'productCategoryname', ")
@@ -656,6 +663,10 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         if(StringUtils.isNotBlank(productNo)){
             map.put("productNo", productNo);
             sql.append(" AND a.equip_code = :productNo ");
+        }
+        if(StringUtils.isNotBlank(userOrgCode)){
+            map.put("userOrgCode", userOrgCode);
+            sql.append(" AND b.org_no = :userOrgCode ");
         }
         sql.append(" group by a.equip_code ");
         return queryPageForBean(FindStockListDTO.class, sql.toString(), map, findStockListDTO.getOffset(), findStockListDTO.getPageSize());

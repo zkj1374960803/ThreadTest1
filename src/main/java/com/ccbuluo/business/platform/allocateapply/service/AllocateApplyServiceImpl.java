@@ -713,7 +713,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         // 统计库存列表里所有的库存
         Optional.ofNullable(basicCarpartsProductDTOPage.getRows()).ifPresent(a ->{
             List<String> productCodeList = a.stream().map(BasicCarpartsProductDTO::getCarpartsCode).collect(Collectors.toList());
-            List<FindStockListDTO> resFindStockListDTO = bizAllocateApplyDao.findAllStockList(productCodeList);
+            String userOrgCode = getUserOrgCode();
+            List<FindStockListDTO> resFindStockListDTO = bizAllocateApplyDao.findAllStockList(productCodeList, userOrgCode);
             // 转map
             Map<String, FindStockListDTO> findStockListDTOMap = resFindStockListDTO.stream().collect(Collectors.toMap(FindStockListDTO::getProductNo, b -> b,(k1,k2)->k1));
             a.forEach(c ->{
@@ -748,7 +749,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public Page<FindStockListDTO> findAllEquipmentStockList(FindStockListDTO findStockListDTO) {
-        Page<FindStockListDTO> page = bizAllocateApplyDao.findAllEquipmentStockList(findStockListDTO);
+        String userOrgCode = getUserOrgCode();
+        Page<FindStockListDTO> page = bizAllocateApplyDao.findAllEquipmentStockList(findStockListDTO, userOrgCode);
         Optional.ofNullable(page.getRows()).ifPresent(a ->{
             a.stream().forEach(b -> {
                 String unit = b.getUnit();
