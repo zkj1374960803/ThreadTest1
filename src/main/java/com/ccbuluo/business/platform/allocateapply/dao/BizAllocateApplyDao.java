@@ -18,6 +18,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -608,5 +609,55 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         }
         sql.append(" GROUP BY a.product_no having SUM(a.problem_stock) > 0 ORDER BY a.create_time DESC");
         return queryListBean(StockBizStockDetailDTO.class, sql.toString(), param);
+    }
+
+    /**
+     * 查询商品所有的库存列表
+     * @param productCodeList 商品的code
+     * @return List<FindStockListDTO>
+     * @author zhangkangjian
+     * @date 2018-09-03 11:52:05
+     */
+    public List<FindStockListDTO> findAllStockList(List<String> productCodeList) {
+        if(productCodeList == null || productCodeList.size() == 0){
+            return Collections.emptyList();
+        }
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("productCodeList", productCodeList);
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT a.product_no,a.product_name,a.product_categoryname,a.product_unit, ")
+            .append(" SUM(IFNULL(a.valid_stock,0) + IFNULL(a.occupy_stock,0) + IFNULL(a.problem_stock,0)) AS 'total' ")
+            .append(" FROM biz_stock_detail a WHERE a.product_no IN (:productCodeList) GROUP BY a.product_no ");
+        return queryListBean(FindStockListDTO.class, sql.toString(), map);
+    }
+
+    /**
+     * 查看所有物料调拨库存
+     * @param findStockListDTO 查询条件
+     * @return StatusDto<Page < FindStockListDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-31 14:47:54
+     */
+    public Page<FindStockListDTO> findAllEquipmentStockList(FindStockListDTO findStockListDTO) {
+        HashMap<String, Object> map = Maps.newHashMap();
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT a.equip_code AS 'productNo', a.equip_name AS 'productName',a.equip_unit AS 'unit',c.type_name AS 'productCategoryname', ")
+            .append(" SUM(IFNULL(b.valid_stock,0) + IFNULL(b.occupy_stock,0) + IFNULL(b.problem_stock,0)) AS 'total' ")
+            .append(" FROM biz_service_equipment a ")
+            .append(" LEFT JOIN biz_stock_detail b ON a.equip_code = b.product_no ")
+            .append(" LEFT JOIN biz_service_equiptype c ON c.id = a.equiptype_id ")
+            .append(" WHERE 1 = 1 ");
+        Integer equiptypeId = findStockListDTO.getEquiptypeId();
+        if(equiptypeId != null && equiptypeId > 0){
+            map.put("equiptypeId", equiptypeId);
+            sql.append(" AND a.equiptype_id = :equiptypeId ");
+        }
+        String productNo = findStockListDTO.getProductNo();
+        if(StringUtils.isNotBlank(productNo)){
+            map.put("productNo", productNo);
+            sql.append(" AND a.equip_code = :productNo ");
+        }
+        sql.append(" group by a.equip_code ");
+        return queryPageForBean(FindStockListDTO.class, sql.toString(), map, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
     }
 }

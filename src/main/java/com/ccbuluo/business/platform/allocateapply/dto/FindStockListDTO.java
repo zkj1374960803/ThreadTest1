@@ -187,4 +187,15 @@ public class FindStockListDTO{
     public void setProductType(String productType) {
         this.productType = productType;
     }
+
+    public FindStockListDTO() {
+    }
+
+    public FindStockListDTO(String productNo, String productName, String productCategoryname, String unit, Integer total) {
+        this.productNo = productNo;
+        this.productName = productName;
+        this.productCategoryname = productCategoryname;
+        this.unit = unit;
+        this.total = total;
+    }
 }
