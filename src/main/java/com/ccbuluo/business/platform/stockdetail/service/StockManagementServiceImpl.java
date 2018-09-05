@@ -63,7 +63,9 @@ public class StockManagementServiceImpl implements StockManagementService {
      */
     @Override
     public FindStockDetailDTO findStockProductDetail(String productNo, String productType, String type) {
-        FindStockDetailDTO findStockDetailDTO = bizStockDetailDao.findStockDetail(productNo, productType);
+        // 根据类型查询机构的编号
+        List<String> orgDTOList = getQueryOrgDTOByOrgType(type);
+        FindStockDetailDTO findStockDetailDTO = bizStockDetailDao.findStockDetail(productNo, productType, orgDTOList);
         if(findStockDetailDTO == null){
             // 物料
             if(Constants.PRODUCT_TYPE_EQUIPMENT.equals(productType)){
@@ -73,8 +75,6 @@ public class StockManagementServiceImpl implements StockManagementService {
                 return findFtingStockDetailDTO(productNo);
             }
         }
-        // 根据类型查询机构的编号
-        List<String> orgDTOList = getQueryOrgDTOByOrgType(type);
         // 查询正常件
         FindProductDetailDTO findProductDetailDTO = bizStockDetailDao.findProductDetail(productNo, productType, orgDTOList);
         // 查询可调拨库存的数量

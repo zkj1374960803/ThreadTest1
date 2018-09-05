@@ -344,7 +344,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author zhangkangjian
      * @date 2018-08-20 11:15:52
      */
-    public FindStockDetailDTO findStockDetail(String productNo, String productType) {
+    public FindStockDetailDTO findStockDetail(String productNo, String productType, List<String> orgDTOList) {
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("productNo", productNo);
         map.put("productType", productType);
@@ -352,8 +352,12 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         sql.append(" SELECT a.id,a.product_no,SUM(ifnull(a.valid_stock,0)) AS 'totalStock', ")
             .append(" SUM(ifnull(a.valid_stock,0)) * a.cost_price AS 'totalAmount', ")
             .append(" a.product_name AS 'productName',a.product_categoryname AS 'productCategoryname',a.product_name AS 'unit' ")
-            .append(" FROM biz_stock_detail a WHERE a.product_no = :productNo AND a.product_type = :productType")
-            .append(" GROUP BY a.product_no ");
+            .append(" FROM biz_stock_detail a WHERE a.product_no = :productNo AND a.product_type = :productType");
+        if(orgDTOList != null && orgDTOList.size() > 0){
+            map.put("orgDTOList", orgDTOList);
+            sql.append(" AND a.org_no in (:orgDTOList) ");
+        }
+        sql.append(" GROUP BY a.product_no ");
         return findForBean(FindStockDetailDTO.class, sql.toString(), map);
     }
 
@@ -531,7 +535,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
             map.put("orgDTOList", orgCodes);
             sql.append(" AND a.org_no in (:orgDTOList) ");
         }
-        sql.append(" GROUP BY a.trade_no ");
+        sql.append(" GROUP BY a.trade_no having SUM(IFNULL(a.valid_stock,0) + IFNULL(a.occupy_stock,0) + IFNULL(a.problem_stock,0) + IFNULL(a.damaged_stock,0)) > 0");
         return queryPageForBean(FindBatchStockListDTO.class, sql.toString(), map, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
     }
 }
