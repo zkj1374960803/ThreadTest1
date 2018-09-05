@@ -4,6 +4,7 @@ import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.ProductUnitEnum;
 import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
+import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dao.FindBatchStockListDTO;
@@ -49,8 +50,9 @@ public class StockManagementServiceImpl implements StockManagementService {
     private CarpartsCategoryService carpartsCategoryService;
 
     @Resource
-    BizServiceEquipmentDao bizServiceEquipmentDao;
-
+    private BizServiceEquipmentDao bizServiceEquipmentDao;
+    @Resource(name = "allocateApplyServiceImpl")
+    private AllocateApplyService allocateApplyServiceImpl;
 
     /**
      * 查看库存详情
@@ -64,7 +66,7 @@ public class StockManagementServiceImpl implements StockManagementService {
     @Override
     public FindStockDetailDTO findStockProductDetail(String productNo, String productType, String type) {
         // 根据类型查询机构的编号
-        List<String> orgDTOList = getQueryOrgDTOByOrgType(type);
+        List<String> orgDTOList = allocateApplyServiceImpl.getOrgCodesByOrgType(type);
         FindStockDetailDTO findStockDetailDTO = bizStockDetailDao.findStockDetail(productNo, productType, orgDTOList);
         if(findStockDetailDTO == null){
             // 物料
