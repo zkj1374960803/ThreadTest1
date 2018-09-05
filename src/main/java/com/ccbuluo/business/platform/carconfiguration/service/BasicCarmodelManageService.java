@@ -104,4 +104,14 @@ public interface BasicCarmodelManageService {
      * 把车型id转换成车型名字
      */
     void buildCarModeName(List<BasicCarpartsProductDTO> list);
+
+    /**
+     * 根据车型id查询车型名字
+     * @param carmodelId 车型id
+     * @return 车型名字
+     * @author liuduo
+     * @date 2018-09-04 16:48:11
+     */
+    String getNameById(Long carmodelId);
+
 }

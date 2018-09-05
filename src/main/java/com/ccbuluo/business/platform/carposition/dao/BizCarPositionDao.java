@@ -1,8 +1,12 @@
 package com.ccbuluo.business.platform.carposition.dao;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizCarPosition;
+import com.ccbuluo.business.entity.BizServiceOrder;
 import com.ccbuluo.dao.BaseDao;
+import com.ccbuluo.db.Page;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -52,13 +56,11 @@ public class BizCarPositionDao extends BaseDao<BizCarPosition> {
      */
     public int updateBizCarPosition(BizCarPosition entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_car_posation SET car_vin = :carVin,")
+        sql.append("UPDATE biz_car_posation SET ")
             .append("detail_address = :detailAddress,province_code = :provinceCode,")
             .append("province_name = :provinceName,city_code = :cityCode,")
             .append("city_name = :cityName,area_code = :areaCode,area_name = :areaName,")
-            .append("creator = :creator,create_time = :createTime,operator = :operator,")
-            .append("operate_time = :operateTime,delete_flag = :deleteFlag,")
-            .append("remark = :remark WHERE id= :id");
+            .append("operator = :operator,operate_time = :operateTime WHERE car_vin= :carVin");
         return super.updateForBean(sql.toString(), entity);
     }
 
@@ -93,5 +95,23 @@ public class BizCarPositionDao extends BaseDao<BizCarPosition> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
         return super.updateForMap(sql.toString(), params);
+    }
+
+    /**
+     * 根据车辆vin码查询车辆停放位置
+     * @param carVin 车辆vin码
+     * @return 车辆停放位置
+     * @author liuduo
+     * @date 2018-09-05 10:18:06
+     */
+    public BizCarPosition getByCarVin(String carVin) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("carVin", carVin);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT bcp.id,bcp.car_vin,bcp.detail_address,bcp.province_name,")
+            .append(" bcp.city_name,bcp.area_name FROM biz_car_posation AS bcp WHERE bcp.car_vin= :carVin");
+
+        return findForBean(BizCarPosition.class, sql.toString(), params);
     }
 }

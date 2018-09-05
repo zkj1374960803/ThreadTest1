@@ -359,4 +359,17 @@ public class BasicCarmodelManageServiceImpl implements BasicCarmodelManageServic
             }
         }
     }
+
+
+    /**
+     * 根据车型id查询车型名字
+     * @param carmodelId 车型id
+     * @return 车型名字
+     * @author liuduo
+     * @date 2018-09-04 16:48:11
+     */
+    @Override
+    public String getNameById(Long carmodelId) {
+        return basicCarmodelManageDao.getNameById(carmodelId);
+    }
 }

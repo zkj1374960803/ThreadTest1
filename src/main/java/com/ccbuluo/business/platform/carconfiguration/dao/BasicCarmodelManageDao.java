@@ -315,4 +315,19 @@ public class BasicCarmodelManageDao extends BaseDao<CarmodelManage> {
         return super.queryListMap(sql.toString(), params);
     }
 
+    /**
+     * 根据车型id查询车型名字
+     * @param carmodelId 车型id
+     * @return 车型名字
+     * @author liuduo
+     * @date 2018-09-04 16:48:11
+     */
+    public String getNameById(Long carmodelId) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("carmodelId", carmodelId);
+
+        String sql = "SELECT carmodel_name FROM basic_carmodel_manage WHERE id = :carmodelId";
+
+        return findForObject(sql, params, String.class);
+    }
 }

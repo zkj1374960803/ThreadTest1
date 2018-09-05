@@ -128,4 +128,33 @@ public interface BasicCarcoreInfoService {
      * @date 2018-08-02 10:09:30
      */
     List<CusmanagerCarCountDTO> queryCarNumByCusmanagerUuid(List<String> cusmanagerUuids);
+
+    /**
+     * 根据车牌号查询客户经理
+     * @param carNo 车牌号
+     * @return 客户经理uuid
+     * @author liuduo
+     * @date 2018-09-04 11:25:42
+     */
+    String getUuidByPlateNum(String carNo);
+
+    /**
+     * 根据车牌号查询车辆信息
+     * @param carNo 车牌号
+     * @return 车辆信息
+     * @author liuduo
+     * @date 2018-09-04 16:18:43
+     */
+    StatusDto<CarcoreInfoDTO> getCarByCarNo(String carNo);
+
+    /**
+     * 查询车牌号
+     * @param orgCode 机构编号
+     * @param statusFlagZero 状态（0为门店，1为客户经理）
+     * @return 车牌号
+     * @author liuduo
+     * @date 2018-09-04 18:45:42
+     */
+    List<String> queryCarNoList(String orgCode, int statusFlagZero);
+
 }

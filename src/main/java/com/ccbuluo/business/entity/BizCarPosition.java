@@ -12,12 +12,7 @@ import java.util.Date;
  * @version V 1.0.0
  */
 @ApiModel(value = "车辆停放的位置实体", description = "车辆停放的位置")
-public class BizCarPosition {
-    /**
-     * 
-     */
-    @ApiModelProperty(name = "id", value = "")
-    private Long id;
+public class BizCarPosition extends AftersaleCommonEntity{
     /**
      * 车辆的vin码
      */
@@ -59,44 +54,10 @@ public class BizCarPosition {
     @ApiModelProperty(name = "areaName", value = "区的名字")
     private String areaName;
     /**
-     * 创建人
-     */
-    @ApiModelProperty(name = "creator", value = "创建人")
-    private String creator;
-    /**
-     * 创建时间
-     */
-    @ApiModelProperty(name = "createTime", value = "创建时间")
-    private Date createTime;
-    /**
-     * 更新人
-     */
-    @ApiModelProperty(name = "operator", value = "更新人")
-    private String operator;
-    /**
-     * 更新时间
-     */
-    @ApiModelProperty(name = "operateTime", value = "更新时间")
-    private Date operateTime;
-    /**
-     * 删除标识
-     */
-    @ApiModelProperty(name = "deleteFlag", value = "删除标识")
-    private Integer deleteFlag;
-    /**
      * 备注
      */
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
-
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return this.id;
-    }
 
     public void setCarVin(String carVin) {
         this.carVin = carVin;
@@ -160,46 +121,6 @@ public class BizCarPosition {
 
     public String getAreaName() {
         return this.areaName;
-    }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
-    public String getCreator() {
-        return this.creator;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getCreateTime() {
-        return this.createTime;
-    }
-
-    public void setOperator(String operator) {
-        this.operator = operator;
-    }
-
-    public String getOperator() {
-        return this.operator;
-    }
-
-    public void setOperateTime(Date operateTime) {
-        this.operateTime = operateTime;
-    }
-
-    public Date getOperateTime() {
-        return this.operateTime;
-    }
-
-    public void setDeleteFlag(Integer deleteFlag) {
-        this.deleteFlag = deleteFlag;
-    }
-
-    public Integer getDeleteFlag() {
-        return this.deleteFlag;
     }
 
     public void setRemark(String remark) {

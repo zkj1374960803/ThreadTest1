@@ -5,6 +5,7 @@ import com.ccbuluo.business.platform.carconfiguration.entity.CarcoreInfo;
 import com.ccbuluo.business.platform.carmanage.dto.*;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
+import com.ccbuluo.http.StatusDto;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -400,5 +401,70 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("carNumber", carNumber);
         return super.updateForMap(sql, map);
+    }
+
+    /**
+     * 根据车牌号查询客户经理
+     * @param carNo 车牌号
+     * @return 客户经理uuid
+     * @author liuduo
+     * @date 2018-09-04 11:25:42
+     */
+    public String getUuidByPlateNum(String carNo) {
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("carNo", carNo);
+
+        String sql = "SELECT cusmanager_uuid FROM basic_carcore_info WHERE plate_number = :carNo";
+
+        return findForObject(sql, map, String.class);
+    }
+
+    /**
+     * 根据车牌号查询车辆信息
+     * @param carNo 车牌号
+     * @return 车辆信息
+     * @author liuduo
+     * @date 2018-09-04 16:18:43
+     */
+    public CarcoreInfoDTO getCarByCarNo(String carNo) {
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("carNo", carNo);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT bci.vin_number,bci.engine_number,bci.beidou_number,bci.produce_time,bci.store_name,")
+            .append(" bci.carmodel_id,bcm.carbrand_name,bcmm.carseries_name FROM basic_carcore_info AS bci ")
+            .append("　LEFT JOIN basic_carbrand_manage AS bcm ON bcm.id = bci.carbrand_id")
+            .append(" LEFT JOIN basic_carseries_manage AS bcmm ON bcmm.id = bci.carseries_id")
+            .append("  WHERE plate_number = :carNo");
+
+        return findForBean(CarcoreInfoDTO.class, sql.toString(), map);
+    }
+
+    /**
+     * 查询车牌号
+     * @param orgCode 机构编号
+     * @param statusFlagZero 状态（0为门店，1为客户经理）
+     * @return 车牌号
+     * @author liuduo
+     * @date 2018-09-04 18:45:42
+     */
+    public List<String> queryCarNoList(String orgCode, int statusFlagZero) {
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("orgCode", orgCode);
+        map.put("statusFlagZero", statusFlagZero);
+        map.put("storeAssigned", Constants.YES);
+        map.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT plate_number FROM basic_carcore_info WHERE 1 = 1");
+        // 是门店
+        if (statusFlagZero == Constants.STATUS_FLAG_ZERO) {
+            sql.append(" AND store_code = orgCode AND store_assigned = :storeAssigned");
+        } else {
+            sql.append(" AND cusmanager_uuid = :orgCode");
+        }
+        sql.append(" AND delete_flag = :deleteFlag");
+
+        return querySingColum(String.class, sql.toString(), map);
     }
 }

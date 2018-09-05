@@ -5,6 +5,7 @@ import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarseriesManageDao;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarcoreInfo;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarseriesManage;
+import com.ccbuluo.business.platform.carconfiguration.service.BasicCarmodelManageService;
 import com.ccbuluo.business.platform.carconfiguration.utils.RegularCodeProductor;
 import com.ccbuluo.business.platform.carmanage.dao.BasicCarcoreInfoDao;
 import com.ccbuluo.business.platform.carmanage.dto.*;
@@ -55,6 +56,8 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
     private InnerUserInfoService innerUserInfoService;
     @Resource
     private GenerateProjectCodeService generateProjectCodeService;
+    @Autowired
+    private BasicCarmodelManageService basicCarmodelManageService;
 
     /**
      * 存储redis时当前模块的名字
@@ -387,6 +390,48 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
             return Collections.emptyList();
         }
         return basicCarcoreInfoDao.queryCarNumByCusmanagerUuid(cusmanagerUuids);
+    }
+
+    /**
+     * 根据车牌号查询客户经理
+     * @param carNo 车牌号
+     * @return 客户经理uuid
+     * @author liuduo
+     * @date 2018-09-04 11:25:42
+     */
+    @Override
+    public String getUuidByPlateNum(String carNo) {
+        return basicCarcoreInfoDao.getUuidByPlateNum(carNo);
+    }
+
+    /**
+     * 根据车牌号查询车辆信息
+     * @param carNo 车牌号
+     * @return 车辆信息
+     * @author liuduo
+     * @date 2018-09-04 16:18:43
+     */
+    @Override
+    public StatusDto<CarcoreInfoDTO> getCarByCarNo(String carNo) {
+        CarcoreInfoDTO carcoreInfoDTO = basicCarcoreInfoDao.getCarByCarNo(carNo);
+        // 查询车型名字
+        String name = basicCarmodelManageService.getNameById(carcoreInfoDTO.getCarmodelId());
+        carcoreInfoDTO.setCarmodelName(name);
+        return StatusDto.buildDataSuccessStatusDto(carcoreInfoDTO);
+    }
+
+
+    /**
+     * 查询车牌号
+     * @param orgCode 机构编号
+     * @param statusFlagZero 状态（0为门店，1为客户经理）
+     * @return 车牌号
+     * @author liuduo
+     * @date 2018-09-04 18:45:42
+     */
+    @Override
+    public List<String> queryCarNoList(String orgCode, int statusFlagZero) {
+        return basicCarcoreInfoDao.queryCarNoList(orgCode, statusFlagZero);
     }
 
 

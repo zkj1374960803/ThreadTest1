@@ -1,0 +1,185 @@
+package com.ccbuluo.business.platform.order.controller;
+
+import com.ccbuluo.business.entity.BizServiceOrder;
+import com.ccbuluo.business.platform.carconfiguration.entity.CarcoreInfo;
+import com.ccbuluo.business.platform.carmanage.dto.CarcoreInfoDTO;
+import com.ccbuluo.business.platform.carmanage.service.BasicCarcoreInfoService;
+import com.ccbuluo.business.platform.order.dto.DetailServiceOrderDTO;
+import com.ccbuluo.business.platform.order.dto.EditServiceOrderDTO;
+import com.ccbuluo.business.platform.order.dto.SaveServiceOrderDTO;
+import com.ccbuluo.business.platform.order.service.ServiceOrderService;
+import com.ccbuluo.core.controller.BaseController;
+import com.ccbuluo.db.Page;
+import com.ccbuluo.http.StatusDto;
+import io.swagger.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+ * 描述 订单管理，客户经理
+ * @author liuduo
+ * @date 2018-09-03 16:22:02
+ * @version V1.0.0
+ */
+@Api(tags = "订单管理（客户经理）")
+@RestController
+@RequestMapping("/platform/custmanagerserviceorder")
+public class ServiceOrderController extends BaseController {
+
+    @Autowired
+    private ServiceOrderService serviceOrderService;
+    @Autowired
+    private BasicCarcoreInfoService basicCarcoreInfoService;
+
+
+    /**
+     * 保存订单
+     * @param saveServiceOrderDTO 订单要保存的信息
+     * @return 保存是否成功
+     * @author liuduo
+     * @date 2018-09-04 14:06:40
+     */
+    @ApiOperation(value = "订单新增", notes = "【刘铎】")
+    @PostMapping("/save")
+    public StatusDto saveOrder(@ApiParam(name = "订单信息", value = "传入json格式", required = true)@RequestBody SaveServiceOrderDTO saveServiceOrderDTO) {
+        return serviceOrderService.saveOrder(saveServiceOrderDTO);
+    }
+
+
+
+    /**
+     * 编辑订单
+     * @param editServiceOrderDTO 订单要保存的信息
+     * @return 编辑是否成功
+     * @author liuduo
+     * @date 2018-09-04 14:06:40
+     */
+    @ApiOperation(value = "订单编辑", notes = "【刘铎】")
+    @PostMapping("/edit")
+    public StatusDto editOrder(@ApiParam(name = "订单信息", value = "传入json格式", required = true)@RequestBody EditServiceOrderDTO editServiceOrderDTO) {
+        return serviceOrderService.editOrder(editServiceOrderDTO);
+    }
+
+
+    /**
+     * 查询订单列表
+     * @param orderStatus 订单状态
+     * @param serviceType 服务类型
+     * @param keyword 关键字
+     * @param offset 起始数
+     * @param pagesize 每页数
+     * @return 订单列表
+     * @author liuduo
+     * @date 2018-09-04 15:06:55
+     */
+    @ApiOperation(value = "订单列表", notes = "【刘铎】")
+    @ApiImplicitParams({@ApiImplicitParam(name = "orderStatus", value = "订单状态",  required = true, paramType = "query"),
+        @ApiImplicitParam(name = "serviceType", value = "服务类型",  required = false, paramType = "query"),
+        @ApiImplicitParam(name = "keyword", value = "关键字",  required = false, paramType = "query"),
+        @ApiImplicitParam(name = "offset", value = "起始数",  required = true, paramType = "query", dataType = "int"),
+        @ApiImplicitParam(name = "pagesize", value = "每页数",  required = true, paramType = "query", dataType = "int")})
+    @GetMapping("/list")
+    public StatusDto<Page<BizServiceOrder>> queryList(@RequestParam String orderStatus,
+                                                      @RequestParam(required = false) String serviceType,
+                                                      @RequestParam(required = false) String keyword,
+                                                      @RequestParam(defaultValue = "0") Integer offset,
+                                                      @RequestParam(defaultValue = "10") Integer pagesize) {
+        return serviceOrderService.queryList(orderStatus, serviceType, keyword, offset, pagesize);
+    }
+
+
+    /**
+     * 修改订单状态
+     * @param serviceOrderno 订单编号
+     * @param orderStatus 订单状态
+     * @return 修改是否成功
+     * @author liuduo
+     * @date 2018-09-04 15:37:36
+     */
+    @ApiOperation(value = "更改订单状态", notes = "【刘铎】")
+    @ApiImplicitParams({@ApiImplicitParam(name = "serviceOrderno", value = "订单编号",  required = true, paramType = "query"),
+        @ApiImplicitParam(name = "orderStatus", value = "订单类型",  required = false, paramType = "query")})
+    @PostMapping("/editstatus")
+    public StatusDto editStatus(@RequestParam String serviceOrderno,@RequestParam String orderStatus) {
+        return serviceOrderService.editStatus(serviceOrderno, orderStatus);
+    }
+
+
+    /**
+     * 查询车牌号下拉框
+     * @return 所有车牌号
+     * @author liuduo
+     * @date 2018-09-04 17:34:08
+     */
+    @ApiOperation(value = "订单新增和编辑用的车牌号下拉框", notes = "【刘铎】")
+    @GetMapping("/querycarnolist")
+    public StatusDto<List<String>> queryCarNoList() {
+        return serviceOrderService.queryCarNoList();
+    }
+
+    /**
+     * 根据车牌号查询车辆信息
+     * @param carNo 车牌号
+     * @return 车辆信息
+     * @author liuduo
+     * @date 2018-09-04 16:18:43
+     */
+    @ApiOperation(value = "根据车牌号查询车辆信息", notes = "【刘铎】")
+    @ApiImplicitParam(name = "carNo", value = "车牌号",  required = false, paramType = "query")
+    @GetMapping("/getcarbycarno")
+    public StatusDto<CarcoreInfoDTO> getCarByCarNo(@RequestParam String carNo) {
+        return basicCarcoreInfoService.getCarByCarNo(carNo);
+    }
+
+
+    /**
+     * 查询服务中心和客户经理（分配用）
+     * @param province 省
+     * @param city 市
+     * @param area 区
+     * @param orgType 机构类型
+     * @param keyword 关键字
+     * @param offset 起始数
+     * @param pagesize 每页数
+     * @return 可以分配的客户经理和服务中心
+     * @author liuduo
+     * @date 2018-09-05 10:40:35
+     */
+    @ApiOperation(value = "查询服务中心和客户经理（分配用）", notes = "【刘铎】")
+    @ApiImplicitParams({@ApiImplicitParam(name = "province", value = "省",  required = false, paramType = "query"),
+        @ApiImplicitParam(name = "city", value = "市",  required = false, paramType = "query"),
+        @ApiImplicitParam(name = "area", value = "区",  required = false, paramType = "query"),
+        @ApiImplicitParam(name = "orgType", value = "机构类型",  required = true, paramType = "query"),
+        @ApiImplicitParam(name = "keyword", value = "关键字",  required = false, paramType = "query"),
+        @ApiImplicitParam(name = "offset", value = "起始数",  required = true, paramType = "query", dataType = "int"),
+        @ApiImplicitParam(name = "pagesize", value = "每页数",  required = true, paramType = "query", dataType = "int")})
+    @GetMapping("/servicecenterlist")
+    public StatusDto<Page<ServiceCenterDTO>> serviceCenterList(@RequestParam(required = false) String province,
+                                       @RequestParam(required = false) String city,
+                                       @RequestParam(required = false) String area,
+                                       @RequestParam(required = false) String orgType,
+                                       @RequestParam(required = false) String keyword,
+                                       @RequestParam(defaultValue = "0") Integer offset,
+                                       @RequestParam(defaultValue = "10") Integer pagesize) {
+        return serviceOrderService.serviceCenterList(province, city, area, orgType, keyword, offset, pagesize);
+    }
+
+
+    /**
+     * 根据订单编号查询订单详情
+     * @param serviceOrderno 订单编号
+     * @return 订单详情
+     * @author liuduo
+     * @date 2018-09-05 09:54:40
+     */
+    @ApiOperation(value = "订单详情", notes = "【刘铎】")
+    @ApiImplicitParam(name = "serviceOrderno", value = "订单编号",  required = true, paramType = "query")
+    @GetMapping("/getdetailbyorderno")
+    public StatusDto<DetailServiceOrderDTO> getDetailByOrderNo(@RequestParam String serviceOrderno) {
+        return serviceOrderService.getDetailByOrderNo(serviceOrderno);
+    }
+
+
+}

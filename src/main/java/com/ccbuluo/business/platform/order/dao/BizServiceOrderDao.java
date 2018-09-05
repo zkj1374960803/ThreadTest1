@@ -1,12 +1,19 @@
 package com.ccbuluo.business.platform.order.dao;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceOrder;
+import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.dao.BaseDao;
+import com.ccbuluo.db.Page;
+import com.ccbuluo.http.StatusDto;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -24,6 +31,8 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
     public NamedParameterJdbcTemplate getNamedParameterJdbcTemplate() {
     return namedParameterJdbcTemplate;
     }
+    @Autowired
+    private UserHolder userHolder;
 
     /**
      * 保存 售后系统的服务单实体
@@ -57,19 +66,13 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
      */
     public int updateBizServiceOrder(BizServiceOrder entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_service_order SET service_orderno = :serviceOrderno,")
+        sql.append("UPDATE biz_service_order SET ")
             .append("car_no = :carNo,car_vin = :carVin,service_type = :serviceType,")
-            .append("report_orgno = :reportOrgno,report_orgtype = :reportOrgtype,")
-            .append("report_time = :reportTime,customer_name = :customerName,")
-            .append("customer_phone = :customerPhone,")
+            .append("customer_name = :customerName,customer_phone = :customerPhone,")
             .append("reserve_contacter = :reserveContacter,reserve_phone = :reservePhone,")
-            .append("order_status = :orderStatus,dispatch_times = :dispatchTimes,")
             .append("cur_processor = :curProcessor,processor_orgtype = :processorOrgtype,")
-            .append("service_time = :serviceTime,order_cost = :orderCost,payed = :payed,")
-            .append("problem_content = :problemContent,creator = :creator,")
-            .append("create_time = :createTime,operator = :operator,")
-            .append("operate_time = :operateTime,delete_flag = :deleteFlag,")
-            .append("remark = :remark WHERE id= :id");
+            .append("service_time = :serviceTime,problem_content = :problemContent,")
+            .append("operator = :operator,operate_time = :operateTime WHERE service_orderno= :serviceOrderno");
         return super.updateForBean(sql.toString(), entity);
     }
 
@@ -107,5 +110,98 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
         return super.updateForMap(sql.toString(), params);
+    }
+
+    /**
+     * 根据订单编号查询订单详情
+     * @param orderNo 订单编号
+     * @return 订单详情
+     * @author liuduo
+     * @date 2018-09-04 14:10:01
+     */
+    public BizServiceOrder getByOrderNo(String orderNo) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("orderNo", orderNo);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT bso.id,bso.service_orderno,bso.car_no,bso.car_vin,")
+            .append("bso.service_type,bso.report_orgno,bso.report_orgtype,bso.report_time,")
+            .append("bso.customer_name,bso.customer_phone,bso.reserve_contacter,")
+            .append("bso.reserve_phone,bso.order_status,bso.dispatch_times,")
+            .append("bso.cur_processor,bso.processor_orgtype,bso.service_time,")
+            .append("bso.order_cost,bso.payed,bso.problem_content,")
+            .append("FROM biz_service_order AS bso WHERE bso.service_orderno= :orderNo");
+        return super.findForBean(BizServiceOrder.class, sql.toString(), params);
+    }
+
+
+    /**
+     * 查询订单列表
+     * @param orderStatus 订单状态
+     * @param serviceType 服务类型
+     * @param keyword 关键字
+     * @param offset 起始数
+     * @param pagesize 每页数
+     * @return 订单列表
+     * @author liuduo
+     * @date 2018-09-04 15:06:55
+     */
+    public Page<BizServiceOrder> queryList(String orderStatus, String serviceType, String keyword, Integer offset, Integer pagesize) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("orderStatus", orderStatus);
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,service_orderno,order_status,car_vin,customer_name,customer_phone,service_type,report_time")
+            .append(" FROM biz_service_order WHERE order_status = :orderStatus  ");
+        if (StringUtils.isNotBlank(serviceType)) {
+            params.put("serviceType", serviceType);
+            sql.append(" AND service_type = :serviceType ");
+        }
+        if (StringUtils.isNotBlank(keyword)) {
+            params.put("keyword", keyword);
+            sql.append(" AND (service_orderno LIKE CONCAT('%',:keyword,'%') or car_vin LIKE CONCAT('%',:keyword,'%') OR ")
+                .append(" customer_name LIKE CONCAT('%',:keyword,'%') OR customer_phone LIKE CONCAT('%',：keyword,'%'))");
+        }
+        sql.append(" AND delete_flag = :deleteFlag ORDER BY operate_time DESC");
+
+        return queryPageForBean(BizServiceOrder.class, sql.toString(), params, offset, pagesize);
+    }
+
+    /**
+     * 修改订单状态
+     * @param serviceOrderno 订单编号
+     * @param orderStatus 订单状态
+     * @return 修改是否成功
+     * @author liuduo
+     * @date 2018-09-04 15:37:36
+     */
+    public void editStatus(String serviceOrderno, String orderStatus) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("serviceOrderno", serviceOrderno);
+        params.put("orderStatus", orderStatus);
+        params.put("operator", userHolder.getLoggedUserId());
+        params.put("operateTime", new Date());
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_service_order SET order_status = :orderStatus,operator = :operator,operate_time = :operateTime WHERE service_orderno= :serviceOrderno");
+
+        updateForMap(sql.toString(), params);
+    }
+
+    /**
+     * 根据订单编号查询车牌号
+     * @param serviceOrderno 订单编号
+     * @return 车牌号
+     * @author liuduo
+     * @date 2018-09-05 09:58:31
+     */
+    public String getCarNoByServiceOrderno(String serviceOrderno) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("serviceOrderno", serviceOrderno);
+
+        String sql = "SELECT car_no FROM biz_service_order WHERE service_orderno = :serviceOrderno";
+
+        return findForObject(sql, params, String.class);
     }
 }

@@ -1,20 +1,24 @@
 package com.ccbuluo.business.platform.order.dto;
 
 import com.ccbuluo.business.entity.AftersaleCommonEntity;
-import com.ccbuluo.business.entity.IdEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
 
 /**
- * 描述 新增服务订单DTO
+ * 描述 编辑服务订单DTO
  * @author baoweiding
  * @date 2018-09-03 18:47:55
  * @version V1.0.0
  */
-@ApiModel(value = "SaveServiceOrderDTO", description = "新增服务订单DTO")
-public class SaveServiceOrderDTO extends AftersaleCommonEntity {
+@ApiModel(value = "EditServiceOrderDTO", description = "编辑服务订单DTO")
+public class EditServiceOrderDTO extends AftersaleCommonEntity {
+    /**
+     * 订单编号
+     */
+    @ApiModelProperty(name = "serviceOrderno", value = "订单编号")
+    private String serviceOrderno;
     /**
      * 车牌号
      */
@@ -105,6 +109,14 @@ public class SaveServiceOrderDTO extends AftersaleCommonEntity {
      */
     @ApiModelProperty(name = "detailAddress", value = "具体地址")
     private String detailAddress;
+
+    public String getServiceOrderno() {
+        return serviceOrderno;
+    }
+
+    public void setServiceOrderno(String serviceOrderno) {
+        this.serviceOrderno = serviceOrderno;
+    }
 
     public String getCarNo() {
         return carNo;
