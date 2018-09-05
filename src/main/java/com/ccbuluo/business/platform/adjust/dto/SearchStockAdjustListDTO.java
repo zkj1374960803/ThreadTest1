@@ -53,6 +53,11 @@ public class SearchStockAdjustListDTO {
      */
     @ApiModelProperty(name = "adjustUserid", value = "盘库人uuid")
     private String adjustUserid;
+    /**
+     * 盘库来源类型
+     */
+    @ApiModelProperty(name = "adjustSourceType", value = "盘库来源类型")
+    private String adjustSourceType;
 
 
     public Long getId() {
@@ -117,5 +122,13 @@ public class SearchStockAdjustListDTO {
 
     public void setAdjustUserid(String adjustUserid) {
         this.adjustUserid = adjustUserid;
+    }
+
+    public String getAdjustSourceType() {
+        return adjustSourceType;
+    }
+
+    public void setAdjustSourceType(String adjustSourceType) {
+        this.adjustSourceType = adjustSourceType;
     }
 }

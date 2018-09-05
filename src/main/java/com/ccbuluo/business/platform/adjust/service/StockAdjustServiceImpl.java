@@ -271,7 +271,7 @@ public class StockAdjustServiceImpl implements StockAdjustService{
      * @date 2018-08-15 11:03:46
      */
     private Page<SearchStockAdjustListDTO> editAdjustOrder(Integer adjustResult, String adjustSource, Integer offset, Integer pagesize, String keyWord, String orgCode, String productType) {
-        Page<SearchStockAdjustListDTO> adjustListDTOPage = bizStockAdjustDao.queryAdjustStockList(adjustResult, adjustSource, keyWord, offset, pagesize, orgCode, productType);
+        Page<SearchStockAdjustListDTO> adjustListDTOPage = bizStockAdjustDao.queryAdjustStockList(adjustResult, keyWord, offset, pagesize, orgCode, productType);
         if (null != adjustListDTOPage && null != adjustListDTOPage.getRows()) {
             List<SearchStockAdjustListDTO> rows = adjustListDTOPage.getRows();
             List<String> orgCodes = rows.stream().map(SearchStockAdjustListDTO::getAdjustOrgno).distinct().collect(Collectors.toList());
@@ -287,9 +287,28 @@ public class StockAdjustServiceImpl implements StockAdjustService{
             rows.forEach(item -> {
                 item.setAdjustDocName(stringBasicUserOrganizationMap.get(item.getAdjustOrgno()).getOrgName());
                 item.setAdjustName(userMap.get(item.getAdjustUserid()));
+                item.setAdjustSourceType(stringBasicUserOrganizationMap.get(item.getAdjustOrgno()).getOrgType());
             });
+            if (StringUtils.isNotBlank(adjustSource)) {
+                List<SearchStockAdjustListDTO> adjustList = Lists.newArrayList();
+                Integer total = 0;
+                for (SearchStockAdjustListDTO row : rows) {
+                    if (adjustSource.equals(row.getAdjustSourceType())) {
+                        adjustList.add(row);
+                        total ++;
+                    }
+                }
+                adjustListDTOPage.setRows(adjustList);
+                adjustListDTOPage.setTotal(total);
+                int totalPage = total / pagesize;
+                if (total % pagesize != 0) {
+                    ++totalPage;
+                }
+                adjustListDTOPage.setTotalPage((long)totalPage);
+            }
+            return adjustListDTOPage;
         }
-        return adjustListDTOPage;
+        return new Page<>();
     }
 
     /**
