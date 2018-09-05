@@ -114,6 +114,7 @@ public class StockManagementController extends BaseController {
         @ApiImplicitParam(name = "productNo", value = "商品的编号", required = true, paramType = "query"),
         @ApiImplicitParam(name = "productType", value = "商品类型(注：FITTINGS零配件，EQUIPMENT物料)", required = true, paramType = "query"),
         @ApiImplicitParam(name = "type", value = "(注：PLATFORM集团，SERVICECENTER服务中心，CUSTMANAGER客户经理)", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "orgNo", value = "服务中心code或者库客户经理code", required = true, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query")
     })
