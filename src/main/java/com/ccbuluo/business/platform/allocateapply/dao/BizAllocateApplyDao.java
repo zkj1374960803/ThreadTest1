@@ -626,7 +626,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         Map<String, Object> map = Maps.newHashMap();
         map.put("productCodeList", productCodeList);
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.product_no,a.product_name,a.product_categoryname,a.product_unit, ")
+        sql.append(" SELECT a.product_no,a.product_name,a.product_categoryname,a.product_unit as 'unit', ")
             .append(" SUM(IFNULL(a.valid_stock,0) + IFNULL(a.occupy_stock,0) + IFNULL(a.problem_stock,0)) AS 'total' ")
             .append(" FROM biz_stock_detail a WHERE a.product_no IN (:productCodeList) ");
         if(StringUtils.isNotBlank(userOrgCode)){
