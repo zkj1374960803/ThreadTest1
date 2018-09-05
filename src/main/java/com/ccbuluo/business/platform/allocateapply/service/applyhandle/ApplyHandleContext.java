@@ -29,20 +29,15 @@ public class ApplyHandleContext {
     @Resource
     private BizAllocateApplyDao bizAllocateApplyDao;
     @Resource
-    private PlatformProxyApplyHandleStrategy platformAllocateApplyHandleService;
-    @Resource
     private PurchaseApplyHandleStrategy purchaseApplyHandleService;
     @Resource
     private SameLevelApplyHandleStrategy serviceAllocateApplyHandleService;
-    @Resource
-    private PlatformDirectApplyHandleStrategy directAllocateApplyHandleService;
     @Resource
     private RefundApplyHandleStrategy refundApplyHandleStrategy;
     @Resource
     private BarterApplyHandleStrategy barterApplyHandleStrategy;
     @Resource
     private BizAllocateTradeorderDao bizAllocateTradeorderDao;
-
 
     /**
      * 申请处理
@@ -65,14 +60,8 @@ public class ApplyHandleContext {
                 case PURCHASE:    // 采购
                     handle = purchaseApplyHandleService;
                     break;
-                case PLATFORMALLOCATE:    // 平台调拨
-                    handle = platformAllocateApplyHandleService;
-                    break;
-                case SAMELEVEL:    // 平级调拨（服务间的调拨）
+                case SAMELEVEL:    // 调拨
                     handle = serviceAllocateApplyHandleService;
-                    break;
-                case DIRECTALLOCATE:    // 直调
-                    handle = directAllocateApplyHandleService;
                     break;
                 case BARTER:    // 商品换货
                     handle = barterApplyHandleStrategy;
@@ -108,14 +97,8 @@ public class ApplyHandleContext {
             case PURCHASE:    // 采购
                 handle = purchaseApplyHandleService;
                 break;
-            case PLATFORMALLOCATE:    // 平台调拨
-                handle = platformAllocateApplyHandleService;
-                break;
-            case SAMELEVEL:    // 平级调拨（服务间的调拨没有回调）
+            case SAMELEVEL:    // 调拨
                 handle = serviceAllocateApplyHandleService;
-                break;
-            case DIRECTALLOCATE:    // 直调
-                handle = directAllocateApplyHandleService;
                 break;
             case BARTER:    // 商品换货
                 handle = barterApplyHandleStrategy;
@@ -212,14 +195,8 @@ public class ApplyHandleContext {
                 case PURCHASE:    // 采购
                     handle = purchaseApplyHandleService;
                     break;
-                case PLATFORMALLOCATE:    // 平台调拨
-                    handle = platformAllocateApplyHandleService;
-                    break;
                 case SAMELEVEL:    // 平级调拨（服务间的调拨）
                     handle = serviceAllocateApplyHandleService;
-                    break;
-                case DIRECTALLOCATE:    // 直调
-                    handle = directAllocateApplyHandleService;
                     break;
                 case BARTER:    // 商品换货
                     handle = barterApplyHandleStrategy;

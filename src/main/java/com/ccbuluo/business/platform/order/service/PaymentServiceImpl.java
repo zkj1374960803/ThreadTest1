@@ -43,12 +43,13 @@ public class PaymentServiceImpl implements PaymentService {
     /**
      *  支付完成调用接口
      * @param applyNo 申请单号
+     * @param totalPrice 支付金额
      * @return StatusDto
      * @author weijb
      * @date 2018-08-22 17:02:58
      */
     @Override
-    public StatusDto paymentCompletion(String applyNo){
+    public StatusDto paymentCompletion(String applyNo, BigDecimal totalPrice){
         try {
             // 根据申请单获取申请单详情
             BizAllocateApply ba = bizAllocateApplyDao.getByNo(applyNo);
@@ -64,8 +65,18 @@ public class PaymentServiceImpl implements PaymentService {
             if(ba.getApplyType().equals(BizAllocateApply.AllocateApplyTypeEnum.PURCHASE.name())){
                 status = BizAllocateApply.ApplyStatusEnum.INSTORE.name();// 等待平台入库
             }
-            //更新申请单状态
-            bizAllocateApplyDao.updateApplyOrderStatus(applyNo, status);
+            // TODO 调用服务端支付接口
+            String payer = ba.getInstockOrgno();// 买入方(支付方)
+            String receive = ba.getOutstockOrgno();//卖出方(接收方)
+            // 如果支付成功
+            if(1 == 1){
+                //更新申请单状态
+                bizAllocateApplyDao.updateApplyOrderStatus(applyNo, status);
+                // 更新订单状态
+//            bizAllocateTradeorderDao
+            }else{
+                return StatusDto.buildFailureStatusDto("支付失败！");
+            }
             return StatusDto.buildSuccessStatusDto("支付成功！");
 
         } catch (Exception e) {

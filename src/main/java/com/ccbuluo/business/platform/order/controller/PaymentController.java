@@ -5,13 +5,12 @@ import com.ccbuluo.business.platform.order.service.PaymentService;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 
 /**
  *  支付功能
@@ -35,9 +34,11 @@ public class PaymentController {
      */
     @ApiOperation(value = "查询退换货申请单详情", notes = "【魏俊标】")
     @GetMapping("/paymentcompletion/{applyNo}")
-    @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
-    public StatusDto<FindAllocateApplyDTO> paymentCompletion(@PathVariable String applyNo){
-        return paymentService.paymentCompletion(applyNo);
+    @ApiImplicitParams({@ApiImplicitParam(name = "applyNo", value = "申请单号", required = false, paramType = "query"),
+            @ApiImplicitParam(name = "totalPrice", value = "支付金额", required = false, paramType = "query")})
+    public StatusDto<FindAllocateApplyDTO> paymentCompletion(@RequestParam(required = false) String applyNo,
+                                                             @RequestParam(required = false) BigDecimal totalPrice){
+        return paymentService.paymentCompletion(applyNo,totalPrice);
     }
 
     /**
