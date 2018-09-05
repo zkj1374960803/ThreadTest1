@@ -344,7 +344,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author zhangkangjian
      * @date 2018-08-20 11:15:52
      */
-    public FindStockDetailDTO findStockDetail(String productNo, String productType, List<String> orgDTOList) {
+    public FindStockDetailDTO findStockDetail(String productNo, String productType, List<String> orgDTOList, String code) {
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("productNo", productNo);
         map.put("productType", productType);
@@ -356,6 +356,10 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         if(orgDTOList != null && orgDTOList.size() > 0){
             map.put("orgDTOList", orgDTOList);
             sql.append(" AND a.org_no in (:orgDTOList) ");
+        }
+        if(StringUtils.isNotBlank(code)){
+            map.put("code", code);
+            sql.append(" AND a.org_no = :code ");
         }
         sql.append(" GROUP BY a.product_no ");
         return findForBean(FindStockDetailDTO.class, sql.toString(), map);
@@ -369,7 +373,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author zhangkangjian
      * @date 2018-08-20 11:34:48
      */
-    public FindProductDetailDTO findProductDetail(String productNo, String productType, List<String> orgDTOList) {
+    public FindProductDetailDTO findProductDetail(String productNo, String productType, List<String> orgDTOList, String code) {
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("productNo", productNo);
         map.put("productType", productType);
@@ -381,6 +385,10 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         if(orgDTOList != null && orgDTOList.size() > 0){
             map.put("orgDTOList", orgDTOList);
             sql.append(" AND a.org_no in (:orgDTOList) ");
+        }
+        if(StringUtils.isNotBlank(code)){
+            map.put("code", code);
+            sql.append(" AND a.org_no = :code ");
         }
         sql.append(" GROUP BY a.product_no ");
         FindProductDetailDTO forBean = findForBean(FindProductDetailDTO.class, sql.toString(), map);
@@ -398,7 +406,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author zhangkangjian
      * @date 2018-08-20 11:34:48
      */
-    public Long findTransferInventory(String productNo, String productType, List<String> orgDTOList, String sellerOrgno) {
+    public Long findTransferInventory(String productNo, String productType, List<String> orgDTOList, String sellerOrgno, String code) {
         if(StringUtils.isAnyBlank(productNo, productType, sellerOrgno)){
             return NumberUtils.LONG_ZERO;
         }
@@ -412,6 +420,10 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         if(orgDTOList != null && orgDTOList.size() > 0){
             map.put("orgDTOList", orgDTOList);
             sql.append(" AND a.org_no in (:orgDTOList) ");
+        }
+        if(StringUtils.isNotBlank(code)){
+            map.put("code", code);
+            sql.append(" AND a.org_no = :code ");
         }
         sql.append(" GROUP BY a.product_no ");
         try {
@@ -430,7 +442,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author zhangkangjian
      * @date 2018-08-20 11:34:48
      */
-    public FindProductDetailDTO findProblemStock(String productNo, String productType, List<String> orgDTOList) {
+    public FindProductDetailDTO findProblemStock(String productNo, String productType, List<String> orgDTOList, String code) {
         if(StringUtils.isAnyBlank(productNo, productType)){
             throw  new CommonException(Constants.ERROR_CODE, "必填参数为null");
         }
@@ -444,6 +456,10 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         if(orgDTOList != null && orgDTOList.size() > 0){
             map.put("orgDTOList", orgDTOList);
             sql.append(" AND a.org_no in (:orgDTOList) ");
+        }
+        if(StringUtils.isNotBlank(code)){
+            map.put("code", code);
+            sql.append(" AND a.org_no = :code ");
         }
         sql.append(" GROUP BY a.product_no ");
         FindProductDetailDTO forBean = findForBean(FindProductDetailDTO.class, sql.toString(), map);
@@ -460,7 +476,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author zhangkangjian
      * @date 2018-08-20 11:34:48
      */
-    public FindProductDetailDTO findDamagedStock(String productNo, String productType, List<String> orgDTOList) {
+    public FindProductDetailDTO findDamagedStock(String productNo, String productType, List<String> orgDTOList, String code) {
         if(StringUtils.isAnyBlank(productNo, productType)){
             throw new CommonException(Constants.ERROR_CODE, "必填参数为null");
         }
@@ -474,6 +490,10 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         if(orgDTOList != null && orgDTOList.size() > 0){
             map.put("orgDTOList", orgDTOList);
             sql.append(" AND a.org_no in (:orgDTOList) ");
+        }
+        if(StringUtils.isNotBlank(code)){
+            map.put("code", code);
+            sql.append(" AND a.org_no = :code ");
         }
         sql.append(" GROUP BY a.product_no ");
         FindProductDetailDTO forBean = findForBean(FindProductDetailDTO.class, sql.toString(), map);
