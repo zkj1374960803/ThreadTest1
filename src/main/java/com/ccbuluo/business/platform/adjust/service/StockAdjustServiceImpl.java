@@ -293,11 +293,12 @@ public class StockAdjustServiceImpl implements StockAdjustService{
                 List<SearchStockAdjustListDTO> adjustList = Lists.newArrayList();
                 Integer total = 0;
                 for (SearchStockAdjustListDTO row : rows) {
-                    adjustSource.equals(row.getAdjustSourceType());
-                    adjustList.add(row);
-                    total ++;
+                    if (adjustSource.equals(row.getAdjustSourceType())) {
+                        adjustList.add(row);
+                        total ++;
+                    }
                 }
-                adjustListDTOPage.setRows(rows);
+                adjustListDTOPage.setRows(adjustList);
                 adjustListDTOPage.setTotal(total);
                 int totalPage = total / pagesize;
                 if (total % pagesize != 0) {

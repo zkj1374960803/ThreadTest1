@@ -105,7 +105,6 @@ public class BizStockAdjustDao extends BaseDao<BizStockAdjust> {
     /**
      * 查询盘库单列表
      * @param adjustResult 盘库结果
-     * @param adjustSource 盘库单来源
      * @param keyWord 关键字（盘库单号/服务中心/客户经理）
      * @param offset 起始数
      * @param pagesize 每页数
