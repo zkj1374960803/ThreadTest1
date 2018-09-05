@@ -163,8 +163,8 @@ public class StockManagementServiceImpl implements StockManagementService {
      */
     @Override
     public Page<FindBatchStockListDTO> findBatchStockList(FindStockListDTO findStockListDTO) {
-        List<String> orgCodes = getQueryOrgDTOByOrgType(findStockListDTO.getType());
-        Page<FindBatchStockListDTO> page = bizStockDetailDao.findBatchStockList(findStockListDTO, orgCodes);
+        List<String> orgDTOList = allocateApplyServiceImpl.getOrgCodesByOrgType(findStockListDTO.getType());
+        Page<FindBatchStockListDTO> page = bizStockDetailDao.findBatchStockList(findStockListDTO, orgDTOList);
         return page;
     }
 
