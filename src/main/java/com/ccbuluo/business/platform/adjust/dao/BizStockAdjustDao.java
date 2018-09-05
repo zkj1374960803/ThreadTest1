@@ -113,7 +113,7 @@ public class BizStockAdjustDao extends BaseDao<BizStockAdjust> {
      * @author liuduo
      * @date 2018-08-15 11:03:46
      */
-    public Page<SearchStockAdjustListDTO> queryAdjustStockList(Integer adjustResult, String adjustSource, String keyWord, Integer offset, Integer pagesize, String orgCode, String productType) {
+    public Page<SearchStockAdjustListDTO> queryAdjustStockList(Integer adjustResult, String keyWord, Integer offset, Integer pagesize, String orgCode, String productType) {
         Map<String, Object> params = Maps.newHashMap();
 
 
@@ -127,10 +127,6 @@ public class BizStockAdjustDao extends BaseDao<BizStockAdjust> {
             } else {
                 sql.append(" AND bsa.adjust_result = 0");
             }
-        }
-        if (StringUtils.isNotBlank(adjustSource)) {
-            params.put("adjustSource", adjustSource);
-            sql.append(" AND bsa.adjust_orgno = :adjustSource");
         }
         if (StringUtils.isNotBlank(keyWord)) {
             params.put("keyWord", keyWord);
