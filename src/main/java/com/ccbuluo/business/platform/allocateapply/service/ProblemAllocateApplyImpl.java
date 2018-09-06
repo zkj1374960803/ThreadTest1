@@ -271,6 +271,9 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
      * @date 2018-08-21 16:46:25
      */
     private String getUserNameByUuid(String uuid){
+        if(StringUtils.isBlank(uuid)){
+            return "";
+        }
         StatusDtoThriftBean<UserInfoDTO> userDetail = innerUserInfoService.findUserDetail(uuid);
         StatusDto<UserInfoDTO> resolve = StatusDtoThriftUtils.resolve(userDetail, UserInfoDTO.class);
         String operatorName = "";
