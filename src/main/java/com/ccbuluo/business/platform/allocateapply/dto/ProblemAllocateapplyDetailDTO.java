@@ -74,6 +74,12 @@ public class ProblemAllocateapplyDetailDTO {
     @ApiModelProperty(name = "instockNum", value = "入库数量", hidden = true)
     private Long instockNum;
 
+    /**
+     * 付款总额
+     */
+    @ApiModelProperty(name = "totalPrice", value = "付款总额", hidden = true)
+    private BigDecimal totalPrice;
+
     public Long getId() {
         return id;
     }
@@ -160,5 +166,13 @@ public class ProblemAllocateapplyDetailDTO {
 
     public void setInstockNum(Long instockNum) {
         this.instockNum = instockNum;
+    }
+
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
     }
 }

@@ -4,6 +4,7 @@ import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.ProductUnitEnum;
 import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
+import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dao.FindBatchStockListDTO;
@@ -49,8 +50,9 @@ public class StockManagementServiceImpl implements StockManagementService {
     private CarpartsCategoryService carpartsCategoryService;
 
     @Resource
-    BizServiceEquipmentDao bizServiceEquipmentDao;
-
+    private BizServiceEquipmentDao bizServiceEquipmentDao;
+    @Resource(name = "allocateApplyServiceImpl")
+    private AllocateApplyService allocateApplyServiceImpl;
 
     /**
      * 查看库存详情
@@ -62,8 +64,10 @@ public class StockManagementServiceImpl implements StockManagementService {
      * @date 2018-08-10 15:45:56
      */
     @Override
-    public FindStockDetailDTO findStockProductDetail(String productNo, String productType, String type) {
-        FindStockDetailDTO findStockDetailDTO = bizStockDetailDao.findStockDetail(productNo, productType);
+    public FindStockDetailDTO findStockProductDetail(String productNo, String productType, String type, String code) {
+        // 根据类型查询机构的编号
+        List<String> orgDTOList = allocateApplyServiceImpl.getOrgCodesByOrgType(type);
+        FindStockDetailDTO findStockDetailDTO = bizStockDetailDao.findStockDetail(productNo, productType, orgDTOList, code);
         if(findStockDetailDTO == null){
             // 物料
             if(Constants.PRODUCT_TYPE_EQUIPMENT.equals(productType)){
@@ -73,17 +77,15 @@ public class StockManagementServiceImpl implements StockManagementService {
                 return findFtingStockDetailDTO(productNo);
             }
         }
-        // 根据类型查询机构的编号
-        List<String> orgDTOList = getQueryOrgDTOByOrgType(type);
         // 查询正常件
-        FindProductDetailDTO findProductDetailDTO = bizStockDetailDao.findProductDetail(productNo, productType, orgDTOList);
+        FindProductDetailDTO findProductDetailDTO = bizStockDetailDao.findProductDetail(productNo, productType, orgDTOList, code);
         // 查询可调拨库存的数量
-        Long transferInventoryNum = bizStockDetailDao.findTransferInventory(productNo, productType, orgDTOList, BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+        Long transferInventoryNum = bizStockDetailDao.findTransferInventory(productNo, productType, orgDTOList, BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM, code);
         findProductDetailDTO.setTransferInventory(transferInventoryNum);
         // 查询问题件
-        FindProductDetailDTO findProblemStock = bizStockDetailDao.findProblemStock(productNo, productType, orgDTOList);
+        FindProductDetailDTO findProblemStock = bizStockDetailDao.findProblemStock(productNo, productType, orgDTOList, code);
         // 查询损坏件
-        FindProductDetailDTO findDamagedStock = bizStockDetailDao.findDamagedStock(productNo, productType, orgDTOList);
+        FindProductDetailDTO findDamagedStock = bizStockDetailDao.findDamagedStock(productNo, productType, orgDTOList, code);
         findStockDetailDTO.setNormalPiece(findProductDetailDTO);
         findStockDetailDTO.setProblemPiece(findProblemStock);
         findStockDetailDTO.setDamagedPiece(findDamagedStock);
@@ -161,8 +163,8 @@ public class StockManagementServiceImpl implements StockManagementService {
      */
     @Override
     public Page<FindBatchStockListDTO> findBatchStockList(FindStockListDTO findStockListDTO) {
-        List<String> orgCodes = getQueryOrgDTOByOrgType(findStockListDTO.getType());
-        Page<FindBatchStockListDTO> page = bizStockDetailDao.findBatchStockList(findStockListDTO, orgCodes);
+        List<String> orgDTOList = allocateApplyServiceImpl.getOrgCodesByOrgType(findStockListDTO.getType());
+        Page<FindBatchStockListDTO> page = bizStockDetailDao.findBatchStockList(findStockListDTO, orgDTOList);
         return page;
     }
 
