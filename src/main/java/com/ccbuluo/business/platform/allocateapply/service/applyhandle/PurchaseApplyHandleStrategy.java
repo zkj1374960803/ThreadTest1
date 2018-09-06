@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,9 +39,11 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
     @Resource
     private UserHolder userHolder;
     @Resource
-    BizAllocateApplyDao bizAllocateApplyDao;
+    private BizAllocateApplyDao bizAllocateApplyDao;
     @Resource
     private GenerateDocCodeService generateDocCodeService;
+    @Resource
+    private BizAllocateTradeorderDao bizAllocateTradeorderDao;
 
     Logger logger = LoggerFactory.getLogger(getClass());
     /**
@@ -59,10 +62,13 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
             if(null == details || details.size() == 0){
                 throw new CommonException("0", "申请单为空！");
             }
-            // TODO 去掉订单
+            // 构建生成订单（采购）
+            List<BizAllocateTradeorder> list = buildOrderEntityList(details);
             // 构建平台入库计划并保存
             List<BizInstockplanDetail> instockplans = buildOutAndInstockplanDetail(details);
             bizInstockplanDetailDao.batchInsertInstockplanDetail(instockplans);
+            // 保存生成订单
+            bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
         } catch (Exception e) {
             logger.error("提交失败！", e);
             throw e;
@@ -160,6 +166,27 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
         bt.setSellerOrgno(detail.getOutstockOrgno());//卖方机构
         bt.setTradeType(detail.getApplyType());//交易类型
         return bt;
+    }
+
+    /**
+      * 构建订单list用于批量保存
+      * @param details 申请单详情
+      * @author weijb
+      * @date 2018-08-11 13:35:41
+      */
+    private List<BizAllocateTradeorder> buildOrderEntityList(List<AllocateapplyDetailBO> details){
+        List<BizAllocateTradeorder> list = new ArrayList<BizAllocateTradeorder>();
+        // 构建生成订单(平台到供应商)
+        BizAllocateTradeorder platformToSeller = buildOrderEntity(details);
+        platformToSeller.setPurchaserOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+        // 采购的时候卖方为供应商（供应商不填为空）
+        platformToSeller.setSellerOrgno("");
+        // 计算订单总价
+        BigDecimal total = getSellTotal(details);
+        platformToSeller.setTotalPrice(total);
+        // 平台采购
+        list.add(platformToSeller);
+        return list;
     }
 
     }
