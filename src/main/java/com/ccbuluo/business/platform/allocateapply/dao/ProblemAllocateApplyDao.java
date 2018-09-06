@@ -122,9 +122,9 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         param.put("orgCode", orgCode);
         StringBuilder sql = new StringBuilder();
 
-        sql.append("SELECT t1.id,t1.apply_no,t1.apply_type,t1.apply_status ,t2.checked_time as outstock_time,t3.checked_time as instock_time,t2.outstock_operator,t3.instock_operator,t2.transportorder_no")
-                .append(" FROM biz_allocate_apply t1 LEFT JOIN biz_outstock_order t2 on t1.apply_no=t2.trade_docno ")
-                .append(" LEFT JOIN biz_instock_order t3 on t1.apply_no=t3.trade_docno ")
+        sql.append("SELECT t1.id,t1.apply_no,t1.apply_type,t1.apply_status ,t3.checked_time as instock_time,t3.instock_operator,bat.total_price")
+                .append(" FROM biz_allocate_apply t1 LEFT JOIN biz_instock_order t3 on t1.apply_no=t3.trade_docno ")
+                .append(" LEFT JOIN  biz_allocate_tradeorder bat on t1.apply_no=bat.apply_no")
                 .append(" WHERE t1.delete_flag = :deleteFlag and t1.applyorg_no = :orgCode and t2.outstock_orgno= :orgCode and t3.instock_orgno = :orgCode ");
         return findForBean(ProblemAllocateapplyDetailDTO.class, sql.toString(), param);
     }
@@ -143,8 +143,9 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         param.put("applyNo", applyNo);
         StringBuilder sql = new StringBuilder();
 
-        sql.append("SELECT t1.id,t1.apply_no,t1.apply_type,t1.apply_status ,t3.instock_time,t3.instock_operator")
+        sql.append("SELECT t1.id,t1.apply_no,t1.apply_type,t1.apply_status ,t3.instock_time,t3.instock_operator,bat.total_price")
                 .append(" FROM biz_allocate_apply t1 LEFT JOIN biz_instock_order t3 on t1.apply_no=t3.trade_docno ")
+                .append(" LEFT JOIN biz_allocate_tradeorder bat on t1.apply_no=bat.apply_no")
                 .append(" WHERE t1.delete_flag = :deleteFlag and t1.process_orgno = :orgCode and t3.instock_orgno = :orgCode ")
                 .append(" AND t1.apply_no = :applyNo");
         return findForBean(ProblemAllocateapplyDetailDTO.class, sql.toString(), param);
