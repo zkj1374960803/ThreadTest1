@@ -4,6 +4,7 @@ import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.InstockTypeEnum;
 import com.ccbuluo.business.constants.OutstockTypeEnum;
+import com.ccbuluo.business.constants.StockPlanStatusEnum;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
@@ -14,6 +15,7 @@ import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
+import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.http.StatusDto;
 import org.slf4j.Logger;
@@ -49,6 +51,8 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
     private BizAllocateTradeorderDao bizAllocateTradeorderDao;
     @Resource
     private BizServiceStorehouseDao bizServiceStorehouseDao;
+    @Resource
+    private UserHolder userHolder;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -243,5 +247,24 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
                 }
             }
         }
+    }
+
+        /**
+     * 构建订单list用于批量保存
+     * @param details 申请单详情
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    private List<BizAllocateTradeorder> buildOrderEntityList(List<AllocateapplyDetailBO> details){
+        List<BizAllocateTradeorder> list = new ArrayList<BizAllocateTradeorder>();
+        // 构建生成订单（机构1对平台）
+        BizAllocateTradeorder purchaserToPlatform = buildOrderEntity(details);// 买方到平台
+        purchaserToPlatform.setSellerOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 从买方到平台"平台code"
+        // 计算订单总价
+        BigDecimal total = getSellTotal(details);
+        purchaserToPlatform.setTotalPrice(total);
+        list.add(purchaserToPlatform);
+
+        return list;
     }
 }
