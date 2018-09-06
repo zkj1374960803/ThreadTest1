@@ -891,6 +891,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
                     validStock = stock.getValidStock();
                 }
                 if(null == validStock || validStock.intValue() == 0){
+                    stock.setOccupyStock(0L);
                     continue;
                 }
                 // 如果本批次的库存正好等于要调拨的数量
