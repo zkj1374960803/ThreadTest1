@@ -22,12 +22,11 @@ public interface PaymentService {
     /**
      *  支付完成调用接口
      * @param applyNo 申请单号
-     * @param totalPrice 支付金额
      * @return StatusDto
      * @author weijb
      * @date 2018-08-22 17:02:58
      */
-    StatusDto paymentCompletion(String applyNo, BigDecimal totalPrice);
+    StatusDto paymentCompletion(String applyNo);
     /**
      *  根据申请单获取总价格
      * @param applyNo 申请单号

@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 public class PaymentController {
     @Resource
     PaymentService paymentService;
+
     /**
      *  支付完成调用接口
      * @param applyNo 申请单号
@@ -34,11 +35,9 @@ public class PaymentController {
      */
     @ApiOperation(value = "查询退换货申请单详情", notes = "【魏俊标】")
     @GetMapping("/paymentcompletion/{applyNo}")
-    @ApiImplicitParams({@ApiImplicitParam(name = "applyNo", value = "申请单号", required = false, paramType = "query"),
-            @ApiImplicitParam(name = "totalPrice", value = "支付金额", required = false, paramType = "query")})
-    public StatusDto<FindAllocateApplyDTO> paymentCompletion(@RequestParam(required = false) String applyNo,
-                                                             @RequestParam(required = false) BigDecimal totalPrice){
-        return paymentService.paymentCompletion(applyNo,totalPrice);
+    @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
+    public StatusDto<FindAllocateApplyDTO> paymentCompletion(@PathVariable String applyNo){
+        return paymentService.paymentCompletion(applyNo);
     }
 
     /**
