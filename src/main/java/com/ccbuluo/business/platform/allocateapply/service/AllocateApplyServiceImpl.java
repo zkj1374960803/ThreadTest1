@@ -318,24 +318,22 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                 page = bizAllocateApplyDao.findApplyList(productType,orgCodes, processType, applyStatus, applyNo, offset, pageSize, userOrgCode);
             }
         }
-        List<QueryAllocateApplyListDTO> rows = page.getRows();
-        if(rows != null){
-            List<String> outstockOrgno = rows.stream().map(QueryAllocateApplyListDTO::getOutstockOrgno).collect(Collectors.toList());
+        // 查询机构的名称
+        Optional.ofNullable(page.getRows()).ifPresent(a ->{
+            List<String> outstockOrgno = a.stream().map(QueryAllocateApplyListDTO::getOutstockOrgno).collect(Collectors.toList());
             Map<String, BasicUserOrganization> organizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(outstockOrgno);
-            rows.stream().forEach(a ->{
-                BasicUserOrganization organization = organizationMap.get(a.getOutstockOrgno());
+            a.stream().forEach(b ->{
+                BasicUserOrganization organization = organizationMap.get(b.getOutstockOrgno());
                 if(organization != null){
-                    a.setOutstockOrgname(organization.getOrgName());
+                    b.setOutstockOrgname(organization.getOrgName());
                 }
             });
-
-        }
+        });
         return page;
     }
 
     /**
      * 查询处理申请列表
-     *
      * @param orgType
      * @param applyStatus
      * @param applyNo
@@ -367,15 +365,17 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                 page = bizAllocateApplyDao.findProcessApplyList(orgCodeStatus, productType,orgCodesByOrgType, applyStatus, applyNo, offset, pageSize, userOrgCode);
             }
         }
-        List<QueryAllocateApplyListDTO> rows = page.getRows();
-        List<String> orgCode = rows.stream().map(QueryAllocateApplyListDTO::getApplyorgNo).collect(Collectors.toList());
-        Map<String, BasicUserOrganization> basicUserOrganizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(orgCode);
-        rows.stream().forEach(a ->{
-            BasicUserOrganization basicUserOrganization = basicUserOrganizationMap.get(a.getApplyorgNo());
-            if(basicUserOrganization != null){
-                a.setOrgName(basicUserOrganization.getOrgName());
-                a.setOrgType(basicUserOrganization.getOrgType());
-            }
+        // 查询机构的名称和类型
+        Optional.ofNullable(page.getRows()).ifPresent(a ->{
+            List<String> orgCode = a.stream().map(QueryAllocateApplyListDTO::getApplyorgNo).collect(Collectors.toList());
+            Map<String, BasicUserOrganization> basicUserOrganizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(orgCode);
+            a.stream().forEach(b ->{
+                BasicUserOrganization basicUserOrganization = basicUserOrganizationMap.get(b.getApplyorgNo());
+                if(basicUserOrganization != null){
+                    b.setOrgName(basicUserOrganization.getOrgName());
+                    b.setOrgType(basicUserOrganization.getOrgType());
+                }
+            });
         });
         return page;
     }
@@ -436,8 +436,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         }
 
         // 查询版本号（数据库乐观锁）
-        String applyNo = processApplyDTO.getApplyNo();
-        Long versionNo = bizAllocateApplyDao.findVersionNo(applyNo);
+        Long versionNo = bizAllocateApplyDao.findVersionNo(processApplyDTO.getApplyNo());
         processApplyDTO.setVersionNo(versionNo);
         // 处理通过，更新申请单状态
         processApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
@@ -486,8 +485,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     @Override
     public Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO) {
         // 根据分类查询供应商的code
-        List<String> productCode = null;
-        List<BasicCarpartsProductDTO> carpartsProductDTOList;
+        List<BasicCarpartsProductDTO> carpartsProductDTOList = Lists.newArrayList();
         if(Constants.PRODUCT_TYPE_EQUIPMENT.equals(findStockListDTO.getProductType())){
             // 查询类型下所有的code
             carpartsProductDTOList  = bizAllocateApplyDao.findEquipmentCode(findStockListDTO.getEquiptypeId());
@@ -495,8 +493,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             // 查询分类下所有商品的code
             carpartsProductDTOList = carpartsProductService.queryCarpartsProductListByCategoryCode(findStockListDTO.getCategoryCode());
         }
-
-        productCode = carpartsProductDTOList.stream().map(BasicCarpartsProductDTO::getCarpartsCode).collect(Collectors.toList());
+        List<String> productCode = carpartsProductDTOList.stream().map(BasicCarpartsProductDTO::getCarpartsCode).collect(Collectors.toList());
         if(productCode == null || productCode.size() == 0){
             return new Page<FindStockListDTO>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
         }
@@ -677,8 +674,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     @Override
     public Page<FindStockListDTO> findStockListByOrgCode(FindStockListDTO findStockListDTO) {
         // 根据分类查询供应商的code
-        List<String> productCode = null;
-        List<BasicCarpartsProductDTO> carpartsProductDTOList;
+        List<BasicCarpartsProductDTO> carpartsProductDTOList = Lists.newArrayList();
         if(Constants.PRODUCT_TYPE_EQUIPMENT.equals(findStockListDTO.getProductType())){
             // 查询类型下所有的code
             carpartsProductDTOList  = bizAllocateApplyDao.findEquipmentCode(findStockListDTO.getEquiptypeId());
@@ -686,8 +682,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             // 查询分类下所有商品的code
             carpartsProductDTOList = carpartsProductService.queryCarpartsProductListByCategoryCode(findStockListDTO.getCategoryCode());
         }
-
-        productCode = carpartsProductDTOList.stream().map(BasicCarpartsProductDTO::getCarpartsCode).collect(Collectors.toList());
+        List<String> productCode = carpartsProductDTOList.stream().map(BasicCarpartsProductDTO::getCarpartsCode).collect(Collectors.toList());
         if(productCode == null || productCode.size() == 0){
             return new Page<FindStockListDTO>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
         }
@@ -695,7 +690,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, List.of(userOrgCode));
         return page;
     }
-
 
     /**
      * 查看所有零配件调拨库存
@@ -713,7 +707,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         // 统计库存列表里所有的库存
         Optional.ofNullable(basicCarpartsProductDTOPage.getRows()).ifPresent(a ->{
             List<String> productCodeList = a.stream().map(BasicCarpartsProductDTO::getCarpartsCode).collect(Collectors.toList());
-            List<FindStockListDTO> resFindStockListDTO = bizAllocateApplyDao.findAllStockList(productCodeList);
+            String userOrgCode = getUserOrgCode();
+            List<FindStockListDTO> resFindStockListDTO = bizAllocateApplyDao.findAllStockList(productCodeList, userOrgCode);
             // 转map
             Map<String, FindStockListDTO> findStockListDTOMap = resFindStockListDTO.stream().collect(Collectors.toMap(FindStockListDTO::getProductNo, b -> b,(k1,k2)->k1));
             a.forEach(c ->{
@@ -748,7 +743,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public Page<FindStockListDTO> findAllEquipmentStockList(FindStockListDTO findStockListDTO) {
-        Page<FindStockListDTO> page = bizAllocateApplyDao.findAllEquipmentStockList(findStockListDTO);
+        String userOrgCode = getUserOrgCode();
+        Page<FindStockListDTO> page = bizAllocateApplyDao.findAllEquipmentStockList(findStockListDTO, userOrgCode);
         Optional.ofNullable(page.getRows()).ifPresent(a ->{
             a.stream().forEach(b -> {
                 String unit = b.getUnit();
@@ -756,8 +752,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                     b.setUnit(ProductUnitEnum.valueOf(unit).getLabel());
                 }
             });
-            }
-        );
+        });
         return page;
     }
 

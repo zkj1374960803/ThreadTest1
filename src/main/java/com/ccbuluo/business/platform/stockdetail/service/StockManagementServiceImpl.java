@@ -2,7 +2,9 @@ package com.ccbuluo.business.platform.stockdetail.service;
 
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.constants.ProductUnitEnum;
 import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
+import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dao.FindBatchStockListDTO;
 import com.ccbuluo.business.platform.stockdetail.dao.FindProductDetailDTO;
@@ -10,14 +12,24 @@ import com.ccbuluo.business.platform.stockdetail.dao.FindStockDetailDTO;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftBean;
 import com.ccbuluo.http.StatusDtoThriftList;
 import com.ccbuluo.http.StatusDtoThriftUtils;
+import com.ccbuluo.merchandiseintf.carparts.category.dto.RelSupplierProductDTO;
+import com.ccbuluo.merchandiseintf.carparts.category.service.CarpartsCategoryService;
+import com.ccbuluo.merchandiseintf.carparts.parameter.service.CarpartsParameterService;
+import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
+import com.ccbuluo.merchandiseintf.carparts.parts.dto.EditBasicCarpartsProductDTO;
+import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -30,6 +42,16 @@ public class StockManagementServiceImpl implements StockManagementService {
     BizStockDetailDao bizStockDetailDao;
     @ThriftRPCClient("UserCoreSerService")
     private BasicUserOrganizationService basicUserOrganizationService;
+    @ThriftRPCClient("BasicMerchandiseSer")
+    private CarpartsProductService carpartsProductService;
+
+    @ThriftRPCClient("BasicMerchandiseSer")
+    private CarpartsCategoryService carpartsCategoryService;
+
+    @Resource
+    BizServiceEquipmentDao bizServiceEquipmentDao;
+
+
     /**
      * 查看库存详情
      *
@@ -42,6 +64,15 @@ public class StockManagementServiceImpl implements StockManagementService {
     @Override
     public FindStockDetailDTO findStockProductDetail(String productNo, String productType, String type) {
         FindStockDetailDTO findStockDetailDTO = bizStockDetailDao.findStockDetail(productNo, productType);
+        if(findStockDetailDTO == null){
+            // 物料
+            if(Constants.PRODUCT_TYPE_EQUIPMENT.equals(productType)){
+                return findEqupmentStockDetail(productNo);
+            }else {
+                // 零配件
+                return findFtingStockDetailDTO(productNo);
+            }
+        }
         // 根据类型查询机构的编号
         List<String> orgDTOList = getQueryOrgDTOByOrgType(type);
         // 查询正常件
@@ -57,6 +88,67 @@ public class StockManagementServiceImpl implements StockManagementService {
         findStockDetailDTO.setProblemPiece(findProblemStock);
         findStockDetailDTO.setDamagedPiece(findDamagedStock);
         return findStockDetailDTO;
+    }
+    /**
+     * 查询零配件的详情
+     * @param productNo 商品的编号
+     * @return FindStockDetailDTO
+     * @author zhangkangjian
+     * @date 2018-09-04 10:02:30
+     */
+    private FindStockDetailDTO findFtingStockDetailDTO(String productNo) {
+        // 零备件
+        StatusDtoThriftBean<EditBasicCarpartsProductDTO> carpartsProductdetail = carpartsProductService.findCarpartsProductdetail(productNo);
+        StatusDto<EditBasicCarpartsProductDTO> resolve = StatusDtoThriftUtils.resolve(carpartsProductdetail, EditBasicCarpartsProductDTO.class);
+        EditBasicCarpartsProductDTO data = resolve.getData();
+        if(data != null){
+            FindStockDetailDTO findStockDetailDTOs = new FindStockDetailDTO();
+            findStockDetailDTOs.setProductNo(data.getCarpartsCode());
+            findStockDetailDTOs.setProductName(data.getCarpartsName());
+            String carpartsUnit = data.getCarpartsUnit();
+            if(StringUtils.isNotBlank(carpartsUnit)){
+                findStockDetailDTOs.setUnit(ProductUnitEnum.valueOf(carpartsUnit).getLabel());
+            }else {
+                findStockDetailDTOs.setUnit(carpartsUnit);
+            }
+            StatusDtoThriftList<RelSupplierProductDTO> relSupplierProductDTO = carpartsCategoryService.queryCarpartsByProductCode(List.of(productNo));
+            StatusDto<List<RelSupplierProductDTO>> resolve1 = StatusDtoThriftUtils.resolve(relSupplierProductDTO, RelSupplierProductDTO.class);
+            List<RelSupplierProductDTO> data1 = resolve1.getData();
+            RelSupplierProductDTO relSupplierProductDTO1 = data1.get(0);
+            String categoryName = relSupplierProductDTO1.getCategoryName();
+            categoryName.replace(Constants.COMMA, "-");
+            findStockDetailDTOs.setProductCategoryname(categoryName);
+            findStockDetailDTOs.setDamagedPiece(new FindProductDetailDTO());
+            findStockDetailDTOs.setNormalPiece(new FindProductDetailDTO());
+            findStockDetailDTOs.setProblemPiece(new FindProductDetailDTO());
+            return findStockDetailDTOs;
+        }
+        return new FindStockDetailDTO();
+    }
+
+    /**
+     *  查询物料的详情
+     * @param productNo 商品的编号
+     * @return FindStockDetailDTO
+     * @author zhangkangjian
+     * @date 2018-09-04 10:03:11
+     */
+    private FindStockDetailDTO findEqupmentStockDetail(String productNo) {
+        FindStockListDTO equpmentDetail = bizServiceEquipmentDao.findEqupmentDetail(productNo);
+        FindStockDetailDTO findStockDetailDTOs = new FindStockDetailDTO();
+        findStockDetailDTOs.setProductNo(equpmentDetail.getProductNo());
+        findStockDetailDTOs.setProductName(equpmentDetail.getProductName());
+        String unit = equpmentDetail.getUnit();
+        if(StringUtils.isNotBlank(unit)){
+            findStockDetailDTOs.setUnit(ProductUnitEnum.valueOf(unit).getLabel());
+        }else {
+            findStockDetailDTOs.setUnit(unit);
+        }
+        findStockDetailDTOs.setProductCategoryname(equpmentDetail.getProductCategoryname());
+        findStockDetailDTOs.setDamagedPiece(new FindProductDetailDTO());
+        findStockDetailDTOs.setNormalPiece(new FindProductDetailDTO());
+        findStockDetailDTOs.setProblemPiece(new FindProductDetailDTO());
+        return findStockDetailDTOs;
     }
 
     /**

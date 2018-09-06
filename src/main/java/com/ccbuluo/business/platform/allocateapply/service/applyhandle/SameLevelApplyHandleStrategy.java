@@ -269,6 +269,11 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
      * @date 2018-08-21 18:05:46
      */
     private void distinstSupplier(List<BizInstockplanDetail> inList,List<BizOutstockplanDetail> outList,List<AllocateapplyDetailBO> details){
+        Optional<BizOutstockplanDetail> outFilter = outList.stream() .filter(outstockplan -> null == outstockplan.getSupplierNo()) .findFirst();
+        if (outFilter.isPresent()) {
+            outFilter.get().setSupplierNo("");
+        }
+
         List<BizOutstockplanDetail> list = new ArrayList<BizOutstockplanDetail>();
         Map<String, List<BizOutstockplanDetail>> collect = outList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getProductNo));
         for (Map.Entry<String, List<BizOutstockplanDetail>> entryP : collect.entrySet()) {
