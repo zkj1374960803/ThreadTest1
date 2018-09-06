@@ -11,6 +11,7 @@ import com.ccbuluo.business.platform.order.service.ServiceOrderService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.usercoreintf.dto.ServiceCenterDTO;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -100,7 +101,7 @@ public class ServiceOrderController extends BaseController {
      */
     @ApiOperation(value = "更改订单状态", notes = "【刘铎】")
     @ApiImplicitParams({@ApiImplicitParam(name = "serviceOrderno", value = "订单编号",  required = true, paramType = "query"),
-        @ApiImplicitParam(name = "orderStatus", value = "订单类型",  required = false, paramType = "query")})
+        @ApiImplicitParam(name = "orderStatus", value = "订单类型",  required = true, paramType = "query")})
     @PostMapping("/editstatus")
     public StatusDto editStatus(@RequestParam String serviceOrderno,@RequestParam String orderStatus) {
         return serviceOrderService.editStatus(serviceOrderno, orderStatus);
@@ -157,12 +158,12 @@ public class ServiceOrderController extends BaseController {
         @ApiImplicitParam(name = "pagesize", value = "每页数",  required = true, paramType = "query", dataType = "int")})
     @GetMapping("/servicecenterlist")
     public StatusDto<Page<ServiceCenterDTO>> serviceCenterList(@RequestParam(required = false) String province,
-                                       @RequestParam(required = false) String city,
-                                       @RequestParam(required = false) String area,
-                                       @RequestParam(required = false) String orgType,
-                                       @RequestParam(required = false) String keyword,
-                                       @RequestParam(defaultValue = "0") Integer offset,
-                                       @RequestParam(defaultValue = "10") Integer pagesize) {
+                                                               @RequestParam(required = false) String city,
+                                                               @RequestParam(required = false) String area,
+                                                               @RequestParam(required = false) String orgType,
+                                                               @RequestParam(required = false) String keyword,
+                                                               @RequestParam(defaultValue = "0") Integer offset,
+                                                               @RequestParam(defaultValue = "10") Integer pagesize) {
         return serviceOrderService.serviceCenterList(province, city, area, orgType, keyword, offset, pagesize);
     }
 
@@ -181,5 +182,22 @@ public class ServiceOrderController extends BaseController {
         return serviceOrderService.getDetailByOrderNo(serviceOrderno);
     }
 
+
+    /**
+     * 分配订单
+     * @param serviceOrderno 订单编号
+     * @param orgCodeOrUuid 机构编号或者客户经理uuid
+     * @return 订单是否分配成功
+     * @author liuduo
+     * @date 2018-09-05 18:32:52
+     */
+    @ApiOperation(value = "分配订单", notes = "【刘铎】")
+    @ApiImplicitParams({@ApiImplicitParam(name = "serviceOrderno", value = "订单编号",  required = true, paramType = "query"),
+        @ApiImplicitParam(name = "orgType", value = "分配的目标类型（服务中心或者客户经理）",  required = true, paramType = "query"),
+        @ApiImplicitParam(name = "orgCodeOrUuid", value = "机构编号或者客户经理uuid",  required = true, paramType = "query")})
+    @PostMapping("/orderallocation")
+    public StatusDto orderAllocation(@RequestParam String serviceOrderno, @RequestParam String orgType, @RequestParam String orgCodeOrUuid) {
+        return serviceOrderService.orderAllocation(serviceOrderno, orgCodeOrUuid);
+    }
 
 }

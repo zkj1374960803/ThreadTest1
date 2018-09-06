@@ -165,4 +165,20 @@ public class BizServiceCustmanagerDao extends BaseDao<BizServiceCustmanager> {
         return queryPageForBean(QueryCustManagerListDTO.class, sql.toString(), queryCustManagerListDTO, queryCustManagerListDTO.getOffset(), queryCustManagerListDTO.getPageSize());
     }
 
+    /**
+     * 根据机构编号查询客户经理
+     * @param orgCodes 机构编号
+     * @return 客户经理
+     * @author liuduo
+     * @date 2018-09-05 15:54:48
+     */
+    public List<BizServiceCustmanager> queryCustManagerListByOrgCode(List<String> orgCodes) {
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("orgCodes", orgCodes);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT manager_name AS 'name',office_phone,servicecenter_code FROM biz_service_custmanager WHERE servicecenter_code IN(:orgCodes)");
+
+        return queryListBean(BizServiceCustmanager.class, sql.toString(), map);
+    }
 }

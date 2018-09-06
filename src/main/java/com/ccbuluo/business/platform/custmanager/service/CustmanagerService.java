@@ -11,6 +11,7 @@ import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * 客户经理
@@ -78,4 +79,14 @@ public interface CustmanagerService {
      * @date 2018-08-09 19:03:17
      */
     Page<QueryCustManagerListDTO> queryCustManagerList(QueryCustManagerListDTO queryCustManagerListDTO);
+
+    /**
+     * 根据机构编号查询客户经理
+     * @param orgCodes 机构编号
+     * @return 客户经理
+     * @author liuduo
+     * @date 2018-09-05 15:54:48
+     */
+    List<BizServiceCustmanager> queryCustManagerListByOrgCode(List<String> orgCodes);
+
 }

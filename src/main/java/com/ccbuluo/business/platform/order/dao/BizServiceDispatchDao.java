@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.order.dao;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceDispatch;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
@@ -7,6 +8,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -100,5 +102,56 @@ public class BizServiceDispatchDao extends BaseDao<BizServiceDispatch> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
         return super.updateForMap(sql.toString(), params);
+    }
+
+    /**
+     * 根据订单号修改订单派发表的接收时间
+     * @param serviceOrderno 订单号
+     * @author liuduo
+     * @date 2018-09-05 16:57:24
+     */
+    public void updateConfirmed(String serviceOrderno) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("serviceOrderno", serviceOrderno);
+        params.put("confirmed", Constants.FLAG_ONE);
+        params.put("confirmTime", new Date());
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_service_dispatch SET confirmed = :confirmed,confirm_time = :confirmTime WHERE service_orderno = :serviceOrderno");
+
+        updateForMap(sql.toString(), params);
+    }
+
+
+    /**
+     * 根据订单号和当前登录人查询服务单派发详情
+     * @param serviceOrderno 订单号
+     * @param loggedUserId 当前登录用户
+     * @return 服务单派发详情
+     * @author liuduo
+     * @date 2018-09-05 18:41:28
+     */
+    public Long getByServiceOrderno(String serviceOrderno, String loggedUserId) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("serviceOrderno", serviceOrderno);
+        params.put("loggedUserId", loggedUserId);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id FROM biz_service_dispatch  WHERE  service_orderno = :serviceOrderno AND processor_uuid = :loggedUserId");
+
+        return findForObject(sql.toString(), params, Long.class);
+    }
+
+    /**
+     * 修改是否是当前处理人
+     * @param bizServiceDispatch 订单分配详情
+     * @return 影响条数
+     * @author liuduo
+     * @date 2018-09-05 19:02:33
+     */
+    public int updateCurrentFlag(BizServiceDispatch bizServiceDispatch) {
+        String sql = "UPDATE biz_service_dispatch SET current_flag = :currentFlag WHERE id = :id";
+
+        return updateForBean(sql, bizServiceDispatch);
     }
 }

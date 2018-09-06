@@ -6,6 +6,7 @@ import com.ccbuluo.business.platform.order.dto.EditServiceOrderDTO;
 import com.ccbuluo.business.platform.order.dto.SaveServiceOrderDTO;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.usercoreintf.dto.ServiceCenterDTO;
 
 import java.util.List;
 
@@ -88,5 +89,15 @@ public interface ServiceOrderService {
      * @author liuduo
      * @date 2018-09-05 10:40:35
      */
-    StatusDto serviceCenterList(String province, String city, String area, String orgType, String keyword, Integer offset, Integer pagesize);
+    StatusDto<Page<ServiceCenterDTO>> serviceCenterList(String province, String city, String area, String orgType, String keyword, Integer offset, Integer pagesize);
+
+    /**
+     * 分配订单
+     * @param serviceOrderno 订单编号
+     * @param orgCodeOrUuid 机构编号或者客户经理uuid
+     * @return 订单是否分配成功
+     * @author liuduo
+     * @date 2018-09-05 18:32:52
+     */
+    StatusDto orderAllocation(String serviceOrderno, String orgCodeOrUuid);
 }

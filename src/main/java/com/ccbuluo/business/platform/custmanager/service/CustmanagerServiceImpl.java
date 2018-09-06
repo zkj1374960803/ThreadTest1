@@ -468,6 +468,18 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     }
 
     /**
+     * 根据机构编号查询客户经理
+     * @param orgCodes 机构编号
+     * @return 客户经理
+     * @author liuduo
+     * @date 2018-09-05 15:54:48
+     */
+    @Override
+    public List<BizServiceCustmanager> queryCustManagerListByOrgCode(List<String> orgCodes) {
+        return bizServiceCustmanagerDao.queryCustManagerListByOrgCode(orgCodes);
+    }
+
+    /**
      *  查询客户经理并填充信息
      * @param useruuid 用户的uuid
      * @param custManagerDetailDTO 客户经理的信息

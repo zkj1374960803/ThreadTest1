@@ -3,15 +3,21 @@ package com.ccbuluo.business.platform.order.service;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.DocCodePrefixEnum;
 import com.ccbuluo.business.entity.BizCarPosition;
+import com.ccbuluo.business.entity.BizServiceCenter;
+import com.ccbuluo.business.entity.BizServiceDispatch;
 import com.ccbuluo.business.entity.BizServiceOrder;
 import com.ccbuluo.business.platform.carmanage.dto.CarcoreInfoDTO;
 import com.ccbuluo.business.platform.carmanage.service.BasicCarcoreInfoService;
 import com.ccbuluo.business.platform.carposition.dao.BizCarPositionDao;
+import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
+import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
+import com.ccbuluo.business.platform.order.dao.BizServiceDispatchDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
 import com.ccbuluo.business.platform.order.dto.DetailServiceOrderDTO;
 import com.ccbuluo.business.platform.order.dto.EditServiceOrderDTO;
 import com.ccbuluo.business.platform.order.dto.SaveServiceOrderDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
+import com.ccbuluo.business.platform.servicecenter.dao.BizServiceCenterDao;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.BusinessUser;
 import com.ccbuluo.core.exception.CommonException;
@@ -19,8 +25,11 @@ import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftBean;
+import com.ccbuluo.http.StatusDtoThriftPage;
 import com.ccbuluo.http.StatusDtoThriftUtils;
+import com.ccbuluo.usercoreintf.dto.ServiceCenterDTO;
 import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
+import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -32,6 +41,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 描述 服务订单service
@@ -53,8 +65,16 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     private BasicCarcoreInfoService basicCarcoreInfoService;
     @ThriftRPCClient("UserCoreSerService")
     private InnerUserInfoService innerUserInfoService;
+    @ThriftRPCClient("UserCoreSerService")
+    private BasicUserOrganizationService basicUserOrganizationService;
     @Autowired
     private BizCarPositionDao bizCarPositionDao;
+    @Autowired
+    private CustmanagerService custmanagerService;
+    @Autowired
+    private BizServiceCenterDao bizServiceCenterDao;
+    @Autowired
+    private BizServiceDispatchDao bizServiceDispatchDao;
 
 
     /**
@@ -81,12 +101,16 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             buildSaveBizServiceOrder(serviceOrderDTO, orderCode, loggedUser);
             // 保存车辆停放位置
             buildSaveBizCarPosition(serviceOrderDTO, loggedUser);
+            // 保存服务单派发
+            buildBizServiceDispatch(orderCode, loggedUser);
             return StatusDto.buildSuccessStatusDto();
         } catch (Exception e) {
             logger.error("保存订单失败！", e.getMessage());
             throw e;
         }
     }
+
+
 
 
     /**
@@ -140,6 +164,10 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     @Transactional(rollbackFor = Exception.class)
     public StatusDto editStatus(String serviceOrderno, String orderStatus) {
         try {
+            // 如果是 待完善 状态，则还需要更新服务单派发表的数据
+            if (StringUtils.isNotBlank(orderStatus) && orderStatus.equals(BizServiceOrder.OrderStatusEnum.WAITING_PERFECTION.name())) {
+                bizServiceDispatchDao.updateConfirmed(serviceOrderno);
+            }
             bizServiceOrderDao.editStatus(serviceOrderno, orderStatus);
             return StatusDto.buildSuccessStatusDto();
         } catch (Exception e) {
@@ -205,8 +233,90 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      * @date 2018-09-05 10:40:35
      */
     @Override
-    public StatusDto serviceCenterList(String province, String city, String area, String orgType, String keyword, Integer offset, Integer pagesize) {
-        return null;
+    public StatusDto<Page<ServiceCenterDTO>> serviceCenterList(String province, String city, String area, String orgType, String keyword, Integer offset, Integer pagesize) {
+        StatusDtoThriftPage<ServiceCenterDTO> serviceCenterDTOStatusDtoThriftPage = basicUserOrganizationService.queryAfterSaleServiceCenter(province, city, area, orgType, keyword, offset, pagesize);
+        Page<ServiceCenterDTO> data = StatusDtoThriftUtils.resolve(serviceCenterDTOStatusDtoThriftPage, ServiceCenterDTO.class).getData();
+        if (null != data && null != data.getRows()) {
+            List<ServiceCenterDTO> rows = data.getRows();
+            // 获取服务中心的code
+            List<String> orgCodes = rows.stream().map(item -> item.getOrgCode()).distinct().collect(Collectors.toList());
+            if (orgCodes.isEmpty()) {
+                return StatusDto.buildDataSuccessStatusDto(new Page<>());
+            }
+            // 查询客户经理
+            if (StringUtils.isNotBlank(orgType) && orgType.equals(BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name())) {
+                List<BizServiceCustmanager> bizServiceCustmanagers = custmanagerService.queryCustManagerListByOrgCode(orgCodes);
+                Map<String, BizServiceCustmanager> collect = bizServiceCustmanagers.stream().collect(Collectors.toMap(a -> a.getServicecenterCode(), Function.identity()));
+                rows.forEach(item -> {
+                    BizServiceCustmanager bizServiceCustmanager = collect.get(item.getOrgCode());
+                    item.setContact(bizServiceCustmanager.getName());
+                    item.setContactPhone(bizServiceCustmanager.getOfficePhone());
+                });
+            }
+        }
+        return StatusDto.buildDataSuccessStatusDto(data);
+    }
+
+    /**
+     * 分配订单
+     * @param serviceOrderno 订单编号
+     * @param orgCodeOrUuid 机构编号或者客户经理uuid
+     * @return 订单是否分配成功
+     * @author liuduo
+     * @date 2018-09-05 18:32:52
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public StatusDto orderAllocation(String serviceOrderno, String orgCodeOrUuid) {
+        try {
+            BusinessUser loggedUser = userHolder.getLoggedUser();
+            // 先更改本次分配单的 是否当前处理人
+            Long id = bizServiceDispatchDao.getByServiceOrderno(serviceOrderno, loggedUser.getUserId());
+            BizServiceDispatch bizServiceDispatch = new BizServiceDispatch();
+            bizServiceDispatch.setId(id);
+            bizServiceDispatch.setCurrentFlag(Constants.STATUS_FLAG_ZERO);
+            int status = bizServiceDispatchDao.updateCurrentFlag(bizServiceDispatch);
+            if (status == 0) {
+                throw new CommonException("3002", "分配失败！");
+            }
+            // 创建新的服务单详情并更新旧的
+            BizServiceDispatch bizServiceDispatch2 = new BizServiceDispatch();
+            bizServiceDispatch2.setServiceOrderno(serviceOrderno);
+            bizServiceDispatch2.setCurrentFlag(Constants.FLAG_ONE);
+            bizServiceDispatch2.setProcessorOrgno(loggedUser.getOrganization().getOrgCode());
+            bizServiceDispatch2.setProcessorOrgtype(loggedUser.getOrganization().getOrgType());
+            bizServiceDispatch2.setProcessorUuid(loggedUser.getUserId());
+            bizServiceDispatch2.setConfirmed(Constants.STATUS_FLAG_ZERO);
+            // todo 分配暂停
+//            if () {
+//
+//            }
+            bizServiceDispatch2.preInsert(loggedUser.getUserId());
+            return null;
+        } catch (Exception e) {
+            logger.error("分配失败", e.getMessage());
+            throw e;
+        }
+    }
+
+
+    /**
+     * 组装服务单派发
+     * @param orderCode 订单编号
+     * @param loggedUser 用户信息
+     * @author liuduo
+     * @date 2018-09-05 16:46:28
+     */
+    private void buildBizServiceDispatch(String orderCode, BusinessUser loggedUser) {
+        BizServiceDispatch bizServiceDispatch = new BizServiceDispatch();
+        bizServiceDispatch.setServiceOrderno(orderCode);
+        bizServiceDispatch.setCurrentFlag(Constants.FLAG_ONE);
+        bizServiceDispatch.setProcessorOrgno(loggedUser.getOrganization().getOrgCode());
+        bizServiceDispatch.setProcessorOrgtype(loggedUser.getOrganization().getOrgType());
+        bizServiceDispatch.setProcessorUuid(loggedUser.getUserId());
+        bizServiceDispatch.setConfirmed(Constants.STATUS_FLAG_ZERO);
+        bizServiceDispatch.preInsert(loggedUser.getUserId());
+        bizServiceDispatchDao.saveBizServiceDispatch(bizServiceDispatch);
     }
 
 
@@ -303,7 +413,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         bizServiceOrder.setCarVin(serviceOrderDTO.getCarVin());
         bizServiceOrder.setServiceType(serviceOrderDTO.getServiceType());
         bizServiceOrder.setReportOrgno(loggedUser.getUserId());
-        bizServiceOrder.setReportOrgtype(loggedUser.getOrganization());
+        bizServiceOrder.setReportOrgtype(loggedUser.getOrganization().getOrgType());
         bizServiceOrder.setReportTime(new Date());
         bizServiceOrder.setCustomerName(serviceOrderDTO.getCustomerName());
         bizServiceOrder.setCustomerPhone(serviceOrderDTO.getCustomerPhone());
