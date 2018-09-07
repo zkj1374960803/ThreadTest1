@@ -59,7 +59,7 @@ public class BizServiceCustmanagerDao extends BaseDao<BizServiceCustmanager> {
      */
     public int updateBizServiceCustmanager(BizServiceCustmanager entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_service_custmanager SET office_phone = :officePhone,")
+        sql.append("UPDATE biz_service_custmanager SET office_phone = :officePhone,manager_name = :name,")
             .append("receiving_address = :receivingAddress, ")
             .append("operator = :operator,operate_time = :operateTime,servicecenter_code = :servicecenterCode WHERE user_uuid = :userUuid");
         return super.updateForBean(sql.toString(), entity);
