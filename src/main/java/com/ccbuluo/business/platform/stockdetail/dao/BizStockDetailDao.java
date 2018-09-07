@@ -534,4 +534,38 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         sql.append(" GROUP BY a.trade_no ");
         return queryPageForBean(FindBatchStockListDTO.class, sql.toString(), map, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
     }
+
+    /**
+     * 修改实际库存和占用库存（还库）
+     * @param bizStockDetailList 库存明细
+     * @author liuduo
+     * @date 2018-09-06 19:49:20
+     */
+    public int updateValidAndOccupy(List<BizStockDetail> bizStockDetailList) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_stock_detail SET valid_stock = IFNULL(valid_stock,0) + :validStock,")
+            .append(" occupy_stock = IFNULL(occupy_stock,0) - :occupyStock WHERE id = :id");
+
+        return batchUpdateForListBean(sql.toString(), bizStockDetailList);
+    }
+
+    /**
+     * 根据商品编号和机构code查询库存
+     * @param productNo 商品编号
+     * @param orgCode 机构code
+     * @return 库存列表
+     * @author liuduo
+     * @date 2018-09-06 20:23:01
+     */
+    public List<BizStockDetail> getStockDetailByOrder(String productNo, String orgCode) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("productNo", productNo);
+        params.put("orgCode", orgCode);
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,valid_stock FROM biz_stock_detail WHERE org_no = :orgCode AND product_no = :productNo AND delete_flag = :deleteFlag");
+
+        return queryListBean(BizStockDetail.class, sql.toString(), params);
+    }
 }

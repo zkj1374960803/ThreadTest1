@@ -146,4 +146,26 @@ public class BizServiceMultiplepriceDao extends BaseDao<BizServiceMultipleprice>
 
         super.updateForMap(sql, params);
     }
+
+    /**
+     * 根据地区和工时查询地区倍数
+     * @param codes 工时编码
+     * @param province 省
+     * @param city 市
+     * @return 地区倍数
+     * @author liuduo
+     * @date 2018-09-06 11:58:07
+     */
+    public List<BizServiceMultipleprice> queryMultiple(List<String> codes, String province, String city) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("codes", codes);
+        params.put("province", province);
+        params.put("city", city);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT maintainitem_code,multiple FROM biz_service_multipleprice WHERE")
+            .append(" maintainitem_code IN(:codes) AND province_name = :province AND city_name = :city");
+
+        return queryListBean(BizServiceMultipleprice.class, sql.toString(), params);
+    }
 }
