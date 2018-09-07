@@ -203,4 +203,19 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
         params.put("totalPrice", totalPrice);
         return super.updateForMap(sql.toString(), params);
     }
+
+    /**
+     * 根据维修单号删除关系
+     * @param serviceOrderno 维修单号
+     * @author liuduo
+     * @date 2018-09-06 19:55:43
+     */
+    public int deleteRelation(String serviceOrderno) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("serviceOrderno", serviceOrderno);
+
+        String sql = "DELETE FROM rel_ordstock_occupy WHERE doc_no = :serviceOrderno";
+
+        return updateForMap(sql, params);
+    }
 }

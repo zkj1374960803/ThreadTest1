@@ -1,11 +1,14 @@
 package com.ccbuluo.business.platform.order.controller;
 
+import com.ccbuluo.business.entity.BizServiceMaintainitem;
 import com.ccbuluo.business.entity.BizServiceOrder;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarcoreInfo;
 import com.ccbuluo.business.platform.carmanage.dto.CarcoreInfoDTO;
 import com.ccbuluo.business.platform.carmanage.service.BasicCarcoreInfoService;
+import com.ccbuluo.business.platform.maintainitem.dto.DetailBizServiceMaintainitemDTO;
 import com.ccbuluo.business.platform.order.dto.DetailServiceOrderDTO;
 import com.ccbuluo.business.platform.order.dto.EditServiceOrderDTO;
+import com.ccbuluo.business.platform.order.dto.SaveOrderDetailDTO;
 import com.ccbuluo.business.platform.order.dto.SaveServiceOrderDTO;
 import com.ccbuluo.business.platform.order.service.ServiceOrderService;
 import com.ccbuluo.core.controller.BaseController;
@@ -198,6 +201,41 @@ public class ServiceOrderController extends BaseController {
     @PostMapping("/orderallocation")
     public StatusDto orderAllocation(@RequestParam String serviceOrderno, @RequestParam String orgType, @RequestParam String orgCodeOrUuid) {
         return serviceOrderService.orderAllocation(serviceOrderno, orgCodeOrUuid);
+    }
+
+
+    /**
+     * 查询工时列表
+     * @param keyword 关键字
+     * @param offset 起始数
+     *  @param pagesize 每页数
+     * @return 工时列表
+     * @author liuduo
+     * @date 2018-09-06 10:39:33
+     */
+    @ApiOperation(value = "处理时添加工时的列表", notes = "【刘铎】")
+    @ApiImplicitParams({@ApiImplicitParam(name = "keyword", value = "关键字", paramType = "query"),
+        @ApiImplicitParam(name = "offset", value = "起始数", paramType = "query", dataType = "int",required = true),
+        @ApiImplicitParam(name = "pagesize", value = "每页数", paramType = "query", dataType = "int",required = true)})
+    @GetMapping("/querymaintainitem")
+    public StatusDto<Page<DetailBizServiceMaintainitemDTO>> queryMaintainitem(@RequestParam(required = false) String keyword,
+                                                                              @RequestParam(defaultValue = "0") Integer offset,
+                                                                              @RequestParam(defaultValue = "10") Integer pagesize) {
+        return serviceOrderService.queryMaintainitem(keyword, offset, pagesize);
+    }
+
+
+    /**
+     * 保存维修单详单
+     * @param saveOrderDetailDTO 维修单详单
+     * @return 保存是否成功
+     * @author liuduo
+     * @date 2018-09-06 17:04:02
+     */
+    @ApiOperation(value = "保存工时和零配件", notes = "【刘铎】")
+    @PostMapping("/saveorderdetail")
+    public StatusDto saveOrderDetail(@ApiParam(name = "订单信息", value = "传入json格式", required = true)@RequestBody SaveOrderDetailDTO saveOrderDetailDTO) {
+        return serviceOrderService.saveOrderDetail(saveOrderDetailDTO);
     }
 
 }

@@ -150,7 +150,7 @@ public class BizServiceMaintainitemDao extends BaseDao<BizServiceMaintainitem> {
             .append("  FROM biz_service_maintainitem AS bsmm WHERE 1 = 1 ");
         if (StringUtils.isNotBlank(keyword)) {
             params.put("keyword", keyword);
-            sql.append(" AND bsmm.maintainitem_name LIKE CONCAT('%',:keyword,'%')");
+            sql.append(" AND (bsmm.maintainitem_name LIKE CONCAT('%',:keyword,'%') OR bsmm.maintainitem_code LIKE CONCAT('%',:keyword,'%'))");
         }
         sql.append("  AND bsmm.delete_flag = :deleteFlag ORDER BY bsmm.operate_time DESC");
 

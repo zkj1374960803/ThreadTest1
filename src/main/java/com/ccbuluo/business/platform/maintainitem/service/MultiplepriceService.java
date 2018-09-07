@@ -46,4 +46,16 @@ public interface MultiplepriceService {
      * @date 2018-07-18 16:14:46
      */
     int deleteById(Long id);
+
+    /**
+     * 根据地区和工时查询地区倍数
+     * @param codes 工时编码
+     * @param province 省
+     * @param city 市
+     * @return 地区倍数
+     * @author liuduo
+     * @date 2018-09-06 11:58:07
+     */
+    List<BizServiceMultipleprice> queryMultiple(List<String> codes, String province, String city);
+
 }

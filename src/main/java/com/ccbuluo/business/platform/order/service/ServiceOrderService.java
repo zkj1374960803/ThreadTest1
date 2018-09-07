@@ -1,8 +1,11 @@
 package com.ccbuluo.business.platform.order.service;
 
+import com.ccbuluo.business.entity.BizServiceMaintainitem;
 import com.ccbuluo.business.entity.BizServiceOrder;
+import com.ccbuluo.business.platform.maintainitem.dto.DetailBizServiceMaintainitemDTO;
 import com.ccbuluo.business.platform.order.dto.DetailServiceOrderDTO;
 import com.ccbuluo.business.platform.order.dto.EditServiceOrderDTO;
+import com.ccbuluo.business.platform.order.dto.SaveOrderDetailDTO;
 import com.ccbuluo.business.platform.order.dto.SaveServiceOrderDTO;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -100,4 +103,24 @@ public interface ServiceOrderService {
      * @date 2018-09-05 18:32:52
      */
     StatusDto orderAllocation(String serviceOrderno, String orgCodeOrUuid);
+
+    /**
+     * 查询工时列表
+     * @param keyword 关键字
+     * @param offset 起始数
+     *  @param pagesize 每页数
+     * @return 工时列表
+     * @author liuduo
+     * @date 2018-09-06 10:39:33
+     */
+    StatusDto<Page<DetailBizServiceMaintainitemDTO>> queryMaintainitem(String keyword, Integer offset, Integer pagesize);
+
+    /**
+     * 保存维修单详单
+     * @param saveOrderDetailDTO 维修单详单
+     * @return 保存是否成功
+     * @author liuduo
+     * @date 2018-09-06 17:04:02
+     */
+    StatusDto saveOrderDetail(SaveOrderDetailDTO saveOrderDetailDTO);
 }

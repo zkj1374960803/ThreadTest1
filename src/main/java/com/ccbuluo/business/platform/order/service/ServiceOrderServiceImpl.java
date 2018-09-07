@@ -2,22 +2,27 @@ package com.ccbuluo.business.platform.order.service;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.DocCodePrefixEnum;
-import com.ccbuluo.business.entity.BizCarPosition;
-import com.ccbuluo.business.entity.BizServiceCenter;
-import com.ccbuluo.business.entity.BizServiceDispatch;
-import com.ccbuluo.business.entity.BizServiceOrder;
+import com.ccbuluo.business.entity.*;
+import com.ccbuluo.business.platform.allocateapply.dto.CheckStockQuantityDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.ProductStockInfoDTO;
+import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.carmanage.dto.CarcoreInfoDTO;
 import com.ccbuluo.business.platform.carmanage.service.BasicCarcoreInfoService;
 import com.ccbuluo.business.platform.carposition.dao.BizCarPositionDao;
+import com.ccbuluo.business.platform.custmanager.dao.BizServiceCustmanagerDao;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
+import com.ccbuluo.business.platform.maintainitem.dto.DetailBizServiceMaintainitemDTO;
+import com.ccbuluo.business.platform.maintainitem.service.MaintainitemService;
+import com.ccbuluo.business.platform.maintainitem.service.MultiplepriceService;
+import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceDispatchDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
-import com.ccbuluo.business.platform.order.dto.DetailServiceOrderDTO;
-import com.ccbuluo.business.platform.order.dto.EditServiceOrderDTO;
-import com.ccbuluo.business.platform.order.dto.SaveServiceOrderDTO;
+import com.ccbuluo.business.platform.order.dao.BizServiceorderDetailDao;
+import com.ccbuluo.business.platform.order.dto.*;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.servicecenter.dao.BizServiceCenterDao;
+import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.BusinessUser;
 import com.ccbuluo.core.exception.CommonException;
@@ -28,9 +33,12 @@ import com.ccbuluo.http.StatusDtoThriftBean;
 import com.ccbuluo.http.StatusDtoThriftPage;
 import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.usercoreintf.dto.ServiceCenterDTO;
+import com.ccbuluo.usercoreintf.dto.ServiceCenterWorkplaceDTO;
 import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
+import com.ccbuluo.usercoreintf.service.BasicUserWorkplaceService;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +47,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +76,8 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     private InnerUserInfoService innerUserInfoService;
     @ThriftRPCClient("UserCoreSerService")
     private BasicUserOrganizationService basicUserOrganizationService;
+    @ThriftRPCClient("UserCoreSerService")
+    private BasicUserWorkplaceService basicUserWorkplaceService;
     @Autowired
     private BizCarPositionDao bizCarPositionDao;
     @Autowired
@@ -75,6 +86,20 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     private BizServiceCenterDao bizServiceCenterDao;
     @Autowired
     private BizServiceDispatchDao bizServiceDispatchDao;
+    @Autowired
+    private MaintainitemService maintainitemService;
+    @Autowired
+    private MultiplepriceService multiplepriceService;
+    @Autowired
+    private BizServiceCustmanagerDao bizServiceCustmanagerDao;
+    @Autowired
+    private AllocateApplyService allocateApplyService;
+    @Autowired
+    private BizStockDetailDao bizStockDetailDao;
+    @Autowired
+    private BizAllocateTradeorderDao bizAllocateTradeorderDao;
+    @Autowired
+    private BizServiceorderDetailDao bizServiceorderDetailDao;
 
 
     /**
@@ -295,6 +320,76 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             return null;
         } catch (Exception e) {
             logger.error("分配失败", e.getMessage());
+            throw e;
+        }
+    }
+
+    /**
+     * 查询工时列表
+     * @param keyword 关键字
+     * @param offset 起始数
+     *  @param pagesize 每页数
+     * @return 工时列表
+     * @author liuduo
+     * @date 2018-09-06 10:39:33
+     */
+    @Override
+    public StatusDto<Page<DetailBizServiceMaintainitemDTO>> queryMaintainitem(String keyword, Integer offset, Integer pagesize) {
+        Page<DetailBizServiceMaintainitemDTO> detailBizServiceMaintainitemDTOPage = maintainitemService.queryList(keyword, offset, pagesize);
+        if (null != detailBizServiceMaintainitemDTOPage && null != detailBizServiceMaintainitemDTOPage.getRows()) {
+            List<DetailBizServiceMaintainitemDTO> rows = detailBizServiceMaintainitemDTOPage.getRows();
+            List<String> codes = rows.stream().map(DetailBizServiceMaintainitemDTO::getMaintainitemCode).collect(Collectors.toList());
+            if (codes.isEmpty()) {
+                return StatusDto.buildDataSuccessStatusDto(new Page<>());
+            }
+            // 获取当前登录人的地址
+            StatusDtoThriftBean<UserInfoDTO> userDetail = innerUserInfoService.findUserDetail(userHolder.getLoggedUserId());
+            UserInfoDTO data = StatusDtoThriftUtils.resolve(userDetail, UserInfoDTO.class).getData();
+            String province = data.getProvince();
+            String city = data.getCity();
+            // 查询地区倍数
+            List<BizServiceMultipleprice> bizServiceMultiplepriceList = multiplepriceService.queryMultiple(codes, province, city);
+            Map<String, BizServiceMultipleprice> collect = bizServiceMultiplepriceList.stream().collect(Collectors.toMap(BizServiceMultipleprice::getMaintainitemCode, Function.identity()));
+            rows.forEach(item -> {
+                BizServiceMultipleprice bizServiceMultipleprice = collect.get(item.getMaintainitemCode());
+                item.setUnitPrice(item.getUnitPrice().multiply(new BigDecimal(bizServiceMultipleprice.getMultiple())));
+            });
+        }
+        return StatusDto.buildDataSuccessStatusDto(detailBizServiceMaintainitemDTOPage);
+    }
+
+
+    /**
+     * 保存维修单详单
+     * @param saveOrderDetailDTO 维修单详单
+     * @return 保存是否成功
+     * @author liuduo
+     * @date 2018-09-06 17:04:02
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public StatusDto saveOrderDetail(SaveOrderDetailDTO saveOrderDetailDTO) {
+        try {
+            // 删除原有工时和零配件
+            bizServiceorderDetailDao.deleteByOrderNo(saveOrderDetailDTO.getServiceOrderno());
+            // 保存工时
+            List<SaveMaintaintemDTO> saveMaintaintemDTOS = saveOrderDetailDTO.getSaveMaintaintemDTOS();
+            if (!saveMaintaintemDTOS.isEmpty()) {
+                saveMaintaintemDTOS.forEach(item -> {
+                    if (StringUtils.isBlank(item.getServiceOrgno())) {
+                        item.setServiceOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+                        item.setServiceOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+                        item.setServiceUserid(userHolder.getLoggedUserId());
+                        item.setServiceUsername(userHolder.getLoggedUser().getUsername());
+                    }
+                    item.preInsert(userHolder.getLoggedUserId());
+                    item.setServiceOrderno(saveOrderDetailDTO.getServiceOrderno());
+                });
+//                bizServiceorderDetailDao.saveEntity()
+            }
+return null;
+        } catch (Exception e) {
+            logger.error("3003", "保存失败！");
             throw e;
         }
     }

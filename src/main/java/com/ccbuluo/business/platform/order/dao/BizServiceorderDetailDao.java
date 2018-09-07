@@ -1,0 +1,115 @@
+package com.ccbuluo.business.platform.order.dao;
+
+import com.ccbuluo.business.entity.BizServiceorderDetail;
+import com.ccbuluo.dao.BaseDao;
+import com.google.common.collect.Maps;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import javax.annotation.Resource;
+import java.util.Map;
+
+/**
+ * 记录维修任务中使用的工时和零配件的详情 dao
+ * @author liuduo
+ * @date 2018-09-06 16:51:41
+ * @version V1.0.0
+ */
+@Repository
+public class BizServiceorderDetailDao extends BaseDao<BizServiceorderDetail> {
+    @Resource
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+    @Override
+    public NamedParameterJdbcTemplate getNamedParameterJdbcTemplate() {
+    return namedParameterJdbcTemplate;
+    }
+
+    /**
+     * 保存 记录维修任务中使用的工时和零配件的详情实体
+     * @param entity 记录维修任务中使用的工时和零配件的详情实体
+     * @return int 影响条数
+     * @author liuduo
+     * @date 2018-09-06 16:51:41
+     */
+    public int saveEntity(BizServiceorderDetail entity) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO biz_serviceorder_detail ( order_no,product_no,")
+            .append("product_type,unit_price,amount,warranty_type,service_orgno,")
+            .append("service_orgname,service_userid,service_username,creator,create_time,")
+            .append("operator,operate_time,delete_flag,remark ) VALUES (  :orderNo,")
+            .append(" :productNo, :productType, :unitPrice, :amount, :warrantyType,")
+            .append(" :serviceOrgno, :serviceOrgname, :serviceUserid, :serviceUsername,")
+            .append(" :creator, :createTime, :operator, :operateTime, :deleteFlag, :remark")
+            .append(" )");
+        return super.save(sql.toString(), entity);
+    }
+
+    /**
+     * 编辑 记录维修任务中使用的工时和零配件的详情实体
+     * @param entity 记录维修任务中使用的工时和零配件的详情实体
+     * @return 影响条数
+     * @author liuduo
+     * @date 2018-09-06 16:51:41
+     */
+    public int update(BizServiceorderDetail entity) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_serviceorder_detail SET order_no = :orderNo,")
+            .append("product_no = :productNo,product_type = :productType,")
+            .append("unit_price = :unitPrice,amount = :amount,")
+            .append("warranty_type = :warrantyType,service_orgno = :serviceOrgno,")
+            .append("service_orgname = :serviceOrgname,service_userid = :serviceUserid,")
+            .append("service_username = :serviceUsername,creator = :creator,")
+            .append("create_time = :createTime,operator = :operator,")
+            .append("operate_time = :operateTime,delete_flag = :deleteFlag,")
+            .append("remark = :remark WHERE id= :id");
+        return super.updateForBean(sql.toString(), entity);
+    }
+
+    /**
+     * 获取记录维修任务中使用的工时和零配件的详情详情
+     * @param id  id
+     * @author liuduo
+     * @date 2018-09-06 16:51:41
+     */
+    public BizServiceorderDetail getById(long id) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,order_no,product_no,product_type,unit_price,amount,")
+            .append("warranty_type,service_orgno,service_orgname,service_userid,")
+            .append("service_username,creator,create_time,operator,operate_time,")
+            .append("delete_flag,remark FROM biz_serviceorder_detail WHERE id= :id");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("id", id);
+        return super.findForBean(BizServiceorderDetail.class, sql.toString(), params);
+    }
+
+    /**
+     * 删除记录维修任务中使用的工时和零配件的详情
+     * @param id  id
+     * @return 影响条数
+     * @author liuduo
+     * @date 2018-09-06 16:51:41
+     */
+    public int deleteById(long id) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE  FROM biz_serviceorder_detail WHERE id= :id ");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("id", id);
+        return super.updateForMap(sql.toString(), params);
+    }
+
+    /**
+     * 根据维修单编号删除工时和零配件
+     * @param serviceOrderno 维修单编号
+     * @author liuduo
+     * @date 2018-09-07 11:27:46
+     */
+    public void deleteByOrderNo(String serviceOrderno) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("serviceOrderno", serviceOrderno);
+
+        String sql = "DELETE  FROM biz_serviceorder_detail WHERE order_no = :serviceOrderno";
+
+        updateForMap(sql, params);
+    }
+}
