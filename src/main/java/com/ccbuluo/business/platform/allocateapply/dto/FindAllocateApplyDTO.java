@@ -159,6 +159,12 @@ public class FindAllocateApplyDTO {
     @ApiModelProperty(name = "sellTotalPrice", value = "销售总价")
     private BigDecimal sellTotalPrice;
 
+    /**
+     * 付款总额(退换货用)
+     */
+    @ApiModelProperty(name = "totalPrice", value = "付款总额", hidden = true)
+    private BigDecimal totalPrice;
+
     public String getRemark() {
         return remark;
     }
@@ -385,5 +391,13 @@ public class FindAllocateApplyDTO {
 
     public void setSellTotalPrice(BigDecimal sellTotalPrice) {
         this.sellTotalPrice = sellTotalPrice;
+    }
+
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
     }
 }
