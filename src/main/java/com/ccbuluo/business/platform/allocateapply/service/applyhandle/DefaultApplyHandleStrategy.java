@@ -776,8 +776,18 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             //占用库存
             convertStockDetail(stockDetails,detail,applyNum,applyType, relOrdstockOccupies);
         }
-        Map<String,Long> map = getProductStock(details);
-        return stockDetails;
+        List<BizStockDetail> list = distinctStockDetail(stockDetails,relOrdstockOccupies);
+        return list;
+    }
+    private List<BizStockDetail> distinctStockDetail(List<BizStockDetail> stockDetails,List<RelOrdstockOccupy> relOrdstockOccupies){
+        List<BizStockDetail> list = new ArrayList<BizStockDetail>();
+        for(BizStockDetail stock : stockDetails){
+            Optional<RelOrdstockOccupy> relFilter = relOrdstockOccupies.stream() .filter(relOrdstock -> stock.getId().intValue() == relOrdstock.getStockId().intValue()) .findFirst();
+            if (relFilter.isPresent()) {
+                list.add(stock);
+            }
+        }
+        return list;
     }
 
     /**
