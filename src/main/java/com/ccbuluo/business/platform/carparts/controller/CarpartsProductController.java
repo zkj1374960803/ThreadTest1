@@ -2,20 +2,25 @@ package com.ccbuluo.business.platform.carparts.controller;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceProjectcode;
+import com.ccbuluo.business.entity.RelProductPrice;
 import com.ccbuluo.business.platform.carconfiguration.service.BasicCarmodelManageService;
+import com.ccbuluo.business.platform.carparts.service.CarpartsProductPriceService;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftPage;
 import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.EditBasicCarpartsProductDTO;
+import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.SaveBasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -31,13 +36,15 @@ import java.util.List;
 public class CarpartsProductController extends BaseController {
 
     @ThriftRPCClient("BasicMerchandiseSer")
-    CarpartsProductService carpartsProductService;
+    private CarpartsProductService carpartsProductService;
     @Resource
     private GenerateProjectCodeService generateProjectCodeService;
     @Resource
-    UserHolder userHolder;
+    private UserHolder userHolder;
     @Resource
-    BasicCarmodelManageService basicCarmodelManageService;
+    private BasicCarmodelManageService basicCarmodelManageService;
+    @Resource(name = "carpartsProductPriceServiceImpl")
+    private CarpartsProductPriceService carpartsProductServiceImpl;
 
     // 编码前缀
     private static final String PREFIX = "FP";
@@ -150,6 +157,39 @@ public class CarpartsProductController extends BaseController {
     @GetMapping("/querycarpartsproductlistbycategorycode")
     public StatusDto<List<BasicCarpartsProductDTO>> queryCarpartsProductListByCategoryCode(@RequestParam(required = false) String categoryCode) {
         return StatusDto.buildDataSuccessStatusDto(carpartsProductService.queryCarpartsProductListByCategoryCode(categoryCode));
+    }
+    
+    /**
+     * 设置零配件的价格
+     * @param relProductPrice 零配件实体
+     * @return StatusDto<String>
+     * @author zhangkangjian
+     * @date 2018-09-06 11:08:27
+     */
+    @ApiOperation(value = "设置零配件的价格",notes = "【张康健】")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "productNo", value = "零部件的商品编号", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "suggestedPrice", value = "零配件价格", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "productType", value = "商品类型(注：FITTINGS零配件，EQUIPMENT物料)", required = true, paramType = "query")
+    })
+    @PostMapping("/setprice")
+    public StatusDto<String> setPrice(@ApiIgnore RelProductPrice relProductPrice){
+        carpartsProductServiceImpl.setPrice(relProductPrice);
+        return StatusDto.buildSuccessStatusDto();
+    }
+
+    /**
+     * 查询零配件价格列表
+     * @param
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-09-06 11:12:44
+     */
+    @ApiOperation(value = "查询零配件价格列表",notes = "【张康健】")
+    @GetMapping("/querycarpartsproductpricelist")
+    public StatusDto<Page<BasicCarpartsProductDTO>> queryCarpartsProductPriceList(QueryCarpartsProductDTO queryCarpartsProductDTO) {
+        return carpartsProductServiceImpl.queryCarpartsProductPriceList(queryCarpartsProductDTO);
     }
 
 }
