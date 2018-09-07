@@ -238,4 +238,32 @@ public class ServiceOrderController extends BaseController {
         return serviceOrderService.saveOrderDetail(saveOrderDetailDTO);
     }
 
+    /**
+     * 提交订单
+     * @param serviceOrderno 订单编号
+     * @return 订单是否提交成功
+     * @author weijb
+     * @date 2018-09-07 17:32:52
+     */
+    @ApiOperation(value = "提交订单", notes = "【魏俊标】")
+    @ApiImplicitParam(name = "serviceOrderno", value = "订单编号",  required = true, paramType = "query")
+    @PostMapping("/ordersubmit")
+    public StatusDto ordersubmit(@RequestParam String serviceOrderno) {
+        return serviceOrderService.ordersubmit(serviceOrderno);
+    }
+
+    /**
+     * 验收
+     * @param serviceOrderno 订单编号
+     * @return 订单是否提交成功
+     * @author weijb
+     * @date 2018-09-07 18:32:52
+     */
+    @ApiOperation(value = "验收", notes = "【魏俊标】")
+    @ApiImplicitParam(name = "serviceOrderno", value = "订单编号",  required = true, paramType = "query")
+    @PostMapping("/acceptance")
+    public StatusDto acceptance(@RequestParam String serviceOrderno) {
+        return serviceOrderService.acceptance(serviceOrderno);
+    }
+
 }

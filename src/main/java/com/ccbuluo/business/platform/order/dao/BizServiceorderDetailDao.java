@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.order.dao;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceorderDetail;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
@@ -7,6 +8,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -111,5 +113,24 @@ public class BizServiceorderDetailDao extends BaseDao<BizServiceorderDetail> {
         String sql = "DELETE  FROM biz_serviceorder_detail WHERE order_no = :serviceOrderno";
 
         updateForMap(sql, params);
+    }
+
+    /**
+     * 查询某个商品的库存入库记录
+     * @param orderNo 服务单号
+     * @author weijb
+     * @date 2018-08-23 16:59:51
+     */
+    public List<BizServiceorderDetail> queryServiceorderDetailList(String orderNo){
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        param.put("orderNo", orderNo);
+        StringBuilder sql = new StringBuilder();
+
+        sql.append("SELECT id,order_no,product_no,product_type,unit_price,amount,")
+                .append("warranty_type,service_orgno,service_orgname,service_userid,")
+                .append("service_username,creator,create_time,operator,operate_time,")
+                .append("delete_flag,remark FROM biz_serviceorder_detail WHERE delete_flag = :deleteFlag and order_no = :orderNo");
+        return super.queryListBean(BizServiceorderDetail.class, sql.toString(), param);
     }
 }

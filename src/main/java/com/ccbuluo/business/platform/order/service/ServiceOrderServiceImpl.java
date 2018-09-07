@@ -2,7 +2,10 @@ package com.ccbuluo.business.platform.order.service;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.DocCodePrefixEnum;
+import com.ccbuluo.business.constants.OutstockTypeEnum;
+import com.ccbuluo.business.constants.StockPlanStatusEnum;
 import com.ccbuluo.business.entity.*;
+import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.allocateapply.dto.CheckStockQuantityDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.ProductStockInfoDTO;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
@@ -20,6 +23,8 @@ import com.ccbuluo.business.platform.order.dao.BizServiceDispatchDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceorderDetailDao;
 import com.ccbuluo.business.platform.order.dto.*;
+import com.ccbuluo.business.platform.outstock.service.OutstockOrderService;
+import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.servicecenter.dao.BizServiceCenterDao;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
@@ -48,9 +53,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -100,6 +103,10 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     private BizAllocateTradeorderDao bizAllocateTradeorderDao;
     @Autowired
     private BizServiceorderDetailDao bizServiceorderDetailDao;
+    @Autowired
+    private BizOutstockplanDetailDao bizOutstockplanDetailDao;
+    @Autowired
+    OutstockOrderService outstockOrderService;
 
 
     /**
@@ -532,5 +539,135 @@ return null;
         bizServiceOrderDao.saveBizServiceOrder(bizServiceOrder);
     }
 
+    /**
+     * 提交订单
+     * @param serviceOrderno 订单编号
+     * @return 订单是否提交成功
+     * @author weijb
+     * @date 2018-09-07 17:32:52
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public StatusDto ordersubmit(String serviceOrderno){
+        try {
+            // 生成出库计划并出库
+            buildOutstockplanAndOut(serviceOrderno);
+            // 修改维修单状态
+            return StatusDto.buildSuccessStatusDto("提交成功");
+        } catch (Exception e) {
+            throw new CommonException("0", "提交失败！");
+        }
+    }
+
+    /**
+     *  生成出库计划并出库
+     * @param orderNo 服务单号
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-09-07 14:10:11
+     */
+    private void buildOutstockplanAndOut(String orderNo){
+        // 查询服务单详情
+        List<BizServiceorderDetail> orderDetails = bizServiceorderDetailDao.queryServiceorderDetailList(orderNo);
+        List<String> codeList = getProductList(orderDetails);
+        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+        // 根据卖方code和商品code（list）查出库存列表
+        List<BizStockDetail> stockDetails = bizStockDetailDao.getStockDetailListByOrgAndProduct(orgCode, codeList);
+        // 查询占用关系
+        List<RelOrdstockOccupy> relOrdstockOccupies = bizAllocateTradeorderDao.getRelOrdstockOccupyByApplyNo(orderNo);
+        // 生成出库计划
+        List<BizOutstockplanDetail> outStpcks = buildOutstockplan(orderDetails, stockDetails, relOrdstockOccupies);
+        // 批量保存出库计划详情
+        bizOutstockplanDetailDao.batchOutstockplanDetail(outStpcks);
+        // 查询出库计划
+        List<BizOutstockplanDetail> outstockPlans = bizOutstockplanDetailDao.getOutstockplansByApplyNo(orderNo,orgCode);
+        // 调用自动出库
+        outstockOrderService.autoSaveOutstockOrder(orderNo, outstockPlans);
+    }
+
+    /**
+     *  生成出库计划并出库
+     * @param orderDetails 服务单详情
+     * @param stockDetails 库存详细
+     * @param relOrdstockOccupies 占用关系
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-09-07 14:10:11
+     */
+    private List<BizOutstockplanDetail> buildOutstockplan(List<BizServiceorderDetail> orderDetails, List<BizStockDetail> stockDetails, List<RelOrdstockOccupy> relOrdstockOccupies){
+        List<BizOutstockplanDetail> outStockList = new ArrayList<BizOutstockplanDetail>();
+        for(RelOrdstockOccupy ro : relOrdstockOccupies){
+            BizOutstockplanDetail outPlan = new BizOutstockplanDetail();
+            for(BizStockDetail stock : stockDetails){
+                if(ro.getStockId().intValue() == stock.getId().intValue()){// 关系库存批次id和库存批次id相等
+                    BizServiceorderDetail order = new BizServiceorderDetail();
+                    Optional<BizServiceorderDetail> orderFilter = orderDetails.stream() .filter(orderDetail -> stock.getProductNo().equals(orderDetail.getProductNo())) .findFirst();
+                    if (orderFilter.isPresent()) {
+                        order = orderFilter.get();
+                    }
+                    outPlan.setProductNo(order.getProductNo());
+                    outPlan.setProductType(stock.getProductType());
+                    outPlan.setProductCategoryname(stock.getProductCategoryname());
+                    outPlan.setProductName(stock.getProductName());
+                    outPlan.setProductUnit(stock.getProductUnit());
+                    // 交易批次号（服务单编号）
+                    outPlan.setTradeNo(String.valueOf(order.getOrderNo()));
+                    outPlan.setSupplierNo(stock.getSupplierNo());
+                    outPlan.setApplyDetailId(order.getId());
+                    // 销售价
+                    outPlan.setSalesPrice(order.getUnitPrice());
+                    // 出库计划的状态（计划执行中）
+                    outPlan.setPlanStatus(StockPlanStatusEnum.DOING.toString());
+                    outPlan.preInsert(userHolder.getLoggedUserId());
+                    outPlan.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
+                    outPlan.setPlanOutstocknum(ro.getOccupyNum());// 计划出库数量applyNum
+                    // 库存所在机构编号
+                    outPlan.setOutOrgno(stock.getOrgNo());
+                    // 库存所在机构的仓库编号
+                    outPlan.setOutRepositoryNo(stock.getRepositoryNo());
+                    // 库存编号id
+                    outPlan.setStockId(stock.getId());
+                    outStockList.add(outPlan);
+                    continue;
+                }
+            }
+        }
+        return outStockList;
+    }
+
+    /**
+     * 获取商品code
+     * @param orderDetails 订单详细
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    private static List<String> getProductList(List<BizServiceorderDetail> orderDetails){
+        List<String> list = new ArrayList<String>();
+        for(BizServiceorderDetail detail : orderDetails){
+            list.add(detail.getProductNo());
+        }
+        return list;
+    }
+
+    /**
+     * 验收
+     * @param serviceOrderno 订单编号
+     * @return 订单是否验收成功
+     * @author weijb
+     * @date 2018-09-07 17:32:52
+     */
+    @Override
+    public StatusDto acceptance(String serviceOrderno){
+        try {
+            // 验收完成
+            bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.COMPLETED.name());
+            // 修改维修单状态
+            return StatusDto.buildSuccessStatusDto("验收成功");
+        } catch (Exception e) {
+            throw new CommonException("0", "验收失败！");
+        }
+    }
 
 }

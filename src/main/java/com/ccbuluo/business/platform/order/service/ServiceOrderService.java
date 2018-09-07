@@ -123,4 +123,22 @@ public interface ServiceOrderService {
      * @date 2018-09-06 17:04:02
      */
     StatusDto saveOrderDetail(SaveOrderDetailDTO saveOrderDetailDTO);
+
+    /**
+     * 提交订单
+     * @param serviceOrderno 订单编号
+     * @return 订单是否提交成功
+     * @author weijb
+     * @date 2018-09-07 17:32:52
+     */
+    StatusDto ordersubmit(String serviceOrderno);
+
+    /**
+     * 验收
+     * @param serviceOrderno 订单编号
+     * @return 订单是否验收成功
+     * @author weijb
+     * @date 2018-09-07 17:32:52
+     */
+    StatusDto acceptance(String serviceOrderno);
 }
