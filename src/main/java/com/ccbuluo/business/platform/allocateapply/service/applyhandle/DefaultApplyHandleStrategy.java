@@ -423,8 +423,8 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     /**
      *  转换平台的出库计划
      * @param
-     * @exception 
-     * @return 
+     * @exception
+     * @return
      * @author weijb
      * @date 2018-08-20 18:05:05
      */
@@ -486,8 +486,18 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             //占用库存
             convertStockDetail(stockDetails,detail,applyNum,applyType, relOrdstockOccupies);
         }
-        Map<String,Long> map = getProductStock(details);
-        return stockDetails;
+        List<BizStockDetail> list = distinctStockDetail(stockDetails,relOrdstockOccupies);
+        return list;
+    }
+    private List<BizStockDetail> distinctStockDetail(List<BizStockDetail> stockDetails,List<RelOrdstockOccupy> relOrdstockOccupies){
+        List<BizStockDetail> list = new ArrayList<BizStockDetail>();
+        for(BizStockDetail stock : stockDetails){
+            Optional<RelOrdstockOccupy> relFilter = relOrdstockOccupies.stream() .filter(relOrdstock -> stock.getId().intValue() == relOrdstock.getStockId().intValue()) .findFirst();
+            if (relFilter.isPresent()) {
+                list.add(stock);
+            }
+        }
+        return list;
     }
 
     /**
