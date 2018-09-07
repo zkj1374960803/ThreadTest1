@@ -13,7 +13,6 @@ import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -57,7 +56,6 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
         Optional.ofNullable(relProductPrice).ifPresent(a ->{
             List<String> productNoList = a.stream().map(RelProductPrice::getProductNo).collect(Collectors.toList());
             queryCarpartsProductDTO.setCarpartsCodeList(productNoList);
-
         });
         StatusDtoThriftPage<BasicCarpartsProductDTO> basicCarpartsProductDTO =
             carpartsProductService.queryCarpartsProductListByPriceType(queryCarpartsProductDTO);
@@ -68,7 +66,7 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
             Map<String, RelProductPrice> relProductPriceMap = a.stream().collect(Collectors.toMap(RelProductPrice::getProductNo, b -> b,(k1, k2)->k1));
             if(rows != null && rows.size() > 0){
                 rows.forEach(item ->{
-                    RelProductPrice relProductPrice1 = relProductPriceMap.get(item.getCarpartsPrice());
+                    RelProductPrice relProductPrice1 = relProductPriceMap.get(item.getCarpartsCode());
                     if(relProductPrice1 != null){
                         item.setCarpartsPrice(String.valueOf(relProductPrice1.getSuggestedPrice()));
                     }

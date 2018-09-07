@@ -36,7 +36,10 @@ public class CarpartsProductPriceDao extends BaseDao<CarpartsProductPriceDao> {
      */
     public List<RelProductPrice> queryCarpartsProductList() {
         StringBuffer sql = new StringBuffer();
-        sql.append(" SELECT * FROM (SELECT a.id,a.create_time,a.suggested_price FROM rel_product_price a ORDER BY a.create_time) a  GROUP BY a.create_time ");
+        sql.append("SELECT a.product_no,a.suggested_price FROM rel_product_price a  ")
+            .append(" INNER JOIN ( ")
+            .append(" SELECT a.product_no,MAX(a.id) AS 'id' FROM rel_product_price a  GROUP BY a.product_no ")
+            .append(" ) b ON a.id = b.id ");
         return queryListBean(RelProductPrice.class, sql.toString(), Maps.newHashMap());
     }
 
