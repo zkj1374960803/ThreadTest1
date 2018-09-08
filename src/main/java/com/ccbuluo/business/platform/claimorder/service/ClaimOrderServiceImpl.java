@@ -16,7 +16,11 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
      * @date 2018-09-08 10:43:18
      */
     @Override
-    public void generateClaimForm() {
+    public void generateClaimForm(String serviceOrdno) {
+        // 查询维修单详单数据
+
+
+
 
     }
 }

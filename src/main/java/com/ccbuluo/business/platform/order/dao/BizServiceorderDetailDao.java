@@ -85,6 +85,10 @@ public class BizServiceorderDetailDao extends BaseDao<BizServiceorderDetail> {
         return super.findForBean(BizServiceorderDetail.class, sql.toString(), params);
     }
 
+
+
+
+
     /**
      * 删除记录维修任务中使用的工时和零配件的详情
      * @param id  id

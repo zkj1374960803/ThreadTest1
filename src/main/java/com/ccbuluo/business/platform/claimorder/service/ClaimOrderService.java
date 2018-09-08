@@ -13,5 +13,5 @@ public interface ClaimOrderService {
      * @author zhangkangjian
      * @date 2018-09-08 10:43:18
      */
-    void generateClaimForm();
+    void generateClaimForm(String serviceOrdno);
 }
