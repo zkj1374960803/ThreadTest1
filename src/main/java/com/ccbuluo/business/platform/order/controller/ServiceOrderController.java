@@ -12,6 +12,7 @@ import com.ccbuluo.business.platform.order.dto.SaveOrderDetailDTO;
 import com.ccbuluo.business.platform.order.dto.SaveServiceOrderDTO;
 import com.ccbuluo.business.platform.order.service.ServiceOrderService;
 import com.ccbuluo.core.controller.BaseController;
+import com.ccbuluo.core.thrift.annotation.ThriftRPCServer;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.usercoreintf.dto.ServiceCenterDTO;
@@ -22,12 +23,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 描述 订单管理，客户经理
+ * 描述 服务单管理，客户经理
  * @author liuduo
  * @date 2018-09-03 16:22:02
  * @version V1.0.0
  */
-@Api(tags = "订单管理（客户经理）")
+@Api(tags = "服务单管理（客户经理）")
 @RestController
 @RequestMapping("/platform/custmanagerserviceorder")
 public class ServiceOrderController extends BaseController {
@@ -36,56 +37,56 @@ public class ServiceOrderController extends BaseController {
     private ServiceOrderService serviceOrderService;
     @Autowired
     private BasicCarcoreInfoService basicCarcoreInfoService;
-
+// todo 调用租赁接口待确定
 
     /**
-     * 保存订单
-     * @param saveServiceOrderDTO 订单要保存的信息
+     * 保存服务单
+     * @param saveServiceOrderDTO 服务单要保存的信息
      * @return 保存是否成功
      * @author liuduo
      * @date 2018-09-04 14:06:40
      */
-    @ApiOperation(value = "订单新增", notes = "【刘铎】")
+    @ApiOperation(value = "服务单新增", notes = "【刘铎】")
     @PostMapping("/save")
-    public StatusDto saveOrder(@ApiParam(name = "订单信息", value = "传入json格式", required = true)@RequestBody SaveServiceOrderDTO saveServiceOrderDTO) {
+    public StatusDto saveOrder(@ApiParam(name = "服务单信息", value = "传入json格式", required = true)@RequestBody SaveServiceOrderDTO saveServiceOrderDTO) {
         return serviceOrderService.saveOrder(saveServiceOrderDTO);
     }
 
 
 
     /**
-     * 编辑订单
-     * @param editServiceOrderDTO 订单要保存的信息
+     * 编辑服务单
+     * @param editServiceOrderDTO 服务单要保存的信息
      * @return 编辑是否成功
      * @author liuduo
      * @date 2018-09-04 14:06:40
      */
-    @ApiOperation(value = "订单编辑", notes = "【刘铎】")
+    @ApiOperation(value = "服务单编辑", notes = "【刘铎】")
     @PostMapping("/edit")
-    public StatusDto editOrder(@ApiParam(name = "订单信息", value = "传入json格式", required = true)@RequestBody EditServiceOrderDTO editServiceOrderDTO) {
+    public StatusDto editOrder(@ApiParam(name = "服务单信息", value = "传入json格式", required = true)@RequestBody EditServiceOrderDTO editServiceOrderDTO) {
         return serviceOrderService.editOrder(editServiceOrderDTO);
     }
 
 
     /**
-     * 查询订单列表
-     * @param orderStatus 订单状态
+     * 查询服务单列表
+     * @param orderStatus 服务单状态
      * @param serviceType 服务类型
      * @param keyword 关键字
      * @param offset 起始数
      * @param pagesize 每页数
-     * @return 订单列表
+     * @return 服务单列表
      * @author liuduo
      * @date 2018-09-04 15:06:55
      */
-    @ApiOperation(value = "订单列表", notes = "【刘铎】")
-    @ApiImplicitParams({@ApiImplicitParam(name = "orderStatus", value = "订单状态",  required = true, paramType = "query"),
+    @ApiOperation(value = "服务单列表", notes = "【刘铎】")
+    @ApiImplicitParams({@ApiImplicitParam(name = "orderStatus", value = "服务单状态",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "serviceType", value = "服务类型",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "keyword", value = "关键字",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "起始数",  required = true, paramType = "query", dataType = "int"),
         @ApiImplicitParam(name = "pagesize", value = "每页数",  required = true, paramType = "query", dataType = "int")})
     @GetMapping("/list")
-    public StatusDto<Page<BizServiceOrder>> queryList(@RequestParam String orderStatus,
+    public StatusDto<Page<BizServiceOrder>> queryList(@RequestParam(required = false) String orderStatus,
                                                       @RequestParam(required = false) String serviceType,
                                                       @RequestParam(required = false) String keyword,
                                                       @RequestParam(defaultValue = "0") Integer offset,
@@ -95,16 +96,16 @@ public class ServiceOrderController extends BaseController {
 
 
     /**
-     * 修改订单状态
-     * @param serviceOrderno 订单编号
-     * @param orderStatus 订单状态
+     * 修改服务单状态
+     * @param serviceOrderno 服务单编号
+     * @param orderStatus 服务单状态
      * @return 修改是否成功
      * @author liuduo
      * @date 2018-09-04 15:37:36
      */
-    @ApiOperation(value = "更改订单状态", notes = "【刘铎】")
-    @ApiImplicitParams({@ApiImplicitParam(name = "serviceOrderno", value = "订单编号",  required = true, paramType = "query"),
-        @ApiImplicitParam(name = "orderStatus", value = "订单类型",  required = true, paramType = "query")})
+    @ApiOperation(value = "更改服务单状态", notes = "【刘铎】")
+    @ApiImplicitParams({@ApiImplicitParam(name = "serviceOrderno", value = "服务单编号",  required = true, paramType = "query"),
+        @ApiImplicitParam(name = "orderStatus", value = "服务单类型",  required = true, paramType = "query")})
     @PostMapping("/editstatus")
     public StatusDto editStatus(@RequestParam String serviceOrderno,@RequestParam String orderStatus) {
         return serviceOrderService.editStatus(serviceOrderno, orderStatus);
@@ -117,7 +118,7 @@ public class ServiceOrderController extends BaseController {
      * @author liuduo
      * @date 2018-09-04 17:34:08
      */
-    @ApiOperation(value = "订单新增和编辑用的车牌号下拉框", notes = "【刘铎】")
+    @ApiOperation(value = "服务单新增和编辑用的车牌号下拉框", notes = "【刘铎】")
     @GetMapping("/querycarnolist")
     public StatusDto<List<String>> queryCarNoList() {
         return serviceOrderService.queryCarNoList();
@@ -172,14 +173,14 @@ public class ServiceOrderController extends BaseController {
 
 
     /**
-     * 根据订单编号查询订单详情
-     * @param serviceOrderno 订单编号
-     * @return 订单详情
+     * 根据服务单编号查询服务单详情
+     * @param serviceOrderno 服务单编号
+     * @return 服务单详情
      * @author liuduo
      * @date 2018-09-05 09:54:40
      */
-    @ApiOperation(value = "订单详情", notes = "【刘铎】")
-    @ApiImplicitParam(name = "serviceOrderno", value = "订单编号",  required = true, paramType = "query")
+    @ApiOperation(value = "服务单详情", notes = "【刘铎】")
+    @ApiImplicitParam(name = "serviceOrderno", value = "服务单编号",  required = true, paramType = "query")
     @GetMapping("/getdetailbyorderno")
     public StatusDto<DetailServiceOrderDTO> getDetailByOrderNo(@RequestParam String serviceOrderno) {
         return serviceOrderService.getDetailByOrderNo(serviceOrderno);
@@ -187,20 +188,20 @@ public class ServiceOrderController extends BaseController {
 
 
     /**
-     * 分配订单
-     * @param serviceOrderno 订单编号
+     * 分配服务单
+     * @param serviceOrderno 服务单编号
      * @param orgCodeOrUuid 机构编号或者客户经理uuid
-     * @return 订单是否分配成功
+     * @return 服务单是否分配成功
      * @author liuduo
      * @date 2018-09-05 18:32:52
      */
-    @ApiOperation(value = "分配订单", notes = "【刘铎】")
-    @ApiImplicitParams({@ApiImplicitParam(name = "serviceOrderno", value = "订单编号",  required = true, paramType = "query"),
+    @ApiOperation(value = "分配服务单", notes = "【刘铎】")
+    @ApiImplicitParams({@ApiImplicitParam(name = "serviceOrderno", value = "服务单编号",  required = true, paramType = "query"),
         @ApiImplicitParam(name = "orgType", value = "分配的目标类型（服务中心或者客户经理）",  required = true, paramType = "query"),
         @ApiImplicitParam(name = "orgCodeOrUuid", value = "机构编号或者客户经理uuid",  required = true, paramType = "query")})
     @PostMapping("/orderallocation")
     public StatusDto orderAllocation(@RequestParam String serviceOrderno, @RequestParam String orgType, @RequestParam String orgCodeOrUuid) {
-        return serviceOrderService.orderAllocation(serviceOrderno, orgCodeOrUuid);
+        return serviceOrderService.orderAllocation(serviceOrderno, orgType, orgCodeOrUuid);
     }
 
 
@@ -234,7 +235,7 @@ public class ServiceOrderController extends BaseController {
      */
     @ApiOperation(value = "保存工时和零配件", notes = "【刘铎】")
     @PostMapping("/saveorderdetail")
-    public StatusDto saveOrderDetail(@ApiParam(name = "订单信息", value = "传入json格式", required = true)@RequestBody SaveOrderDetailDTO saveOrderDetailDTO) {
+    public StatusDto saveOrderDetail(@ApiParam(name = "服务单信息", value = "传入json格式", required = true)@RequestBody SaveOrderDetailDTO saveOrderDetailDTO) {
         return serviceOrderService.saveOrderDetail(saveOrderDetailDTO);
     }
 

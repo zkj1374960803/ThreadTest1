@@ -433,9 +433,9 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT bci.vin_number,bci.engine_number,bci.beidou_number,bci.produce_time,bci.store_name,")
             .append(" bci.carmodel_id,bcm.carbrand_name,bcmm.carseries_name FROM basic_carcore_info AS bci ")
-            .append("　LEFT JOIN basic_carbrand_manage AS bcm ON bcm.id = bci.carbrand_id")
+            .append(" LEFT JOIN basic_carbrand_manage AS bcm ON bcm.id = bci.carbrand_id")
             .append(" LEFT JOIN basic_carseries_manage AS bcmm ON bcmm.id = bci.carseries_id")
-            .append("  WHERE plate_number = :carNo");
+            .append(" WHERE plate_number = :carNo");
 
         return findForBean(CarcoreInfoDTO.class, sql.toString(), map);
     }

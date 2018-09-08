@@ -154,4 +154,17 @@ public class BizServiceDispatchDao extends BaseDao<BizServiceDispatch> {
 
         return updateForBean(sql, bizServiceDispatch);
     }
+
+    /**
+     * 修改前一个分配单
+     * @param updateBizServiceDispatch 需要修改的分配信息
+     * @author liuduo
+     * @date 2018-09-08 10:16:26
+     */
+    public int updateReplaceOrgNo(BizServiceDispatch updateBizServiceDispatch) {
+        StringBuilder sql = new StringBuilder();
+        sql.append(" UPDATE biz_service_dispatch SET replace_orgno = :replaceOrgno,replace_orgtype = :replaceOrgtype,dispatch_time = :dispatchTime WHERE id = :id");
+
+        return updateForBean(sql.toString(), updateBizServiceDispatch);
+    }
 }

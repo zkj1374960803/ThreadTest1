@@ -38,7 +38,7 @@ public class BizCarPositionDao extends BaseDao<BizCarPosition> {
      */
     public int saveBizCarPosition(BizCarPosition entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO biz_car_posation ( car_vin,detail_address,province_code,")
+        sql.append("INSERT INTO biz_car_position ( car_vin,detail_address,province_code,")
             .append("province_name,city_code,city_name,area_code,area_name,creator,")
             .append("create_time,operator,operate_time,delete_flag,remark ) VALUES ( ")
             .append(" :carVin, :detailAddress, :provinceCode, :provinceName, :cityCode,")
@@ -56,7 +56,7 @@ public class BizCarPositionDao extends BaseDao<BizCarPosition> {
      */
     public int updateBizCarPosition(BizCarPosition entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_car_posation SET ")
+        sql.append("UPDATE biz_car_position SET ")
             .append("detail_address = :detailAddress,province_code = :provinceCode,")
             .append("province_name = :provinceName,city_code = :cityCode,")
             .append("city_name = :cityName,area_code = :areaCode,area_name = :areaName,")
@@ -75,7 +75,7 @@ public class BizCarPositionDao extends BaseDao<BizCarPosition> {
         sql.append("SELECT bcp.id,bcp.car_vin,bcp.detail_address,bcp.province_code,")
             .append("bcp.province_name,bcp.city_code,bcp.city_name,bcp.area_code,")
             .append("bcp.area_name,bcp.creator,bcp.create_time,bcp.operator,")
-            .append("bcp.operate_time,bcp.delete_flag,bcp.remark FROM biz_car_posation")
+            .append("bcp.operate_time,bcp.delete_flag,bcp.remark FROM biz_car_position")
             .append(" AS bcp WHERE bcp.id= :id");
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
@@ -91,7 +91,7 @@ public class BizCarPositionDao extends BaseDao<BizCarPosition> {
      */
     public int deleteBizCarPositionById(Long id) {
         StringBuilder sql = new StringBuilder();
-        sql.append("DELETE  FROM biz_car_posation WHERE id= :id ");
+        sql.append("DELETE  FROM biz_car_position WHERE id= :id ");
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
         return super.updateForMap(sql.toString(), params);
@@ -110,7 +110,7 @@ public class BizCarPositionDao extends BaseDao<BizCarPosition> {
 
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT bcp.id,bcp.car_vin,bcp.detail_address,bcp.province_name,")
-            .append(" bcp.city_name,bcp.area_name FROM biz_car_posation AS bcp WHERE bcp.car_vin= :carVin");
+            .append(" bcp.city_name,bcp.area_name FROM biz_car_position AS bcp WHERE bcp.car_vin= :carVin");
 
         return findForBean(BizCarPosition.class, sql.toString(), params);
     }

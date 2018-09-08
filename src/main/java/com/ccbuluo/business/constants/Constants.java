@@ -41,6 +41,7 @@ public class Constants {
 
     public static final Long LONG_FLAG_ONE = 1L;
     public static final Long LONG_FLAG_ZERO = 0L;
+    public static final Long LONG_FLAG_TWO = 2L;
 
     public static final int FAILURE_ONE = -1;
     public static final int FAILURE_TWO = -2;

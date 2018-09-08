@@ -47,7 +47,9 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,7 +60,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * 描述 服务订单service
+ * 描述 服务服务单service
  * @author liuduo
  * @date 2018-09-03 17:35:19
  * @version V1.0.0
@@ -110,7 +112,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
 
 
     /**
-     * 描述 新增服务订单
+     * 描述 新增服务服务单
      * @param serviceOrderDTO
      * @return com.ccbuluo.http.StatusDto<java.lang.String>
      * @author liuduo
@@ -120,16 +122,16 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     @Transactional(rollbackFor = Exception.class)
     public StatusDto<String> saveOrder(SaveServiceOrderDTO serviceOrderDTO) {
         try {
-            // 生成订单号
+            // 生成服务单号
             String orderCode = null;
             StatusDto<String> order = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.DD);
             if (order.getCode().equals(Constants.SUCCESS_CODE)) {
                 orderCode = order.getData();
             } else {
-                return StatusDto.buildFailure("生成订单编码失败！");
+                return StatusDto.buildFailure("生成服务单编码失败！");
             }
             BusinessUser loggedUser = userHolder.getLoggedUser();
-            // 保存订单
+            // 保存服务单
             buildSaveBizServiceOrder(serviceOrderDTO, orderCode, loggedUser);
             // 保存车辆停放位置
             buildSaveBizCarPosition(serviceOrderDTO, loggedUser);
@@ -137,7 +139,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             buildBizServiceDispatch(orderCode, loggedUser);
             return StatusDto.buildSuccessStatusDto();
         } catch (Exception e) {
-            logger.error("保存订单失败！", e.getMessage());
+            logger.error("保存服务单失败！", e.getMessage());
             throw e;
         }
     }
@@ -146,8 +148,8 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
 
 
     /**
-     * 编辑订单
-     * @param editServiceOrderDTO 订单要保存的信息
+     * 编辑服务单
+     * @param editServiceOrderDTO 服务单要保存的信息
      * @return 编辑是否成功
      * @author liuduo
      * @date 2018-09-04 14:06:40
@@ -156,25 +158,25 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     @Transactional(rollbackFor = Exception.class)
     public StatusDto editOrder(EditServiceOrderDTO editServiceOrderDTO) {
         try {
-            // 编辑订单
+            // 编辑服务单
             buildEditBizServiceOrder(editServiceOrderDTO);
             // 编辑车辆停放位置
             buildEditBizCarPosition(editServiceOrderDTO);
             return StatusDto.buildSuccessStatusDto();
         } catch (Exception e) {
-            logger.error("编辑订单失败！", e.getMessage());
+            logger.error("编辑服务单失败！", e.getMessage());
             throw e;
         }
     }
 
     /**
-     * 查询订单列表
-     * @param orderStatus 订单状态
+     * 查询服务单列表
+     * @param orderStatus 服务单状态
      * @param serviceType 服务类型
      * @param keyword 关键字
      * @param offset 起始数
      * @param pagesize 每页数
-     * @return 订单列表
+     * @return 服务单列表
      * @author liuduo
      * @date 2018-09-04 15:06:55
      */
@@ -185,9 +187,9 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
 
 
     /**
-     * 修改订单状态
-     * @param serviceOrderno 订单编号
-     * @param orderStatus 订单状态
+     * 修改服务单状态
+     * @param serviceOrderno 服务单编号
+     * @param orderStatus 服务单状态
      * @return 修改是否成功
      * @author liuduo
      * @date 2018-09-04 15:37:36
@@ -227,15 +229,15 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     }
 
     /**
-     * 根据订单编号查询订单详情
-     * @param serviceOrderno 订单编号
-     * @return 订单详情
+     * 根据服务单编号查询服务单详情
+     * @param serviceOrderno 服务单编号
+     * @return 服务单详情
      * @author liuduo
      * @date 2018-09-05 09:54:40
      */
     @Override
     public StatusDto<DetailServiceOrderDTO> getDetailByOrderNo(String serviceOrderno) {
-        // 根据订单编号查询车牌号
+        // 根据服务单编号查询车牌号
         String carNo = bizServiceOrderDao.getCarNoByServiceOrderno(serviceOrderno);
         // 根据车牌号查询车辆基本信息
         CarcoreInfoDTO data = basicCarcoreInfoService.getCarByCarNo(carNo).getData();
@@ -290,16 +292,17 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     }
 
     /**
-     * 分配订单
-     * @param serviceOrderno 订单编号
+     * 分配服务单
+     * @param serviceOrderno 服务单编号
+     * @param orgType 类型（服务中心还是客户经理）
      * @param orgCodeOrUuid 机构编号或者客户经理uuid
-     * @return 订单是否分配成功
+     * @return 服务单是否分配成功
      * @author liuduo
      * @date 2018-09-05 18:32:52
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public StatusDto orderAllocation(String serviceOrderno, String orgCodeOrUuid) {
+    public StatusDto orderAllocation(String serviceOrderno, String orgType, String orgCodeOrUuid) {
         try {
             BusinessUser loggedUser = userHolder.getLoggedUser();
             // 先更改本次分配单的 是否当前处理人
@@ -311,20 +314,36 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             if (status == 0) {
                 throw new CommonException("3002", "分配失败！");
             }
-            // 创建新的服务单详情并更新旧的
-            BizServiceDispatch bizServiceDispatch2 = new BizServiceDispatch();
-            bizServiceDispatch2.setServiceOrderno(serviceOrderno);
-            bizServiceDispatch2.setCurrentFlag(Constants.FLAG_ONE);
-            bizServiceDispatch2.setProcessorOrgno(loggedUser.getOrganization().getOrgCode());
-            bizServiceDispatch2.setProcessorOrgtype(loggedUser.getOrganization().getOrgType());
-            bizServiceDispatch2.setProcessorUuid(loggedUser.getUserId());
-            bizServiceDispatch2.setConfirmed(Constants.STATUS_FLAG_ZERO);
-            // todo 分配暂停
-//            if () {
-//
-//            }
-            bizServiceDispatch2.preInsert(loggedUser.getUserId());
-            return null;
+            // 查询该服务单被分配的次数，如果大于1则不能分配
+            BizServiceOrder byOrderNo = bizServiceOrderDao.getByOrderNo(serviceOrderno);
+            if (byOrderNo.getDispatchTimes() > Constants.LONG_FLAG_ONE) {
+                throw new CommonException("3006", "该服务单已被分配，请核对！");
+            }
+            if (StringUtils.isNotBlank(orgType) && !orgType.equals(Constants.ORG_TYPE)) {
+                // 创建新的服务单详情并更新旧的
+                BizServiceDispatch bizServiceDispatch2 = new BizServiceDispatch();
+                bizServiceDispatch2.setServiceOrderno(serviceOrderno);
+                bizServiceDispatch2.setPreviousId(id);
+                bizServiceDispatch2.setCurrentFlag(Constants.FLAG_ONE);
+                bizServiceDispatch2.setProcessorOrgno(loggedUser.getOrganization().getOrgCode());
+                bizServiceDispatch2.setProcessorOrgtype(loggedUser.getOrganization().getOrgType());
+                bizServiceDispatch2.setProcessorUuid(loggedUser.getUserId());
+                bizServiceDispatch2.setConfirmed(Constants.STATUS_FLAG_ZERO);
+                bizServiceDispatch2.preInsert(loggedUser.getUserId());
+                bizServiceDispatchDao.saveBizServiceDispatch(bizServiceDispatch2);
+                BizServiceDispatch updateBizServiceDispatch = new BizServiceDispatch();
+                updateBizServiceDispatch.setId(id);
+                updateBizServiceDispatch.setReplaceOrgno(orgCodeOrUuid);
+                updateBizServiceDispatch.setReplaceOrgtype(orgType);
+                updateBizServiceDispatch.setDispatchTime(new Date());
+                int i = bizServiceDispatchDao.updateReplaceOrgNo(updateBizServiceDispatch);
+                if (i == Constants.FAILURESTATUS) {
+                    throw new CommonException("3007", "原服务单状态修改失败，请联系管理员！");
+                }
+                // 分配之后修改该服务单的分配次数
+                bizServiceOrderDao.updateDispatchTimes(serviceOrderno, Constants.LONG_FLAG_TWO);
+            }
+            return StatusDto.buildSuccessStatusDto();
         } catch (Exception e) {
             logger.error("分配失败", e.getMessage());
             throw e;
@@ -352,14 +371,20 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             // 获取当前登录人的地址
             StatusDtoThriftBean<UserInfoDTO> userDetail = innerUserInfoService.findUserDetail(userHolder.getLoggedUserId());
             UserInfoDTO data = StatusDtoThriftUtils.resolve(userDetail, UserInfoDTO.class).getData();
-            String province = data.getProvince();
-            String city = data.getCity();
+            StatusDtoThriftBean<ServiceCenterWorkplaceDTO> workplaceByCode = basicUserWorkplaceService.getWorkplaceByCode(data.getOrgCode());
+            ServiceCenterWorkplaceDTO data1 = StatusDtoThriftUtils.resolve(workplaceByCode, ServiceCenterWorkplaceDTO.class).getData();
+            String province = data1.getProvince();
+            String city = data1.getCity();
             // 查询地区倍数
             List<BizServiceMultipleprice> bizServiceMultiplepriceList = multiplepriceService.queryMultiple(codes, province, city);
             Map<String, BizServiceMultipleprice> collect = bizServiceMultiplepriceList.stream().collect(Collectors.toMap(BizServiceMultipleprice::getMaintainitemCode, Function.identity()));
             rows.forEach(item -> {
                 BizServiceMultipleprice bizServiceMultipleprice = collect.get(item.getMaintainitemCode());
-                item.setUnitPrice(item.getUnitPrice().multiply(new BigDecimal(bizServiceMultipleprice.getMultiple())));
+                if (null != bizServiceMultipleprice && null != bizServiceMultipleprice.getMultiple()) {
+                    item.setUnitPrice(item.getUnitPrice().multiply(new BigDecimal(bizServiceMultipleprice.getMultiple())));
+                } else {
+                    item.setUnitPrice(item.getUnitPrice().multiply(new BigDecimal(Constants.FLAG_ONE)));
+                }
             });
         }
         return StatusDto.buildDataSuccessStatusDto(detailBizServiceMaintainitemDTOPage);
@@ -377,34 +402,181 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     @Transactional(rollbackFor = Exception.class)
     public StatusDto saveOrderDetail(SaveOrderDetailDTO saveOrderDetailDTO) {
         try {
-            // 删除原有工时和零配件
+            // 1、删除原有工时和零配件
             bizServiceorderDetailDao.deleteByOrderNo(saveOrderDetailDTO.getServiceOrderno());
-            // 保存工时
-            List<SaveMaintaintemDTO> saveMaintaintemDTOS = saveOrderDetailDTO.getSaveMaintaintemDTOS();
-            if (!saveMaintaintemDTOS.isEmpty()) {
-                saveMaintaintemDTOS.forEach(item -> {
-                    if (StringUtils.isBlank(item.getServiceOrgno())) {
-                        item.setServiceOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
-                        item.setServiceOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
-                        item.setServiceUserid(userHolder.getLoggedUserId());
-                        item.setServiceUsername(userHolder.getLoggedUser().getUsername());
-                    }
-                    item.preInsert(userHolder.getLoggedUserId());
-                    item.setServiceOrderno(saveOrderDetailDTO.getServiceOrderno());
-                });
-//                bizServiceorderDetailDao.saveEntity()
-            }
-return null;
+            // 2、保存工时
+            saveMaintaintem(saveOrderDetailDTO);
+            // 3、还库存
+            returnStock(saveOrderDetailDTO);
+            // 4、占库存
+            occupyStock(saveOrderDetailDTO);
+            // 5、保存零配件
+            saveMerchandise(saveOrderDetailDTO);
+            return StatusDto.buildSuccessStatusDto();
         } catch (Exception e) {
             logger.error("3003", "保存失败！");
             throw e;
         }
     }
 
+    /**
+     * 保存零配件
+     * @param saveOrderDetailDTO 维修单详单
+     * @author liuduo
+     * @date 2018-09-07 15:40:44
+     */
+    private void saveMerchandise(SaveOrderDetailDTO saveOrderDetailDTO) {
+        List<SaveMerchandiseDTO> saveMerchandiseDTOS = saveOrderDetailDTO.getSaveMerchandiseDTOS();
+        if (!saveMerchandiseDTOS.isEmpty()) {
+            List<BizServiceorderDetail> bizServiceorderDetailList = Lists.newArrayList();
+            saveMerchandiseDTOS.forEach(item -> {
+                if (StringUtils.isBlank(item.getServiceOrgno())) {
+                    item.setServiceOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+                    item.setServiceOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+                    item.setServiceUserid(userHolder.getLoggedUserId());
+                    item.setServiceUsername(userHolder.getLoggedUser().getUsername());
+                }
+                item.preInsert(userHolder.getLoggedUserId());
+                item.setServiceOrderno(saveOrderDetailDTO.getServiceOrderno());
+                BizServiceorderDetail bizServiceorderDetail = new BizServiceorderDetail();
+                BeanUtils.copyProperties(bizServiceorderDetail, item);
+                bizServiceorderDetailList.add(bizServiceorderDetail);
+            });
+            bizServiceorderDetailDao.saveBizServiceorderDetail(bizServiceorderDetailList);
+        }
+    }
+
+
+    /**
+     * 占库存
+     * @param saveOrderDetailDTO 维修单详单
+     * @author liuduo
+     * @date 2018-09-07 15:21:56
+     */
+    private void occupyStock(SaveOrderDetailDTO saveOrderDetailDTO) {
+        List<SaveMerchandiseDTO> saveMerchandiseDTOS = saveOrderDetailDTO.getSaveMerchandiseDTOS();
+        if (!saveMerchandiseDTOS.isEmpty()) {
+            String orgCode = "";
+            List<BizStockDetail> bizStockDetailList = Lists.newArrayList();
+            List<RelOrdstockOccupy> relOrdstockOccupyList = Lists.newArrayList();
+            for (SaveMerchandiseDTO saveMerchandiseDTO : saveMerchandiseDTOS) {
+                if (StringUtils.isBlank(saveMerchandiseDTO.getServiceOrderno())) {
+                    orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+                } else {
+                    orgCode = saveMerchandiseDTO.getServiceOrderno();
+                }
+                // 根据商品编号和使用人查询库存
+                List<BizStockDetail> stockDetailByOrder = bizStockDetailDao.getStockDetailByOrder(saveMerchandiseDTO.getProductNo(), orgCode);
+                // 使用的数量
+                Long amount = saveMerchandiseDTO.getAmount();
+                // 使用的数量减去实际的数量后得到的数量
+                Long lastNum = 0L;
+                for (BizStockDetail bizStockDetail : stockDetailByOrder) {
+                    // 库存的实际数量
+                    Long validStock = bizStockDetail.getValidStock();
+                    lastNum = amount - validStock;
+                    if (lastNum <= Constants.LONG_FLAG_ZERO) {
+                        // 占用库存，关联库存关系
+                        bizStockDetail.setValidStock(amount);
+                        bizStockDetail.setOccupyStock(amount);
+                        bizStockDetailList.add(bizStockDetail);
+                        RelOrdstockOccupy relOrdstockOccupy = new RelOrdstockOccupy();
+                        relOrdstockOccupy.setOrderType(BizServiceOrder.ServiceTypeEnum.REPAIR.name());
+                        relOrdstockOccupy.setDocNo(saveOrderDetailDTO.getServiceOrderno());
+                        relOrdstockOccupy.setStockId(bizStockDetail.getId());
+                        relOrdstockOccupy.setOccupyNum(amount);
+                        relOrdstockOccupy.setOccupyStarttime(new Date());
+                        relOrdstockOccupy.preInsert(userHolder.getLoggedUserId());
+                        relOrdstockOccupyList.add(relOrdstockOccupy);
+                        break;
+                    } else {
+                        // 占用库存，关联库存关系
+                        bizStockDetail.setValidStock(validStock);
+                        bizStockDetail.setOccupyStock(validStock);
+                        bizStockDetailList.add(bizStockDetail);
+                        RelOrdstockOccupy relOrdstockOccupy = new RelOrdstockOccupy();
+                        relOrdstockOccupy.setOrderType(BizServiceOrder.ServiceTypeEnum.REPAIR.name());
+                        relOrdstockOccupy.setDocNo(saveOrderDetailDTO.getServiceOrderno());
+                        relOrdstockOccupy.setStockId(bizStockDetail.getId());
+                        relOrdstockOccupy.setOccupyNum(validStock);
+                        relOrdstockOccupy.setOccupyStarttime(new Date());
+                        relOrdstockOccupy.preInsert(userHolder.getLoggedUserId());
+                        relOrdstockOccupyList.add(relOrdstockOccupy);
+                        amount = lastNum;
+                    }
+                }
+                // 占用库存
+                int i = bizStockDetailDao.batchUpdateValidStock(bizStockDetailList);
+                if (i != bizStockDetailList.size()) {
+                    throw new CommonException("3005", "库存占用失败！");
+                }
+                // 关联库存关系
+                bizAllocateTradeorderDao.batchInsertRelOrdstockOccupy(relOrdstockOccupyList);
+            }
+        }
+    }
+
+
+    /**
+     * 还库存
+     * @param saveOrderDetailDTO 维修单详单
+     * @author liuduo
+     * @date 2018-09-07 14:23:37
+     */
+    private void returnStock(SaveOrderDetailDTO saveOrderDetailDTO) {
+        // 查询关联关系
+        List<RelOrdstockOccupy> relOrdstockOccupyByApplyNo = bizAllocateTradeorderDao.getRelOrdstockOccupyByApplyNo(saveOrderDetailDTO.getServiceOrderno());
+        List<BizStockDetail> bizStockDetailList = Lists.newArrayList();
+        if (!relOrdstockOccupyByApplyNo.isEmpty()) {
+            relOrdstockOccupyByApplyNo.forEach(item -> {
+                BizStockDetail bizStockDetail = new BizStockDetail();
+                bizStockDetail.setId(item.getStockId());
+                bizStockDetail.setValidStock(item.getOccupyNum());
+                bizStockDetail.setOccupyStock(item.getOccupyNum());
+                bizStockDetailList.add(bizStockDetail);
+            });
+            // 还库存
+            int i = bizStockDetailDao.updateValidAndOccupy(bizStockDetailList);
+            if (i != bizStockDetailList.size()) {
+                throw new CommonException("3004", "库存归还失败！");
+            }
+            // 删除关联关系
+            bizAllocateTradeorderDao.deleteRelation(saveOrderDetailDTO.getServiceOrderno());
+        }
+    }
+
+
+    /**
+     * 保存工时
+     * @param saveOrderDetailDTO 维修单详单
+     * @author liuduo
+     * @date 2018-09-07 14:23:37
+     */
+    private void saveMaintaintem(SaveOrderDetailDTO saveOrderDetailDTO) {
+        List<SaveMaintaintemDTO> saveMaintaintemDTOS = saveOrderDetailDTO.getSaveMaintaintemDTOS();
+        if (!saveMaintaintemDTOS.isEmpty()) {
+            List<BizServiceorderDetail> bizServiceorderDetailList = Lists.newArrayList();
+            saveMaintaintemDTOS.forEach(item -> {
+                if (StringUtils.isBlank(item.getServiceOrgno())) {
+                    item.setServiceOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+                    item.setServiceOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+                    item.setServiceUserid(userHolder.getLoggedUserId());
+                    item.setServiceUsername(userHolder.getLoggedUser().getUsername());
+                }
+                item.preInsert(userHolder.getLoggedUserId());
+                item.setServiceOrderno(saveOrderDetailDTO.getServiceOrderno());
+                BizServiceorderDetail bizServiceorderDetail = new BizServiceorderDetail();
+                BeanUtils.copyProperties(bizServiceorderDetail, item);
+                bizServiceorderDetailList.add(bizServiceorderDetail);
+            });
+            bizServiceorderDetailDao.saveBizServiceorderDetail(bizServiceorderDetailList);
+        }
+    }
+
 
     /**
      * 组装服务单派发
-     * @param orderCode 订单编号
+     * @param orderCode 服务单编号
      * @param loggedUser 用户信息
      * @author liuduo
      * @date 2018-09-05 16:46:28
@@ -424,7 +596,7 @@ return null;
 
     /**
      * 组装编辑用的车辆停放位置
-     * @param editServiceOrderDTO 订单信息
+     * @param editServiceOrderDTO 服务单信息
      * @author liuduo
      * @date 2018-09-04 14:53:15
      */
@@ -445,8 +617,8 @@ return null;
 
 
     /**
-     * 组装编辑用的订单信息
-     * @param editServiceOrderDTO 订单信息
+     * 组装编辑用的服务单信息
+     * @param editServiceOrderDTO 服务单信息
      * @author liuduo
      * @date 2018-09-04 14:39:36
      */
@@ -479,7 +651,7 @@ return null;
 
     /**
      * 组装车辆停放位置
-     * @param serviceOrderDTO 订单信息
+     * @param serviceOrderDTO 服务单信息
      * @param loggedUser  当前登录人
      * @author liuduo
      * @date 2018-09-04 11:59:33
@@ -501,9 +673,9 @@ return null;
 
 
     /**
-     * 组装订单
-     * @param serviceOrderDTO 订单信息
-     * @param orderCode 订单编号
+     * 组装服务单
+     * @param serviceOrderDTO 服务单信息
+     * @param orderCode 服务单编号
      * @param loggedUser 当前登录人
      * @author liuduo
      * @date 2018-09-04 11:58:20
@@ -514,7 +686,7 @@ return null;
         bizServiceOrder.setServiceOrderno(orderCode);
         bizServiceOrder.setCarVin(serviceOrderDTO.getCarVin());
         bizServiceOrder.setServiceType(serviceOrderDTO.getServiceType());
-        bizServiceOrder.setReportOrgno(loggedUser.getUserId());
+        bizServiceOrder.setReportOrgno(loggedUser.getOrganization().getOrgCode());
         bizServiceOrder.setReportOrgtype(loggedUser.getOrganization().getOrgType());
         bizServiceOrder.setReportTime(new Date());
         bizServiceOrder.setCustomerName(serviceOrderDTO.getCustomerName());

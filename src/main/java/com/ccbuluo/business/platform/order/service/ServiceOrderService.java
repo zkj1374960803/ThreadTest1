@@ -97,12 +97,13 @@ public interface ServiceOrderService {
     /**
      * 分配订单
      * @param serviceOrderno 订单编号
+     * @param orgType 类型（服务中心还是客户经理）
      * @param orgCodeOrUuid 机构编号或者客户经理uuid
      * @return 订单是否分配成功
      * @author liuduo
      * @date 2018-09-05 18:32:52
      */
-    StatusDto orderAllocation(String serviceOrderno, String orgCodeOrUuid);
+    StatusDto orderAllocation(String serviceOrderno, String orgType, String orgCodeOrUuid);
 
     /**
      * 查询工时列表

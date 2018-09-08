@@ -568,4 +568,18 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
 
         return queryListBean(BizStockDetail.class, sql.toString(), params);
     }
+
+    /**
+     * 维修单占用库存
+     * @param bizStockDetailList 库存详情集合
+     * @author liuduo
+     * @date 2018-09-07 15:16:46
+     */
+    public int batchUpdateValidStock(List<BizStockDetail> bizStockDetailList) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_stock_detail SET valid_stock = IFNULL(valid_stock,0) - :validStock,")
+            .append(" occupy_stock = IFNULL(occupy_stock,0) + :occupyStock WHERE id = :id");
+
+        return batchUpdateForListBean(sql.toString(), bizStockDetailList);
+    }
 }

@@ -218,4 +218,6 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
 
         return updateForMap(sql, params);
     }
+
+
 }

@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.order.dao;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceorderDetail;
+import com.ccbuluo.business.platform.order.dto.SaveMaintaintemDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -117,6 +118,26 @@ public class BizServiceorderDetailDao extends BaseDao<BizServiceorderDetail> {
         String sql = "DELETE  FROM biz_serviceorder_detail WHERE order_no = :serviceOrderno";
 
         updateForMap(sql, params);
+    }
+
+    /**
+     * 保存 记录维修任务中使用的工时和零配件的详情实体
+     * @param bizServiceorderDetails 记录维修任务中使用的工时和零配件的详情实体
+     * @return int 影响条数
+     * @author liuduo
+     * @date 2018-09-06 16:51:41
+     */
+    public void saveBizServiceorderDetail(List<BizServiceorderDetail> bizServiceorderDetails) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO biz_serviceorder_detail ( order_no,product_no,")
+            .append("product_type,unit_price,amount,warranty_type,service_orgno,")
+            .append("service_orgname,service_userid,service_username,creator,create_time,")
+            .append("operator,operate_time,delete_flag,remark ) VALUES (  :orderNo,")
+            .append(" :productNo, :productType, :unitPrice, :amount, :warrantyType,")
+            .append(" :serviceOrgno, :serviceOrgname, :serviceUserid, :serviceUsername,")
+            .append(" :creator, :createTime, :operator, :operateTime, :deleteFlag, :remark)");
+
+        batchInsertForListBean(sql.toString(), bizServiceorderDetails);
     }
 
     /**

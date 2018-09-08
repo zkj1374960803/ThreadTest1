@@ -125,12 +125,12 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
 
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT bso.id,bso.service_orderno,bso.car_no,bso.car_vin,")
-            .append("bso.service_type,bso.report_orgno,bso.report_orgtype,bso.report_time,")
-            .append("bso.customer_name,bso.customer_phone,bso.reserve_contacter,")
-            .append("bso.reserve_phone,bso.order_status,bso.dispatch_times,")
-            .append("bso.cur_processor,bso.processor_orgtype,bso.service_time,")
-            .append("bso.order_cost,bso.payed,bso.problem_content,")
-            .append("FROM biz_service_order AS bso WHERE bso.service_orderno= :orderNo");
+            .append(" bso.service_type,bso.report_orgno,bso.report_orgtype,bso.report_time,")
+            .append(" bso.customer_name,bso.customer_phone,bso.reserve_contacter,")
+            .append(" bso.reserve_phone,bso.order_status,bso.dispatch_times,")
+            .append(" bso.cur_processor,bso.processor_orgtype,bso.service_time,")
+            .append(" bso.order_cost,bso.payed,bso.problem_content ")
+            .append(" FROM biz_service_order AS bso WHERE bso.service_orderno= :orderNo");
         return super.findForBean(BizServiceOrder.class, sql.toString(), params);
     }
 
@@ -148,12 +148,15 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
      */
     public Page<BizServiceOrder> queryList(String orderStatus, String serviceType, String keyword, Integer offset, Integer pagesize) {
         Map<String, Object> params = Maps.newHashMap();
-        params.put("orderStatus", orderStatus);
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
 
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,service_orderno,order_status,car_vin,customer_name,customer_phone,service_type,report_time")
-            .append(" FROM biz_service_order WHERE order_status = :orderStatus  ");
+            .append(" FROM biz_service_order WHERE  1=1 ");
+        if (StringUtils.isNotBlank(orderStatus)) {
+            params.put("orderStatus", orderStatus);
+            sql.append(" AND order_status = :orderStatus ");
+        }
         if (StringUtils.isNotBlank(serviceType)) {
             params.put("serviceType", serviceType);
             sql.append(" AND service_type = :serviceType ");
@@ -203,5 +206,22 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
         String sql = "SELECT car_no FROM biz_service_order WHERE service_orderno = :serviceOrderno";
 
         return findForObject(sql, params, String.class);
+    }
+
+    /**
+     * 修改维修单的分配次数
+     * @param serviceOrderno 维修单单号
+     * @param longFlagTwo 分配次数
+     * @author liuduo
+     * @date 2018-09-08 10:27:10
+     */
+    public void updateDispatchTimes(String serviceOrderno, Long longFlagTwo) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("serviceOrderno", serviceOrderno);
+        params.put("longFlagTwo", longFlagTwo);
+
+        String sql = "UPDATE biz_service_order SET dispatch_times = :longFlagTwo WHERE service_orderno = :serviceOrderno";
+
+        updateForMap(sql, params);
     }
 }
