@@ -304,6 +304,9 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     @Transactional(rollbackFor = Exception.class)
     public StatusDto orderAllocation(String serviceOrderno, String orgType, String orgCodeOrUuid) {
         try {
+            if (!orgType.equals(BizServiceOrder.ProcessorOrgtypeEnum.SERVICECENTER.name())) {
+                throw new CommonException("3009", "不能分配到非服务中心的其他机构！");
+            }
             BusinessUser loggedUser = userHolder.getLoggedUser();
             // 先更改本次分配单的 是否当前处理人
             Long id = bizServiceDispatchDao.getByServiceOrderno(serviceOrderno, loggedUser.getUserId());
@@ -319,7 +322,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             if (byOrderNo.getDispatchTimes() > Constants.LONG_FLAG_ONE) {
                 throw new CommonException("3006", "该服务单已被分配，请核对！");
             }
-            if (StringUtils.isNotBlank(orgType) && !orgType.equals(Constants.ORG_TYPE)) {
+            if (StringUtils.isNotBlank(orgType)) {
                 // 创建新的服务单详情并更新旧的
                 BizServiceDispatch bizServiceDispatch2 = new BizServiceDispatch();
                 bizServiceDispatch2.setServiceOrderno(serviceOrderno);
@@ -428,7 +431,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     private void saveMerchandise(SaveOrderDetailDTO saveOrderDetailDTO) {
         List<SaveMerchandiseDTO> saveMerchandiseDTOS = saveOrderDetailDTO.getSaveMerchandiseDTOS();
         if (!saveMerchandiseDTOS.isEmpty()) {
-            List<BizServiceorderDetail> bizServiceorderDetailList = Lists.newArrayList();
+            List<SaveMerchandiseDTO> saveMerchandiseDTOS1 = Lists.newArrayList();
             saveMerchandiseDTOS.forEach(item -> {
                 if (StringUtils.isBlank(item.getServiceOrgno())) {
                     item.setServiceOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
@@ -438,11 +441,9 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
                 }
                 item.preInsert(userHolder.getLoggedUserId());
                 item.setServiceOrderno(saveOrderDetailDTO.getServiceOrderno());
-                BizServiceorderDetail bizServiceorderDetail = new BizServiceorderDetail();
-                BeanUtils.copyProperties(bizServiceorderDetail, item);
-                bizServiceorderDetailList.add(bizServiceorderDetail);
+                saveMerchandiseDTOS1.add(item);
             });
-            bizServiceorderDetailDao.saveBizServiceorderDetail(bizServiceorderDetailList);
+            bizServiceorderDetailDao.saveMerchandise(saveMerchandiseDTOS1);
         }
     }
 
@@ -460,13 +461,18 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             List<BizStockDetail> bizStockDetailList = Lists.newArrayList();
             List<RelOrdstockOccupy> relOrdstockOccupyList = Lists.newArrayList();
             for (SaveMerchandiseDTO saveMerchandiseDTO : saveMerchandiseDTOS) {
-                if (StringUtils.isBlank(saveMerchandiseDTO.getServiceOrderno())) {
-                    orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
-                } else {
-                    orgCode = saveMerchandiseDTO.getServiceOrderno();
-                }
                 // 根据商品编号和使用人查询库存
-                List<BizStockDetail> stockDetailByOrder = bizStockDetailDao.getStockDetailByOrder(saveMerchandiseDTO.getProductNo(), orgCode);
+                String orgNo = "";
+                if (StringUtils.isNotBlank(saveMerchandiseDTO.getServiceOrgno())) {
+                    orgNo = saveMerchandiseDTO.getServiceOrgno();
+                } else {
+                    orgNo = userHolder.getLoggedUser().getOrganization().getOrgCode();
+                }
+                List<BizStockDetail> stockDetailByOrder = bizStockDetailDao.getStockDetailByOrder(saveMerchandiseDTO.getProductNo(), orgNo);
+                long count = stockDetailByOrder.stream().map(BizStockDetail::getValidStock).count();
+                if (saveMerchandiseDTO.getAmount() > count) {
+                    throw new CommonException("3008", "现有库存小于使用库存，请核对！");
+                }
                 // 使用的数量
                 Long amount = saveMerchandiseDTO.getAmount();
                 // 使用的数量减去实际的数量后得到的数量
@@ -555,7 +561,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     private void saveMaintaintem(SaveOrderDetailDTO saveOrderDetailDTO) {
         List<SaveMaintaintemDTO> saveMaintaintemDTOS = saveOrderDetailDTO.getSaveMaintaintemDTOS();
         if (!saveMaintaintemDTOS.isEmpty()) {
-            List<BizServiceorderDetail> bizServiceorderDetailList = Lists.newArrayList();
+            List<SaveMaintaintemDTO> saveMaintaintemDTOS1 = Lists.newArrayList();
             saveMaintaintemDTOS.forEach(item -> {
                 if (StringUtils.isBlank(item.getServiceOrgno())) {
                     item.setServiceOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
@@ -565,11 +571,9 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
                 }
                 item.preInsert(userHolder.getLoggedUserId());
                 item.setServiceOrderno(saveOrderDetailDTO.getServiceOrderno());
-                BizServiceorderDetail bizServiceorderDetail = new BizServiceorderDetail();
-                BeanUtils.copyProperties(bizServiceorderDetail, item);
-                bizServiceorderDetailList.add(bizServiceorderDetail);
+                saveMaintaintemDTOS1.add(item);
             });
-            bizServiceorderDetailDao.saveBizServiceorderDetail(bizServiceorderDetailList);
+            bizServiceorderDetailDao.saveMaintaintem(saveMaintaintemDTOS1);
         }
     }
 

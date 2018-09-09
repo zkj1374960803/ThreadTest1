@@ -64,6 +64,11 @@ public class SaveMerchandiseDTO extends AftersaleCommonEntity {
      */
     @ApiModelProperty(name = "serviceUsername", value = "提供维修服务的员工用户的姓名")
     private String serviceUsername;
+    /**
+     * 备注
+     */
+    @ApiModelProperty(name = "remark", value = "备注")
+    private String remark;
 
     public String getServiceOrderno() {
         return serviceOrderno;
@@ -143,5 +148,13 @@ public class SaveMerchandiseDTO extends AftersaleCommonEntity {
 
     public void setServiceUsername(String serviceUsername) {
         this.serviceUsername = serviceUsername;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.order.dao;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceorderDetail;
 import com.ccbuluo.business.platform.order.dto.SaveMaintaintemDTO;
+import com.ccbuluo.business.platform.order.dto.SaveMerchandiseDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -121,23 +122,23 @@ public class BizServiceorderDetailDao extends BaseDao<BizServiceorderDetail> {
     }
 
     /**
-     * 保存 记录维修任务中使用的工时和零配件的详情实体
-     * @param bizServiceorderDetails 记录维修任务中使用的工时和零配件的详情实体
+     * 保存 记录维修任务中使用的工时详情实体
+     * @param saveMaintaintemDTOS1 记录维修任务中使用的工时详情实体
      * @return int 影响条数
      * @author liuduo
      * @date 2018-09-06 16:51:41
      */
-    public void saveBizServiceorderDetail(List<BizServiceorderDetail> bizServiceorderDetails) {
+    public void saveMaintaintem(List<SaveMaintaintemDTO> saveMaintaintemDTOS1) {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO biz_serviceorder_detail ( order_no,product_no,")
             .append("product_type,unit_price,amount,warranty_type,service_orgno,")
             .append("service_orgname,service_userid,service_username,creator,create_time,")
-            .append("operator,operate_time,delete_flag,remark ) VALUES (  :orderNo,")
+            .append("operator,operate_time,delete_flag,remark ) VALUES (  :serviceOrderno,")
             .append(" :productNo, :productType, :unitPrice, :amount, :warrantyType,")
             .append(" :serviceOrgno, :serviceOrgname, :serviceUserid, :serviceUsername,")
             .append(" :creator, :createTime, :operator, :operateTime, :deleteFlag, :remark)");
 
-        batchInsertForListBean(sql.toString(), bizServiceorderDetails);
+        batchInsertForListBean(sql.toString(), saveMaintaintemDTOS1);
     }
 
     /**
@@ -157,5 +158,26 @@ public class BizServiceorderDetailDao extends BaseDao<BizServiceorderDetail> {
                 .append("service_username,creator,create_time,operator,operate_time,")
                 .append("delete_flag,remark FROM biz_serviceorder_detail WHERE delete_flag = :deleteFlag and order_no = :orderNo");
         return super.queryListBean(BizServiceorderDetail.class, sql.toString(), param);
+    }
+
+
+    /**
+     * 保存 记录维修任务中使用的零配件详情实体
+     * @param saveMerchandiseDTOS1 记录维修任务中使用的零配件详情实体
+     * @return int 影响条数
+     * @author liuduo
+     * @date 2018-09-06 16:51:41
+     */
+    public void saveMerchandise(List<SaveMerchandiseDTO> saveMerchandiseDTOS1) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO biz_serviceorder_detail ( order_no,product_no,")
+            .append("product_type,unit_price,amount,warranty_type,service_orgno,")
+            .append("service_orgname,service_userid,service_username,creator,create_time,")
+            .append("operator,operate_time,delete_flag,remark ) VALUES (  :serviceOrderno,")
+            .append(" :productNo, :productType, :unitPrice, :amount, :warrantyType,")
+            .append(" :serviceOrgno, :serviceOrgname, :serviceUserid, :serviceUsername,")
+            .append(" :creator, :createTime, :operator, :operateTime, :deleteFlag, :remark)");
+
+        batchInsertForListBean(sql.toString(), saveMerchandiseDTOS1);
     }
 }

@@ -135,9 +135,10 @@ public class BizServiceDispatchDao extends BaseDao<BizServiceDispatch> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("serviceOrderno", serviceOrderno);
         params.put("loggedUserId", loggedUserId);
+        params.put("currentFlag", Constants.FLAG_ONE);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id FROM biz_service_dispatch  WHERE  service_orderno = :serviceOrderno AND processor_uuid = :loggedUserId");
+        sql.append("SELECT id FROM biz_service_dispatch  WHERE  service_orderno = :serviceOrderno AND processor_uuid = :loggedUserId AND current_flag = :currentFlag");
 
         return findForObject(sql.toString(), params, Long.class);
     }

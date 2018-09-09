@@ -197,8 +197,8 @@ public class ServiceOrderController extends BaseController {
      */
     @ApiOperation(value = "分配服务单", notes = "【刘铎】")
     @ApiImplicitParams({@ApiImplicitParam(name = "serviceOrderno", value = "服务单编号",  required = true, paramType = "query"),
-        @ApiImplicitParam(name = "orgType", value = "分配的目标类型（服务中心或者客户经理）",  required = true, paramType = "query"),
-        @ApiImplicitParam(name = "orgCodeOrUuid", value = "机构编号或者客户经理uuid",  required = true, paramType = "query")})
+        @ApiImplicitParam(name = "orgType", value = "分配的目标类型（服务中心）",  required = true, paramType = "query"),
+        @ApiImplicitParam(name = "orgCodeOrUuid", value = "机构编号",  required = true, paramType = "query")})
     @PostMapping("/orderallocation")
     public StatusDto orderAllocation(@RequestParam String serviceOrderno, @RequestParam String orgType, @RequestParam String orgCodeOrUuid) {
         return serviceOrderService.orderAllocation(serviceOrderno, orgType, orgCodeOrUuid);

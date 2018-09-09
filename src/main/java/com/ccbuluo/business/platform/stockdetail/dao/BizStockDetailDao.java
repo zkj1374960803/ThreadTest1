@@ -564,7 +564,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,valid_stock FROM biz_stock_detail WHERE org_no = :orgCode AND product_no = :productNo AND delete_flag = :deleteFlag");
+        sql.append("SELECT id,IFNULL(valid_stock,0) AS valid_stock FROM biz_stock_detail WHERE org_no = :orgCode AND product_no = :productNo AND delete_flag = :deleteFlag");
 
         return queryListBean(BizStockDetail.class, sql.toString(), params);
     }
