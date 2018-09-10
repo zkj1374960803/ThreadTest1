@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
 import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
+import com.ccbuluo.business.constants.ApplyTypeEnum;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.InstockTypeEnum;
 import com.ccbuluo.business.entity.*;
@@ -102,7 +103,7 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 查询出库计划
             List<BizOutstockplanDetail> outstockPlans = bizOutstockplanDetailDao.getOutstockplansByApplyNo(applyNo,applyorgNo);
             // 调用自动出库
-            outstockOrderService.autoSaveOutstockOrder(applyNo, outstockPlans);
+            outstockOrderService.autoSaveOutstockOrder(applyNo, outstockPlans,ApplyTypeEnum.APPLYORDER.name());
         } catch (Exception e) {
             logger.error("提交失败！", e);
             throw e;

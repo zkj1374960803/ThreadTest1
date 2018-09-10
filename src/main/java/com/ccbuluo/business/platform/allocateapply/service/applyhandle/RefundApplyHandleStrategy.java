@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
 import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
+import com.ccbuluo.business.constants.ApplyTypeEnum;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
@@ -95,7 +96,7 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 查询出库计划
             List<BizOutstockplanDetail> outstockPlans = bizOutstockplanDetailDao.getOutstockplansByApplyNo(applyNo,applyorgNo);
             // 调用自动出库
-            outstockOrderService.autoSaveOutstockOrder(applyNo, outstockPlans);
+            outstockOrderService.autoSaveOutstockOrder(applyNo, outstockPlans,ApplyTypeEnum.APPLYORDER.name());
             String stockType = getStockType(details);
             // 只有正常件才保存库存和占用关系
             if(BizStockDetail.StockTypeEnum.VALIDSTOCK.name().equals(stockType)){
