@@ -1,9 +1,12 @@
 package com.ccbuluo.business.platform.claimorder.service;
 
+import org.springframework.stereotype.Service;
+
 /**
  * @author zhangkangjian
  * @date 2018-09-08 10:42:41
  */
+@Service
 public class ClaimOrderServiceImpl implements ClaimOrderService{
 
 

@@ -11,6 +11,7 @@ import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleStrategy;
+import com.ccbuluo.business.platform.claimorder.service.ClaimOrderService;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceorderDetailDao;
@@ -52,13 +53,13 @@ public class PaymentServiceImpl implements PaymentService {
     @Resource
     private BizAllocateapplyDetailDao bizAllocateapplyDetailDao;
     @Autowired
-    BizAllocateTradeorderDao bizAllocateTradeorderDao;
+    private BizAllocateTradeorderDao bizAllocateTradeorderDao;
     @Autowired
-    BizServiceOrderDao bizServiceOrderDao;
-    @ThriftRPCClient("UserCoreSerService")
-    private InnerUserInfoService innerUserInfoService;
+    private BizServiceOrderDao bizServiceOrderDao;
     @Autowired
-    BizServiceorderDetailDao bizServiceorderDetailDao;
+    private BizServiceorderDetailDao bizServiceorderDetailDao;
+    @Autowired
+    private ClaimOrderService claimOrderService;
 
     /**
      *  支付完成调用接口
@@ -188,6 +189,10 @@ public class PaymentServiceImpl implements PaymentService {
             String receive = pair.getLeft();
             BigDecimal price = pair.getRight();
             // TODO 调用支付接口
+            if(1 == 1){
+                // 调用生成索赔单(支付成功)
+                claimOrderService.generateClaimForm(serviceOrderno);
+            }
         }
         return null;
     }
