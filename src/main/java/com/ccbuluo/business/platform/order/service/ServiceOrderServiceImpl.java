@@ -1,9 +1,6 @@
 package com.ccbuluo.business.platform.order.service;
 
-import com.ccbuluo.business.constants.Constants;
-import com.ccbuluo.business.constants.DocCodePrefixEnum;
-import com.ccbuluo.business.constants.OutstockTypeEnum;
-import com.ccbuluo.business.constants.StockPlanStatusEnum;
+import com.ccbuluo.business.constants.*;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.allocateapply.dto.CheckStockQuantityDTO;
@@ -760,7 +757,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         // 查询出库计划
         List<BizOutstockplanDetail> outstockPlans = bizOutstockplanDetailDao.getOutstockplansByApplyNo(orderNo,orgCode);
         // 调用自动出库
-        outstockOrderService.autoSaveOutstockOrder(orderNo, outstockPlans);
+        outstockOrderService.autoSaveOutstockOrder(orderNo, outstockPlans,ApplyTypeEnum.SERVICEORDER.name());
     }
 
     /**
