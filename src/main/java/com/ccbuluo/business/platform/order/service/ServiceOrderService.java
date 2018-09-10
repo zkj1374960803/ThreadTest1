@@ -49,7 +49,7 @@ public interface ServiceOrderService {
      * @author liuduo
      * @date 2018-09-04 15:06:55
      */
-    StatusDto<Page<BizServiceOrder>> queryList(String orderStatus, String serviceType, String keyword, Integer offset, Integer pagesize);
+    StatusDto<Page<BizServiceOrder>> queryList(String orderStatus, String serviceType, String reportOrgno, String keyword, Integer offset, Integer pagesize);
 
     /**
      * 修改服务单状态

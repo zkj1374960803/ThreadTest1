@@ -88,16 +88,18 @@ public class ServiceOrderController extends BaseController {
     @ApiOperation(value = "维修单列表", notes = "【刘铎】")
     @ApiImplicitParams({@ApiImplicitParam(name = "orderStatus", value = "维修单状态",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "serviceType", value = "服务类型",  required = false, paramType = "query"),
+        @ApiImplicitParam(name = "reportOrgno", value = "当前登录人的机构编号",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "keyword", value = "关键字",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "起始数",  required = true, paramType = "query", dataType = "int"),
         @ApiImplicitParam(name = "pagesize", value = "每页数",  required = true, paramType = "query", dataType = "int")})
     @GetMapping("/list")
     public StatusDto<Page<BizServiceOrder>> queryList(@RequestParam(required = false) String orderStatus,
                                                       @RequestParam(required = false) String serviceType,
+                                                      @RequestParam(required = false) String reportOrgno,
                                                       @RequestParam(required = false) String keyword,
                                                       @RequestParam(defaultValue = "0") Integer offset,
                                                       @RequestParam(defaultValue = "10") Integer pagesize) {
-        return serviceOrderService.queryList(orderStatus, serviceType, keyword, offset, pagesize);
+        return serviceOrderService.queryList(orderStatus, serviceType, reportOrgno, keyword, offset, pagesize);
     }
 
 

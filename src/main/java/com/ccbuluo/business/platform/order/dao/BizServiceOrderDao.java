@@ -146,27 +146,31 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
      * @author liuduo
      * @date 2018-09-04 15:06:55
      */
-    public Page<BizServiceOrder> queryList(String orderStatus, String serviceType, String keyword, Integer offset, Integer pagesize) {
+    public Page<BizServiceOrder> queryList(String orderStatus, String serviceType, String reportOrgno, String keyword, Integer offset, Integer pagesize) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,service_orderno,order_status,car_vin,customer_name,customer_phone,service_type,report_time")
-            .append(" FROM biz_service_order WHERE  1=1 ");
+        sql.append("SELECT bso.id,bso.service_orderno,bso.order_status,bso.car_vin,bso.customer_name,bso.customer_phone,bso.service_type,bso.report_time")
+            .append(" FROM biz_service_order AS bso LEFT JOIN biz_service_dispatch AS bsd ON bsd.service_orderno = bso.service_orderno WHERE  1=1 ");
         if (StringUtils.isNotBlank(orderStatus)) {
             params.put("orderStatus", orderStatus);
-            sql.append(" AND order_status = :orderStatus ");
+            sql.append(" AND bso.order_status = :orderStatus ");
         }
         if (StringUtils.isNotBlank(serviceType)) {
             params.put("serviceType", serviceType);
-            sql.append(" AND service_type = :serviceType ");
+            sql.append(" AND bso.service_type = :serviceType ");
+        }
+        if (StringUtils.isNotBlank(reportOrgno)) {
+            params.put("reportOrgno", reportOrgno);
+            sql.append(" AND (bso.report_orgno = :reportOrgno OR bsd.processor_orgno = :reportOrgno)");
         }
         if (StringUtils.isNotBlank(keyword)) {
             params.put("keyword", keyword);
-            sql.append(" AND (service_orderno LIKE CONCAT('%',:keyword,'%') or car_vin LIKE CONCAT('%',:keyword,'%') OR ")
-                .append(" customer_name LIKE CONCAT('%',:keyword,'%') OR customer_phone LIKE CONCAT('%',:keyword,'%'))");
+            sql.append(" AND (bso.service_orderno LIKE CONCAT('%',:keyword,'%') or bso.car_vin LIKE CONCAT('%',:keyword,'%') OR ")
+                .append(" bso.customer_name LIKE CONCAT('%',:keyword,'%') OR bso.customer_phone LIKE CONCAT('%',:keyword,'%'))");
         }
-        sql.append(" AND delete_flag = :deleteFlag ORDER BY operate_time DESC");
+        sql.append(" AND bso.delete_flag = :deleteFlag ORDER BY bso.operate_time DESC");
 
         return queryPageForBean(BizServiceOrder.class, sql.toString(), params, offset, pagesize);
     }

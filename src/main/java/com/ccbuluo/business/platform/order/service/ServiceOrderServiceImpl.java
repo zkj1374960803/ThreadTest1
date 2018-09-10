@@ -191,8 +191,8 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      * @date 2018-09-04 15:06:55
      */
     @Override
-    public StatusDto<Page<BizServiceOrder>> queryList(String orderStatus, String serviceType, String keyword, Integer offset, Integer pagesize) {
-        return StatusDto.buildDataSuccessStatusDto(bizServiceOrderDao.queryList(orderStatus, serviceType, keyword, offset, pagesize));
+    public StatusDto<Page<BizServiceOrder>> queryList(String orderStatus, String serviceType, String reportOrgno, String keyword, Integer offset, Integer pagesize) {
+        return StatusDto.buildDataSuccessStatusDto(bizServiceOrderDao.queryList(orderStatus, serviceType, reportOrgno, keyword, offset, pagesize));
     }
 
 
@@ -352,9 +352,8 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
                 bizServiceDispatch2.setServiceOrderno(serviceOrderno);
                 bizServiceDispatch2.setPreviousId(id);
                 bizServiceDispatch2.setCurrentFlag(Constants.FLAG_ONE);
-                bizServiceDispatch2.setProcessorOrgno(loggedUser.getOrganization().getOrgCode());
-                bizServiceDispatch2.setProcessorOrgtype(loggedUser.getOrganization().getOrgType());
-                bizServiceDispatch2.setProcessorUuid(loggedUser.getUserId());
+                bizServiceDispatch2.setProcessorOrgno(orgCodeOrUuid);
+                bizServiceDispatch2.setProcessorOrgtype(orgType);
                 bizServiceDispatch2.setConfirmed(Constants.STATUS_FLAG_ZERO);
                 bizServiceDispatch2.preInsert(loggedUser.getUserId());
                 bizServiceDispatchDao.saveBizServiceDispatch(bizServiceDispatch2);
@@ -678,6 +677,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         bizServiceOrder.setServiceType(editServiceOrderDTO.getServiceType());
         bizServiceOrder.setCustomerName(editServiceOrderDTO.getCustomerName());
         bizServiceOrder.setCustomerPhone(editServiceOrderDTO.getCustomerPhone());
+        bizServiceOrder.setCustomerOrgno(editServiceOrderDTO.getCustomerOrgno());
         bizServiceOrder.setReserveContacter(editServiceOrderDTO.getReserveContacter());
         bizServiceOrder.setReservePhone(editServiceOrderDTO.getReservePhone());
         // 根据车牌号查询该车属于哪个机构
@@ -749,6 +749,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         bizServiceOrder.setReportTime(new Date());
         bizServiceOrder.setCustomerName(serviceOrderDTO.getCustomerName());
         bizServiceOrder.setCustomerPhone(serviceOrderDTO.getCustomerPhone());
+        bizServiceOrder.setCustomerOrgno(serviceOrderDTO.getCustomerOrgno());
         bizServiceOrder.setReserveContacter(serviceOrderDTO.getReserveContacter());
         bizServiceOrder.setReservePhone(serviceOrderDTO.getReservePhone());
         if (loggedUser.getOrganization().getOrgType().equals(BizServiceOrder.ProcessorOrgtypeEnum.STORE.name())) {

@@ -60,6 +60,11 @@ public class EditServiceOrderDTO extends AftersaleCommonEntity {
     @ApiModelProperty(name = "reserveContacter", value = "备用联系人的姓名")
     private String reserveContacter;
     /**
+     * 客户方机构编号
+     */
+    @ApiModelProperty(name = "customerOrgno", value = "客户方机构编号")
+    private String customerOrgno;
+    /**
      * 备用联系人的联系方式
      */
     @ApiModelProperty(name = "reservePhone", value = "备用联系人的联系方式")
@@ -260,5 +265,13 @@ public class EditServiceOrderDTO extends AftersaleCommonEntity {
 
     public void setDetailAddress(String detailAddress) {
         this.detailAddress = detailAddress;
+    }
+
+    public String getCustomerOrgno() {
+        return customerOrgno;
+    }
+
+    public void setCustomerOrgno(String customerOrgno) {
+        this.customerOrgno = customerOrgno;
     }
 }

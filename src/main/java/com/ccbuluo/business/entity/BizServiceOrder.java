@@ -60,6 +60,11 @@ public class BizServiceOrder extends AftersaleCommonEntity{
     @ApiModelProperty(name = "customerPhone", value = "客户的联系方式")
     private String customerPhone;
     /**
+     * 客户方机构编号
+     */
+    @ApiModelProperty(name = "customerOrgno", value = "客户方机构编号")
+    private String customerOrgno;
+    /**
      * 备用联系人的姓名
      */
     @ApiModelProperty(name = "reserveContacter", value = "备用联系人的姓名")
@@ -353,5 +358,11 @@ public class BizServiceOrder extends AftersaleCommonEntity{
         return this.remark;
     }
 
+    public String getCustomerOrgno() {
+        return customerOrgno;
+    }
 
+    public void setCustomerOrgno(String customerOrgno) {
+        this.customerOrgno = customerOrgno;
+    }
 }
