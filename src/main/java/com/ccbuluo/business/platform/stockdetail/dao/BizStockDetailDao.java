@@ -256,14 +256,14 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author liuduo
      * @date 2018-08-10 15:02:51
      */
-    public List<Pair<Long,Long>> queryVersionNoById(List<Long> stockIds) {
-        Map<String, Object> param = Maps.newHashMap();
-        param.put("stockIds", stockIds);
-
-        String sql = "SELECT id,version_no FROM biz_stock_detail  WHERE id IN(:stockIds)";
-
-        return super.queryListPair(sql, param, Long.class, Long.class);
-    }
+//    public List<Pair<Long,Long>> queryVersionNoById(List<Long> stockIds) {
+//        Map<String, Object> param = Maps.newHashMap();
+//        param.put("stockIds", stockIds);
+//
+//        String sql = "SELECT id,version_no FROM biz_stock_detail  WHERE id IN(:stockIds)";
+//
+//        return super.queryListPair(sql, param, Long.class, Long.class);
+//    }
 
     /**
      * 把库存明细中的有效库存更新库到占用库存
