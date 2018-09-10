@@ -96,7 +96,7 @@ public class ClaimOrderDao extends BaseDao<ClaimOrderDao> {
      */
     public List<ProductDetailDTO> queryMaintainitemDetail(ProductDetailDTO productDetailDTO) {
         StringBuffer sql = new StringBuffer();
-        sql.append(" SELECT a.product_no,b.maintainitem_name as 'productName',a.unit_price, a.amount,a.warranty_type,a.service_username  ")
+        sql.append(" SELECT a.product_no,b.maintainitem_name as 'productName',a.unit_price, a.amount,a.warranty_type,a.service_username,a.service_userid  ")
             .append(" FROM biz_serviceorder_detail a ")
             .append("  LEFT JOIN biz_service_maintainitem b ON a.product_no = b.maintainitem_code ")
             .append(" WHERE 1 = 1  ");
