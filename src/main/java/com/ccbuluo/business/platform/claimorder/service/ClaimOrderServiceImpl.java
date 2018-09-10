@@ -4,6 +4,7 @@ import com.ccbuluo.business.constants.DocCodePrefixEnum;
 import com.ccbuluo.business.constants.OrganizationTypeEnum;
 import com.ccbuluo.business.entity.BizServiceOrder;
 import com.ccbuluo.business.entity.BizServiceorderDetail;
+import com.ccbuluo.business.platform.carconfiguration.service.BasicCarmodelManageService;
 import com.ccbuluo.business.platform.claimorder.dao.ClaimOrderDao;
 import com.ccbuluo.business.platform.claimorder.dto.BizServiceClaimorder;
 import com.ccbuluo.business.platform.claimorder.dto.QueryClaimorderListDTO;
@@ -48,6 +49,8 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
     private CarpartsProductService carpartsProductService;
     @Resource
     private BizServiceOrderDao bizServiceOrderDao;
+    @Resource
+    private BasicCarmodelManageService basicCarmodelManageService;
 
     /**
      * 生成索赔单
@@ -174,6 +177,8 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
                 });
             }
         });
+        // todo
+//        basicCarmodelManageService.buildCarModeName(fittingDetail);
         return fittingDetail;
     }
 

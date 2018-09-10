@@ -73,6 +73,11 @@ public class ProductDetailDTO extends AftersaleCommonEntity {
     @ApiModelProperty(name = "carModelName", value = "适配车型")
     private String carModelName;
 
+
+    public Double getTotalPrice() {
+        return unitPrice.doubleValue() * amount;
+    }
+
     public String getProductName() {
         return productName;
     }
