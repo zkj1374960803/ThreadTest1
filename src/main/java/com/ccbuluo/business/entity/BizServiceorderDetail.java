@@ -3,7 +3,6 @@ package com.ccbuluo.business.entity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -33,7 +32,7 @@ public class BizServiceorderDetail extends AftersaleCommonEntity{
      * 商品的单价
      */
     @ApiModelProperty(name = "unitPrice", value = "商品的单价")
-    private BigDecimal unitPrice;
+    private double unitPrice;
     /**
      * 使用的数量
      */
@@ -70,6 +69,11 @@ public class BizServiceorderDetail extends AftersaleCommonEntity{
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
 
+
+    public double getTotalPrice() {
+        return amount * unitPrice;
+    }
+
     public void setOrderNo(String orderNo) {
         this.orderNo = orderNo;
     }
@@ -94,11 +98,11 @@ public class BizServiceorderDetail extends AftersaleCommonEntity{
         return this.productType;
     }
 
-    public void setUnitPrice(BigDecimal unitPrice) {
+    public void setUnitPrice(double unitPrice) {
         this.unitPrice = unitPrice;
     }
 
-    public BigDecimal getUnitPrice() {
+    public double getUnitPrice() {
         return this.unitPrice;
     }
 
@@ -158,5 +162,29 @@ public class BizServiceorderDetail extends AftersaleCommonEntity{
         return this.remark;
     }
 
+    public enum ProductTypeEnum{
+        FITTING("零配件"),MAINTAINITEM("工时");
+        private String label;
+        ProductTypeEnum(String label) {
+            this.label = label;
+        }
+        public String getLabel() {
+            return label;
+        }
+    }
+
+    public enum WarrantyTypeEnum{
+        OVERSHELFLIFE("过保"),INSHELFLIFE("在保");
+
+        private String label;
+
+        WarrantyTypeEnum(String label) {
+            this.label = label;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+    }
 
 }
