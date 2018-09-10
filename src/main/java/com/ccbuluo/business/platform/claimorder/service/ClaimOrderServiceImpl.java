@@ -175,7 +175,7 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
                     String productNo = c.getProductNo();
                     BasicCarpartsProductDTO carparts = basicCarpartsProductMap.get(productNo);
                     c.setProductName(carparts.getCarpartsName());
-                    c.setCarModelName(carparts.getFitCarmodel());
+                    c.setCarModelName(carparts.getCarmodelName());
                     c.setProductCategoryname(carparts.getCategoryCodePath());
                     c.setProductUnit(carparts.getUnitName());
                 });
