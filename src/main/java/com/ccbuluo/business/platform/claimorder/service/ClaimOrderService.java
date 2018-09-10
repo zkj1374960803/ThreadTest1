@@ -2,9 +2,11 @@ package com.ccbuluo.business.platform.claimorder.service;
 
 import com.ccbuluo.business.platform.claimorder.dto.BizServiceClaimorder;
 import com.ccbuluo.business.platform.claimorder.dto.QueryClaimorderListDTO;
+import com.ccbuluo.business.platform.order.dto.ProductDetailDTO;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -72,4 +74,12 @@ public interface ClaimOrderService {
      * @date 2018-09-10 10:43:33
      */
     void updateDocStatusAndRepayTime(String claimOrdno, String docStatus);
+    /**
+     * 查询零配件列表信息
+     * @param productDetailDTO 查询条件
+     * @return List<ProductDetailDTO>
+     * @author zhangkangjian
+     * @date 2018-09-10 16:36:14
+     */
+    List<ProductDetailDTO> queryFitingDetailList(ProductDetailDTO productDetailDTO);
 }

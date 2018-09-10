@@ -6,11 +6,9 @@ import com.ccbuluo.business.entity.BizServiceOrder;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarcoreInfo;
 import com.ccbuluo.business.platform.carmanage.dto.CarcoreInfoDTO;
 import com.ccbuluo.business.platform.carmanage.service.BasicCarcoreInfoService;
+import com.ccbuluo.business.platform.claimorder.service.ClaimOrderService;
 import com.ccbuluo.business.platform.maintainitem.dto.DetailBizServiceMaintainitemDTO;
-import com.ccbuluo.business.platform.order.dto.DetailServiceOrderDTO;
-import com.ccbuluo.business.platform.order.dto.EditServiceOrderDTO;
-import com.ccbuluo.business.platform.order.dto.SaveOrderDetailDTO;
-import com.ccbuluo.business.platform.order.dto.SaveServiceOrderDTO;
+import com.ccbuluo.business.platform.order.dto.*;
 import com.ccbuluo.business.platform.order.service.ServiceOrderService;
 import com.ccbuluo.business.vehiclelease.resdto.CarLesseeResDTO;
 import com.ccbuluo.business.vehiclelease.service.CarcoreInfoService;
@@ -26,7 +24,9 @@ import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 描述 维修单管理，客户经理
@@ -43,6 +43,7 @@ public class ServiceOrderController extends BaseController {
     private ServiceOrderService serviceOrderService;
     @Autowired
     private BasicCarcoreInfoService basicCarcoreInfoService;
+
     @ThriftRPCClient("BasicOrdergenerationSerService")
     private CarcoreInfoService carcoreInfoService;
 
@@ -58,8 +59,6 @@ public class ServiceOrderController extends BaseController {
     public StatusDto saveOrder(@ApiParam(name = "维修单信息", value = "传入json格式", required = true)@RequestBody SaveServiceOrderDTO saveServiceOrderDTO) {
         return serviceOrderService.saveOrder(saveServiceOrderDTO);
     }
-
-
 
     /**
      * 编辑维修单
@@ -306,6 +305,19 @@ public class ServiceOrderController extends BaseController {
         return serviceOrderService.acceptance(serviceOrderno);
     }
 
-
+    /**
+     * 查询维修单的工时详情和零配件详情
+     * @param serviceOrderno 维修单的编号
+     * @return Map<String,List<ProductDetailDTO>>
+     * @author zhangkangjian
+     * @date 2018-09-10 17:41:01
+     */
+    @ApiOperation(value = "查询维修单的工时详情和零配件详情", notes = "【张康健】")
+    @GetMapping("/querymaintainitemandfittingdetail")
+    @ApiImplicitParam(name = "serviceOrderno", value ="维修单编号",  required = true, paramType = "query")
+    public StatusDto<Map<String,List<ProductDetailDTO>>> querymaintainitemAndFittingDetail(String serviceOrderno){
+        Map<String,List<ProductDetailDTO>> map = serviceOrderService.querymaintainitemAndFittingDetail(serviceOrderno);
+        return StatusDto.buildDataSuccessStatusDto(map);
+    }
 
 }

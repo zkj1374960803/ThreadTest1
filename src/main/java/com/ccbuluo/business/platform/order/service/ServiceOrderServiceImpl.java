@@ -9,6 +9,8 @@ import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.carmanage.dto.CarcoreInfoDTO;
 import com.ccbuluo.business.platform.carmanage.service.BasicCarcoreInfoService;
 import com.ccbuluo.business.platform.carposition.dao.BizCarPositionDao;
+import com.ccbuluo.business.platform.claimorder.dao.ClaimOrderDao;
+import com.ccbuluo.business.platform.claimorder.service.ClaimOrderService;
 import com.ccbuluo.business.platform.custmanager.dao.BizServiceCustmanagerDao;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
@@ -43,6 +45,7 @@ import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.ccbuluo.usercoreintf.service.BasicUserWorkplaceService;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,6 +115,10 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     private ServiceLogService serviceLogService;
     @Autowired
     private BizServiceLogDao bizServiceLogDao;
+    @Autowired
+    private ClaimOrderDao claimOrderDao;
+    @Resource(name = "claimOrderServiceImpl")
+    private ClaimOrderService claimOrderServiceImpl;
 
 
     /**
@@ -924,6 +931,30 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         // 操作的主体的类型
         String subjectType = "ServiceOrderServiceImpl";
         return StatusDto.buildDataSuccessStatusDto(bizServiceLogDao.orderLog(serviceOrderno, subjectType));
+    }
+
+    /**
+     * 查询维修单的工时详情和零配件详情
+     * @param serviceOrderno 维修单的编号
+     * @return Map<String , List < ProductDetailDTO>>
+     * @author zhangkangjian
+     * @date 2018-09-10 17:41:01
+     */
+    @Override
+    public Map<String, List<ProductDetailDTO>> querymaintainitemAndFittingDetail(String serviceOrderno) {
+        ProductDetailDTO productDetailDTO = new ProductDetailDTO();
+        productDetailDTO.setServiceOrderno(serviceOrderno);
+        // 工时类型
+        productDetailDTO.setProductType(BizServiceorderDetail.ProductTypeEnum.MAINTAINITEM.name());
+        List<ProductDetailDTO> maintainitemDetail = claimOrderDao.queryMaintainitemDetail(productDetailDTO);
+        // 查询零配件信息
+        productDetailDTO.setProductType(BizServiceorderDetail.ProductTypeEnum.FITTING.name());
+        // 查询零配件列表信息
+        List<ProductDetailDTO> fittingDetail = claimOrderServiceImpl.queryFitingDetailList(productDetailDTO);
+        HashMap<String, List<ProductDetailDTO>> map = Maps.newHashMap();
+        map.put("maintainitemDetail", maintainitemDetail);
+        map.put("fittingDetail", fittingDetail);
+        return map;
     }
 
 }

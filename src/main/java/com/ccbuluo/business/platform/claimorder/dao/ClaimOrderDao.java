@@ -101,7 +101,7 @@ public class ClaimOrderDao extends BaseDao<ClaimOrderDao> {
             .append("  LEFT JOIN biz_service_maintainitem b ON a.product_no = b.maintainitem_code ")
             .append(" WHERE 1 = 1  ");
         if(StringUtils.isNotBlank(productDetailDTO.getServiceOrderno())){
-            sql.append(" AND a.order_no = :orderNo ");
+            sql.append(" AND a.order_no = :serviceOrderno ");
         }
         if(StringUtils.isNotBlank(productDetailDTO.getProductType())){
             sql.append(" AND a.product_type = :productType ");

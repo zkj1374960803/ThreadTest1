@@ -149,7 +149,8 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
      * @author zhangkangjian
      * @date 2018-09-10 16:36:14
      */
-    private List<ProductDetailDTO> queryFitingDetailList(ProductDetailDTO productDetailDTO) {
+    @Override
+    public List<ProductDetailDTO> queryFitingDetailList(ProductDetailDTO productDetailDTO) {
         List<ProductDetailDTO> fittingDetail = claimOrderDao.queryMaintainitemDetail(productDetailDTO);
         Optional.ofNullable(fittingDetail).ifPresent(a ->{
             List<String> productNoList = fittingDetail.stream().map(ProductDetailDTO::getProductNo).collect(Collectors.toList());

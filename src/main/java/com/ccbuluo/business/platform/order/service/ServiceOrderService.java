@@ -4,15 +4,13 @@ import com.ccbuluo.business.entity.BizServiceLog;
 import com.ccbuluo.business.entity.BizServiceMaintainitem;
 import com.ccbuluo.business.entity.BizServiceOrder;
 import com.ccbuluo.business.platform.maintainitem.dto.DetailBizServiceMaintainitemDTO;
-import com.ccbuluo.business.platform.order.dto.DetailServiceOrderDTO;
-import com.ccbuluo.business.platform.order.dto.EditServiceOrderDTO;
-import com.ccbuluo.business.platform.order.dto.SaveOrderDetailDTO;
-import com.ccbuluo.business.platform.order.dto.SaveServiceOrderDTO;
+import com.ccbuluo.business.platform.order.dto.*;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.usercoreintf.dto.ServiceCenterDTO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 描述 服务服务单service
@@ -152,4 +150,13 @@ public interface ServiceOrderService {
      * @date 2018-09-10 14:45:37
      */
     StatusDto<List<BizServiceLog>> orderLog(String serviceOrderno);
+
+    /**
+     * 查询维修单的工时详情和零配件详情
+     * @param serviceOrderno 维修单的编号
+     * @return Map<String,List<ProductDetailDTO>>
+     * @author zhangkangjian
+     * @date 2018-09-10 17:41:01
+     */
+    Map<String,List<ProductDetailDTO>> querymaintainitemAndFittingDetail(String serviceOrderno);
 }
