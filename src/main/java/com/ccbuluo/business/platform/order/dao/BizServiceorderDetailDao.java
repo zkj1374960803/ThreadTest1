@@ -172,12 +172,13 @@ public class BizServiceorderDetailDao extends BaseDao<BizServiceorderDetail> {
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         param.put("orderNo", orderNo);
+        param.put("productType", BizServiceorderDetail.ProductTypeEnum.FITTING.name());
         StringBuilder sql = new StringBuilder();
 
         sql.append("SELECT id,order_no,product_no,product_type,unit_price,amount,")
                 .append("warranty_type,service_orgno,service_orgname,service_userid,")
                 .append("service_username,creator,create_time,operator,operate_time,")
-                .append("delete_flag,remark FROM biz_serviceorder_detail WHERE delete_flag = :deleteFlag and order_no = :orderNo");
+                .append("delete_flag,remark FROM biz_serviceorder_detail WHERE delete_flag = :deleteFlag and product_type = :productType and order_no = :orderNo");
         return super.queryListBean(BizServiceorderDetail.class, sql.toString(), param);
     }
 
