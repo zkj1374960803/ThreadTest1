@@ -12,12 +12,14 @@ import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
+import com.ccbuluo.business.platform.servicelog.service.ServiceLogService;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.http.StatusDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +55,8 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
     BizAllocateApplyDao bizAllocateApplyDao;
     @Resource
     private UserHolder userHolder;
+    @Autowired
+    private ServiceLogService serviceLogService;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -166,6 +170,8 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
             bizInstockplanDetailDao.batchInsertInstockplanDetail(applyNo);
             //更新申请单状态(已撤销)
             bizAllocateApplyDao.updateApplyOrderStatus(applyNo, BizAllocateApply.ApplyStatusEnum.CANCEL.name());
+            // 记录日志
+            addlog(applyNo,"撤销申请！",BizServiceLog.actionEnum.CANCEL.name());
         } catch (Exception e) {
             logger.error("撤销失败！", e);
             throw e;
@@ -336,5 +342,29 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
         inPlan.setRemark(bd.getRemark());
         inPlan.setInstockType(InstockTypeEnum.TRANSFER.toString());
         return inPlan;
+    }
+
+    /**
+     * 记录日志
+     * @param applyNo 申请单号
+     * @param content 日志内容
+     * @param action 动作
+     */
+    private void addlog(String applyNo,String content,String action){
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.ERP.name());
+        // BizServiceLog.actionEnum.UPDATE.name()
+        bizServiceLog.setAction(action);
+        bizServiceLog.setSubjectType("SameLevelApplyHandleStrategy");
+        bizServiceLog.setSubjectKeyvalue(applyNo);
+        if (userHolder.getLoggedUser().getOrganization().getOrgType().equals(BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name())) {
+            bizServiceLog.setLogContent("客户经理"+content);
+        } else {
+            bizServiceLog.setLogContent("服务中心"+content);
+        }
+        bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+        bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+        serviceLogService.create(bizServiceLog);
     }
 }

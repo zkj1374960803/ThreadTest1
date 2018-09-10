@@ -74,7 +74,7 @@ public class BizServiceLog extends AftersaleCommonEntity{
     }
 
     public enum actionEnum{
-        SAVE("增"),DELETE("删"),UPDATE("改"),SELECT("查");
+        SAVE("增"),DELETE("删"),UPDATE("改"),SELECT("查"),CANCEL("撤销");
 
         actionEnum(String label){
             this.label = label;
