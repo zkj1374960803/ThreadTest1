@@ -11,10 +11,15 @@ import com.ccbuluo.business.platform.order.dto.EditServiceOrderDTO;
 import com.ccbuluo.business.platform.order.dto.SaveOrderDetailDTO;
 import com.ccbuluo.business.platform.order.dto.SaveServiceOrderDTO;
 import com.ccbuluo.business.platform.order.service.ServiceOrderService;
+import com.ccbuluo.business.vehiclelease.resdto.CarLesseeResDTO;
+import com.ccbuluo.business.vehiclelease.service.CarcoreInfoService;
 import com.ccbuluo.core.controller.BaseController;
+import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCServer;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftBean;
+import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.usercoreintf.dto.ServiceCenterDTO;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +42,8 @@ public class ServiceOrderController extends BaseController {
     private ServiceOrderService serviceOrderService;
     @Autowired
     private BasicCarcoreInfoService basicCarcoreInfoService;
-// todo 调用租赁接口待确定
+    @ThriftRPCClient("BasicOrdergenerationSerService")
+    private CarcoreInfoService carcoreInfoService;
 
     /**
      * 保存服务单
@@ -137,6 +143,23 @@ public class ServiceOrderController extends BaseController {
     public StatusDto<CarcoreInfoDTO> getCarByCarNo(@RequestParam String carNo) {
         return basicCarcoreInfoService.getCarByCarNo(carNo);
     }
+
+
+    /**
+     * 根据车牌号查询车辆承租人的信息
+     * @param carNo 车牌号
+     * @return 车辆承租人的信息
+     * @author liuduo
+     * @date 2018-09-10 10:09:50
+     */
+    @ApiOperation(value = "根据车牌号查询车辆信息", notes = "【刘铎】")
+    @ApiImplicitParam(name = "carNo", value = "车牌号",  required = false, paramType = "query")
+    @GetMapping("/getuserbycarno")
+    public StatusDto<CarLesseeResDTO> getUserByCarno(@RequestParam String carNo) {
+        StatusDtoThriftBean<CarLesseeResDTO> carLessee = carcoreInfoService.findCarLessee(carNo);
+        return StatusDto.buildDataSuccessStatusDto(StatusDtoThriftUtils.resolve(carLessee, CarLesseeResDTO.class).getData());
+    }
+
 
 
     /**
@@ -266,5 +289,7 @@ public class ServiceOrderController extends BaseController {
     public StatusDto acceptance(@RequestParam String serviceOrderno) {
         return serviceOrderService.acceptance(serviceOrderno);
     }
+
+
 
 }
