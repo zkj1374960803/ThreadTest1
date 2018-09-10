@@ -1,11 +1,13 @@
 package com.ccbuluo.business.platform.order.service;
 
+import com.ccbuluo.business.constants.OrderStatusEnum;
 import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleStrategy;
+import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.core.common.UserHolder;
@@ -39,6 +41,8 @@ public class PaymentServiceImpl implements PaymentService {
     private BizAllocateApplyDao bizAllocateApplyDao;
     @Resource
     private BizAllocateapplyDetailDao bizAllocateapplyDetailDao;
+    @Autowired
+    BizAllocateTradeorderDao bizAllocateTradeorderDao;
 
     /**
      *  支付完成调用接口
@@ -64,8 +68,20 @@ public class PaymentServiceImpl implements PaymentService {
             if(ba.getApplyType().equals(BizAllocateApply.AllocateApplyTypeEnum.PURCHASE.name())){
                 status = BizAllocateApply.ApplyStatusEnum.INSTORE.name();// 等待平台入库
             }
-            //更新申请单状态
-            bizAllocateApplyDao.updateApplyOrderStatus(applyNo, status);
+            // 根据申请单获取申请单详情
+            List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
+            String payer = ba.getInstockOrgno();// 买入方(支付方)
+            String receive = ba.getOutstockOrgno();//卖出方(接收方)
+            BigDecimal sellTotal = getSellTotal(details);
+            // 如果支付成功
+            if(1 == 1){
+                //更新申请单状态
+                bizAllocateApplyDao.updateApplyOrderStatus(applyNo, status);
+                // 更新订单状态
+                bizAllocateTradeorderDao.updateTradeorderStatus(applyNo,OrderStatusEnum.PAYMENTCOMPLETION.name());
+            }else{
+                return StatusDto.buildFailureStatusDto("支付失败！");
+            }
             return StatusDto.buildSuccessStatusDto("支付成功！");
 
         } catch (Exception e) {
