@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.order.service;
 
+import com.ccbuluo.business.entity.BizServiceLog;
 import com.ccbuluo.business.entity.BizServiceMaintainitem;
 import com.ccbuluo.business.entity.BizServiceOrder;
 import com.ccbuluo.business.platform.maintainitem.dto.DetailBizServiceMaintainitemDTO;
@@ -142,4 +143,13 @@ public interface ServiceOrderService {
      * @date 2018-09-07 17:32:52
      */
     StatusDto acceptance(String serviceOrderno);
+
+    /**
+     * 查询维修单日志
+     * @param serviceOrderno 维修单编号
+     * @return 维修单日志
+     * @author liuduo
+     * @date 2018-09-10 14:45:37
+     */
+    StatusDto<List<BizServiceLog>> orderLog(String serviceOrderno);
 }

@@ -2,11 +2,13 @@ package com.ccbuluo.business.platform.servicelog.dao;
 
 import com.ccbuluo.business.entity.BizServiceLog;
 import com.ccbuluo.dao.BaseDao;
+import com.ccbuluo.http.StatusDto;
 import com.google.common.collect.Maps;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.Max;
 import java.util.List;
 import java.util.Map;
 
@@ -91,5 +93,27 @@ public class BizServiceLogDao extends BaseDao<BizServiceLog> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("id", id);
         return super.updateForMap(sql.toString(), params);
+    }
+
+
+    /**
+     * 查询维修单日志
+     * @param serviceOrderno 维修单编号
+     * @param subjectType 操作的主体的类型
+     * @return 维修单日志
+     * @author liuduo
+     * @date 2018-09-10 14:45:37
+     */
+    public List<BizServiceLog> orderLog(String serviceOrderno, String subjectType) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("serviceOrderno", serviceOrderno);
+        params.put("subjectType", subjectType);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT bsl.id,bsl.model,bsl.action,bsl.log_content,bsl.owner_orgno,")
+            .append(" bsl.owner_orgname,bsl.creator,bsl.create_time FROM biz_service_log AS bsl")
+            .append("  WHERE bsl.subject_keyvalue = :serviceOrderno AND subject_type = :subjectType");
+
+        return queryListBean(BizServiceLog.class, sql.toString(), params);
     }
 }

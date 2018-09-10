@@ -24,6 +24,8 @@ import com.ccbuluo.business.platform.outstock.service.OutstockOrderService;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.servicecenter.dao.BizServiceCenterDao;
+import com.ccbuluo.business.platform.servicelog.dao.BizServiceLogDao;
+import com.ccbuluo.business.platform.servicelog.service.ServiceLogService;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.BusinessUser;
@@ -106,6 +108,10 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
     @Autowired
     OutstockOrderService outstockOrderService;
+    @Autowired
+    private ServiceLogService serviceLogService;
+    @Autowired
+    private BizServiceLogDao bizServiceLogDao;
 
 
     /**
@@ -198,6 +204,20 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             // 如果是 待完善 状态，则还需要更新服务单派发表的数据
             if (StringUtils.isNotBlank(orderStatus) && orderStatus.equals(BizServiceOrder.OrderStatusEnum.WAITING_PERFECTION.name())) {
                 bizServiceDispatchDao.updateConfirmed(serviceOrderno);
+                BizServiceLog bizServiceLog = new BizServiceLog();
+                bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
+                bizServiceLog.setAction(BizServiceLog.actionEnum.UPDATE.name());
+                bizServiceLog.setSubjectType("ServiceOrderServiceImpl");
+                bizServiceLog.setSubjectKeyvalue(serviceOrderno);
+                if (userHolder.getLoggedUser().getOrganization().getOrgType().equals(BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name())) {
+                    bizServiceLog.setLogContent("客户经理接单");
+                } else {
+                    bizServiceLog.setLogContent("服务中心接单");
+                }
+                bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+                bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+                bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+                serviceLogService.create(bizServiceLog);
             }
             bizServiceOrderDao.editStatus(serviceOrderno, orderStatus);
             return StatusDto.buildSuccessStatusDto();
@@ -343,6 +363,16 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
                 // 分配之后修改该服务单的分配次数
                 bizServiceOrderDao.updateDispatchTimes(serviceOrderno, Constants.LONG_FLAG_TWO);
             }
+            BizServiceLog bizServiceLog = new BizServiceLog();
+            bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
+            bizServiceLog.setAction(BizServiceLog.actionEnum.SAVE.name());
+            bizServiceLog.setSubjectType("ServiceOrderServiceImpl");
+            bizServiceLog.setSubjectKeyvalue(serviceOrderno);
+            bizServiceLog.setLogContent("客户经理分配");
+            bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+            bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+            bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+            serviceLogService.create(bizServiceLog);
             return StatusDto.buildSuccessStatusDto();
         } catch (Exception e) {
             logger.error("分配失败", e.getMessage());
@@ -412,6 +442,16 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             occupyStock(saveOrderDetailDTO);
             // 5、保存零配件
             saveMerchandise(saveOrderDetailDTO);
+            BizServiceLog bizServiceLog = new BizServiceLog();
+            bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
+            bizServiceLog.setAction(BizServiceLog.actionEnum.UPDATE.name());
+            bizServiceLog.setSubjectType("ServiceOrderServiceImpl");
+            bizServiceLog.setSubjectKeyvalue(saveOrderDetailDTO.getServiceOrderno());
+            bizServiceLog.setLogContent("开始处理维修");
+            bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+            bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+            bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+            serviceLogService.create(bizServiceLog);
             return StatusDto.buildSuccessStatusDto();
         } catch (Exception e) {
             logger.error("3003", "保存失败！");
@@ -647,6 +687,16 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         bizServiceOrder.setProblemContent(editServiceOrderDTO.getProblemContent());
         bizServiceOrder.preUpdate(userHolder.getLoggedUserId());
         bizServiceOrderDao.updateBizServiceOrder(bizServiceOrder);
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
+        bizServiceLog.setAction(BizServiceLog.actionEnum.UPDATE.name());
+        bizServiceLog.setSubjectType("ServiceOrderServiceImpl");
+        bizServiceLog.setSubjectKeyvalue(editServiceOrderDTO.getServiceOrderno());
+        bizServiceLog.setLogContent("编辑维修单");
+        bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+        bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+        serviceLogService.create(bizServiceLog);
     }
 
 
@@ -694,7 +744,11 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         bizServiceOrder.setCustomerPhone(serviceOrderDTO.getCustomerPhone());
         bizServiceOrder.setReserveContacter(serviceOrderDTO.getReserveContacter());
         bizServiceOrder.setReservePhone(serviceOrderDTO.getReservePhone());
-        bizServiceOrder.setOrderStatus(BizServiceOrder.OrderStatusEnum.WAITING_CHECKING.name());
+        if (loggedUser.getOrganization().getOrgType().equals(BizServiceOrder.ProcessorOrgtypeEnum.STORE.name())) {
+            bizServiceOrder.setOrderStatus(BizServiceOrder.OrderStatusEnum.DRAFT.name());
+        } else {
+            bizServiceOrder.setOrderStatus(BizServiceOrder.OrderStatusEnum.WAITING_RECEIVE.name());
+        }
         bizServiceOrder.setDispatchTimes(Constants.LONG_FLAG_ONE);
         // 根据车牌号查询该车属于哪个机构
         String uuid = basicCarcoreInfoService.getUuidByPlateNum(serviceOrderDTO.getCarNo());
@@ -710,6 +764,20 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         bizServiceOrder.setProblemContent(serviceOrderDTO.getProblemContent());
         bizServiceOrder.preInsert(loggedUser.getUserId());
         bizServiceOrderDao.saveBizServiceOrder(bizServiceOrder);
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
+        bizServiceLog.setAction(BizServiceLog.actionEnum.SAVE.name());
+        bizServiceLog.setSubjectType("ServiceOrderServiceImpl");
+        bizServiceLog.setSubjectKeyvalue(orderCode);
+        if (loggedUser.getOrganization().getOrgType().equals(BizServiceOrder.ProcessorOrgtypeEnum.STORE.name())) {
+            bizServiceLog.setLogContent("提交保修");
+        } else {
+            bizServiceLog.setLogContent("新增维修单");
+        }
+        bizServiceLog.setOwnerOrgno(loggedUser.getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(loggedUser.getOrganization().getOrgName());
+        bizServiceLog.preInsert(loggedUser.getUserId());
+        serviceLogService.create(bizServiceLog);
     }
 
     /**
@@ -842,6 +910,20 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         } catch (Exception e) {
             throw new CommonException("0", "验收失败！");
         }
+    }
+
+    /**
+     * 查询维修单日志
+     * @param serviceOrderno 维修单编号
+     * @return 维修单日志
+     * @author liuduo
+     * @date 2018-09-10 14:45:37
+     */
+    @Override
+    public StatusDto<List<BizServiceLog>> orderLog(String serviceOrderno) {
+        // 操作的主体的类型
+        String subjectType = "ServiceOrderServiceImpl";
+        return StatusDto.buildDataSuccessStatusDto(bizServiceLogDao.orderLog(serviceOrderno, subjectType));
     }
 
 }
