@@ -1,4 +1,4 @@
-package com.ccbuluo.business.platform.claimorder.controller;
+package com.ccbuluo.business.servicecenter.claimorder.controller;
 
 import com.ccbuluo.business.platform.claimorder.dto.BizServiceClaimorder;
 import com.ccbuluo.business.platform.claimorder.dto.QueryClaimorderListDTO;
@@ -10,27 +10,49 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import java.util.Map;
 
 /**
  * 索赔单
  * @author zhangkangjian
  * @date 2018-09-08 10:13:49
  */
-@Api(tags = "索赔单(平台端)")
+@Api(tags = "索赔单(服务中心端)")
 @RestController
-@RequestMapping("/platform/claimorder")
-public class ClaimOrderController{
+@RequestMapping("/servicecenter/claimorder")
+public class ServiceClaimOrderController {
+
     @Resource(name = "claimOrderServiceImpl")
     private ClaimOrderService claimOrderServiceImpl;
 
     /**
+     * 提交索赔单
+     * @param bizServiceClaimorder 索赔单实体
+     * @return StatusDto<String> 状态DTO
+     * @author zhangkangjian
+     * @date 2018-09-08 14:17:49
+     */
+    @ApiOperation(value = "提交索赔单", notes = "【张康健】")
+    @PostMapping("/conmmitclaimorder")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "claimOrdno", value = "索赔单号", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "trackingNo", value = "物流单号", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "refundAdress", value = "物流地址", required = true, paramType = "query"),
+    })
+    public StatusDto<String> conmmitClaimOrder(@ApiIgnore BizServiceClaimorder bizServiceClaimorder){
+        claimOrderServiceImpl.updateClaimOrder(bizServiceClaimorder);
+        return StatusDto.buildSuccessStatusDto();
+    }
+
+    /**
      * 查询索赔单的详情
-     * @param bizServiceClaimorder 查询条件
-     * @return StatusDto<BizServiceClaimorder>
+     * @return StatusDto<Map<String, Object>>
      * @author zhangkangjian
      * @date 2018-09-08 14:35:15
      */
@@ -64,35 +86,6 @@ public class ClaimOrderController{
         return claimOrderServiceImpl.queryClaimorderList(claimOrdno, docStatus, offset, pageSize);
     }
 
-    /**
-     * 验收索赔单
-     * @param claimOrdno 索赔单号
-     * @return StatusDto<String> 状态DTO
-     * @author zhangkangjian
-     * @date 2018-09-10 10:14:11
-     */
-    @ApiOperation(value = "验收索赔单", notes = "【张康健】")
-    @GetMapping("/acceptanceclaimsheet")
-    @ApiImplicitParam(name = "claimOrdno", value = "索赔单号", required = true, paramType = "query")
-    public StatusDto<String> acceptanceClaimSheet(String claimOrdno){
-        claimOrderServiceImpl.updateDocStatusAndProcessTime(claimOrdno, BizServiceClaimorder.DocStatusEnum.PENDINGPAYMENT.name());
-        return StatusDto.buildSuccessStatusDto();
-    }
-    
-    /**
-     * 索赔单付款
-     * @param claimOrdno 索赔单号
-     * @return StatusDto<String> 状态DTO
-     * @author zhangkangjian
-     * @date 2018-09-10 10:38:07
-     */
-    @ApiOperation(value = "索赔单付款", notes = "【张康健】")
-    @GetMapping("/billofpayment")
-    @ApiImplicitParam(name = "claimOrdno", value = "索赔单号", required = true, paramType = "query")
-    public StatusDto<String> billOfPayment(String claimOrdno){
-        claimOrderServiceImpl.updateDocStatusAndRepayTime(claimOrdno, BizServiceClaimorder.DocStatusEnum.COMPLETED.name());
-        return StatusDto.buildSuccessStatusDto();
-    }
 
 
 }
