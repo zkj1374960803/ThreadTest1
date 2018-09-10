@@ -15,6 +15,8 @@ import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
 import com.ccbuluo.business.platform.maintaincar.dao.BizServiceMaintaincarDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
+import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
+import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.dto.SaveBizServiceStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.service.StoreHouseService;
 import com.ccbuluo.business.platform.supplier.service.SupplierServiceImpl;
@@ -48,6 +50,7 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 客户经理实现端
@@ -83,6 +86,8 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     private StoreHouseService storeHouseService;
     @Resource(name = "allocateApplyServiceImpl")
     private AllocateApplyService allocateApplyService;
+    @Resource
+    private BizServiceStorehouseDao bizServiceStorehouseDao;
 
     /**
      * 创建客户经理
@@ -449,10 +454,13 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             StatusDto<List<UserInfoDTO>> userInfoStatusDto = StatusDtoThriftUtils.resolve(userInfoDTOList, UserInfoDTO.class);
             List<UserInfoDTO> data = userInfoStatusDto.getData();
             List<UserInfoDTO> userInfoList = Optional.ofNullable(data).orElse(Collections.EMPTY_LIST);
+            List<String> collect = userInfoList.stream().map(UserInfoDTO::getOrgCode).collect(Collectors.toList());
             Map<String, UserInfoDTO> userInfoMap = userInfoList.stream().collect(Collectors.toMap(UserInfoDTO::getUseruuid, a -> a,(k1,k2)->k1));
 
             List<String> orgCodeList = rows.stream().map(QueryCustManagerListDTO::getServiceCenter).collect(Collectors.toList());
             organizationMap = orgService.queryOrganizationByOrgCodes(orgCodeList);
+            List<BizServiceStorehouse> queryStorehouseDTOList = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(collect);
+
             rows.stream().forEach(c -> {
                 UserInfoDTO userInfoDTO1 = userInfoMap.get(c.getUseruuid());
                 if(userInfoDTO1 != null){
@@ -463,6 +471,18 @@ public class CustmanagerServiceImpl implements CustmanagerService{
                     c.setServiceCenterName(basicUserOrganization.getOrgName());
                 }
             });
+
+            Optional.ofNullable(queryStorehouseDTOList).ifPresent(a ->{
+                Map<String, BizServiceStorehouse> queryStorehouseDTOMap = a.stream().collect(Collectors.toMap(BizServiceStorehouse::getServicecenterCode, b -> b,(k1,k2)->k1));
+                rows.stream().forEach(c ->{
+                    String orgCode = c.getOrgCode();
+                    BizServiceStorehouse queryStorehouseDTO = queryStorehouseDTOMap.get(orgCode);
+                    if(queryStorehouseDTO != null){
+                        c.setInRepositoryNo(queryStorehouseDTO.getStorehouseCode());
+                    }
+                });
+            });
+
         }
         return queryCustManagerListDTOPage;
     }

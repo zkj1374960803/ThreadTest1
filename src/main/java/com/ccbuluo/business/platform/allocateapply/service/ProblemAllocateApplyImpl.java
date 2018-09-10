@@ -213,6 +213,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             allocateApplyDTO.setInstockOperatorName(inOperatorName); // 入库人
             allocateApplyDTO.setInstockTime(info.getInstockTime());// 入库时间
             allocateApplyDTO.setTransportorderNo(info.getTransportorderNo());// 物流单号
+            allocateApplyDTO.setTotalPrice(info.getTotalPrice());
         }
         // 计算成本价格
         convertCostPrice(allocateApplyDTO);
@@ -237,6 +238,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             allocateApplyDTO.setInstockOperatorName(inOperatorName); // 入库人
             allocateApplyDTO.setInstockTime(info.getInstockTime());// 入库时间
             allocateApplyDTO.setTransportorderNo(info.getTransportorderNo());// 物流单号
+            allocateApplyDTO.setTotalPrice(info.getTotalPrice());
         }
         // 计算成本价格
         convertCostPrice(allocateApplyDTO);
@@ -269,6 +271,9 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
      * @date 2018-08-21 16:46:25
      */
     private String getUserNameByUuid(String uuid){
+        if(StringUtils.isBlank(uuid)){
+            return "";
+        }
         StatusDtoThriftBean<UserInfoDTO> userDetail = innerUserInfoService.findUserDetail(uuid);
         StatusDto<UserInfoDTO> resolve = StatusDtoThriftUtils.resolve(userDetail, UserInfoDTO.class);
         String operatorName = "";
