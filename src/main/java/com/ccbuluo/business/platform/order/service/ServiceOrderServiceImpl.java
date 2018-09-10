@@ -728,7 +728,8 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         try {
             // 生成出库计划并出库
             buildOutstockplanAndOut(serviceOrderno);
-            // 修改维修单状态
+            // 修改维修单状态(待验收)
+            bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.WAITING_CHECKING.name());
             return StatusDto.buildSuccessStatusDto("提交成功");
         } catch (Exception e) {
             throw new CommonException("0", "提交失败！");
