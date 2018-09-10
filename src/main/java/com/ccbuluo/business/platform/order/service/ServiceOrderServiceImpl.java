@@ -819,6 +819,9 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     private void buildOutstockplanAndOut(String orderNo){
         // 查询服务单详情
         List<BizServiceorderDetail> orderDetails = bizServiceorderDetailDao.queryServiceorderDetailList(orderNo);
+        if(null == orderDetails || orderDetails.size() == 0){
+            return;
+        }
         List<String> codeList = getProductList(orderDetails);
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         // 根据卖方code和商品code（list）查出库存列表
