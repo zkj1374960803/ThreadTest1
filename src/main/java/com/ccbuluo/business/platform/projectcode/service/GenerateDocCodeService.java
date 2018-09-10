@@ -56,6 +56,9 @@ public class GenerateDocCodeService {
             case DD:    // 维修订单号
                 resultDto = getCode(prefix.toString());
                 break;
+            case TP:    // 索赔单号
+                resultDto = getCode(prefix.toString());
+                break;
             default:
                 resultDto = StatusDto.buildStatusDtoWithCode(BizErrorCodeEnum.CODE_UNKONEPREFIX.getErrorCode(),
                         BizErrorCodeEnum.CODE_UNKONEPREFIX.getMessage());

@@ -3,10 +3,12 @@ package com.ccbuluo.business.platform.order.dao;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceorderDetail;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
+import com.ccbuluo.business.platform.claimorder.dto.BizServiceClaimorderDTO;
 import com.ccbuluo.business.platform.order.dto.SaveMaintaintemDTO;
 import com.ccbuluo.business.platform.order.dto.SaveMerchandiseDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -88,9 +90,27 @@ public class BizServiceorderDetailDao extends BaseDao<BizServiceorderDetail> {
         return super.findForBean(BizServiceorderDetail.class, sql.toString(), params);
     }
 
-
-
-
+    /**
+     * 查询维修单详单数据
+     * @param bizServiceorderDetail 查询条件
+     * @return List<BizServiceorderDetail>
+     * @author zhangkangjian
+     * @date 2018-09-08 11:42:12
+     */
+    public List<BizServiceorderDetail> queryListBizServiceorderDetail(BizServiceorderDetail bizServiceorderDetail) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,order_no,product_no,product_type,unit_price,amount,")
+            .append("warranty_type,service_orgno,service_orgname,service_userid,")
+            .append("service_username,creator,create_time,operator,operate_time,")
+            .append("delete_flag,remark FROM biz_serviceorder_detail WHERE 1 = 1");
+        if (StringUtils.isNotBlank(bizServiceorderDetail.getOrderNo())) {
+            sql.append(" AND order_no = :orderNo ");
+        }
+        if(StringUtils.isNotBlank(bizServiceorderDetail.getWarrantyType())){
+            sql.append(" AND warranty_type = :warrantyType ");
+        }
+        return queryListBean(BizServiceorderDetail.class, sql.toString(), bizServiceorderDetail);
+    }
 
     /**
      * 删除记录维修任务中使用的工时和零配件的详情
