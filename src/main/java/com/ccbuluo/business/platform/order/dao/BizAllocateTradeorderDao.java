@@ -219,5 +219,22 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
         return updateForMap(sql, params);
     }
 
+    /**
+     * 根据申请编号更新交易单的所有商品总价
+     * @param applyNo 申请编号
+     * @return 影响条数
+     * @author liuduo
+     * @date 2018-08-07 11:55:41
+     */
+    public int updateTradeorderStatus(String applyNo, String orderStatus) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_allocate_tradeorder SET order_status = :orderStatus")
+                .append(" WHERE apply_no = :applyNo");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("orderStatus", orderStatus);
+        return super.updateForMap(sql.toString(), params);
+    }
+
 
 }
