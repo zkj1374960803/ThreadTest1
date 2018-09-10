@@ -6,6 +6,8 @@ import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleContext;
+import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
+import com.ccbuluo.business.platform.order.service.ServiceOrderService;
 import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
 import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.business.platform.outstock.dto.OutstockorderDetailDTO;
@@ -69,24 +71,33 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     private StoreHouseService storeHouseService;
     @Autowired
     private ApplyHandleContext applyHandleContext;
+    @Autowired
+    private BizServiceOrderDao bizServiceOrderDao;
 
     /**
      * 自动保存出库单
      *
      * @param applyNo                   申请单号
      * @param bizOutstockplanDetailList 出库计划
+     * @param applyNoType 申请单类型
      * @return 是否保存成功
      * @author liuduo
      * @date 2018-08-07 15:15:07
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public StatusDto<String> autoSaveOutstockOrder(String applyNo, List<BizOutstockplanDetail> bizOutstockplanDetailList) {
+    public StatusDto<String> autoSaveOutstockOrder(String applyNo, List<BizOutstockplanDetail> bizOutstockplanDetailList, String applyNoType) {
         try {
             Map<String, List<BizOutstockplanDetail>> collect = bizOutstockplanDetailList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getOutRepositoryNo));
             // 根据申请单号查询基本信息
-            FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
-            List<BizOutstockOrder> bizOutstockOrderList = Lists.newArrayList();
+            FindAllocateApplyDTO detail = new FindAllocateApplyDTO();
+            BizServiceOrder bizServiceOrde = new BizServiceOrder();
+            if (applyNoType.equals(ApplyTypeEnum.APPLYORDER.name())) {
+                detail = allocateApplyService.findDetail(applyNo);
+            } else {
+                bizServiceOrde = bizServiceOrderDao.getByOrderNo(applyNo);
+            }
+
             List<BizOutstockorderDetail> bizOutstockorderDetailList = Lists.newArrayList();
             Date date = new Date();
             for (String outRepositoryNo : collect.keySet()) {
@@ -103,7 +114,11 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 BizOutstockOrder bizOutstockOrder = new BizOutstockOrder();
                 bizOutstockOrder.setOutstockorderNo(outstockNo);
                 bizOutstockOrder.setOutRepositoryNo(outRepositoryNo);
-                bizOutstockOrder.setOutstockOrgno(detail.getOutstockOrgno());
+                if (applyNoType.equals(ApplyTypeEnum.APPLYORDER.name())) {
+                    bizOutstockOrder.setOutstockOrgno(detail.getOutstockOrgno());
+                } else {
+                    bizOutstockOrder.setOutstockOrgno(bizServiceOrde.getReportOrgno());
+                }
                 bizOutstockOrder.setOutstockOperator(userHolder.getLoggedUserId());
                 bizOutstockOrder.setTradeDocno(applyNo);
                 bizOutstockOrder.setOutstockType(bizOutstockplanDetail.getOutstockType());
@@ -146,8 +161,10 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 List<BizOutstockplanDetail> bizOutstockplanDetailList2 = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
                 updatePlanStatus(bizOutstockplanDetailList2);
                 // 6、更改申请单状态
-                List<BizOutstockplanDetail> bizOutstockplanDetailList3 = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
-                updateApplyOrderStatus(applyNo, detail, bizOutstockplanDetailList3);
+                if (applyNoType.equals(ApplyTypeEnum.APPLYORDER.name())) {
+                    List<BizOutstockplanDetail> bizOutstockplanDetailList3 = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
+                    updateApplyOrderStatus(applyNo, detail, bizOutstockplanDetailList3);
+                }
             }
             return StatusDto.buildSuccessStatusDto("保存成功！");
         } catch (Exception e) {

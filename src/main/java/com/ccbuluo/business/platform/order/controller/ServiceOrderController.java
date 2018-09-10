@@ -152,7 +152,7 @@ public class ServiceOrderController extends BaseController {
      * @author liuduo
      * @date 2018-09-10 10:09:50
      */
-    @ApiOperation(value = "根据车牌号查询车辆信息", notes = "【刘铎】")
+    @ApiOperation(value = "根据车牌号查询承租人信息", notes = "【刘铎】")
     @ApiImplicitParam(name = "carNo", value = "车牌号",  required = false, paramType = "query")
     @GetMapping("/getuserbycarno")
     public StatusDto<CarLesseeResDTO> getUserByCarno(@RequestParam String carNo) {

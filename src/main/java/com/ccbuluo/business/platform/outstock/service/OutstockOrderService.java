@@ -22,11 +22,12 @@ public interface OutstockOrderService {
      * 自动出库
      * @param applyNo                    申请单号
      * @param bizOutstockplanDetailList 出库计划
+     * @param applyNoType 申请单类型
      * @return 是否保存成功
      * @author liuduo
      * @date 2018-08-07 15:15:07
      */
-    StatusDto<String> autoSaveOutstockOrder(String applyNo, List<BizOutstockplanDetail> bizOutstockplanDetailList);
+    StatusDto<String> autoSaveOutstockOrder(String applyNo, List<BizOutstockplanDetail> bizOutstockplanDetailList, String applyNoType);
 
     /**
      * 保存出库单

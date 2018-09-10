@@ -14,14 +14,14 @@ import com.ccbuluo.usercoreintf.dto.ServiceCenterDTO;
 import java.util.List;
 
 /**
- * 描述 服务订单service
+ * 描述 服务服务单service
  * @author liuduo
  * @date 2018-09-03 17:35:19
  * @version V1.0.0
  */
 public interface ServiceOrderService {
     /**
-     * 描述 新增服务订单
+     * 描述 新增服务服务单
      * @param serviceOrderDTO
      * @return com.ccbuluo.http.StatusDto<java.lang.String>
      * @author liuduo
@@ -31,8 +31,8 @@ public interface ServiceOrderService {
 
 
     /**
-     * 编辑订单
-     * @param editServiceOrderDTO 订单要保存的信息
+     * 编辑服务单
+     * @param editServiceOrderDTO 服务单要保存的信息
      * @return 编辑是否成功
      * @author liuduo
      * @date 2018-09-04 14:06:40
@@ -40,22 +40,22 @@ public interface ServiceOrderService {
     StatusDto editOrder(EditServiceOrderDTO editServiceOrderDTO);
 
     /**
-     * 查询订单列表
-     * @param orderStatus 订单状态
+     * 查询服务单列表
+     * @param orderStatus 服务单状态
      * @param serviceType 服务类型
      * @param keyword 关键字
      * @param offset 起始数
      * @param pagesize 每页数
-     * @return 订单列表
+     * @return 服务单列表
      * @author liuduo
      * @date 2018-09-04 15:06:55
      */
     StatusDto<Page<BizServiceOrder>> queryList(String orderStatus, String serviceType, String keyword, Integer offset, Integer pagesize);
 
     /**
-     * 修改订单状态
-     * @param serviceOrderno 订单编号
-     * @param orderStatus 订单状态
+     * 修改服务单状态
+     * @param serviceOrderno 服务单编号
+     * @param orderStatus 服务单状态
      * @return 修改是否成功
      * @author liuduo
      * @date 2018-09-04 15:37:36
@@ -71,9 +71,9 @@ public interface ServiceOrderService {
     StatusDto<List<String>> queryCarNoList();
 
     /**
-     * 根据订单编号查询订单详情
-     * @param serviceOrderno 订单编号
-     * @return 订单详情
+     * 根据服务单编号查询服务单详情
+     * @param serviceOrderno 服务单编号
+     * @return 服务单详情
      * @author liuduo
      * @date 2018-09-05 09:54:40
      */
@@ -95,11 +95,11 @@ public interface ServiceOrderService {
     StatusDto<Page<ServiceCenterDTO>> serviceCenterList(String province, String city, String area, String orgType, String keyword, Integer offset, Integer pagesize);
 
     /**
-     * 分配订单
-     * @param serviceOrderno 订单编号
+     * 分配服务单
+     * @param serviceOrderno 服务单编号
      * @param orgType 类型（服务中心还是客户经理）
      * @param orgCodeOrUuid 机构编号或者客户经理uuid
-     * @return 订单是否分配成功
+     * @return 服务单是否分配成功
      * @author liuduo
      * @date 2018-09-05 18:32:52
      */
@@ -126,9 +126,9 @@ public interface ServiceOrderService {
     StatusDto saveOrderDetail(SaveOrderDetailDTO saveOrderDetailDTO);
 
     /**
-     * 提交订单
-     * @param serviceOrderno 订单编号
-     * @return 订单是否提交成功
+     * 提交服务单
+     * @param serviceOrderno 服务单编号
+     * @return 服务单是否提交成功
      * @author weijb
      * @date 2018-09-07 17:32:52
      */
@@ -136,8 +136,8 @@ public interface ServiceOrderService {
 
     /**
      * 验收
-     * @param serviceOrderno 订单编号
-     * @return 订单是否验收成功
+     * @param serviceOrderno 服务单编号
+     * @return 服务单是否验收成功
      * @author weijb
      * @date 2018-09-07 17:32:52
      */
