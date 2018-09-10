@@ -164,7 +164,7 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
         if (StringUtils.isNotBlank(keyword)) {
             params.put("keyword", keyword);
             sql.append(" AND (service_orderno LIKE CONCAT('%',:keyword,'%') or car_vin LIKE CONCAT('%',:keyword,'%') OR ")
-                .append(" customer_name LIKE CONCAT('%',:keyword,'%') OR customer_phone LIKE CONCAT('%',：keyword,'%'))");
+                .append(" customer_name LIKE CONCAT('%',:keyword,'%') OR customer_phone LIKE CONCAT('%',:keyword,'%'))");
         }
         sql.append(" AND delete_flag = :deleteFlag ORDER BY operate_time DESC");
 
