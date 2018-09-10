@@ -120,8 +120,7 @@ public class StockDetailServiceImpl implements StockDetailService{
      */
     @Override
     public List<Pair<Long,Long>> queryVersionNoById(List<Long> stockIds) {
-//        return bizStockDetailDao.queryVersionNoById(stockIds);
-        return null;
+        return bizStockDetailDao.queryVersionNoById(stockIds);
     }
 
     /**
