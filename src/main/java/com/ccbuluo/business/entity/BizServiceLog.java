@@ -6,23 +6,31 @@ import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
 
 /**
- * 实体
- * @author Ryze
+ * 日志实体
+ * @author zhangkangjian
  * @date 2018-09-03 15:38:39
  * @version V 1.0.0
  */
-@ApiModel(value = "实体", description = "")
-public class BizServiceLog {
-    /**
-     * 
-     */
-    @ApiModelProperty(name = "id", value = "")
-    private Long id;
+@ApiModel(value = "BizServiceLog", description = "日志实体")
+public class BizServiceLog extends AftersaleCommonEntity{
+
     /**
      * 功能所属的模块编号：服务(SERVICE)、进销存(ERP)、车辆管理(CAR)、基础信息(BASIC)
      */
     @ApiModelProperty(name = "model", value = "功能所属的模块编号：服务(SERVICE)、进销存(ERP)、车辆管理(CAR)、基础信息(BASIC)")
     private String model;
+
+    /**
+     * 操作的主体的类型
+     */
+    @ApiModelProperty(name = "subjectType", value = "操作的主体的类型")
+    private String subjectType;
+
+    /**
+     * 主角对象的主键id值
+     */
+    @ApiModelProperty(name = "subjectKeyvalue", value = "主角对象的主键id值")
+    private String subjectKeyvalue;
     /**
      * 功能的编号
      */
@@ -43,31 +51,6 @@ public class BizServiceLog {
      */
     @ApiModelProperty(name = "ownerOrgname", value = "触发功能的人所属机构的名称")
     private String ownerOrgname;
-    /**
-     * 创建人
-     */
-    @ApiModelProperty(name = "creator", value = "创建人")
-    private String creator;
-    /**
-     * 创建时间
-     */
-    @ApiModelProperty(name = "createTime", value = "创建时间")
-    private Date createTime;
-    /**
-     * 更新人
-     */
-    @ApiModelProperty(name = "operator", value = "更新人")
-    private String operator;
-    /**
-     * 更新时间
-     */
-    @ApiModelProperty(name = "operateTime", value = "更新时间")
-    private Date operateTime;
-    /**
-     * 删除标识
-     */
-    @ApiModelProperty(name = "deleteFlag", value = "删除标识")
-    private Integer deleteFlag;
     /**
      * 备注
      */
@@ -104,102 +87,80 @@ public class BizServiceLog {
         }
     }
 
+    public enum modelEnum{
+        SERVICE("服务"),ERP("进销存"),CAR("车辆管理"),BASIC("基础信息");
+        private String label;
 
-    public void setId(Long id) {
-        this.id = id;
+        modelEnum(String label) {
+            this.label = label;
+        }
+
+        public String getLabel() {
+            return label;
+        }
     }
 
-    public Long getId() {
-        return this.id;
+    public String getSubjectType() {
+        return subjectType;
+    }
+
+    public void setSubjectType(String subjectType) {
+        this.subjectType = subjectType;
+    }
+
+    public String getSubjectKeyvalue() {
+        return subjectKeyvalue;
+    }
+
+    public void setSubjectKeyvalue(String subjectKeyvalue) {
+        this.subjectKeyvalue = subjectKeyvalue;
+    }
+
+    public String getModel() {
+        return model;
     }
 
     public void setModel(String model) {
         this.model = model;
     }
 
-    public String getModel() {
-        return this.model;
+    public String getAction() {
+        return action;
     }
 
     public void setAction(String action) {
         this.action = action;
     }
 
-    public String getAction() {
-        return this.action;
+    public String getLogContent() {
+        return logContent;
     }
 
     public void setLogContent(String logContent) {
         this.logContent = logContent;
     }
 
-    public String getLogContent() {
-        return this.logContent;
+    public String getOwnerOrgno() {
+        return ownerOrgno;
     }
 
     public void setOwnerOrgno(String ownerOrgno) {
         this.ownerOrgno = ownerOrgno;
     }
 
-    public String getOwnerOrgno() {
-        return this.ownerOrgno;
+    public String getOwnerOrgname() {
+        return ownerOrgname;
     }
 
     public void setOwnerOrgname(String ownerOrgname) {
         this.ownerOrgname = ownerOrgname;
     }
 
-    public String getOwnerOrgname() {
-        return this.ownerOrgname;
-    }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
-    public String getCreator() {
-        return this.creator;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getCreateTime() {
-        return this.createTime;
-    }
-
-    public void setOperator(String operator) {
-        this.operator = operator;
-    }
-
-    public String getOperator() {
-        return this.operator;
-    }
-
-    public void setOperateTime(Date operateTime) {
-        this.operateTime = operateTime;
-    }
-
-    public Date getOperateTime() {
-        return this.operateTime;
-    }
-
-    public void setDeleteFlag(Integer deleteFlag) {
-        this.deleteFlag = deleteFlag;
-    }
-
-    public Integer getDeleteFlag() {
-        return this.deleteFlag;
+    public String getRemark() {
+        return remark;
     }
 
     public void setRemark(String remark) {
         this.remark = remark;
     }
-
-    public String getRemark() {
-        return this.remark;
-    }
-
-
 }
