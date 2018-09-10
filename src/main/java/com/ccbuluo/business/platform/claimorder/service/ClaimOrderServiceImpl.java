@@ -4,6 +4,7 @@ import com.ccbuluo.business.constants.DocCodePrefixEnum;
 import com.ccbuluo.business.constants.OrganizationTypeEnum;
 import com.ccbuluo.business.entity.BizServiceOrder;
 import com.ccbuluo.business.entity.BizServiceorderDetail;
+import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarmodelManageDao;
 import com.ccbuluo.business.platform.carconfiguration.service.BasicCarmodelManageService;
 import com.ccbuluo.business.platform.claimorder.dao.ClaimOrderDao;
 import com.ccbuluo.business.platform.claimorder.dto.BizServiceClaimorder;
@@ -51,7 +52,8 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
     private BizServiceOrderDao bizServiceOrderDao;
     @Resource
     private BasicCarmodelManageService basicCarmodelManageService;
-
+    @Autowired
+    private BasicCarmodelManageDao basicCarmodelManageDao;
     /**
      * 生成索赔单
      * @author zhangkangjian
@@ -166,6 +168,8 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
             StatusDto<Page<BasicCarpartsProductDTO>> basicCarpartsProductDTOResolve = StatusDtoThriftUtils.resolve(basicCarpartsProductDTO, BasicCarpartsProductDTO.class);
             List<BasicCarpartsProductDTO> basicCarpartsProductDTOList = basicCarpartsProductDTOResolve.getData().getRows();
             if(basicCarpartsProductDTOList != null){
+                // 填充车型名称
+                basicCarmodelManageService.buildCarModeName(basicCarpartsProductDTOList);
                 Map<String, BasicCarpartsProductDTO> basicCarpartsProductMap = basicCarpartsProductDTOList.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, b -> b,(k1, k2)->k1));
                 a.forEach(c->{
                     String productNo = c.getProductNo();
@@ -177,8 +181,6 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
                 });
             }
         });
-        // todo
-//        basicCarmodelManageService.buildCarModeName(fittingDetail);
         return fittingDetail;
     }
 
