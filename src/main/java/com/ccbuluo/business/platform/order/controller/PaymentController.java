@@ -27,13 +27,13 @@ public class PaymentController {
     @Resource
     PaymentService paymentService;
     /**
-     *  支付完成调用接口
+     *  申请单支付功能
      * @param applyNo 申请单号
      * @return StatusDto
      * @author weijb
      * @date 2018-08-22 17:02:58
      */
-    @ApiOperation(value = "查询退换货申请单详情", notes = "【魏俊标】")
+    @ApiOperation(value = "申请单支付功能", notes = "【魏俊标】")
     @GetMapping("/paymentcompletion/{applyNo}")
     @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
     public StatusDto<FindAllocateApplyDTO> paymentCompletion(@PathVariable String applyNo){
@@ -53,5 +53,19 @@ public class PaymentController {
     public StatusDto<FindAllocateApplyDTO> getTotalPrice(@PathVariable String applyNo){
         FindAllocateApplyDTO allocate = paymentService.getTotalPrice(applyNo);
         return StatusDto.buildDataSuccessStatusDto(allocate);
+    }
+
+    /**
+     *  服务单（维修单）支付功能
+     * @param serviceOrderno 服务单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-22 17:02:58
+     */
+    @ApiOperation(value = "服务单（维修单）支付功能", notes = "【魏俊标】")
+    @GetMapping("/servicepaymentcompletion/{serviceOrderno}")
+    @ApiImplicitParam(name = "serviceOrderno", value = "申请单号", required = true, paramType = "path")
+    public StatusDto<FindAllocateApplyDTO> servicepaymentcompletion(@PathVariable String serviceOrderno){
+        return paymentService.servicepaymentcompletion(serviceOrderno);
     }
 }

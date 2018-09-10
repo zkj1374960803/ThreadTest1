@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.order.dao;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceorderDetail;
+import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.order.dto.SaveMaintaintemDTO;
 import com.ccbuluo.business.platform.order.dto.SaveMerchandiseDTO;
 import com.ccbuluo.dao.BaseDao;
@@ -179,5 +180,24 @@ public class BizServiceorderDetailDao extends BaseDao<BizServiceorderDetail> {
             .append(" :creator, :createTime, :operator, :operateTime, :deleteFlag, :remark)");
 
         batchInsertForListBean(sql.toString(), saveMerchandiseDTOS1);
+    }
+
+    /**
+     * 获取服务单详情
+     * @param orderNo  服务单编号
+     * @author weijb
+     * @date 2018-09-10 16:51:41
+     */
+    public List<BizServiceorderDetail> getServiceorderDetailByOrderNo(String orderNo) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,order_no,product_no,product_type,unit_price,amount,")
+                .append("warranty_type,service_orgno,service_orgname,service_userid,")
+                .append("service_username,creator,create_time,operator,operate_time,")
+                .append("delete_flag,remark FROM biz_serviceorder_detail WHERE warranty_type=warrantyType and order_no= :orderNo");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("orderNo", orderNo);
+        // 过保的零配件
+        params.put("warrantyType", BizServiceorderDetail.WarrantyTypeEnum.OVERSHELFLIFE.name());
+        return super.queryListBean(BizServiceorderDetail.class, sql.toString(), params);
     }
 }

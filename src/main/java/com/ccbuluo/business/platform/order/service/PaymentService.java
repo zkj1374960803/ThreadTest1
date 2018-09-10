@@ -34,4 +34,13 @@ public interface PaymentService {
      * @date 2018-08-29 15:02:58
      */
     FindAllocateApplyDTO getTotalPrice(String applyNo);
+
+    /**
+     *  服务单（维修单）支付功能
+     * @param serviceOrderno 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-09-10 17:02:58
+     */
+    StatusDto servicepaymentcompletion(String serviceOrderno);
 }

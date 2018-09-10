@@ -224,4 +224,25 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
 
         updateForMap(sql, params);
     }
+
+    /**
+     * 获取售后系统的服务单详情
+     * @param serviceOrderno  服务单号
+     * @author Ryze
+     * @date 2018-09-03 15:38:39
+     */
+    public BizServiceOrder getBizServiceOrderByServiceOrderno(String serviceOrderno) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT bso.id,bso.service_orderno,bso.car_no,bso.car_vin,")
+                .append("bso.service_type,bso.report_orgno,bso.report_orgtype,bso.report_time,")
+                .append("bso.customer_name,bso.customer_phone,bso.reserve_contacter,")
+                .append("bso.reserve_phone,bso.order_status,bso.dispatch_times,")
+                .append("bso.cur_processor,bso.processor_orgtype,bso.service_time,")
+                .append("bso.order_cost,bso.payed,bso.problem_content,bso.creator,")
+                .append("bso.create_time,bso.operator,bso.operate_time,bso.delete_flag,")
+                .append("bso.remark FROM biz_service_order AS bso WHERE bso.service_orderno= :serviceOrderno");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("serviceOrderno", serviceOrderno);
+        return super.findForBean(BizServiceOrder.class, sql.toString(), params);
+    }
 }

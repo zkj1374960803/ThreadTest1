@@ -791,7 +791,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
                     outPlan.setSupplierNo(stock.getSupplierNo());
                     outPlan.setApplyDetailId(order.getId());
                     // 销售价
-                    outPlan.setSalesPrice(order.getUnitPrice());
+                    outPlan.setSalesPrice(BigDecimal.valueOf(order.getUnitPrice()));
                     // 出库计划的状态（计划执行中）
                     outPlan.setPlanStatus(StockPlanStatusEnum.DOING.toString());
                     outPlan.preInsert(userHolder.getLoggedUserId());

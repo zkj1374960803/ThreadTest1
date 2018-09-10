@@ -1,30 +1,40 @@
 package com.ccbuluo.business.platform.order.service;
 
+import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
 import com.ccbuluo.business.constants.OrderStatusEnum;
 import com.ccbuluo.business.entity.BizAllocateApply;
+import com.ccbuluo.business.entity.BizOutstockplanDetail;
+import com.ccbuluo.business.entity.BizServiceOrder;
+import com.ccbuluo.business.entity.BizServiceorderDetail;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleStrategy;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
+import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
+import com.ccbuluo.business.platform.order.dao.BizServiceorderDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
+import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftBean;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
+import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
+import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 支付功能
@@ -43,6 +53,12 @@ public class PaymentServiceImpl implements PaymentService {
     private BizAllocateapplyDetailDao bizAllocateapplyDetailDao;
     @Autowired
     BizAllocateTradeorderDao bizAllocateTradeorderDao;
+    @Autowired
+    BizServiceOrderDao bizServiceOrderDao;
+    @ThriftRPCClient("UserCoreSerService")
+    private InnerUserInfoService innerUserInfoService;
+    @Autowired
+    BizServiceorderDetailDao bizServiceorderDetailDao;
 
     /**
      *  支付完成调用接口
@@ -51,6 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
      * @author weijb
      * @date 2018-08-22 17:02:58
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public StatusDto paymentCompletion(String applyNo){
         try {
@@ -73,7 +90,7 @@ public class PaymentServiceImpl implements PaymentService {
             String payer = ba.getInstockOrgno();// 买入方(支付方)
             String receive = ba.getOutstockOrgno();//卖出方(接收方)
             BigDecimal sellTotal = getSellTotal(details);
-            // 如果支付成功
+            // 如果支付成功 TODO
             if(1 == 1){
                 //更新申请单状态
                 bizAllocateApplyDao.updateApplyOrderStatus(applyNo, status);
@@ -150,5 +167,60 @@ public class PaymentServiceImpl implements PaymentService {
             bigDecimal = bigDecimal.add(costPrice.multiply(appNum));
         }
         return bigDecimal;
+    }
+
+    /**
+     *  服务单（维修单）支付功能
+     * @param serviceOrderno 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-09-10 17:02:58
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public StatusDto servicepaymentcompletion(String serviceOrderno){
+        // 根据车辆查询收款人组织code
+        BizServiceOrder serviceOrder = bizServiceOrderDao.getBizServiceOrderByServiceOrderno(serviceOrderno);
+        String payer = "";// 这个待确认 TODO serviceOrder
+        // 查询出过保的零配件（根据详单查新付款人组织编号和金额）
+        List<Pair<String,BigDecimal>> list = getRreceiveInfo(serviceOrderno);
+        for(Pair<String,BigDecimal> pair : list){
+            String receive = pair.getLeft();
+            BigDecimal price = pair.getRight();
+            // TODO 调用支付接口
+        }
+        return null;
+    }
+    private List<Pair<String,BigDecimal>> getRreceiveInfo(String serviceOrderno){
+        List<BizServiceorderDetail> orderDetails = bizServiceorderDetailDao.getServiceorderDetailByOrderNo(serviceOrderno);
+        // 根据维修服务的code分组
+        Map<String, List<BizServiceorderDetail>> collect = orderDetails.stream().collect(Collectors.groupingBy(BizServiceorderDetail::getServiceOrgno));
+        List<Pair<String,BigDecimal>> list = new ArrayList<Pair<String,BigDecimal>>();
+        for (Map.Entry<String, List<BizServiceorderDetail>> entry : collect.entrySet()) {
+            List<BizServiceorderDetail> value = entry.getValue();
+            Pair<String,BigDecimal> pair = getPriceTatol(value);
+            list.add(pair);
+        }
+        return list;
+    }
+    /**
+     *  计算服务单价格
+     * @param details 服务单详情
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    private Pair<String,BigDecimal> getPriceTatol(List<BizServiceorderDetail> details){
+        BigDecimal bigDecimal = BigDecimal.ZERO;
+        BigDecimal costPrice = BigDecimal.ZERO;
+        String orgNo = "";
+        for(BizServiceorderDetail detail : details){
+            orgNo = detail.getServiceOrgno();
+            // 使用的数量
+            BigDecimal occupyNum = BigDecimal.valueOf(detail.getAmount());
+            // 成本价格
+            costPrice = BigDecimal.valueOf(detail.getUnitPrice());
+            bigDecimal = bigDecimal.add(occupyNum.multiply(costPrice));
+        }
+        return Pair.of(orgNo, bigDecimal);
     }
 }
