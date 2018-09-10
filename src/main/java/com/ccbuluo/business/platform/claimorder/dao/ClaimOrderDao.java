@@ -3,11 +3,9 @@ package com.ccbuluo.business.platform.claimorder.dao;
 import com.ccbuluo.business.platform.claimorder.dto.BizServiceClaimorder;
 import com.ccbuluo.business.platform.claimorder.dto.QueryClaimorderListDTO;
 import com.ccbuluo.business.platform.order.dto.ProductDetailDTO;
-import com.ccbuluo.business.platform.order.dto.SaveMaintaintemDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
 import com.google.common.collect.Maps;
-import io.swagger.models.auth.In;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -15,7 +13,6 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
-import javax.print.DocFlavor;
 import java.util.HashMap;
 import java.util.List;
 
@@ -40,6 +37,9 @@ public class ClaimOrderDao extends BaseDao<ClaimOrderDao> {
      * @date 2018-09-08 13:02:21
      */
     public void batchSaveServiceClaimorders(List<BizServiceClaimorder> bizServiceClaimorders) {
+        if(bizServiceClaimorders == null || bizServiceClaimorders.size() == 0){
+            return;
+        }
         StringBuffer sql = new StringBuffer();
         sql.append(" INSERT INTO biz_service_claimorder ( ")
             .append(" claim_ordno,service_ordno,tracking_no,refund_adress,doc_status, ")
@@ -89,12 +89,12 @@ public class ClaimOrderDao extends BaseDao<ClaimOrderDao> {
 
     /**
      * 查询工时的信息
-     * @param productDetailDTO
+     * @param productDetailDTO 查询条件
      * @return List<SaveMaintaintemDTO> 工时的列表
      * @author zhangkangjian
      * @date 2018-09-08 14:54:41
      */
-    public List<ProductDetailDTO> findMaintainitemDetail(ProductDetailDTO productDetailDTO) {
+    public List<ProductDetailDTO> queryMaintainitemDetail(ProductDetailDTO productDetailDTO) {
         StringBuffer sql = new StringBuffer();
         sql.append(" SELECT a.product_no,b.maintainitem_name as 'productName',a.unit_price, a.amount,a.warranty_type,a.service_username  ")
             .append(" FROM biz_serviceorder_detail a ")
@@ -115,12 +115,11 @@ public class ClaimOrderDao extends BaseDao<ClaimOrderDao> {
 
     /**
      *  查询索赔单列表
-     * @param claimOrdno
-     * @param userOrgCode
-     * @param offset
-     * @param pageSize
-     * @exception
-     * @return
+     * @param claimOrdno 索赔单号
+     * @param userOrgCode 用户orgcode
+     * @param offset 偏移量
+     * @param pageSize 每页显示的数量
+     * @return Page<QueryClaimorderListDTO> 分页的索赔单列表
      * @author zhangkangjian
      * @date 2018-09-08 16:16:03
      */
@@ -145,6 +144,7 @@ public class ClaimOrderDao extends BaseDao<ClaimOrderDao> {
         }
         return queryPageForBean(QueryClaimorderListDTO.class, sql.toString(), map, offset, pageSize);
     }
+
     /**
      * 更新索赔单状态
      * @param claimOrdno 索赔单编号
@@ -185,7 +185,6 @@ public class ClaimOrderDao extends BaseDao<ClaimOrderDao> {
             .append(" doc_status = :docStatus, process_time = now()")
             .append(" WHERE claim_ordno = :claimOrdno ");
         updateForBean(sql.toString(), map);
-
     }
 
     /**
