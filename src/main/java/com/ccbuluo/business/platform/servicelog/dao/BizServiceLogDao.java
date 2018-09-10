@@ -95,7 +95,6 @@ public class BizServiceLogDao extends BaseDao<BizServiceLog> {
         return super.updateForMap(sql.toString(), params);
     }
 
-
     /**
      * 查询维修单日志
      * @param serviceOrderno 维修单编号
