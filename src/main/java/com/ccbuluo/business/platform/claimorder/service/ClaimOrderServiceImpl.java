@@ -6,12 +6,10 @@ import com.ccbuluo.business.entity.BizServiceOrder;
 import com.ccbuluo.business.entity.BizServiceorderDetail;
 import com.ccbuluo.business.platform.claimorder.dao.ClaimOrderDao;
 import com.ccbuluo.business.platform.claimorder.dto.BizServiceClaimorder;
-import com.ccbuluo.business.platform.claimorder.dto.BizServiceClaimorderDTO;
 import com.ccbuluo.business.platform.claimorder.dto.QueryClaimorderListDTO;
 import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceorderDetailDao;
 import com.ccbuluo.business.platform.order.dto.ProductDetailDTO;
-import com.ccbuluo.business.platform.order.dto.SaveMaintaintemDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.BusinessUser;
@@ -25,7 +23,6 @@ import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -64,7 +61,7 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
         // 查询维修单详单数据
         BizServiceorderDetail queryBizServiceorderDetail = new BizServiceorderDetail();
         queryBizServiceorderDetail.setOrderNo(serviceOrdno);
-        // 在保 过保
+        // 查询在保状态
         queryBizServiceorderDetail.setWarrantyType(BizServiceorderDetail.WarrantyTypeEnum.INSHELFLIFE.name());
         List<BizServiceorderDetail> bizServiceorderDetails = Optional.ofNullable(bizServiceorderDetailDao.queryListBizServiceorderDetail(queryBizServiceorderDetail)).orElse(new ArrayList<BizServiceorderDetail>());
         // 根据机构分组统计索赔单的总金额
@@ -104,14 +101,13 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
 
     /**
      * 提交索赔单
-     * @param bizServiceClaimorder@exception
+     * @param bizServiceClaimorder
      * @author zhangkangjian
      * @date 2018-09-08 14:26:55
      */
     @Override
     public void updateClaimOrder(BizServiceClaimorder bizServiceClaimorder) {
         // 设置索赔单的状态
-        // 待验收
         bizServiceClaimorder.setDocStatus(BizServiceClaimorder.DocStatusEnum.WAITACCEPTANCE.name());
         claimOrderDao.updateClaimOrder(bizServiceClaimorder);
     }
@@ -136,10 +132,25 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
         productDetailDTO.setWarrantyType(BizServiceorderDetail.WarrantyTypeEnum.INSHELFLIFE.name());
         // 工时类型
         productDetailDTO.setProductType(BizServiceorderDetail.ProductTypeEnum.MAINTAINITEM.name());
-        List<ProductDetailDTO> maintainitemDetail = claimOrderDao.findMaintainitemDetail(productDetailDTO);
+        List<ProductDetailDTO> maintainitemDetail = claimOrderDao.queryMaintainitemDetail(productDetailDTO);
         // 查询零配件信息
         productDetailDTO.setProductType(BizServiceorderDetail.ProductTypeEnum.FITTING.name());
-        List<ProductDetailDTO> fittingDetail = claimOrderDao.findMaintainitemDetail(productDetailDTO);
+        // 查询零配件列表信息
+        List<ProductDetailDTO> fittingDetail = queryFitingDetailList(productDetailDTO);
+        serviceClaimorderDetail.setFittingDetail(fittingDetail);
+        serviceClaimorderDetail.setMaintainitemDetail(maintainitemDetail);
+        return serviceClaimorderDetail;
+    }
+
+    /**
+     * 查询零配件列表信息
+     * @param productDetailDTO 查询条件
+     * @return List<ProductDetailDTO>
+     * @author zhangkangjian
+     * @date 2018-09-10 16:36:14
+     */
+    private List<ProductDetailDTO> queryFitingDetailList(ProductDetailDTO productDetailDTO) {
+        List<ProductDetailDTO> fittingDetail = claimOrderDao.queryMaintainitemDetail(productDetailDTO);
         Optional.ofNullable(fittingDetail).ifPresent(a ->{
             List<String> productNoList = fittingDetail.stream().map(ProductDetailDTO::getProductNo).collect(Collectors.toList());
             QueryCarpartsProductDTO queryCarpartsProductDTO = new QueryCarpartsProductDTO();
@@ -150,28 +161,28 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
                 carpartsProductService.queryCarpartsProductListByPriceType(queryCarpartsProductDTO);
             StatusDto<Page<BasicCarpartsProductDTO>> basicCarpartsProductDTOResolve = StatusDtoThriftUtils.resolve(basicCarpartsProductDTO, BasicCarpartsProductDTO.class);
             List<BasicCarpartsProductDTO> basicCarpartsProductDTOList = basicCarpartsProductDTOResolve.getData().getRows();
-            Map<String, BasicCarpartsProductDTO> basicCarpartsProductMap = basicCarpartsProductDTOList.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, b -> b,(k1,k2)->k1));
-            a.forEach(c->{
-                String productNo = c.getProductNo();
-                BasicCarpartsProductDTO carparts = basicCarpartsProductMap.get(productNo);
-                c.setProductName(carparts.getCarpartsName());
-                c.setCarModelName(carparts.getFitCarmodel());
-                c.setProductCategoryname(carparts.getCategoryCodePath());
-                c.setProductUnit(carparts.getUnitName());
-            });
+            if(basicCarpartsProductDTOList != null){
+                Map<String, BasicCarpartsProductDTO> basicCarpartsProductMap = basicCarpartsProductDTOList.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, b -> b,(k1, k2)->k1));
+                a.forEach(c->{
+                    String productNo = c.getProductNo();
+                    BasicCarpartsProductDTO carparts = basicCarpartsProductMap.get(productNo);
+                    c.setProductName(carparts.getCarpartsName());
+                    c.setCarModelName(carparts.getFitCarmodel());
+                    c.setProductCategoryname(carparts.getCategoryCodePath());
+                    c.setProductUnit(carparts.getUnitName());
+                });
+            }
         });
-        serviceClaimorderDetail.setFittingDetail(fittingDetail);
-        serviceClaimorderDetail.setMaintainitemDetail(maintainitemDetail);
-        return serviceClaimorderDetail;
+        return fittingDetail;
     }
 
     /**
      * 查询索赔单的列表
-     * @param claimOrdno
-     * @param offset
-     * @param pageSize
-     * @return
-     * @throws
+     * @param claimOrdno 索赔单编号
+     * @param docStatus 索赔单状态
+     * @param offset 偏移量
+     * @param pageSize 每页显示的数量
+     * @return StatusDto<Page<QueryClaimorderListDTO>>
      * @author zhangkangjian
      * @date 2018-09-08 16:55:56
      */
@@ -198,7 +209,6 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
 
     /**
      * 更新索赔单状态和验收时间
-     *
      * @param claimOrdno 索赔单号
      * @param docStatus  索赔单状态
      * @author zhangkangjian

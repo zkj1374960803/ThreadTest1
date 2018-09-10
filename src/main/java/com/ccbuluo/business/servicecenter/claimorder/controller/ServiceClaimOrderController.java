@@ -59,7 +59,7 @@ public class ServiceClaimOrderController {
     @ApiOperation(value = "查询索赔单的详情", notes = "【张康健】")
     @GetMapping("/findclaimorderdetail")
     @ApiImplicitParam(name = "claimOrdno", value = "索赔单号", required = true, paramType = "query")
-    public StatusDto<BizServiceClaimorder> findClaimOrderDetail(BizServiceClaimorder bizServiceClaimorder){
+    public StatusDto<BizServiceClaimorder> findClaimOrderDetail(@ApiIgnore BizServiceClaimorder bizServiceClaimorder){
         BizServiceClaimorder claimOrderDetail = claimOrderServiceImpl.findClaimOrderDetail(bizServiceClaimorder);
         return StatusDto.buildDataSuccessStatusDto(claimOrderDetail);
     }

@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 
@@ -37,7 +38,7 @@ public class ClaimOrderController{
     @ApiOperation(value = "查询索赔单的详情", notes = "【张康健】")
     @GetMapping("/findclaimorderdetail")
     @ApiImplicitParam(name = "claimOrdno", value = "索赔单号", required = true, paramType = "query")
-    public StatusDto<BizServiceClaimorder> findClaimOrderDetail(BizServiceClaimorder bizServiceClaimorder){
+    public StatusDto<BizServiceClaimorder> findClaimOrderDetail(@ApiIgnore BizServiceClaimorder bizServiceClaimorder){
         BizServiceClaimorder claimOrderDetail = claimOrderServiceImpl.findClaimOrderDetail(bizServiceClaimorder);
         return StatusDto.buildDataSuccessStatusDto(claimOrderDetail);
     }
