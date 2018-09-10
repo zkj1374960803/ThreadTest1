@@ -1,7 +1,9 @@
 package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
 import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
+import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.InstockTypeEnum;
+import com.ccbuluo.business.constants.OutstockTypeEnum;
 import com.ccbuluo.business.constants.StockPlanStatusEnum;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
@@ -10,16 +12,19 @@ import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
+import com.ccbuluo.business.platform.servicelog.service.ServiceLogService;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.http.StatusDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +55,8 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
     BizAllocateApplyDao bizAllocateApplyDao;
     @Resource
     private UserHolder userHolder;
+    @Autowired
+    private ServiceLogService serviceLogService;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -83,11 +90,11 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 构建占用库存和订单占用库存关系
             List<BizStockDetail> stockDetailList = buildStockAndRelOrdEntity(details,stockDetails,applyType,relOrdstockOccupies);
             // 构建生成订单(调拨)
-            List<BizAllocateTradeorder> list = buildOrderEntityList(details, applyType,null,null);
+            List<BizAllocateTradeorder> list = buildOrderEntityList(details);
             // 保存生成订单
             bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
-            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, BizAllocateApply.AllocateApplyTypeEnum.SAMELEVEL, relOrdstockOccupies);
+            Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, relOrdstockOccupies);
             // 批量保存出库计划详情
             bizOutstockplanDetailDao.batchOutstockplanDetail(pir.getLeft());
             // 批量保存入库计划详情
@@ -109,6 +116,28 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
             throw e;
         }
         return StatusDto.buildSuccessStatusDto("申请处理成功！");
+    }
+
+    /**
+     * 构建订单list用于批量保存
+     * @param details 申请单详情
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    private List<BizAllocateTradeorder> buildOrderEntityList(List<AllocateapplyDetailBO> details){
+        List<BizAllocateTradeorder> list = new ArrayList<BizAllocateTradeorder>();
+        // 构建生成订单(买方到卖方)
+        BizAllocateTradeorder purchaserToSeller = buildOrderEntity(details);
+        // 特殊情况处理
+        // 计算订单总价
+        BigDecimal total = getSellTotal(details);
+        // 调拨(从买方到卖方)
+        purchaserToSeller.setTotalPrice(total);
+        // 从买方到卖方
+        if(null != purchaserToSeller){
+            list.add(purchaserToSeller);
+        }
+        return list;
     }
 
     /**
@@ -141,6 +170,8 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
             bizInstockplanDetailDao.batchInsertInstockplanDetail(applyNo);
             //更新申请单状态(已撤销)
             bizAllocateApplyDao.updateApplyOrderStatus(applyNo, BizAllocateApply.ApplyStatusEnum.CANCEL.name());
+            // 记录日志
+            addlog(applyNo,"撤销申请！",BizServiceLog.actionEnum.CANCEL.name());
         } catch (Exception e) {
             logger.error("撤销失败！", e);
             throw e;
@@ -152,22 +183,60 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
      *  构建出库和入库计划并保存
      * @param details 申请单详情
      * @param stockDetails 库存详情列表
-     * @param applyTypeEnum 申请类型枚举
      * @author weijb
      * @date 2018-08-11 13:35:41
      */
-    @Override
-    public Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> buildOutAndInstockplanDetail(List<AllocateapplyDetailBO> details, List<BizStockDetail> stockDetails, BizAllocateApply.AllocateApplyTypeEnum applyTypeEnum, List<RelOrdstockOccupy> relOrdstockOccupies){
+    private Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> buildOutAndInstockplanDetail(List<AllocateapplyDetailBO> details, List<BizStockDetail> stockDetails, List<RelOrdstockOccupy> relOrdstockOccupies){
         List<BizOutstockplanDetail> outList = new ArrayList<BizOutstockplanDetail>();
         List<BizInstockplanDetail> inList = new ArrayList<BizInstockplanDetail>();
         // 卖方机构出库计划
-        outstockplanSeller(outList,relOrdstockOccupies,stockDetails,details, BizAllocateApply.AllocateApplyTypeEnum.SAMELEVEL.toString());
-        // 买方入库计划
-//        instockplanPurchaser(inList,details, BizAllocateApply.AllocateApplyTypeEnum.SAMELEVEL.toString());
+        outstockplanSeller(outList,relOrdstockOccupies,stockDetails,details);
         // 买方入库计划(也要根据出库计划来，并且还要根据供应商来分组合并商品编号)
         instockplanPlatformFromStockAndGroup(inList, outList,details);
         return Pair.of(outList, inList);
     }
+
+    /**
+     * 卖方机构出库（机构2）
+     * @param outList 出库计划list
+     * @param relOrdstockOccupies 库存和占用库存关系
+     * @param stockDetails 库存
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    private void outstockplanSeller(List<BizOutstockplanDetail> outList, List<RelOrdstockOccupy> relOrdstockOccupies, List<BizStockDetail> stockDetails,List<AllocateapplyDetailBO> details){
+        // 卖方机构出库计划
+        for(RelOrdstockOccupy ro : relOrdstockOccupies){
+            BizOutstockplanDetail outstockplanSeller = new BizOutstockplanDetail();
+            for(BizStockDetail stockDetail : stockDetails){
+                // 关系库存批次id和库存批次id相等
+                if(ro.getStockId().intValue() == stockDetail.getId().intValue()){
+                    Optional<AllocateapplyDetailBO> applyFilter = details.stream() .filter(applyDetail -> stockDetail.getProductNo().equals(applyDetail.getProductNo())) .findFirst();
+                    if (applyFilter.isPresent()) {
+                        AllocateapplyDetailBO applyDetail = applyFilter.get();
+                        outstockplanSeller = buildBizOutstockplanDetail(applyDetail,stockDetail);
+                        // 卖方机构编号
+                        outstockplanSeller.setOutOrgno(applyDetail.getOutstockOrgno());
+                    }
+                    // 库存类型(在创建占用关系的时候赋值)
+                    outstockplanSeller.setStockType(ro.getStockType());
+                    // 计划出库数量applyNum
+                    outstockplanSeller.setPlanOutstocknum(ro.getOccupyNum());
+                    // 卖方仓库编号（根据机构和商品编号查询的库存）
+                    outstockplanSeller.setOutRepositoryNo(stockDetail.getRepositoryNo());
+                    // 库存编号id
+                    outstockplanSeller.setStockId(stockDetail.getId());
+                    // 成本价
+                    outstockplanSeller.setCostPrice(stockDetail.getCostPrice());
+                    // 交易类型
+                    outstockplanSeller.setOutstockType(OutstockTypeEnum.TRANSFER.toString());
+                    outList.add(outstockplanSeller);
+                    continue;
+                }
+            }
+        }
+    }
+
     /**
      *  入库之后回调事件
      * @param ba 申请单
@@ -206,6 +275,11 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
      * @date 2018-08-21 18:05:46
      */
     private void distinstSupplier(List<BizInstockplanDetail> inList,List<BizOutstockplanDetail> outList,List<AllocateapplyDetailBO> details){
+        Optional<BizOutstockplanDetail> outFilter = outList.stream() .filter(outstockplan -> null == outstockplan.getSupplierNo()) .findFirst();
+        if (outFilter.isPresent()) {
+            outFilter.get().setSupplierNo("");
+        }
+
         List<BizOutstockplanDetail> list = new ArrayList<BizOutstockplanDetail>();
         Map<String, List<BizOutstockplanDetail>> collect = outList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getProductNo));
         for (Map.Entry<String, List<BizOutstockplanDetail>> entryP : collect.entrySet()) {
@@ -253,20 +327,44 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
      */
     private BizInstockplanDetail buildBizInstockplanDetail(BizOutstockplanDetail bd){
         BizInstockplanDetail inPlan = new BizInstockplanDetail();
-        inPlan.setProductNo(bd.getProductNo());// 商品编号
-        inPlan.setProductType(bd.getProductType());// 商品类型
-        inPlan.setProductCategoryname(bd.getProductCategoryname());// 商品分类名称
-        inPlan.setProductName(bd.getProductName());// 商品名称
-        inPlan.setProductUnit(bd.getProductUnit());// 商品计量单位
-        inPlan.setTradeNo(bd.getTradeNo());// 交易批次号（申请单编号）
-        inPlan.setSupplierNo(bd.getSupplierNo());//供应商编号
-        inPlan.setCostPrice(bd.getCostPrice());// 成本价
-        inPlan.setPlanInstocknum(bd.getPlanOutstocknum());// 计划入库数量
-        inPlan.setCompleteStatus(StockPlanStatusEnum.DOING.toString());// 完成状态（计划执行中）
+        inPlan.setProductNo(bd.getProductNo());
+        inPlan.setProductType(bd.getProductType());
+        inPlan.setProductCategoryname(bd.getProductCategoryname());
+        inPlan.setProductName(bd.getProductName());
+        inPlan.setProductUnit(bd.getProductUnit());
+        inPlan.setTradeNo(bd.getTradeNo());
+        inPlan.setSupplierNo(bd.getSupplierNo());
+        inPlan.setCostPrice(bd.getCostPrice());
+        inPlan.setPlanInstocknum(bd.getPlanOutstocknum());
+        inPlan.setCompleteStatus(StockPlanStatusEnum.DOING.toString());
         inPlan.preInsert(userHolder.getLoggedUserId());
-        inPlan.setStockType(bd.getStockType());// 库存类型
-        inPlan.setRemark(bd.getRemark());// 备注
-        inPlan.setInstockType(InstockTypeEnum.TRANSFER.toString());// 交易类型
+        inPlan.setStockType(bd.getStockType());
+        inPlan.setRemark(bd.getRemark());
+        inPlan.setInstockType(InstockTypeEnum.TRANSFER.toString());
         return inPlan;
+    }
+
+    /**
+     * 记录日志
+     * @param applyNo 申请单号
+     * @param content 日志内容
+     * @param action 动作
+     */
+    private void addlog(String applyNo,String content,String action){
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.ERP.name());
+        // BizServiceLog.actionEnum.UPDATE.name()
+        bizServiceLog.setAction(action);
+        bizServiceLog.setSubjectType("SameLevelApplyHandleStrategy");
+        bizServiceLog.setSubjectKeyvalue(applyNo);
+        if (userHolder.getLoggedUser().getOrganization().getOrgType().equals(BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name())) {
+            bizServiceLog.setLogContent("客户经理"+content);
+        } else {
+            bizServiceLog.setLogContent("服务中心"+content);
+        }
+        bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+        bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+        serviceLogService.create(bizServiceLog);
     }
 }

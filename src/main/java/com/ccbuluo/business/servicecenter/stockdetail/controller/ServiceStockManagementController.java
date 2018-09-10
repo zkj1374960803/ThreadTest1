@@ -93,12 +93,16 @@ public class ServiceStockManagementController extends BaseController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "productNo", value = "商品的编号", required = true, paramType = "query"),
         @ApiImplicitParam(name = "productType", value = "商品类型(注：FITTINGS零配件，EQUIPMENT物料)", required = true, paramType = "query"),
-        @ApiImplicitParam(name = "type", value = "(注：PLATFORM集团，SERVICECENTER服务中心，CUSTMANAGER客户经理)", required = true, paramType = "query")
+        @ApiImplicitParam(name = "type", value = "(注：PLATFORM集团，SERVICECENTER服务中心，CUSTMANAGER客户经理)", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "code", value = "服务中心的code或者客户经理的orgcode", required = false, paramType = "query")
     })
-    public StatusDto<FindStockDetailDTO> findStockProductDetail(String productNo, String productType, String type){
-        FindStockDetailDTO findStockDetailDTO = stockManagementService.findStockProductDetail(productNo, productType, type);
+    public StatusDto<FindStockDetailDTO> findStockProductDetail(String productNo, String productType, String type, String code){
+        FindStockDetailDTO findStockDetailDTO = stockManagementService.findStockProductDetail(productNo, productType, type, code);
         return StatusDto.buildDataSuccessStatusDto(findStockDetailDTO);
     }
+
+
+
 
     /**
      * 查看库存详情（批次库存列表查询）

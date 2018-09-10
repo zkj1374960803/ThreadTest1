@@ -250,6 +250,28 @@ public class BizServiceStorehouseDao extends BaseDao<BizServiceStorehouse> {
         return queryListBean(QueryStorehouseDTO.class, sql.toString(), param);
     }
 
+
+    /**
+     * 根据服务中心查询启用的仓库列表
+     * @param serviceCenterCode 服务中心code
+     * @return List<QueryStorehouseDTO> 仓库列表
+     * @author zhangkangjian
+     * @date 2018-08-07 15:15:11
+     */
+    public List<BizServiceStorehouse> queryStorehouseByServiceCenterCode(List<String> serviceCenterCode) {
+        if(serviceCenterCode == null || serviceCenterCode.size() == 0){
+            return Collections.emptyList();
+        }
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("serviceCenterCode", serviceCenterCode);
+        param.put("storehouseStatus", Constants.STATUS_FLAG_ONE);
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT storehouse_code,storehouse_name,servicecenter_code ")
+            .append(" FROM biz_service_storehouse ")
+            .append("  WHERE servicecenter_code in (:serviceCenterCode) AND storehouse_status = :storehouseStatus ");
+        return queryListBean(BizServiceStorehouse.class, sql.toString(), param);
+    }
+
     /**
      * 根据仓库code查询仓库信息
      * @param codes 仓库code

@@ -18,7 +18,7 @@ public interface StockManagementService {
      * @author zhangkangjian
      * @date 2018-08-10 15:45:56
      */
-    FindStockDetailDTO findStockProductDetail(String productNo, String productType, String type);
+    FindStockDetailDTO findStockProductDetail(String productNo, String productType, String type, String code);
     /**
      * 查看库存详情（批次库存列表查询）
      * @param findStockListDTO

@@ -7,6 +7,7 @@ import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**

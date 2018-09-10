@@ -4,6 +4,7 @@ import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
 import com.ccbuluo.business.constants.ApplyTypeEnum;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.InstockTypeEnum;
+import com.ccbuluo.business.constants.OutstockTypeEnum;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
@@ -138,8 +139,6 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
         problemOutstockplanPurchaser(outList,relOrdstockOccupies,stockDetails,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
         // 平台入库
         problemInstockplanPlatform(inList,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
-        // 平台出库
-//        outstockplanPlatform(outList,relOrdstockOccupies,stockDetails,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
         // 申请方入库（换货：买方机构的入库要以出库的数据来构建（不同批次，不同价格）（问题件库存））
         problemInstockplanPurchaser(inList,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
         return Pair.of(outList, inList);
@@ -159,19 +158,28 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
         for(RelOrdstockOccupy ro : relOrdstockOccupies){
             BizOutstockplanDetail outstockplanPurchaser = new BizOutstockplanDetail();
             for(BizStockDetail bd : stockDetails){
-                if(ro.getStockId().intValue() == bd.getId().intValue()){// 关系库存批次id和库存批次id相等
+                // 关系库存批次id和库存批次id相等
+                if(ro.getStockId().intValue() == bd.getId().intValue()){
                     AllocateapplyDetailBO detail = new AllocateapplyDetailBO();
                     Optional<AllocateapplyDetailBO> applyFilter = details.stream() .filter(applyDetail -> bd.getProductNo().equals(applyDetail.getProductNo())) .findFirst();
                     if (applyFilter.isPresent()) {
                         detail = applyFilter.get();
                     }
-                    outstockplanPurchaser = buildBizOutstockplanDetail(detail, applyType,bd);
-                    outstockplanPurchaser.setStockType(ro.getStockType());// 库存类型(在创建占用关系的时候赋值)
-                    outstockplanPurchaser.setPlanOutstocknum(ro.getOccupyNum());// 计划出库数量applyNum
-                    outstockplanPurchaser.setOutRepositoryNo(bd.getRepositoryNo());// 仓库code
-                    outstockplanPurchaser.setOutOrgno(detail.getApplyorgNo());// 换货的时候是申请方机构出货
-                    outstockplanPurchaser.setStockId(bd.getId());// 库存编号id
-                    outstockplanPurchaser.setCostPrice(bd.getCostPrice());// 成本价
+                    outstockplanPurchaser = buildBizOutstockplanDetail(detail,bd);
+                    // 库存类型(在创建占用关系的时候赋值)
+                    outstockplanPurchaser.setStockType(ro.getStockType());
+                    // 计划出库数量applyNum
+                    outstockplanPurchaser.setPlanOutstocknum(ro.getOccupyNum());
+                    // 仓库code
+                    outstockplanPurchaser.setOutRepositoryNo(bd.getRepositoryNo());
+                    // 换货的时候是申请方机构出货
+                    outstockplanPurchaser.setOutOrgno(detail.getApplyorgNo());
+                    // 库存编号id
+                    outstockplanPurchaser.setStockId(bd.getId());
+                    // 成本价
+                    outstockplanPurchaser.setCostPrice(bd.getCostPrice());
+                    // 交易类型
+                    outstockplanPurchaser.setOutstockType(OutstockTypeEnum.BARTER.toString());
                     outList.add(outstockplanPurchaser);
                     continue;
                 }
@@ -190,8 +198,13 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
         // 买入方入库计划
         for(AllocateapplyDetailBO ad : details){
             BizInstockplanDetail instockplanPurchaser = new BizInstockplanDetail();
-            instockplanPurchaser = buildBizInstockplanDetail(ad, applyType);
-            instockplanPurchaser.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());// 库存类型(在创建占用关系的时候赋值)
+            instockplanPurchaser = buildBizInstockplanDetail(ad);
+            // 交易类型
+            instockplanPurchaser.setInstockType(InstockTypeEnum.BARTER.toString());
+            // 库存类型 （问题件申请机构入库的时候应该是有效库存）
+            instockplanPurchaser.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
+            // 成本价(退货和换货的成本价是零)
+            instockplanPurchaser.setCostPrice(BigDecimal.ZERO);
             instockplanPurchaser.setInstockRepositoryNo(ad.getInRepositoryNo());// 入库仓库编号
             instockplanPurchaser.setInstockOrgno(ad.getApplyorgNo());// 申请方入机构编号
             inList.add(instockplanPurchaser);
@@ -210,9 +223,13 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
         for(AllocateapplyDetailBO ad : details){
             BizInstockplanDetail instockplanPlatform = new BizInstockplanDetail();
             // 平台入库计划
-            instockplanPlatform = buildBizInstockplanDetail(ad, applyType);
-            instockplanPlatform.setStockType(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.name());// 库存类型(在创建占用关系的时候赋值)
-            instockplanPlatform.setCostPrice(BigDecimal.ZERO);//  平台采购类型的成本价在生成入库计划的时候是0，等入库回调的时候再回填
+            instockplanPlatform = buildBizInstockplanDetail(ad);
+            // 交易类型
+            instockplanPlatform.setInstockType(InstockTypeEnum.BARTER.toString());
+            // 库存类型(在创建占用关系的时候赋值)
+            instockplanPlatform.setStockType(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.name());
+            //  平台采购类型的成本价在生成入库计划的时候是0，等入库回调的时候再回填
+            instockplanPlatform.setCostPrice(BigDecimal.ZERO);
             // 根据平台的no查询平台的仓库
             List<QueryStorehouseDTO> list = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
             String repositoryNo = "";
