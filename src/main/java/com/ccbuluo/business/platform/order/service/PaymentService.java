@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.order.service;
 
 
+import com.ccbuluo.business.entity.BizServiceOrder;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.db.Page;
@@ -44,4 +45,13 @@ public interface PaymentService {
      * @date 2018-09-10 17:02:58
      */
     StatusDto servicepaymentcompletion(String serviceOrderno);
+
+    /**
+     *  根据维修单获取总价格
+     * @param serviceOrderno 维修单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-09-11 14:02:58
+     */
+    BizServiceOrder getServiceOrdernoPrice(String serviceOrderno);
 }

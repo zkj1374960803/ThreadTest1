@@ -2,10 +2,7 @@ package com.ccbuluo.business.platform.order.service;
 
 import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
 import com.ccbuluo.business.constants.OrderStatusEnum;
-import com.ccbuluo.business.entity.BizAllocateApply;
-import com.ccbuluo.business.entity.BizOutstockplanDetail;
-import com.ccbuluo.business.entity.BizServiceOrder;
-import com.ccbuluo.business.entity.BizServiceorderDetail;
+import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
@@ -15,6 +12,7 @@ import com.ccbuluo.business.platform.claimorder.service.ClaimOrderService;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceorderDetailDao;
+import com.ccbuluo.business.platform.servicelog.service.ServiceLogService;
 import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.core.common.UserHolder;
@@ -24,7 +22,9 @@ import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftBean;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
+import com.ccbuluo.usercoreintf.dto.OrgWorkplaceDTO;
 import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
+import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +60,12 @@ public class PaymentServiceImpl implements PaymentService {
     private BizServiceorderDetailDao bizServiceorderDetailDao;
     @Autowired
     private ClaimOrderService claimOrderService;
+    @Resource
+    private UserHolder userHolder;
+    @Autowired
+    private ServiceLogService serviceLogService;
+    @ThriftRPCClient("UserCoreSerService")
+    private BasicUserOrganizationService basicUserOrganizationService;
 
     /**
      *  支付完成调用接口
@@ -88,8 +94,8 @@ public class PaymentServiceImpl implements PaymentService {
             }
             // 根据申请单获取申请单详情
             List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
-            String payer = ba.getInstockOrgno();// 买入方(支付方)
-            String receive = ba.getOutstockOrgno();//卖出方(接收方)
+            String payerOrgno = ba.getInstockOrgno();// 买入方(支付方)
+            String receiveOrgno = ba.getOutstockOrgno();//卖出方(接收方)
             BigDecimal sellTotal = getSellTotal(details);
             // 如果支付成功 TODO
             if(1 == 1){
@@ -97,6 +103,10 @@ public class PaymentServiceImpl implements PaymentService {
                 bizAllocateApplyDao.updateApplyOrderStatus(applyNo, status);
                 // 更新订单状态
                 bizAllocateTradeorderDao.updateTradeorderStatus(applyNo,OrderStatusEnum.PAYMENTCOMPLETION.name());
+                // 记录日志
+                StatusDtoThriftBean<OrgWorkplaceDTO> byCode = basicUserOrganizationService.getByCode(payerOrgno);
+
+                addlog(applyNo,payerOrgno+"支付给"+receiveOrgno+sellTotal+"人民币",BizServiceLog.actionEnum.PAYMENT.name());
             }else{
                 return StatusDto.buildFailureStatusDto("支付失败！");
             }
@@ -182,16 +192,18 @@ public class PaymentServiceImpl implements PaymentService {
     public StatusDto servicepaymentcompletion(String serviceOrderno){
         // 根据车辆查询收款人组织code
         BizServiceOrder serviceOrder = bizServiceOrderDao.getBizServiceOrderByServiceOrderno(serviceOrderno);
-        String payer = "";// 这个待确认 TODO serviceOrder
+        String payerOrgno = "";// 这个待确认 TODO serviceOrder
         // 查询出过保的零配件（根据详单查新付款人组织编号和金额）
         List<Pair<String,BigDecimal>> list = getRreceiveInfo(serviceOrderno);
         for(Pair<String,BigDecimal> pair : list){
-            String receive = pair.getLeft();
+            String receiveOrgno = pair.getLeft();
             BigDecimal price = pair.getRight();
             // TODO 调用支付接口
             if(1 == 1){
                 // 调用生成索赔单(支付成功)
                 claimOrderService.generateClaimForm(serviceOrderno);
+                // 记录日志
+                addlog(serviceOrderno,payerOrgno+"支付给"+receiveOrgno+price+"人民币",BizServiceLog.actionEnum.PAYMENT.name());
             }
         }
         return null;
@@ -227,5 +239,45 @@ public class PaymentServiceImpl implements PaymentService {
             bigDecimal = bigDecimal.add(occupyNum.multiply(costPrice));
         }
         return Pair.of(orgNo, bigDecimal);
+    }
+
+    /**
+     * 记录日志
+     * @param applyNo 申请单号
+     * @param content 日志内容
+     * @param action 动作
+     */
+    private void addlog(String applyNo,String content,String action){
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.ERP.name());
+        // BizServiceLog.actionEnum.UPDATE.name()
+        bizServiceLog.setAction(action);
+        bizServiceLog.setSubjectType("PaymentServiceImpl");
+        bizServiceLog.setSubjectKeyvalue(applyNo);
+        if (userHolder.getLoggedUser().getOrganization().getOrgType().equals(BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name())) {
+            bizServiceLog.setLogContent("客户经理:"+content);
+        } else {
+            bizServiceLog.setLogContent("服务中心:"+content);
+        }
+        bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+        bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+        serviceLogService.create(bizServiceLog);
+    }
+
+    /**
+     *  根据维修单获取总价格
+     * @param serviceOrderno 维修单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-09-11 14:02:58
+     */
+    @Override
+    public BizServiceOrder getServiceOrdernoPrice(String serviceOrderno){
+        BizServiceOrder serviceOrder = new BizServiceOrder();
+        List<BizServiceorderDetail> orderDetails = bizServiceorderDetailDao.getServiceorderDetailByOrderNo(serviceOrderno);
+        Pair<String,BigDecimal> pair = getPriceTatol(orderDetails);
+        serviceOrder.setOrderCost(pair.getRight());
+        return serviceOrder;
     }
 }
