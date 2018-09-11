@@ -1,10 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
 import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
-import com.ccbuluo.business.constants.ApplyTypeEnum;
-import com.ccbuluo.business.constants.BusinessPropertyHolder;
-import com.ccbuluo.business.constants.InstockTypeEnum;
-import com.ccbuluo.business.constants.OutstockTypeEnum;
+import com.ccbuluo.business.constants.*;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
@@ -207,6 +204,7 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
             instockplanPurchaser.setCostPrice(BigDecimal.ZERO);
             instockplanPurchaser.setInstockRepositoryNo(ad.getInRepositoryNo());// 入库仓库编号
             instockplanPurchaser.setInstockOrgno(ad.getApplyorgNo());// 申请方入机构编号
+            instockplanPurchaser.setCompleteStatus(StockPlanStatusEnum.NOTEFFECTIVE.toString());// 完成状态（计划执行中）
             inList.add(instockplanPurchaser);
         }
     }
@@ -240,5 +238,20 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
             instockplanPlatform.setInstockOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 平台机构编号
             inList.add(instockplanPlatform);
         }
+    }
+
+    /**
+     *  入库之后回调事件
+     * @param ba 申请单
+     * @author weijb
+     * @param ba 申请单
+     * @return
+     */
+    @Override
+    public StatusDto platformInstockCallback(BizAllocateApply ba){
+        super.platformInstockCallback(ba);
+        // 调拨入库之后要更改申请方入库计划状态
+        bizInstockplanDetailDao.updateCompleteStatus(ba.getApplyNo());
+        return StatusDto.buildSuccessStatusDto("操作成功！");
     }
 }

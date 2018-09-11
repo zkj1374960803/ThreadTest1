@@ -66,6 +66,8 @@ public class PaymentServiceImpl implements PaymentService {
     private ServiceLogService serviceLogService;
     @ThriftRPCClient("UserCoreSerService")
     private BasicUserOrganizationService basicUserOrganizationService;
+    @ThriftRPCClient("UserCoreSerService")
+    private InnerUserInfoService innerUserInfoService;
 
     /**
      *  支付完成调用接口
@@ -283,5 +285,26 @@ public class PaymentServiceImpl implements PaymentService {
         Pair<String,BigDecimal> pair = getPriceTatol(orderDetails);
         serviceOrder.setOrderCost(pair.getRight());
         return serviceOrder;
+    }
+
+    /**
+     *  调用支付功能
+     * @param payerOrgno 付款人
+     * @param receiveOrgno 收款人
+     * @param price 金额
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-09-11 15:13:28
+     */
+    private StatusDto payment(String payerOrgno,String receiveOrgno, BigDecimal price){
+        double v = price.doubleValue();
+        return null;
+    }
+
+    public static void main(String[] args) {
+        double v =12;
+        System.out.println(v);
+        System.out.println(0 - v);
     }
 }

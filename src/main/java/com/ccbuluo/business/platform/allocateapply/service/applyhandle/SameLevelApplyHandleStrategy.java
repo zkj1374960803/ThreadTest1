@@ -230,6 +230,8 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
                     outstockplanSeller.setCostPrice(stockDetail.getCostPrice());
                     // 交易类型
                     outstockplanSeller.setOutstockType(OutstockTypeEnum.TRANSFER.toString());
+                    // 未执行
+                    outstockplanSeller.setPlanStatus(StockPlanStatusEnum.NOTEFFECTIVE.toString());
                     outList.add(outstockplanSeller);
                     continue;
                 }
@@ -246,8 +248,9 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
      */
     @Override
     public StatusDto platformInstockCallback(BizAllocateApply ba){
-        // 服务间的调拨没有回调
-        return null;
+        // 调拨入库之后要更改申请方入库计划状态
+        bizInstockplanDetailDao.updateCompleteStatus(ba.getApplyNo());
+        return StatusDto.buildSuccessStatusDto("操作成功！");
     }
     /**
      * 买方入库机构构建
@@ -312,6 +315,8 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
                     // 计划出库数量
                     planOutstocknum += bd.getPlanOutstocknum();
                 }
+                // 完成状态（未生效）
+                inPlan.setCompleteStatus(StockPlanStatusEnum.NOTEFFECTIVE.toString());
                 inPlan.setPlanInstocknum(planOutstocknum);
                 inList.add(inPlan);
             }

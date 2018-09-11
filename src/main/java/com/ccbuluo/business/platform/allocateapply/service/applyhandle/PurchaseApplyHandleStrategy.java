@@ -110,7 +110,8 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
      */
     @Override
     public StatusDto platformInstockCallback(BizAllocateApply ba){
-        return super.platformInstockCallback(ba);
+        // 采购没有回调
+        return StatusDto.buildSuccessStatusDto("操作成功！");
     }
 
     /**
