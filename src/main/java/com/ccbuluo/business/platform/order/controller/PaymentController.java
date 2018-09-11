@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.order.controller;
 
+import com.ccbuluo.business.entity.BizServiceOrder;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.order.service.PaymentService;
 import com.ccbuluo.http.StatusDto;
@@ -65,7 +66,21 @@ public class PaymentController {
     @ApiOperation(value = "服务单（维修单）支付功能", notes = "【魏俊标】")
     @GetMapping("/servicepaymentcompletion/{serviceOrderno}")
     @ApiImplicitParam(name = "serviceOrderno", value = "申请单号", required = true, paramType = "path")
-    public StatusDto<FindAllocateApplyDTO> servicepaymentcompletion(@PathVariable String serviceOrderno){
+    public StatusDto<String> servicepaymentcompletion(@PathVariable String serviceOrderno){
         return paymentService.servicepaymentcompletion(serviceOrderno);
+    }
+    /**
+     *  根据维修单获取总价格
+     * @param serviceOrderno 维修单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-09-11 14:02:58
+     */
+    @ApiOperation(value = "根据服务单（维修单）获取总价格", notes = "【魏俊标】")
+    @GetMapping("/getserviceordernoprice/{serviceOrderno}")
+    @ApiImplicitParam(name = "serviceOrderno", value = "申请单号", required = true, paramType = "path")
+    public StatusDto<BizServiceOrder> getServiceOrdernoPrice(@PathVariable String serviceOrderno){
+        BizServiceOrder serviceOrder = paymentService.getServiceOrdernoPrice(serviceOrderno);
+        return StatusDto.buildDataSuccessStatusDto(serviceOrder);
     }
 }
