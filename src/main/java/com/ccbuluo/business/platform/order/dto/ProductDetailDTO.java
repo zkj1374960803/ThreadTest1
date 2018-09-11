@@ -33,7 +33,7 @@ public class ProductDetailDTO extends AftersaleCommonEntity {
      * 商品的单价
      */
     @ApiModelProperty(name = "unitPrice", value = "商品的单价")
-    private BigDecimal unitPrice;
+    private BigDecimal unitPrice = new BigDecimal(0);
     /**
      * 使用的数量
      */
