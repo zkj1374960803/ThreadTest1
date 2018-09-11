@@ -119,6 +119,8 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     private ClaimOrderDao claimOrderDao;
     @Resource(name = "claimOrderServiceImpl")
     private ClaimOrderService claimOrderServiceImpl;
+    @Autowired
+    private ClaimOrderService claimOrderService;
 
 
     /**
@@ -916,6 +918,8 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     @Override
     public StatusDto acceptance(String serviceOrderno){
         try {
+            // 调用生成索赔单(支付成功)
+            claimOrderService.generateClaimForm(serviceOrderno);
             // 验收完成
             bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.COMPLETED.name());
             // 修改维修单状态

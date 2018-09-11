@@ -58,8 +58,6 @@ public class PaymentServiceImpl implements PaymentService {
     private BizServiceOrderDao bizServiceOrderDao;
     @Autowired
     private BizServiceorderDetailDao bizServiceorderDetailDao;
-    @Autowired
-    private ClaimOrderService claimOrderService;
     @Resource
     private UserHolder userHolder;
     @Autowired
@@ -99,6 +97,8 @@ public class PaymentServiceImpl implements PaymentService {
             String payerOrgno = ba.getInstockOrgno();// 买入方(支付方)
             String receiveOrgno = ba.getOutstockOrgno();//卖出方(接收方)
             BigDecimal sellTotal = getSellTotal(details);
+            //  采购支付（平台付款）
+            // 调拨支付（申请方付款、处理方收款）
             // 如果支付成功 TODO
             if(1 == 1){
                 //更新申请单状态
@@ -210,8 +210,6 @@ public class PaymentServiceImpl implements PaymentService {
         }
         // 付款完成，状态改为待验收
         bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.WAITING_CHECKING.name());
-        // 调用生成索赔单(支付成功)（有可能零配件都在质保范围）
-        claimOrderService.generateClaimForm(serviceOrderno);
         return StatusDto.buildSuccessStatusDto("支付成功！");
     }
     private List<Pair<String,BigDecimal>> getRreceiveInfo(String serviceOrderno){
