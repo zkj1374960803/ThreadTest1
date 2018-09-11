@@ -15,7 +15,7 @@ public class CheckRepairOrderStockDTO {
     private String outstockOrgno;
     @ApiModelProperty(name = "productInfoList", value = "商品的信息")
     List<ProductStockInfoDTO> productInfoList;
-    @ApiModelProperty(name = "serviceOrderno", value = "维修单编号", hidden = true)
+    @ApiModelProperty(name = "serviceOrderno", value = "维修单编号")
     private String serviceOrderno;
 
     public String getServiceOrderno() {
