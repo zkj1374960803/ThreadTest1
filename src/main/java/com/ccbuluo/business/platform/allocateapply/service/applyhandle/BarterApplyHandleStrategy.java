@@ -254,4 +254,5 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
         bizInstockplanDetailDao.updateCompleteStatus(ba.getApplyNo());
         return StatusDto.buildSuccessStatusDto("操作成功！");
     }
+
 }
