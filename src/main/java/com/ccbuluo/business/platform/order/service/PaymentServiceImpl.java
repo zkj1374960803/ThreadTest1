@@ -199,14 +199,18 @@ public class PaymentServiceImpl implements PaymentService {
             String receiveOrgno = pair.getLeft();
             BigDecimal price = pair.getRight();
             // TODO 调用支付接口
-            if(1 == 1){
-                // 调用生成索赔单(支付成功)
-                claimOrderService.generateClaimForm(serviceOrderno);
-                // 记录日志
-                addlog(serviceOrderno,payerOrgno+"支付给"+receiveOrgno+price+"人民币",BizServiceLog.actionEnum.PAYMENT.name());
+            StatusDto statusDto = null;
+            if(! statusDto.isSuccess()){
+                return statusDto;
             }
+            // 记录日志
+            addlog(serviceOrderno,payerOrgno+"支付给"+receiveOrgno+price+"人民币",BizServiceLog.actionEnum.PAYMENT.name());
         }
-        return null;
+        // 付款完成，状态改为待验收
+        bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.WAITING_CHECKING.name());
+        // 调用生成索赔单(支付成功)（有可能零配件都在质保范围）
+        claimOrderService.generateClaimForm(serviceOrderno);
+        return StatusDto.buildSuccessStatusDto("支付成功！");
     }
     private List<Pair<String,BigDecimal>> getRreceiveInfo(String serviceOrderno){
         List<BizServiceorderDetail> orderDetails = bizServiceorderDetailDao.getServiceorderDetailByOrderNo(serviceOrderno);
