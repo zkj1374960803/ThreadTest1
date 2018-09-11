@@ -80,8 +80,8 @@ public class ClaimOrderDao extends BaseDao<ClaimOrderDao> {
         sql.append(" SELECT id,claim_ordno,service_ordno,tracking_no, ")
             .append(" refund_adress,doc_status,claim_orgno,claim_orgname, ")
             .append(" process_orgno,process_orgname,claim_amount,actual_amount, ")
-            .append(" repay_time,creator,create_time,operator, ")
-            .append(" operate_time,delete_flag,remark,UNIX_TIMESTAMP(process_time)  ")
+            .append(" UNIX_TIMESTAMP(repay_time) as 'repayTime',creator,UNIX_TIMESTAMP(create_time) as 'createTime',operator, ")
+            .append(" operate_time,delete_flag,remark,UNIX_TIMESTAMP(process_time) as 'processTime'  ")
             .append(" FROM biz_service_claimorder  ")
             .append(" WHERE claim_ordno = :claimOrdno ");
         return findForBean(BizServiceClaimorder.class, sql.toString(), bizServiceClaimorder);
