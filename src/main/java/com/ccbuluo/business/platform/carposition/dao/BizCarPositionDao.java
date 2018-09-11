@@ -39,10 +39,10 @@ public class BizCarPositionDao extends BaseDao<BizCarPosition> {
     public int saveBizCarPosition(BizCarPosition entity) {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO biz_car_position ( car_vin,detail_address,province_code,")
-            .append("province_name,city_code,city_name,area_code,area_name,creator,")
+            .append("province_name,city_code,city_name,area_code,area_name,service_orderno,creator,")
             .append("create_time,operator,operate_time,delete_flag,remark ) VALUES ( ")
             .append(" :carVin, :detailAddress, :provinceCode, :provinceName, :cityCode,")
-            .append(" :cityName, :areaCode, :areaName, :creator, :createTime, :operator,")
+            .append(" :cityName, :areaCode, :areaName, :serviceOrderno,:creator, :createTime, :operator,")
             .append(" :operateTime, :deleteFlag, :remark )");
         return super.save(sql.toString(), entity);
     }
@@ -60,7 +60,7 @@ public class BizCarPositionDao extends BaseDao<BizCarPosition> {
             .append("detail_address = :detailAddress,province_code = :provinceCode,")
             .append("province_name = :provinceName,city_code = :cityCode,")
             .append("city_name = :cityName,area_code = :areaCode,area_name = :areaName,")
-            .append("operator = :operator,operate_time = :operateTime WHERE car_vin= :carVin");
+            .append("operator = :operator,operate_time = :operateTime WHERE car_vin= :carVin AND service_orderno = :serviceOrderno");
         return super.updateForBean(sql.toString(), entity);
     }
 
@@ -104,13 +104,14 @@ public class BizCarPositionDao extends BaseDao<BizCarPosition> {
      * @author liuduo
      * @date 2018-09-05 10:18:06
      */
-    public BizCarPosition getByCarVin(String carVin) {
+    public BizCarPosition getByCarVin(String carVin, String serviceOrderno) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("carVin", carVin);
+        params.put("serviceOrderno", serviceOrderno);
 
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT bcp.id,bcp.car_vin,bcp.detail_address,bcp.province_name,")
-            .append(" bcp.city_name,bcp.area_name FROM biz_car_position AS bcp WHERE bcp.car_vin= :carVin");
+            .append(" bcp.city_name,bcp.area_name FROM biz_car_position AS bcp WHERE bcp.car_vin= :carVin AND bcp.service_orderno = :serviceOrderno");
 
         return findForBean(BizCarPosition.class, sql.toString(), params);
     }
