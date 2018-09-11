@@ -99,6 +99,8 @@ public class PaymentServiceImpl implements PaymentService {
             BigDecimal sellTotal = getSellTotal(details);
             //  采购支付（平台付款）
             // 调拨支付（申请方付款、处理方收款）
+            // 退款（平台付款）
+
             // 如果支付成功 TODO
             if(1 == 1){
                 //更新申请单状态

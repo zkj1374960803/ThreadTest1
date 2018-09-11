@@ -921,7 +921,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             // 调用生成索赔单(支付成功)
             claimOrderService.generateClaimForm(serviceOrderno);
             // 验收完成
-            bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.COMPLETED.name());
+            bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.WAITING_PAYMENT.name());
             // 修改维修单状态
             return StatusDto.buildSuccessStatusDto("验收成功");
         } catch (Exception e) {
