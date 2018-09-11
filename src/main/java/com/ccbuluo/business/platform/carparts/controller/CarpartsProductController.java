@@ -11,7 +11,6 @@ import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
-import com.ccbuluo.http.StatusDtoThriftPage;
 import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.EditBasicCarpartsProductDTO;
@@ -174,7 +173,30 @@ public class CarpartsProductController extends BaseController {
     })
     @PostMapping("/setprice")
     public StatusDto<String> setPrice(@ApiIgnore RelProductPrice relProductPrice){
-        carpartsProductServiceImpl.setPrice(relProductPrice);
+        relProductPrice.setProductType(Constants.PRODUCT_TYPE_FITTINGS);
+        relProductPrice.setPriceLevel(4L);
+        carpartsProductServiceImpl.saveProductPrice(relProductPrice);
+        return StatusDto.buildSuccessStatusDto();
+    }
+
+
+    /**
+     * 设置物料的价格
+     * @param relProductPrice 物料价格实体
+     * @return StatusDto<String>
+     * @author zhangkangjian
+     * @date 2018-09-06 11:08:27
+     */
+    @ApiOperation(value = "设置物料的价格",notes = "【张康健】")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "productNo", value = "物料的商品编号", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "suggestedPrice", value = "物料的价格", required = true, paramType = "query")
+    })
+    @PostMapping("/setequipmentprice")
+    public StatusDto<String> setEquipmentPrice(@ApiIgnore RelProductPrice relProductPrice){
+        relProductPrice.setProductType(Constants.PRODUCT_TYPE_EQUIPMENT);
+        relProductPrice.setPriceLevel(3L);
+        carpartsProductServiceImpl.saveProductPrice(relProductPrice);
         return StatusDto.buildSuccessStatusDto();
     }
 

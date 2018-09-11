@@ -26,5 +26,5 @@ public interface CarpartsProductPriceService {
      * @author zhangkangjian
      * @date 2018-09-06 19:27:11
      */
-    void setPrice(RelProductPrice relProductPrice);
+    void saveProductPrice(RelProductPrice relProductPrice);
 }

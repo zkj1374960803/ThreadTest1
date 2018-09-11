@@ -84,11 +84,9 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
      * @date 2018-09-06 19:27:11
      */
     @Override
-    public void setPrice(RelProductPrice relProductPrice) {
+    public void saveProductPrice(RelProductPrice relProductPrice) {
         // 查询商品最新一条的价格，并更新结束时间
         carpartsProductPriceDao.updateProductEndTime(relProductPrice);
-        // 客户销售价格，等级4
-        relProductPrice.setPriceLevel(4L);
         String loggedUserId = userHolder.getLoggedUserId();
         relProductPrice.setOperator(loggedUserId);
         relProductPrice.setCreator(loggedUserId);
