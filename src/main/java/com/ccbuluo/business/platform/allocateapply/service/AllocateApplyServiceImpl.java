@@ -6,6 +6,7 @@ import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.entity.BizAllocateApply.AllocateApplyTypeEnum;
 import com.ccbuluo.business.entity.BizAllocateApply.ApplyStatusEnum;
 import com.ccbuluo.business.entity.BizInstockplanDetail;
+import com.ccbuluo.business.entity.BizServiceorderDetail;
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
@@ -13,6 +14,8 @@ import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleContext;
+import com.ccbuluo.business.platform.claimorder.dao.ClaimOrderDao;
+import com.ccbuluo.business.platform.claimorder.service.ClaimOrderService;
 import com.ccbuluo.business.platform.custmanager.dao.BizServiceCustmanagerDao;
 import com.ccbuluo.business.platform.custmanager.dto.CustManagerDetailDTO;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
@@ -20,6 +23,7 @@ import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.instock.dao.BizInstockOrderDao;
 import com.ccbuluo.business.platform.instock.service.InstockOrderService;
+import com.ccbuluo.business.platform.order.dto.ProductDetailDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
@@ -77,6 +81,11 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     private CarpartsCategoryService carpartsCategoryService;
 //    @ThriftRPCClient("BasicMerchandiseSer")
 //    private CarpartsCategoryService carpartsProductService;
+    @Resource(name = "claimOrderServiceImpl")
+    private ClaimOrderService claimOrderServiceImpl;
+    @Resource
+    private ClaimOrderDao claimOrderDao;
+
 
     @Resource
     private ApplyHandleContext applyHandleContext;
@@ -756,6 +765,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         return page;
     }
 
+
     /**
      * 修改申请单状态
      * @param applyNo 申请单号
@@ -826,15 +836,14 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public StatusDto<List<ProductStockInfoDTO>> checkStockQuantity(CheckStockQuantityDTO checkStockQuantityDTO) {
+        Map<String, Object> map = bizAllocateApplyDao.queryStockQuantity(checkStockQuantityDTO.getOutstockOrgno(), checkStockQuantityDTO.getSellerOrgno());
+        StatusDto<List<ProductStockInfoDTO>> listStatusDto = getListStatusDto(map, checkStockQuantityDTO.getProductInfoList());
+        return listStatusDto;
+    }
+
+    private StatusDto<List<ProductStockInfoDTO>> getListStatusDto(Map<String, Object> map, List<ProductStockInfoDTO> allocateapplyDetailList) {
         String flag = Constants.SUCCESS_CODE;
         String message = "成功";
-        // 如果当前登陆人是平台的人，说明这个申请是平台创建的或者是平台处理的，需要校验库存来源
-        String userOrgCode = getUserOrgCode();
-        if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(userOrgCode)){
-            checkStockQuantityDTO.setSellerOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
-        }
-        Map<String, Object> map = bizAllocateApplyDao.queryStockQuantity(checkStockQuantityDTO.getOutstockOrgno(), checkStockQuantityDTO.getSellerOrgno());
-        List<ProductStockInfoDTO> allocateapplyDetailList = checkStockQuantityDTO.getProductInfoList();
         for (int i = 0; i < allocateapplyDetailList.size(); i++) {
             ProductStockInfoDTO allocateapplyDetailDTO = allocateapplyDetailList.get(i);
             String productno = allocateapplyDetailDTO.getProductNo();
@@ -859,6 +868,38 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         listStatusDto.setMessage(message);
         return listStatusDto;
     }
+
+    /**
+     * 维修单检查库存
+     * @param checkStockQuantityDTO
+     * @return StatusDto<List < ProductStockInfoDTO>>
+     * @author zhangkangjian
+     * @date 2018-09-11 16:21:56
+     */
+    @Override
+    public StatusDto<List<ProductStockInfoDTO>> checkRepairOrderStock(CheckRepairOrderStockDTO checkStockQuantityDTO) {
+
+        // 查询出库机构下所有库存
+        Map<String, Object> map = bizAllocateApplyDao.queryStockQuantity(checkStockQuantityDTO.getOutstockOrgno(), null);
+        ProductDetailDTO productDetailDTO = new ProductDetailDTO();
+        productDetailDTO.setServiceOrderno(checkStockQuantityDTO.getServiceOrderno());
+        // 查询零配件信息
+        productDetailDTO.setProductType(BizServiceorderDetail.ProductTypeEnum.FITTING.name());
+        // 查询零配件列表信息
+        List<ProductDetailDTO> fittingDetail = claimOrderDao.queryMaintainitemDetail(productDetailDTO);
+        fittingDetail.forEach(a ->{
+            Object stockNum = map.get(a.getProductNo());
+            if(stockNum != null){
+                Long amount = a.getAmount();
+                map.put(a.getProductNo(), (Long)stockNum + amount);
+            }
+        });
+        List<ProductStockInfoDTO> allocateapplyDetailList = checkStockQuantityDTO.getProductInfoList();
+
+        StatusDto<List<ProductStockInfoDTO>> listStatusDto = getListStatusDto(map, allocateapplyDetailList);
+        return listStatusDto;
+    }
+
 
     /**
      * 撤销申请单
