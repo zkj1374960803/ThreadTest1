@@ -119,6 +119,8 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     private ClaimOrderDao claimOrderDao;
     @Resource(name = "claimOrderServiceImpl")
     private ClaimOrderService claimOrderServiceImpl;
+    @Autowired
+    private ClaimOrderService claimOrderService;
 
 
     /**
@@ -144,7 +146,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             // 保存服务单
             buildSaveBizServiceOrder(serviceOrderDTO, orderCode, loggedUser);
             // 保存车辆停放位置
-            buildSaveBizCarPosition(serviceOrderDTO, loggedUser);
+            buildSaveBizCarPosition(serviceOrderDTO, loggedUser, orderCode);
             // 保存服务单派发
             buildBizServiceDispatch(orderCode, loggedUser);
             return StatusDto.buildSuccessStatusDto();
@@ -268,7 +270,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         BizServiceOrder byOrderNo = bizServiceOrderDao.getByOrderNo(serviceOrderno);
         String carVin = byOrderNo.getCarVin();
         // 根据车辆vin码查询车辆停放地址
-        BizCarPosition bizCarPosition = bizCarPositionDao.getByCarVin(carVin);
+        BizCarPosition bizCarPosition = bizCarPositionDao.getByCarVin(carVin, serviceOrderno);
         DetailServiceOrderDTO detailServiceOrderDTO = new DetailServiceOrderDTO();
         detailServiceOrderDTO.setServiceOrderno(serviceOrderno);
         detailServiceOrderDTO.setBizCarPosition(bizCarPosition);
@@ -650,6 +652,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     private void buildEditBizCarPosition(EditServiceOrderDTO editServiceOrderDTO) {
         // 保存省市区
         BizCarPosition bizCarPosition = new BizCarPosition();
+        bizCarPosition.setServiceOrderno(editServiceOrderDTO.getServiceOrderno());
         bizCarPosition.setCarVin(editServiceOrderDTO.getCarVin());
         bizCarPosition.setDetailAddress(editServiceOrderDTO.getDetailAddress());
         bizCarPosition.setProvinceCode(editServiceOrderDTO.getProvinceCode());
@@ -714,9 +717,10 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      * @author liuduo
      * @date 2018-09-04 11:59:33
      */
-    private void buildSaveBizCarPosition(SaveServiceOrderDTO serviceOrderDTO, BusinessUser loggedUser) {
+    private void buildSaveBizCarPosition(SaveServiceOrderDTO serviceOrderDTO, BusinessUser loggedUser, String serviceOrderNo) {
         // 保存省市区
         BizCarPosition bizCarPosition = new BizCarPosition();
+        bizCarPosition.setServiceOrderno(serviceOrderNo);
         bizCarPosition.setCarVin(serviceOrderDTO.getCarVin());
         bizCarPosition.setDetailAddress(serviceOrderDTO.getDetailAddress());
         bizCarPosition.setProvinceCode(serviceOrderDTO.getProvinceCode());
@@ -914,8 +918,10 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     @Override
     public StatusDto acceptance(String serviceOrderno){
         try {
+            // 调用生成索赔单(支付成功)
+            claimOrderService.generateClaimForm(serviceOrderno);
             // 验收完成
-            bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.COMPLETED.name());
+            bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.WAITING_PAYMENT.name());
             // 修改维修单状态
             return StatusDto.buildSuccessStatusDto("验收成功");
         } catch (Exception e) {

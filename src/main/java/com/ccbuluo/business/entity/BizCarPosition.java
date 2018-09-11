@@ -14,6 +14,11 @@ import java.util.Date;
 @ApiModel(value = "车辆停放的位置实体", description = "车辆停放的位置")
 public class BizCarPosition extends AftersaleCommonEntity{
     /**
+     * 服务单的编号
+     */
+    @ApiModelProperty(name = "serviceOrderno", value = "服务单的编号")
+    private String serviceOrderno;
+    /**
      * 车辆的vin码
      */
     @ApiModelProperty(name = "carVin", value = "车辆的vin码")
@@ -131,5 +136,11 @@ public class BizCarPosition extends AftersaleCommonEntity{
         return this.remark;
     }
 
+    public String getServiceOrderno() {
+        return serviceOrderno;
+    }
 
+    public void setServiceOrderno(String serviceOrderno) {
+        this.serviceOrderno = serviceOrderno;
+    }
 }

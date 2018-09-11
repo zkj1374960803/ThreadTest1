@@ -58,14 +58,14 @@ public class PaymentServiceImpl implements PaymentService {
     private BizServiceOrderDao bizServiceOrderDao;
     @Autowired
     private BizServiceorderDetailDao bizServiceorderDetailDao;
-    @Autowired
-    private ClaimOrderService claimOrderService;
     @Resource
     private UserHolder userHolder;
     @Autowired
     private ServiceLogService serviceLogService;
     @ThriftRPCClient("UserCoreSerService")
     private BasicUserOrganizationService basicUserOrganizationService;
+    @ThriftRPCClient("UserCoreSerService")
+    private InnerUserInfoService innerUserInfoService;
 
     /**
      *  支付完成调用接口
@@ -97,6 +97,10 @@ public class PaymentServiceImpl implements PaymentService {
             String payerOrgno = ba.getInstockOrgno();// 买入方(支付方)
             String receiveOrgno = ba.getOutstockOrgno();//卖出方(接收方)
             BigDecimal sellTotal = getSellTotal(details);
+            //  采购支付（平台付款）
+            // 调拨支付（申请方付款、处理方收款）
+            // 退款（平台付款）
+
             // 如果支付成功 TODO
             if(1 == 1){
                 //更新申请单状态
@@ -199,14 +203,16 @@ public class PaymentServiceImpl implements PaymentService {
             String receiveOrgno = pair.getLeft();
             BigDecimal price = pair.getRight();
             // TODO 调用支付接口
-            if(1 == 1){
-                // 调用生成索赔单(支付成功)
-                claimOrderService.generateClaimForm(serviceOrderno);
-                // 记录日志
-                addlog(serviceOrderno,payerOrgno+"支付给"+receiveOrgno+price+"人民币",BizServiceLog.actionEnum.PAYMENT.name());
+            StatusDto statusDto = null;
+            if(! statusDto.isSuccess()){
+                return statusDto;
             }
+            // 记录日志
+            addlog(serviceOrderno,payerOrgno+"支付给"+receiveOrgno+price+"人民币",BizServiceLog.actionEnum.PAYMENT.name());
         }
-        return null;
+        // 付款完成，状态改为待验收
+        bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.WAITING_CHECKING.name());
+        return StatusDto.buildSuccessStatusDto("支付成功！");
     }
     private List<Pair<String,BigDecimal>> getRreceiveInfo(String serviceOrderno){
         List<BizServiceorderDetail> orderDetails = bizServiceorderDetailDao.getServiceorderDetailByOrderNo(serviceOrderno);
@@ -279,5 +285,26 @@ public class PaymentServiceImpl implements PaymentService {
         Pair<String,BigDecimal> pair = getPriceTatol(orderDetails);
         serviceOrder.setOrderCost(pair.getRight());
         return serviceOrder;
+    }
+
+    /**
+     *  调用支付功能
+     * @param payerOrgno 付款人
+     * @param receiveOrgno 收款人
+     * @param price 金额
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-09-11 15:13:28
+     */
+    private StatusDto payment(String payerOrgno,String receiveOrgno, BigDecimal price){
+        double v = price.doubleValue();
+        return null;
+    }
+
+    public static void main(String[] args) {
+        double v =12;
+        System.out.println(v);
+        System.out.println(0 - v);
     }
 }

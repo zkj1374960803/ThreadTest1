@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.inputstockplan.dao;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 
+import com.ccbuluo.business.constants.StockPlanStatusEnum;
 import com.ccbuluo.business.entity.BizInstockplanDetail;
 import com.ccbuluo.business.platform.outstock.dto.UpdatePlanStatusDTO;
 import com.ccbuluo.dao.BaseDao;
@@ -282,5 +283,21 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
         String sql = "SELECT id,version_no FROM biz_instockplan_detail WHERE id IN(:ids)";
 
         return queryListBean(UpdatePlanStatusDTO.class, sql, params);
+    }
+
+    /**
+     * 根据申请单号更改入库计划状态
+     * @param applyNo 申请单编号
+     * @exception
+     * @author weijb
+     * @Date 2018-08-10 17:37:32
+     */
+    public int updateCompleteStatus(String applyNo){
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_instockplan_detail SET complete_status = :completeStatus  WHERE trade_no= :applyNo ");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("completeStatus", StockPlanStatusEnum.DOING.toString());
+        return super.updateForMap(sql.toString(), params);
     }
 }
