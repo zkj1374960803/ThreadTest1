@@ -184,7 +184,7 @@ public class ClaimOrderDao extends BaseDao<ClaimOrderDao> {
         sql.append(" UPDATE biz_service_claimorder SET ")
             .append(" doc_status = :docStatus, process_time = now()")
             .append(" WHERE claim_ordno = :claimOrdno ");
-        updateForBean(sql.toString(), map);
+        updateForMap(sql.toString(), map);
     }
 
     /**
@@ -205,6 +205,6 @@ public class ClaimOrderDao extends BaseDao<ClaimOrderDao> {
         sql.append(" UPDATE biz_service_claimorder SET ")
             .append(" doc_status = :docStatus, repay_time = now()")
             .append(" WHERE claim_ordno = :claimOrdno ");
-        updateForBean(sql.toString(), map);
+        updateForMap(sql.toString(), map);
     }
 }
