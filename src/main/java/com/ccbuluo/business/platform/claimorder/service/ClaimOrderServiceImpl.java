@@ -137,6 +137,7 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
         productDetailDTO.setWarrantyType(BizServiceorderDetail.WarrantyTypeEnum.INSHELFLIFE.name());
         // 工时类型
         productDetailDTO.setProductType(BizServiceorderDetail.ProductTypeEnum.MAINTAINITEM.name());
+        productDetailDTO.setServiceOrderno(serviceClaimorderDetail.getServiceOrdno());
         List<ProductDetailDTO> maintainitemDetail = claimOrderDao.queryMaintainitemDetail(productDetailDTO);
         // 查询零配件信息
         productDetailDTO.setProductType(BizServiceorderDetail.ProductTypeEnum.FITTING.name());
