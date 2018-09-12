@@ -1,5 +1,7 @@
 package com.ccbuluo.business.platform.claimorder.service;
 
+import com.ccbuluo.business.constants.BusinessPropertyHolder;
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.DocCodePrefixEnum;
 import com.ccbuluo.business.constants.OrganizationTypeEnum;
 import com.ccbuluo.business.entity.BizServiceOrder;
@@ -200,6 +202,10 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
         BusinessUser loggedUser = userHolder.getLoggedUser();
         Organization organization = loggedUser.getOrganization();
         String orgCode = organization.getOrgCode();
+        // 如果时平台的话，查询所有的索赔单
+        if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(orgCode)){
+            orgCode = null;
+        }
         Page<QueryClaimorderListDTO> queryClaimorderListDTOPage = claimOrderDao.queryClaimorderList(claimOrdno, docStatus, orgCode, offset, pageSize);
         return StatusDto.buildDataSuccessStatusDto(queryClaimorderListDTOPage);
     }
