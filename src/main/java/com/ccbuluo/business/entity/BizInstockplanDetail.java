@@ -121,6 +121,12 @@ public class BizInstockplanDetail extends AftersaleCommonEntity{
     @ApiModelProperty(name = "stockType", value = "库存类型（正常库存、问题库存、报损件库存，等等）")
     private String stockType;
 
+    /**
+     *  卖方机构的编号
+     */
+    @ApiModelProperty(name = "sellerOrgno", value = "卖方机构的编号")
+    private String sellerOrgno;
+
     public void setInstockType(String instockType) {
         this.instockType = instockType;
     }
@@ -294,5 +300,13 @@ public class BizInstockplanDetail extends AftersaleCommonEntity{
 
     public void setShouldInstocknum(Long shouldInstocknum) {
         this.shouldInstocknum = shouldInstocknum;
+    }
+
+    public String getSellerOrgno() {
+        return sellerOrgno;
+    }
+
+    public void setSellerOrgno(String sellerOrgno) {
+        this.sellerOrgno = sellerOrgno;
     }
 }

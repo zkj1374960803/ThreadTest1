@@ -175,6 +175,8 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
                 inPlan.setInstockRepositoryNo(ad.getInRepositoryNo());
                 // 买入机构编号
                 inPlan.setInstockOrgno(ad.getInstockOrgno());
+                // 卖方机构的编号
+                inPlan.setSellerOrgno(ad.getOutstockOrgno());
             }
             inPlan.setPlanInstocknum(outstockplan.getPlanOutstocknum());
             // 根据平台的no查询平台的仓库

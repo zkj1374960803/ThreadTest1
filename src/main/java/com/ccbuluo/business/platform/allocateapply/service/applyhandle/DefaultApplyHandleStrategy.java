@@ -289,6 +289,8 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         inPlan.preInsert(userHolder.getLoggedUserId());
         inPlan.setStockType(ad.getStockType());// 库存类型
         inPlan.setRemark(ad.getRemark());// 备注
+        // 卖方机构的编号
+        inPlan.setSellerOrgno(ad.getOutstockOrgno());
         return inPlan;
     }
 

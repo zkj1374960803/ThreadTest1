@@ -236,6 +236,8 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
             }
             instockplanPlatform.setInstockRepositoryNo(repositoryNo);// 平台仓库编号
             instockplanPlatform.setInstockOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 平台机构编号
+            // 卖方机构的编号
+            instockplanPlatform.setSellerOrgno(ad.getOutstockOrgno());
             inList.add(instockplanPlatform);
         }
     }

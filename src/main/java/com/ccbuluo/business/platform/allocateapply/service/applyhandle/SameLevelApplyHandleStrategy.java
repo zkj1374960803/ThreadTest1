@@ -306,6 +306,8 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
                             inPlan.setInstockOrgno(ad.getInstockOrgno());
                             // 买方入库的成本价等于单子上的销售价
                             inPlan.setCostPrice(ad.getSellPrice());
+                            // 卖方机构的编号
+                            inPlan.setSellerOrgno(ad.getOutstockOrgno());
                         }
                         i++;
                     }
