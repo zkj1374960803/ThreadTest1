@@ -71,7 +71,7 @@ public class PaymentServiceImpl implements PaymentService {
     private ServiceLogService serviceLogService;
     @ThriftRPCClient("UserCoreSerService")
     private BasicUserOrganizationService basicUserOrganizationService;
-    @ThriftRPCClient("UserCoreSerService")
+//    @ThriftRPCClient("UserCoreSerService")
     private BizFinanceAccountService bizFinanceAccountService;
     @Resource
     private BizInstockplanDetailDao bizInstockplanDetailDao;
