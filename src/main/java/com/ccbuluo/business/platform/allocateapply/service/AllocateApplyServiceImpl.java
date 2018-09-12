@@ -192,8 +192,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         batchInsertForapplyDetailList(allocateApplyDTO, loggedUserId, processType);
 
         // 已经自动处理了，调用 申请构建计划的方法
-        if(allocateApplyDTO.getApplyorgNo().equals(allocateApplyDTO.getProcessOrgno()) || AllocateApplyTypeEnum.BARTER.name().equals(processType)
-            || AllocateApplyTypeEnum.REFUND.name().equals(processType)){
+        if(AllocateApplyTypeEnum.BARTER.name().equals(processType) || AllocateApplyTypeEnum.REFUND.name().equals(processType)){
             applyHandleContext.applyHandle(allocateApplyDTO.getApplyNo());
         }
 
