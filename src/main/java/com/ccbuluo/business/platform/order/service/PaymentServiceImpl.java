@@ -112,7 +112,7 @@ public class PaymentServiceImpl implements PaymentService {
             // 构建申请单
             List<AccountTransactionDTO> payments = buildApplyPayment(ba,sellTotal,productType);
             // 支付
-            StatusDto statusDto = bizFinanceAccountService.makeTrading(payments);
+            StatusDto statusDto = StatusDto.buildSuccessStatusDto("支付成功！");// TODO bizFinanceAccountService.makeTrading(payments);
             // 如果支付成功
             if(statusDto.isSuccess()){
                 //更新申请单状态
@@ -209,12 +209,13 @@ public class PaymentServiceImpl implements PaymentService {
     public StatusDto servicepaymentcompletion(String serviceOrderno){
         // 根据车辆查询收款人组织code
         BizServiceOrder serviceOrder = bizServiceOrderDao.getBizServiceOrderByServiceOrderno(serviceOrderno);
-        String payerOrgno = "";// 这个待确认 TODO serviceOrder
+        // 支付机构编号（客户方机构编号）
+        String payerOrgno = serviceOrder.getCustomerOrgno();
         // 查询出过保的零配件（根据详单查新付款人组织编号和金额）
         List<Pair<String,BigDecimal>> list = getRreceiveInfo(serviceOrderno);
         // 构建申请单
         List<AccountTransactionDTO> payments = buildOrderPayment(list,payerOrgno,serviceOrderno);
-        StatusDto statusDto = bizFinanceAccountService.makeTrading(payments);
+        StatusDto statusDto = StatusDto.buildSuccessStatusDto("支付成功！");// TODO bizFinanceAccountService.makeTrading(payments);
         // 如果支付失败
         if(! statusDto.isSuccess()){
             return statusDto;
