@@ -82,4 +82,12 @@ public interface ClaimOrderService {
      * @date 2018-09-10 16:36:14
      */
     List<ProductDetailDTO> queryFitingDetailList(ProductDetailDTO productDetailDTO);
+    /**
+     * 查询支付价格
+     * @param serviceOrdno 维修单号
+     * @return  Map<String, Double>
+     * @author zhangkangjian
+     * @date 2018-09-12 14:02:21
+     */
+    Map<String, Double> findPaymentAmount(String serviceOrdno);
 }

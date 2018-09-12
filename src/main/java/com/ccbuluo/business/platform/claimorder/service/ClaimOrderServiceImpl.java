@@ -27,12 +27,14 @@ import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
 /**
  * @author zhangkangjian
@@ -149,6 +151,38 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
         serviceClaimorderDetail.setMaintainitemDetail(maintainitemDetail);
         return serviceClaimorderDetail;
     }
+
+
+     /**
+      * 查询支付价格
+      * @param serviceOrdno 维修单号
+      * @return  Map<String, Double>
+      * @author zhangkangjian
+      * @date 2018-09-12 14:02:21
+      */
+     @Override
+     public Map<String, Double> findPaymentAmount(String serviceOrdno){
+         ProductDetailDTO productDetailDTO = new ProductDetailDTO();
+         productDetailDTO.setWarrantyType(BizServiceorderDetail.WarrantyTypeEnum.INSHELFLIFE.name());
+         productDetailDTO.setProductType(BizServiceorderDetail.ProductTypeEnum.MAINTAINITEM.name());
+         productDetailDTO.setServiceOrderno(serviceOrdno);
+         List<ProductDetailDTO> maintainitemDetail = claimOrderDao.queryMaintainitemDetail(productDetailDTO);
+         // 查询零配件信息
+         productDetailDTO.setProductType(BizServiceorderDetail.ProductTypeEnum.FITTING.name());
+         // 查询零配件列表信息
+         List<ProductDetailDTO> fittingDetail = queryFitingDetailList(productDetailDTO);
+         // 统计价格
+         double maintainitemPrice = maintainitemDetail.stream().mapToDouble(ProductDetailDTO::getTotalPrice).sum();
+         double fittingPrice = fittingDetail.stream().mapToDouble(ProductDetailDTO::getTotalPrice).sum();
+         HashMap<String, Double> map = Maps.newHashMap();
+         map.put("maintainitemPrice", maintainitemPrice);
+         map.put("fittingPrice", fittingPrice);
+         map.put("maintainitemAndFittingPrice", maintainitemPrice + fittingPrice);
+         return map;
+     }
+
+
+
 
     /**
      * 查询零配件列表信息
