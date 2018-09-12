@@ -201,4 +201,12 @@ public interface AllocateApplyService {
      * @date 2018-08-31 14:47:54
      */
     Page<FindStockListDTO> findAllEquipmentStockList(FindStockListDTO findStockListDTO);
+    /**
+     *  维修单检查库存
+     * @param checkRepairOrderStockDTO
+     * @return StatusDto<List<ProductStockInfoDTO>>
+     * @author zhangkangjian
+     * @date 2018-09-11 16:21:56
+     */
+    StatusDto<List<ProductStockInfoDTO>> checkRepairOrderStock(CheckRepairOrderStockDTO checkRepairOrderStockDTO);
 }

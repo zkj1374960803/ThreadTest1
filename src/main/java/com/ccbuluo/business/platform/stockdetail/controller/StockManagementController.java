@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.stockdetail.controller;
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.platform.allocateapply.dto.CheckRepairOrderStockDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.CheckStockQuantityDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.ProductStockInfoDTO;
@@ -172,6 +173,19 @@ public class StockManagementController extends BaseController {
     @PostMapping("/checkstockquantity")
     public StatusDto<List<ProductStockInfoDTO>> checkStockQuantity(@ApiParam(name = "CheckStockQuantityDTO", value = "Json数据", required = true) @RequestBody CheckStockQuantityDTO checkStockQuantityDTO){
         return allocateApplyServiceImpl.checkStockQuantity(checkStockQuantityDTO);
+    }
+
+    /**
+     *  维修单检查库存
+     * @param checkRepairOrderStockDTO
+     * @return StatusDto<List<ProductStockInfoDTO>>
+     * @author zhangkangjian
+     * @date 2018-09-11 16:21:56
+     */
+    @ApiOperation(value = "维修单校验库存", notes = "【张康健】")
+    @PostMapping("/checkrepairorderstock")
+    public StatusDto<List<ProductStockInfoDTO>> checkRepairOrderStock(@ApiParam(name = "CheckRepairOrderStockDTO", value = "Json数据", required = true) @RequestBody CheckRepairOrderStockDTO checkRepairOrderStockDTO){
+        return allocateApplyServiceImpl.checkRepairOrderStock(checkRepairOrderStockDTO);
     }
 
 

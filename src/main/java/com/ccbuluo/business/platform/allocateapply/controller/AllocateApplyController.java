@@ -47,6 +47,22 @@ public class AllocateApplyController extends BaseController {
     }
 
     /**
+     * 创建物料或者零配件【调拨】申请
+     * @param allocateApplyDTO 申请实体
+     * @return StatusDto<String> 状态DTO
+     * @author zhangkangjian
+     * @date 2018-09-11 14:50:29
+     */
+    @ApiOperation(value = "创建物料或者零配件【调拨】申请", notes = "【张康健】")
+    @PostMapping("/createtransferapply")
+    public StatusDto<String> createTransferApply(@ApiParam(name = "bizAllocateApply", value = "创建申请json", required = true) @RequestBody AllocateApplyDTO allocateApplyDTO){
+//        allocateApplyServiceImpl.createTransferApply(allocateApplyDTO);
+        return StatusDto.buildSuccessStatusDto();
+    }
+
+
+
+    /**
      * 查询申请单详情
      * @param applyNo 申请单号
      * @return StatusDto<FindAllocateApplyDTO>
