@@ -326,11 +326,17 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         // 查询机构的名称
         Optional.ofNullable(page.getRows()).ifPresent(a ->{
             List<String> outstockOrgno = a.stream().map(QueryAllocateApplyListDTO::getOutstockOrgno).collect(Collectors.toList());
-            Map<String, BasicUserOrganization> organizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(outstockOrgno);
+            List<String> instockOrgno = a.stream().map(QueryAllocateApplyListDTO::getInstockOrgno).collect(Collectors.toList());
+            Map<String, BasicUserOrganization> outOrganizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(outstockOrgno);
+            Map<String, BasicUserOrganization> inOrganizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(instockOrgno);
             a.stream().forEach(b ->{
-                BasicUserOrganization organization = organizationMap.get(b.getOutstockOrgno());
-                if(organization != null){
-                    b.setOutstockOrgname(organization.getOrgName());
+                BasicUserOrganization outOrganization = outOrganizationMap.get(b.getOutstockOrgno());
+                BasicUserOrganization inOrganization = inOrganizationMap.get(b.getInstockOrgno());
+                if(outOrganization != null){
+                    b.setOutstockOrgname(outOrganization.getOrgName());
+                }
+                if(inOrganization != null){
+                    b.setInstockOrgName(inOrganization.getOrgName());
                 }
             });
         });
