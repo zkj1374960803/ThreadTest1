@@ -73,7 +73,7 @@ public interface ClaimOrderService {
      * @author zhangkangjian
      * @date 2018-09-10 10:43:33
      */
-    void updateDocStatusAndRepayTime(String claimOrdno, String docStatus);
+    StatusDto updateDocStatusAndRepayTime(String claimOrdno, String docStatus);
     /**
      * 查询零配件列表信息
      * @param productDetailDTO 查询条件

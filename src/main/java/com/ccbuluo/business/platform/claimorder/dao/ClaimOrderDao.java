@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.claimorder.dao;
 
+import com.ccbuluo.business.entity.BizServiceorderDetail;
 import com.ccbuluo.business.platform.claimorder.dto.BizServiceClaimorder;
 import com.ccbuluo.business.platform.claimorder.dto.QueryClaimorderListDTO;
 import com.ccbuluo.business.platform.order.dto.ProductDetailDTO;
@@ -206,5 +207,26 @@ public class ClaimOrderDao extends BaseDao<ClaimOrderDao> {
             .append(" doc_status = :docStatus, repay_time = now()")
             .append(" WHERE claim_ordno = :claimOrdno ");
         updateForBean(sql.toString(), map);
+    }
+
+    /**
+     * 根据索赔单号查询详情
+     * @param claimOrdno 查询条件
+     * @return BizServiceClaimorder 索赔单详情
+     * @author weijb
+     * @date 2018-09-08 14:41:53
+     */
+    public BizServiceClaimorder findClaimOrderDetail(String claimOrdno) {
+        StringBuffer sql = new StringBuffer();
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("claimOrdno", claimOrdno);
+        sql.append(" SELECT id,claim_ordno,service_ordno,tracking_no, ")
+                .append(" refund_adress,doc_status,claim_orgno,claim_orgname, ")
+                .append(" process_orgno,process_orgname,claim_amount,actual_amount, ")
+                .append(" UNIX_TIMESTAMP(repay_time) as 'repayTime',creator,UNIX_TIMESTAMP(create_time) as 'createTime',operator, ")
+                .append(" operate_time,delete_flag,remark,UNIX_TIMESTAMP(process_time) as 'processTime'  ")
+                .append(" FROM biz_service_claimorder  ")
+                .append(" WHERE claim_ordno = :claimOrdno ");
+        return findForBean(BizServiceClaimorder.class, sql.toString(), map);
     }
 }

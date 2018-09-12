@@ -91,8 +91,7 @@ public class ClaimOrderController{
     @GetMapping("/billofpayment")
     @ApiImplicitParam(name = "claimOrdno", value = "索赔单号", required = true, paramType = "query")
     public StatusDto<String> billOfPayment(String claimOrdno){
-        claimOrderServiceImpl.updateDocStatusAndRepayTime(claimOrdno, BizServiceClaimorder.DocStatusEnum.COMPLETED.name());
-        return StatusDto.buildSuccessStatusDto();
+        return claimOrderServiceImpl.updateDocStatusAndRepayTime(claimOrdno, BizServiceClaimorder.DocStatusEnum.COMPLETED.name());
     }
 
 
