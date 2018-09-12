@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import java.util.Map;
 
 /**
  * 索赔单
@@ -92,6 +93,22 @@ public class ClaimOrderController{
     @ApiImplicitParam(name = "claimOrdno", value = "索赔单号", required = true, paramType = "query")
     public StatusDto<String> billOfPayment(String claimOrdno){
         return claimOrderServiceImpl.updateDocStatusAndRepayTime(claimOrdno, BizServiceClaimorder.DocStatusEnum.COMPLETED.name());
+    }
+
+
+    /**
+     * 查询支付价格
+     * @param serviceOrdno 维修单号
+     * @return  Map<String, Double>
+     * @author zhangkangjian
+     * @date 2018-09-12 14:02:21
+     */
+    @ApiOperation(value = "查询支付索赔单金额", notes = "【张康健】")
+    @GetMapping("/findpaymentamount")
+    @ApiImplicitParam(name = "serviceOrdno", value = "维修单号", required = true, paramType = "query")
+    public StatusDto<Map<String, Double>> findPaymentAmount(String serviceOrdno){
+        Map<String, Double> paymentAmount = claimOrderServiceImpl.findPaymentAmount(serviceOrdno);
+        return StatusDto.buildDataSuccessStatusDto(paymentAmount);
     }
 
 
