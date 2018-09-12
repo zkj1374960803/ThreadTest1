@@ -6,6 +6,7 @@ import com.ccbuluo.business.platform.order.dto.ProductDetailDTO;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -67,13 +68,13 @@ public interface ClaimOrderService {
      */
     void updateDocStatusAndProcessTime(String claimOrdno, String docStatus);
     /**
-     * 更新索赔单状态和支付时间
+     * 索赔单付款
      * @param claimOrdno 索赔单号
      * @param docStatus 索赔单状态
      * @author zhangkangjian
      * @date 2018-09-10 10:43:33
      */
-    StatusDto updateDocStatusAndRepayTime(String claimOrdno, String docStatus);
+    StatusDto billOfPayment(String claimOrdno, String docStatus, BigDecimal actualAmount);
     /**
      * 查询零配件列表信息
      * @param productDetailDTO 查询条件

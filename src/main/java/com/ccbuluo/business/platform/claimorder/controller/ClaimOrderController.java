@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -90,9 +91,12 @@ public class ClaimOrderController{
      */
     @ApiOperation(value = "索赔单付款", notes = "【张康健】")
     @GetMapping("/billofpayment")
-    @ApiImplicitParam(name = "claimOrdno", value = "索赔单号", required = true, paramType = "query")
-    public StatusDto<String> billOfPayment(String claimOrdno){
-        return claimOrderServiceImpl.updateDocStatusAndRepayTime(claimOrdno, BizServiceClaimorder.DocStatusEnum.COMPLETED.name());
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "claimOrdno", value = "索赔单号", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "actualAmount", value = "实际赔偿的金额", required = true, paramType = "query")
+    })
+    public StatusDto<String> billOfPayment(String claimOrdno, BigDecimal actualAmount){
+        return claimOrderServiceImpl.billOfPayment(claimOrdno, BizServiceClaimorder.DocStatusEnum.COMPLETED.name(),actualAmount);
     }
 
 

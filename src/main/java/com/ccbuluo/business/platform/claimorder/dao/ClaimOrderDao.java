@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 
@@ -195,16 +196,17 @@ public class ClaimOrderDao extends BaseDao<ClaimOrderDao> {
      * @author zhangkangjian
      * @date 2018-09-10 11:00:18
      */
-    public void updateDocStatusAndRepayTime(String claimOrdno, String docStatus) {
+    public void updateDocStatusAndRepayTime(String claimOrdno, String docStatus, BigDecimal actualAmount) {
         if(StringUtils.isAnyBlank(claimOrdno, docStatus)){
             return;
         }
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("claimOrdno", claimOrdno);
         map.put("docStatus", docStatus);
+        map.put("actualAmount", actualAmount);
         StringBuffer sql = new StringBuffer();
         sql.append(" UPDATE biz_service_claimorder SET ")
-            .append(" doc_status = :docStatus, repay_time = now()")
+            .append(" doc_status = :docStatus,actual_amount = :actualAmount, repay_time = now()")
             .append(" WHERE claim_ordno = :claimOrdno ");
         updateForMap(sql.toString(), map);
     }
