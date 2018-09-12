@@ -1,5 +1,10 @@
 package com.ccbuluo.business.platform.claimorder.service;
 
+import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
+import com.ccbuluo.account.AccountTransactionDTO;
+import com.ccbuluo.account.AccountTypeEnumThrift;
+import com.ccbuluo.account.BizFinanceAccountService;
+import com.ccbuluo.account.TransactionTypeEnumThrift;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.DocCodePrefixEnum;
@@ -32,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
@@ -58,6 +64,7 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
     private BasicCarmodelManageService basicCarmodelManageService;
     @Autowired
     private BasicCarmodelManageDao basicCarmodelManageDao;
+    private BizFinanceAccountService bizFinanceAccountService;
     /**
      * 生成索赔单
      * @author zhangkangjian
@@ -276,7 +283,63 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
      * @date 2018-09-10 10:43:33
      */
     @Override
-    public void updateDocStatusAndRepayTime(String claimOrdno, String docStatus) {
-        claimOrderDao.updateDocStatusAndRepayTime(claimOrdno, docStatus);
+    public StatusDto updateDocStatusAndRepayTime(String claimOrdno, String docStatus) {
+        BizServiceClaimorder claimorder = claimOrderDao.findClaimOrderDetail(claimOrdno);
+        // 构建申请单
+        List<AccountTransactionDTO> payments = buildClaimPayment(claimorder);
+        // 支付
+        StatusDto statusDto = bizFinanceAccountService.makeTrading(payments);
+        // 如果支付成功
+        if(statusDto.isSuccess()){
+            claimOrderDao.updateDocStatusAndRepayTime(claimOrdno, docStatus);
+        }else{
+            return statusDto;
+        }
+        return StatusDto.buildSuccessStatusDto("支付成功！");
+    }
+
+    /**
+     *  构建维修单
+     * @param
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-09-12 10:07:36
+     */
+    private List<AccountTransactionDTO> buildClaimPayment(BizServiceClaimorder claimorder){
+        List<AccountTransactionDTO> list = new ArrayList<AccountTransactionDTO>();
+        //  付款方
+        AccountTransactionDTO accountPayer = buildAccountTransactionDTO(Constants.AFTER_SALE_PLATFORM,claimorder.getClaimOrdno());
+        // 收款方
+        AccountTransactionDTO accountReceive = buildAccountTransactionDTO(claimorder.getClaimOrgno(),claimorder.getClaimOrdno());
+        // 付款金额
+        BigDecimal sellTotal = BigDecimal.ZERO;
+        accountPayer.setAmount(0 - sellTotal.doubleValue());
+        accountReceive.setAmount(sellTotal.doubleValue());
+
+        list.add(accountReceive);
+        list.add(accountPayer);
+        return list;
+    }
+    /**
+     *  构建支付对象
+     * @param orgNo 组织机构
+     * @param applyNo 单号
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-09-12 10:50:36
+     */
+    private AccountTransactionDTO buildAccountTransactionDTO(String orgNo,String applyNo){
+        AccountTransactionDTO transaction = new AccountTransactionDTO();
+        // 账户
+        transaction.setOrganizationCode(orgNo);
+        // 账户类型
+        transaction.setAccountTypeEnumThrift(AccountTypeEnumThrift.SMALL_CHANGE);
+        // 业务单号
+        transaction.setBusinessSourceDocumentNumber(applyNo);
+        // 交易类型
+        transaction.setTransactionTypeEnumThrift(TransactionTypeEnumThrift.THREE_PACK_SUPPLIER_REFUND);
+        return transaction;
     }
 }

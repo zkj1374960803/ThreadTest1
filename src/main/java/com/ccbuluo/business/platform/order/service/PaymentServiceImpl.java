@@ -326,7 +326,7 @@ public class PaymentServiceImpl implements PaymentService {
             // 交易类型
             accountReceive.setTransactionTypeEnumThrift(TransactionTypeEnumThrift.THREE_GUARANTEES_REFUND_COLLECTION);
             // 收款
-            accountPayer.setAmount(price.doubleValue());
+            accountReceive.setAmount(price.doubleValue());
             list.add(accountReceive);
         }
         accountPayer.setAmount(0 - sellTotal.doubleValue());
@@ -383,20 +383,10 @@ public class PaymentServiceImpl implements PaymentService {
         }
         // 退货
         if(BizAllocateApply.AllocateApplyTypeEnum.REFUND.toString().equals(ba.getApplyType())){
-            // 零配件
-            if(Constants.PRODUCT_TYPE_FITTINGS.equals(productType)){
-                // 付款
-                accountPayer.setTransactionTypeEnumThrift(TransactionTypeEnumThrift.SPARE_PARTS_TRANSFER_PAYMENT);
-                // 收款
-                accountReceive.setTransactionTypeEnumThrift(TransactionTypeEnumThrift.SPARE_PARTS_TRANSFER_RECEIPT);
-            }
-            // 物料
-            if(Constants.PRODUCT_TYPE_EQUIPMENT.equals(productType)){
-                // 付款
-                accountPayer.setTransactionTypeEnumThrift(TransactionTypeEnumThrift.MATERIAL_TRANSFER_PAYMENT);
-                // 收款
-                accountReceive.setTransactionTypeEnumThrift(TransactionTypeEnumThrift.MATERIAL_TRANSFER_RECEIPT);
-            }
+            // 付款
+            accountPayer.setTransactionTypeEnumThrift(TransactionTypeEnumThrift.PROBLEM_PIECE_REFUND_PAYMENT);
+            // 收款
+            accountReceive.setTransactionTypeEnumThrift(TransactionTypeEnumThrift.PROBLEM_PIECE_REFUND_RECEIPT);
             // 退货的支付方是平台
             accountPayer.setOrganizationCode(Constants.AFTER_SALE_PLATFORM);
         }
