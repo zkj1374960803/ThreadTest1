@@ -276,22 +276,23 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
     }
 
     /**
-     * 更新索赔单状态和支付时间
+     * 索赔单付款
      * @param claimOrdno 索赔单号
      * @param docStatus  索赔单状态
      * @author zhangkangjian
      * @date 2018-09-10 10:43:33
      */
     @Override
-    public StatusDto updateDocStatusAndRepayTime(String claimOrdno, String docStatus) {
+    public StatusDto billOfPayment(String claimOrdno, String docStatus, BigDecimal actualAmount) {
         BizServiceClaimorder claimorder = claimOrderDao.findClaimOrderDetail(claimOrdno);
         // 构建申请单
-        List<AccountTransactionDTO> payments = buildClaimPayment(claimorder);
+        List<AccountTransactionDTO> payments = buildClaimPayment(claimorder,actualAmount);
         // 支付
         StatusDto statusDto = bizFinanceAccountService.makeTrading(payments);
         // 如果支付成功
         if(statusDto.isSuccess()){
-            claimOrderDao.updateDocStatusAndRepayTime(claimOrdno, docStatus);
+            // 更新索赔单状态和支付时间
+            claimOrderDao.updateDocStatusAndRepayTime(claimOrdno, docStatus,actualAmount);
         }else{
             return statusDto;
         }
@@ -306,17 +307,15 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
      * @author weijb
      * @date 2018-09-12 10:07:36
      */
-    private List<AccountTransactionDTO> buildClaimPayment(BizServiceClaimorder claimorder){
+    private List<AccountTransactionDTO> buildClaimPayment(BizServiceClaimorder claimorder, BigDecimal actualAmount){
         List<AccountTransactionDTO> list = new ArrayList<AccountTransactionDTO>();
         //  付款方
         AccountTransactionDTO accountPayer = buildAccountTransactionDTO(Constants.AFTER_SALE_PLATFORM,claimorder.getClaimOrdno());
         // 收款方
         AccountTransactionDTO accountReceive = buildAccountTransactionDTO(claimorder.getClaimOrgno(),claimorder.getClaimOrdno());
         // 付款金额
-        BigDecimal sellTotal = BigDecimal.ZERO;
-        accountPayer.setAmount(0 - sellTotal.doubleValue());
-        accountReceive.setAmount(sellTotal.doubleValue());
-
+        accountPayer.setAmount(0 - actualAmount.doubleValue());
+        accountReceive.setAmount(actualAmount.doubleValue());
         list.add(accountReceive);
         list.add(accountPayer);
         return list;
