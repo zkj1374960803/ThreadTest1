@@ -491,12 +491,12 @@ public class PaymentServiceImpl implements PaymentService {
             // 零配件
             if(Constants.PRODUCT_TYPE_FITTINGS.equals(productType)){
                 // 付款
-                bill.setBusinessType(TransactionTypeEnumThrift.SPAREPARTS_EXTERNAL_PURCHASE_PAYMENT.getCode());
+                bill.setBusinessType(TransactionTypeEnumThrift.SPAREPARTS_EXTERNAL_PURCHASE_PAYMENT.getLabel());
             }
             // 物料
             if(Constants.PRODUCT_TYPE_EQUIPMENT.equals(productType)){
                 // 付款
-                bill.setBusinessType(TransactionTypeEnumThrift.MATERIAL_EXTERNAL_PURCHASE_PAYMENT.getCode());
+                bill.setBusinessType(TransactionTypeEnumThrift.MATERIAL_EXTERNAL_PURCHASE_PAYMENT.getLabel());
             }
             List<BizFinanceReceipt> receipts = new ArrayList<BizFinanceReceipt>();
             BizFinanceReceipt receipt = new BizFinanceReceipt();
