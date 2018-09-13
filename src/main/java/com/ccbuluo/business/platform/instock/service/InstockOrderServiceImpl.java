@@ -10,6 +10,7 @@ import com.ccbuluo.business.platform.inputstockplan.service.InputStockPlanServic
 import com.ccbuluo.business.platform.instock.dao.BizInstockOrderDao;
 import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
 import com.ccbuluo.business.platform.instock.dto.InstockorderDetailDTO;
+import com.ccbuluo.business.platform.order.service.fifohandle.StockInOutCallBackContext;
 import com.ccbuluo.business.platform.outstock.dto.UpdatePlanStatusDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.service.StockDetailService;
@@ -70,6 +71,8 @@ public class InstockOrderServiceImpl implements InstockOrderService {
     private ApplyHandleContext applyHandleContext;
     @Autowired
     private StoreHouseService storeHouseService;
+    @Autowired
+    private StockInOutCallBackContext stockInOutCallBackContext;
 
     /**
      * 根据类型查询申请单
@@ -185,8 +188,9 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         // 6、如果是平台端，则把库存明细中的有效库存更新到占用库存
 //        updateOccupyStockById(stockIds);
         // 7、如果是平台入库后则改变申请单状态为 平台待出库，如果是机构入库后则改变申请单的状态为  确认收货
-        List<BizInstockplanDetail> bizInstockplanDetails3 = inputStockPlanService.queryListByApplyNoAndInReNo(applyNo, inRepositoryNo);
-        List<BizInstockplanDetail> collect = bizInstockplanDetails3.stream().filter(item -> item.getCompleteStatus().equals(StockPlanStatusEnum.COMPLETE.name())).collect(Collectors.toList());
+//        List<BizInstockplanDetail> bizInstockplanDetails3 = inputStockPlanService.queryListByApplyNoAndInReNo(applyNo, inRepositoryNo);
+//        List<BizInstockplanDetail> collect = bizInstockplanDetails3.stream().filter(item -> item.getCompleteStatus().equals(StockPlanStatusEnum.COMPLETE.name())).collect(Collectors.toList());
+        stockInOutCallBackContext.inStockCallBack(applyNo);
 //        updateApplyStatus(applyNo, bizInstockplanDetails3, collect);
         // 8、更新入库单的复核状态
         bizInstockOrderDao.updateChecked(instockNo, Constants.FLAG_ONE, new Date());
@@ -201,36 +205,36 @@ public class InstockOrderServiceImpl implements InstockOrderService {
      * @author liuduo
      * @date 2018-08-21 18:52:48
      */
-    private void updateApplyStatus(String applyNo, FindAllocateApplyDTO detail, List<BizInstockplanDetail> bizInstockplanDetails3, List<BizInstockplanDetail> collect) {
-        if (collect.size() == bizInstockplanDetails3.size()) {
-            String applyType = detail.getApplyType();
-            String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
-            if (StringUtils.isNotBlank(applyType)) {
-                // 更改申请单状态
-                switch (Enum.valueOf(BizAllocateApply.AllocateApplyTypeEnum.class, applyType)) {
-                    case PURCHASE:
-                    case PLATFORMALLOCATE:
-                    case SAMELEVEL:
-                    case DIRECTALLOCATE:
-                        allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.CONFIRMRECEIPT.toString());
-                        break;
-                    case BARTER:
-                        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-                            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.PLATFORMOUTBOUND.toString());
-                        } else {
-                            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REPLACECOMPLETED.toString());
-                        }
-                        break;
-                    case REFUND:
-                        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-                            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.WAITINGREFUND.toString());
-                        }
-                        break;
-                }
-            }
-
-        }
-    }
+//    private void updateApplyStatus(String applyNo, FindAllocateApplyDTO detail, List<BizInstockplanDetail> bizInstockplanDetails3, List<BizInstockplanDetail> collect) {
+//        if (collect.size() == bizInstockplanDetails3.size()) {
+//            String applyType = detail.getApplyType();
+//            String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+//            if (StringUtils.isNotBlank(applyType)) {
+//                // 更改申请单状态
+//                switch (Enum.valueOf(BizAllocateApply.AllocateApplyTypeEnum.class, applyType)) {
+//                    case PURCHASE:
+//                    case PLATFORMALLOCATE:
+//                    case SAMELEVEL:
+//                    case DIRECTALLOCATE:
+//                        allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.CONFIRMRECEIPT.toString());
+//                        break;
+//                    case BARTER:
+//                        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+//                            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.PLATFORMOUTBOUND.toString());
+//                        } else {
+//                            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REPLACECOMPLETED.toString());
+//                        }
+//                        break;
+//                    case REFUND:
+//                        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+//                            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.WAITINGREFUND.toString());
+//                        }
+//                        break;
+//                }
+//            }
+//
+//        }
+//    }
 
 
     /**
