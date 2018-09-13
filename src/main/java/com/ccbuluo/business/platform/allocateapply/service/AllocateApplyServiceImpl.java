@@ -77,14 +77,10 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     private CarpartsProductService carpartsProductService;
     @ThriftRPCClient("BasicMerchandiseSer")
     private CarpartsCategoryService carpartsCategoryService;
-//    @ThriftRPCClient("BasicMerchandiseSer")
-//    private CarpartsCategoryService carpartsProductService;
     @Resource(name = "claimOrderServiceImpl")
     private ClaimOrderService claimOrderServiceImpl;
     @Resource
     private ClaimOrderDao claimOrderDao;
-
-
     @Resource
     private ApplyHandleContext applyHandleContext;
     @Autowired
@@ -139,7 +135,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         }
 
         // 创建申请的机构是不是平台并且出库机构平台的话，处理机构为出库机构，出库机构设置为空
-        if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(userOrgCode) &&
+        if(!BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(userOrgCode) &&
             BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(allocateApplyDTO.getOutstockOrgno())){
             allocateApplyDTO.setProcessOrgno(allocateApplyDTO.getOutstockOrgno());
             allocateApplyDTO.setOutstockOrgno(null);
@@ -506,6 +502,48 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         queryPurchaseListDTO.setApplyType(InstockTypeEnum.PURCHASE.name());
         Page<QueryPurchaseListDTO> allocateApplyByCode = bizAllocateApplyDao.queryAllocateApplyByCode(queryPurchaseListDTO);
         return allocateApplyByCode;
+    }
+
+    /**
+     * 创建采购单
+     * @param createPurchaseBillDTO
+     * @author zhangkangjian
+     * @date 2018-09-13 13:58:37
+     */
+    @Override
+    public void createPurchaseBill(CreatePurchaseBillDTO createPurchaseBillDTO) {
+        // 生成采购编号
+        StatusDto<String> stringStatusDto = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.CG);
+        String data = stringStatusDto.getData();
+        AllocateApplyDTO allocateApplyDTO = new AllocateApplyDTO();
+        allocateApplyDTO.setApplyNo(data);
+        String loggedUserId = userHolder.getLoggedUserId();
+        allocateApplyDTO.setOperator(loggedUserId);
+        allocateApplyDTO.setCreator(loggedUserId);
+        allocateApplyDTO.setApplyer(loggedUserId);
+        allocateApplyDTO.setApplyerName(userHolder.getLoggedUser().getName());
+        String userOrgCode = getUserOrgCode();
+        if(userOrgCode != null) {
+            allocateApplyDTO.setApplyorgNo(userOrgCode);
+        }
+        // 默认申请的状态为待处理
+        allocateApplyDTO.setApplyStatus(ApplyStatusEnum.PENDING.name());
+        allocateApplyDTO.setProcessOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+        allocateApplyDTO.setProcessOrgtype(OrganizationTypeEnum.PLATFORM.name());
+        allocateApplyDTO.setOutstockOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+        allocateApplyDTO.setOutstockOrgtype(OrganizationTypeEnum.PLATFORM.name());
+        String inRepositoryNo = createPurchaseBillDTO.getInRepositoryNo();
+        allocateApplyDTO.setInRepositoryNo(inRepositoryNo);
+        String orgCode = bizServiceStorehouseDao.getOrgCodeByStoreHouseCode(allocateApplyDTO.getInRepositoryNo());
+        allocateApplyDTO.setInstockOrgno(orgCode);
+        allocateApplyDTO.setApplyStatus(ApplyStatusEnum.PENDING.name());
+        allocateApplyDTO.setProcessType(InstockTypeEnum.PURCHASE.name());
+        // 保存申请单基础数据
+        bizAllocateApplyDao.saveEntity(allocateApplyDTO);
+        List<AllocateapplyDetailDTO> allocateapplyDetailList = createPurchaseBillDTO.getAllocateapplyDetailList();
+        allocateApplyDTO.setAllocateapplyDetailList(allocateapplyDetailList);
+        // 保存申请单详情数据
+        batchInsertForapplyDetailList(allocateApplyDTO, loggedUserId, allocateApplyDTO.getProcessType());
     }
 
     /**
