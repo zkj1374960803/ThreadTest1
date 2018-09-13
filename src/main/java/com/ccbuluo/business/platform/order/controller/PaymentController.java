@@ -124,7 +124,6 @@ public class PaymentController {
     @GetMapping("/savecustomerservicemarketcounter/{serviceOrderno}")
     @ApiImplicitParam(name = "claimOrdno", value = "申请单号", required = true, paramType = "path")
     public StatusDto<String> saveCustomerServiceMarketCounter(@PathVariable String claimOrdno){
-        // TODO 索赔单也可能有多个
         return paymentService.saveCustomerServiceMarketCounter(claimOrdno);
     }
 }
