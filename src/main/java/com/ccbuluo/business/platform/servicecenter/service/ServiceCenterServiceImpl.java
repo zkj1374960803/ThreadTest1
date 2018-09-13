@@ -1,5 +1,9 @@
 package com.ccbuluo.business.platform.servicecenter.service;
 
+import com.ccbuluo.account.BizFinanceAccountService;
+import com.ccbuluo.account.BusinessItemTypeEnumThrift;
+import com.ccbuluo.account.BusinessTypeEnumThrift;
+import com.ccbuluo.account.OrganizationTypeEnumThrift;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceLabel;
@@ -59,6 +63,8 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
     private BasicUserWorkplaceService workplaceService;
     @ThriftRPCClient("UserCoreSerService")
     private InnerUserInfoService userService;
+    @ThriftRPCClient("BasicWalletpaymentSerService")
+    private BizFinanceAccountService bizFinanceAccountService;
 
     private static final String AFTERSALESERVICECENTER = "(售后服务中心所属职场)";
     private static final String SAVEFAILURE = "保存失败！";
@@ -106,6 +112,19 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
             StatusDto<String> workplaceStatus = crteateWorkplace(saveServiceCenterDTO, serviceCenterCode);
             if (workplaceStatus.getCode().equals(Constants.ERROR_CODE)) {
                 throw new IllegalAccessException(SAVEFAILURE);
+            }
+
+            // 生成支付账号
+            StatusDto<String> stringStatusDto = bizFinanceAccountService.saveBizFinanceAccount(saveServiceCenterDTO.getServiceCenterName(),
+                                                                                                BusinessTypeEnumThrift.AFTER_SALE,
+                                                                                                BusinessItemTypeEnumThrift.SERVICE_CENTER,
+                                                                                                serviceCenterCode,
+                                                                                                saveServiceCenterDTO.getServiceCenterName(),
+                                                                                                OrganizationTypeEnumThrift.ORGANIZATION,
+                                                                                                userHolder.getLoggedUser().getOrganization().getOrgCode());
+            String code = stringStatusDto.getCode();
+            if (null != code && code.equals(Constants.ERROR_CODE)) {
+                throw new IllegalAccessException(stringStatusDto.getMessage());
             }
             return StatusDto.buildSuccessStatusDto(SAVESUCCESS);
         } catch (Exception e) {

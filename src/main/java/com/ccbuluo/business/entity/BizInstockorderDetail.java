@@ -70,6 +70,11 @@ public class BizInstockorderDetail extends AftersaleCommonEntity{
     @ApiModelProperty(name = "unit", value = "计量单位")
     private String unit;
     /**
+     * 卖方机构(内部的机构)编号
+     */
+    @ApiModelProperty(name = "unit", value = "卖方机构(内部的机构)编号")
+    private String sellerOrgno;
+    /**
      * 成本单价
      */
     @ApiModelProperty(name = "costPrice", value = "成本单价")
@@ -191,5 +196,13 @@ public class BizInstockorderDetail extends AftersaleCommonEntity{
 
     public void setProblemNum(Long problemNum) {
         this.problemNum = problemNum;
+    }
+
+    public String getSellerOrgno() {
+        return sellerOrgno;
+    }
+
+    public void setSellerOrgno(String sellerOrgno) {
+        this.sellerOrgno = sellerOrgno;
     }
 }

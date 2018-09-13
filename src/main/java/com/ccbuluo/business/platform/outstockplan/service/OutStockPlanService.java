@@ -32,7 +32,7 @@ public interface OutStockPlanService {
      * @author liuduo
      * @date 2018-08-09 14:38:57
      */
-    List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String outRepositoryNo);
+    List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String status, String outRepositoryNo);
 
     /**
      * 根据出库计划id查询版本号（乐观锁）

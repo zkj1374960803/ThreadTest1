@@ -28,7 +28,7 @@ public interface InstockOrderService {
      */
     StatusDto<String> autoSaveInstockOrder(String applyNo, String inRepositoryNo,  List<BizInstockplanDetail> bizInstockplanDetails);
     /**
-     * 根据申请单号状态查询申请单号集合
+     * 根据类型查询申请单
      * @return 申请单号
      * @author liuduo
      * @date 2018-08-07 14:19:40

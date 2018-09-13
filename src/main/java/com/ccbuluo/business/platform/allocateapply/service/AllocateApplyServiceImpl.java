@@ -906,15 +906,17 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     }
 
     /**
-     * 根据申请单状态查询申请单
+     * 根据类型查询申请单
+     * @param productType 商品类型
+     * @param orgCode 当前登录人机构
      * @param status 申请单状态
      * @return 状态为等待收货的申请单
      * @author liuduo
      * @date 2018-08-11 12:56:39
      */
     @Override
-    public List<String> queryApplyNo(List<String> status, String orgCode, String productType, Integer stockType) {
-        return bizAllocateApplyDao.queryApplyNo(status, orgCode, productType, stockType);
+    public List<String> queryApplyNo(String productType, String orgCode, String status) {
+        return bizAllocateApplyDao.queryApplyNo(productType, orgCode, status);
     }
 
     /**
@@ -1025,6 +1027,20 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
 
         StatusDto<List<ProductStockInfoDTO>> listStatusDto = getListStatusDto(map, allocateapplyDetailList);
         return listStatusDto;
+    }
+
+    /**
+     * 根据商品类型查询申请单号
+     * @param productType 商品类型
+     * @param orgCode 机构code
+     * @param status 申请单状态
+     * @return 申请单号
+     * @author liuduo
+     * @date 2018-09-13 14:06:06
+     */
+    @Override
+    public List<String> queryOutStockApplyNo(String productType, String orgCode, String status) {
+        return bizAllocateApplyDao.queryOutStockApplyNo(productType, orgCode, status);
     }
 
 

@@ -148,7 +148,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             // 保存车辆停放位置
             buildSaveBizCarPosition(serviceOrderDTO, loggedUser, orderCode);
             // 保存服务单派发
-            buildBizServiceDispatch(orderCode, loggedUser);
+            buildBizServiceDispatch(serviceOrderDTO, orderCode, loggedUser);
             return StatusDto.buildSuccessStatusDto();
         } catch (Exception e) {
             logger.error("保存服务单失败！", e.getMessage());
@@ -333,6 +333,14 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             if (!orgType.equals(BizServiceOrder.ProcessorOrgtypeEnum.SERVICECENTER.name())) {
                 throw new CommonException("3009", "不能分配到非服务中心的其他机构！");
             }
+            // 查询该服务单被分配的次数，如果大于1则不能分配
+            BizServiceOrder byOrderNo = bizServiceOrderDao.getByOrderNo(serviceOrderno);
+            if (byOrderNo.getServiceType().equals(BizServiceOrder.ServiceTypeEnum.MAINTAIN.name())) {
+                throw new CommonException("3010", "该服务单是保养类型，无法分配，请核对！");
+            }
+            if (byOrderNo.getDispatchTimes() > Constants.LONG_FLAG_ONE) {
+                throw new CommonException("3006", "该服务单已被分配，请核对！");
+            }
             BusinessUser loggedUser = userHolder.getLoggedUser();
             // 先更改本次分配单的 是否当前处理人
             Long id = bizServiceDispatchDao.getByServiceOrderno(serviceOrderno, loggedUser.getUserId());
@@ -342,11 +350,6 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             int status = bizServiceDispatchDao.updateCurrentFlag(bizServiceDispatch);
             if (status == 0) {
                 throw new CommonException("3002", "分配失败！");
-            }
-            // 查询该服务单被分配的次数，如果大于1则不能分配
-            BizServiceOrder byOrderNo = bizServiceOrderDao.getByOrderNo(serviceOrderno);
-            if (byOrderNo.getDispatchTimes() > Constants.LONG_FLAG_ONE) {
-                throw new CommonException("3006", "该服务单已被分配，请核对！");
             }
             if (StringUtils.isNotBlank(orgType)) {
                 // 创建新的服务单详情并更新旧的
@@ -369,7 +372,12 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
                     throw new CommonException("3007", "原服务单状态修改失败，请联系管理员！");
                 }
                 // 分配之后修改该服务单的分配次数
-                bizServiceOrderDao.updateDispatchTimes(serviceOrderno, Constants.LONG_FLAG_TWO);
+                BizServiceOrder bizServiceOrder = new BizServiceOrder();
+                bizServiceOrder.setProcessorOrgno(orgCodeOrUuid);
+                bizServiceOrder.setProcessorOrgtype(BizServiceOrder.ProcessorOrgtypeEnum.SERVICECENTER.name());
+                bizServiceOrder.setServiceOrderno(serviceOrderno);
+                bizServiceOrder.setDispatchTimes(Constants.LONG_FLAG_TWO);
+                bizServiceOrderDao.updateDispatchTimes(bizServiceOrder);
             }
             BizServiceLog bizServiceLog = new BizServiceLog();
             bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
@@ -630,13 +638,21 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      * @author liuduo
      * @date 2018-09-05 16:46:28
      */
-    private void buildBizServiceDispatch(String orderCode, BusinessUser loggedUser) {
+    private void buildBizServiceDispatch(SaveServiceOrderDTO serviceOrderDTO, String orderCode, BusinessUser loggedUser) {
         BizServiceDispatch bizServiceDispatch = new BizServiceDispatch();
         bizServiceDispatch.setServiceOrderno(orderCode);
         bizServiceDispatch.setCurrentFlag(Constants.FLAG_ONE);
-        bizServiceDispatch.setProcessorOrgno(loggedUser.getOrganization().getOrgCode());
-        bizServiceDispatch.setProcessorOrgtype(loggedUser.getOrganization().getOrgType());
-        bizServiceDispatch.setProcessorUuid(loggedUser.getUserId());
+        // 根据车牌号查询该车属于哪个机构
+        String uuid = basicCarcoreInfoService.getUuidByPlateNum(serviceOrderDTO.getCarNo());
+        if (StringUtils.isBlank(uuid)) {
+            throw new CommonException("3001", "该车辆没有被分配到客户经理，请核对！");
+        }
+        bizServiceDispatch.setProcessorUuid(uuid);
+        // 根据用户uuid查询用户机构类型
+        StatusDtoThriftBean<UserInfoDTO> userDetail = innerUserInfoService.findUserDetail(uuid);
+        UserInfoDTO data = StatusDtoThriftUtils.resolve(userDetail, UserInfoDTO.class).getData();
+        bizServiceDispatch.setProcessorOrgtype(data.getOrgType());
+        bizServiceDispatch.setProcessorOrgno(data.getOrgCode());
         bizServiceDispatch.setConfirmed(Constants.STATUS_FLAG_ZERO);
         bizServiceDispatch.preInsert(loggedUser.getUserId());
         bizServiceDispatchDao.saveBizServiceDispatch(bizServiceDispatch);
@@ -693,6 +709,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         StatusDtoThriftBean<UserInfoDTO> userDetail = innerUserInfoService.findUserDetail(uuid);
         UserInfoDTO data = StatusDtoThriftUtils.resolve(userDetail, UserInfoDTO.class).getData();
         bizServiceOrder.setProcessorOrgtype(data.getOrgType());
+        bizServiceOrder.setProcessorOrgno(data.getOrgCode());
         bizServiceOrder.setServiceTime(editServiceOrderDTO.getServiceTime());
         bizServiceOrder.setProblemContent(editServiceOrderDTO.getProblemContent());
         bizServiceOrder.preUpdate(userHolder.getLoggedUserId());
@@ -772,6 +789,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         StatusDtoThriftBean<UserInfoDTO> userDetail = innerUserInfoService.findUserDetail(uuid);
         UserInfoDTO data = StatusDtoThriftUtils.resolve(userDetail, UserInfoDTO.class).getData();
         bizServiceOrder.setProcessorOrgtype(data.getOrgType());
+        bizServiceOrder.setProcessorOrgno(data.getOrgCode());
         bizServiceOrder.setServiceTime(serviceOrderDTO.getServiceTime());
         bizServiceOrder.setProblemContent(serviceOrderDTO.getProblemContent());
         bizServiceOrder.preInsert(loggedUser.getUserId());

@@ -215,19 +215,16 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
 
     /**
      * 修改维修单的分配次数
-     * @param serviceOrderno 维修单单号
-     * @param longFlagTwo 分配次数
+     * @param bizServiceOrder 维修单
      * @author liuduo
      * @date 2018-09-08 10:27:10
      */
-    public void updateDispatchTimes(String serviceOrderno, Long longFlagTwo) {
-        Map<String, Object> params = Maps.newHashMap();
-        params.put("serviceOrderno", serviceOrderno);
-        params.put("longFlagTwo", longFlagTwo);
+    public void updateDispatchTimes(BizServiceOrder bizServiceOrder) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_service_order SET dispatch_times = :longFlagTwo,processor_orgno = :processorOrgno,")
+            .append(" processor_orgtype = :processorOrgtype WHERE service_orderno = :serviceOrderno");
 
-        String sql = "UPDATE biz_service_order SET dispatch_times = :longFlagTwo WHERE service_orderno = :serviceOrderno";
-
-        updateForMap(sql, params);
+        updateForBean(sql.toString(), bizServiceOrder);
     }
 
     /**
