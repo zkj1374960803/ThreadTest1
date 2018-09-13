@@ -8,6 +8,7 @@ import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleContext;
 import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
 import com.ccbuluo.business.platform.order.service.ServiceOrderService;
+import com.ccbuluo.business.platform.order.service.fifohandle.StockInOutCallBackContext;
 import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
 import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.business.platform.outstock.dto.OutstockorderDetailDTO;
@@ -73,6 +74,8 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     private ApplyHandleContext applyHandleContext;
     @Autowired
     private BizServiceOrderDao bizServiceOrderDao;
+    @Autowired
+    private StockInOutCallBackContext stockInOutCallBackContext;
 
     /**
      * 自动保存出库单
@@ -148,10 +151,11 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 List<BizOutstockplanDetail> bizOutstockplanDetailList2 = outStockPlanService.queryOutstockplan(applyNo, StockPlanStatusEnum.DOING.toString(), outRepositoryNo);
                 updatePlanStatus(bizOutstockplanDetailList2);
                 // 6、更改申请单状态
-//                if (applyNoType.equals(ApplyTypeEnum.APPLYORDER.name())) {
+                if (applyNoType.equals(ApplyTypeEnum.APPLYORDER.name())) {
 //                    List<BizOutstockplanDetail> bizOutstockplanDetailList3 = outStockPlanService.queryOutstockplan(applyNo, StockPlanStatusEnum.DOING.toString(), outRepositoryNo);
 //                    updateApplyOrderStatus(applyNo, bizOutstockplanDetailList3);
-//                }
+                    stockInOutCallBackContext.outStockCallBack(applyNo);
+                }
             }
             return StatusDto.buildSuccessStatusDto("保存成功！");
         } catch (Exception e) {
@@ -230,6 +234,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         // 6、更改申请单状态
 //        List<BizOutstockplanDetail> bizOutstockplanDetailList3 = outStockPlanService.queryOutstockplan(applyNo, StockPlanStatusEnum.DOING.toString(), outRepositoryNo);
 //        updateApplyOrderStatus(applyNo, bizOutstockplanDetailList3);
+        stockInOutCallBackContext.outStockCallBack(applyNo);
         // 7、更新出库单的复核状态
         bizOutstockOrderDao.updateChecked(outstockNo, Constants.FLAG_ONE, new Date());
     }
@@ -244,42 +249,42 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      * @author liuduo
      * @date 2018-08-11 13:05:07
      */
-    private void updateApplyOrderStatus(String applyNo, FindAllocateApplyDTO detail, List<BizOutstockplanDetail> bizOutstockplanDetailList) {
-        List<BizOutstockplanDetail> collect = bizOutstockplanDetailList.stream().filter(item -> item.getPlanStatus().equals(StockPlanStatusEnum.COMPLETE.name())).collect(Collectors.toList());
-        String applyType = detail.getApplyType();
-        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
-        if (StringUtils.isNotBlank(applyType)) {
-            // 判断本次交易的出库计划是否全部完成
-            if (bizOutstockplanDetailList.size() == collect.size()) {
-                switch (Enum.valueOf(BizAllocateApply.AllocateApplyTypeEnum.class, applyType)) {
-                    case PLATFORMALLOCATE:
-                    case PURCHASE:
-                        allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.WAITINGRECEIPT.toString());
-                        break;
-                    case DIRECTALLOCATE:
-                    case SAMELEVEL:
-                        allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.WAITINGRECEIPT.toString());
-                        break;
-                    case BARTER:
-                        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-                            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REPLACEWAITIN.toString());
-                        } else {
-                            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.PRODRETURNED.toString());
-                        }
-                        break;
-                    case REFUND:
-                        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-                            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REFUNDCOMPLETED.toString());
-                        } else {
-                            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.PRODRETURNED.toString());
-                        }
-                        break;
-                }
-            }
-
-        }
-
-    }
+//    private void updateApplyOrderStatus(String applyNo, FindAllocateApplyDTO detail, List<BizOutstockplanDetail> bizOutstockplanDetailList) {
+//        List<BizOutstockplanDetail> collect = bizOutstockplanDetailList.stream().filter(item -> item.getPlanStatus().equals(StockPlanStatusEnum.COMPLETE.name())).collect(Collectors.toList());
+//        String applyType = detail.getApplyType();
+//        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+//        if (StringUtils.isNotBlank(applyType)) {
+//            // 判断本次交易的出库计划是否全部完成
+//            if (bizOutstockplanDetailList.size() == collect.size()) {
+//                switch (Enum.valueOf(BizAllocateApply.AllocateApplyTypeEnum.class, applyType)) {
+//                    case PLATFORMALLOCATE:
+//                    case PURCHASE:
+//                        allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.WAITINGRECEIPT.toString());
+//                        break;
+//                    case DIRECTALLOCATE:
+//                    case SAMELEVEL:
+//                        allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.WAITINGRECEIPT.toString());
+//                        break;
+//                    case BARTER:
+//                        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+//                            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REPLACEWAITIN.toString());
+//                        } else {
+//                            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.PRODRETURNED.toString());
+//                        }
+//                        break;
+//                    case REFUND:
+//                        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+//                            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REFUNDCOMPLETED.toString());
+//                        } else {
+//                            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.PRODRETURNED.toString());
+//                        }
+//                        break;
+//                }
+//            }
+//
+//        }
+//
+//    }
 
     /**
      * 查询等待发货的申请单
