@@ -146,17 +146,17 @@ public class StoreServiceOrderController extends BaseController {
 
 
     /**
-     * 根据车牌号查询车辆承租人的信息
-     * @param carNo 车牌号
+     * 根据车辆vin码查询车辆承租人的信息
+     * @param vinNumber 车辆vin码
      * @return 车辆承租人的信息
      * @author liuduo
      * @date 2018-09-10 10:09:50
      */
-    @ApiOperation(value = "根据车牌号查询承租人信息", notes = "【刘铎】")
-    @ApiImplicitParam(name = "carNo", value = "车牌号",  required = false, paramType = "query")
+    @ApiOperation(value = "根据车辆vin码查询车辆承租人的信息", notes = "【刘铎】")
+    @ApiImplicitParam(name = "vinNumber", value = "车辆vin码",  required = false, paramType = "query")
     @GetMapping("/getuserbycarno")
-    public StatusDto<CarLesseeResDTO> getUserByCarno(@RequestParam String carNo) {
-        StatusDtoThriftBean<CarLesseeResDTO> carLessee = carcoreInfoService.findCarLessee(carNo);
+    public StatusDto<CarLesseeResDTO> getUserByCarno(@RequestParam String vinNumber) {
+        StatusDtoThriftBean<CarLesseeResDTO> carLessee = carcoreInfoService.findCarLessee(vinNumber);
         return StatusDto.buildDataSuccessStatusDto(StatusDtoThriftUtils.resolve(carLessee, CarLesseeResDTO.class).getData());
     }
 
