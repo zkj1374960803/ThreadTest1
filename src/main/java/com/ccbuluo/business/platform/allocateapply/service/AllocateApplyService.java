@@ -240,4 +240,12 @@ public interface AllocateApplyService {
      * @date 2018-09-13 09:58:35
      */
     Page<QueryPurchaseListDTO> queryPurchaseLise(QueryPurchaseListDTO queryPurchaseListDTO);
+
+    /**
+     * 创建采购单
+     * @param createPurchaseBillDTO
+     * @author zhangkangjian
+     * @date 2018-09-13 13:58:37
+     */
+    void createPurchaseBill(CreatePurchaseBillDTO createPurchaseBillDTO);
 }

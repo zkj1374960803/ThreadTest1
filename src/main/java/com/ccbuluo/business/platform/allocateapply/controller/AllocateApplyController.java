@@ -1,8 +1,10 @@
 package com.ccbuluo.business.platform.allocateapply.controller;
 
+import com.ccbuluo.business.entity.BizInstockplanDetail;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
+import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
@@ -31,6 +33,8 @@ public class AllocateApplyController extends BaseController {
     private AllocateApplyService allocateApplyServiceImpl;
     @Resource(name = "custmanagerServiceImpl")
     private CustmanagerService custmanagerService;
+    @Resource
+    BizInstockplanDetailDao bizInstockplanDetailDao;
 
     /**
      * 创建物料或者零配件申请
@@ -241,6 +245,23 @@ public class AllocateApplyController extends BaseController {
         Page<QueryPurchaseListDTO> page = allocateApplyServiceImpl.queryPurchaseLise(queryPurchaseListDTO);
         return StatusDto.buildDataSuccessStatusDto(page);
     }
+
+    /**
+     * 创建采购单
+     * @param createPurchaseBillDTO
+     * @return StatusDto<String>
+     * @author zhangkangjian
+     * @date 2018-09-13 13:58:37
+     */
+    @PostMapping("/createpurchasebill")
+    @ApiOperation(value = "创建采购单", notes = "【张康健】")
+    public StatusDto<String> createPurchaseBill(@ApiParam(name = "CreatePurchaseBillDTO", value = "创建采购申请json", required = true) @RequestBody CreatePurchaseBillDTO createPurchaseBillDTO){
+        allocateApplyServiceImpl.createPurchaseBill(createPurchaseBillDTO);
+        return StatusDto.buildSuccessStatusDto();
+    }
+
+
+
     /**
      * 查询采购单的付款信息
      * @param
@@ -249,7 +270,13 @@ public class AllocateApplyController extends BaseController {
      * @author zhangkangjian
      * @date 2018-09-13 11:17:58
      */
+    @PostMapping("/querypaymentinfo")
+    @ApiOperation(value = "查询采购单的付款信息", notes = "【张康健】")
+    public StatusDto<List<BizInstockplanDetail>> queryPaymentInfo(@ApiIgnore QueryPurchaseListDTO queryPurchaseListDTO){
 
+//        bizInstockplanDetailDao.queryPaymentInfo();
+        return null;
+    }
 
 
 }

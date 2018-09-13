@@ -8,6 +8,7 @@ import com.ccbuluo.business.entity.BizInstockplanDetail;
 import com.ccbuluo.business.platform.outstock.dto.UpdatePlanStatusDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -65,18 +66,24 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
      */
     public List<BizInstockplanDetail> queryListByApplyNo(String applyNo, String status,  String inRepositoryNo) {
         Map<String, Object> params = Maps.newHashMap();
-        params.put("applyNo", applyNo);
-        params.put("completeStatus", status);
-        params.put("inRepositoryNo", inRepositoryNo);
-
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,instock_type,product_no,product_name,product_type,product_categoryname,")
             .append("trade_no,supplier_no,instock_repository_no,cost_price,")
             .append("IFNULL(plan_instocknum,0) AS planInstocknum,IFNULL(actual_instocknum,0) AS actualInstocknum,complete_status,complete_time,")
             .append("outstock_planid")
-            .append(" FROM biz_instockplan_detail WHERE trade_no= :applyNo")
-            .append(" AND complete_status = :completeStatus AND instock_repository_no = :inRepositoryNo");
-
+            .append(" FROM biz_instockplan_detail WHERE 1 = 1");
+        if(StringUtils.isNotBlank(applyNo)){
+            params.put("applyNo", applyNo);
+            sql.append(" AND trade_no= :applyNo ");
+        }
+        if(StringUtils.isNotBlank(status)){
+            params.put("completeStatus", status);
+            sql.append(" AND complete_status = :completeStatus ");
+        }
+        if (StringUtils.isNotBlank(inRepositoryNo)){
+            params.put("inRepositoryNo", inRepositoryNo);
+            sql.append("  AND instock_repository_no = :inRepositoryNo ");
+        }
         return super.queryListBean(BizInstockplanDetail.class, sql.toString(), params);
     }
 
