@@ -706,4 +706,17 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         sql.append(" group by a.equip_code ");
         return queryPageForBean(FindStockListDTO.class, sql.toString(), map, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
     }
+
+    /**
+     * 批量更新采购商品数据
+     * @param purchaseProductInfo 采购单的数据
+     * @author zhangkangjian
+     * @date 2018-09-13 16:25:39
+     */
+    public void batchupdatePurchaseProductInfo(List<PurchaseProductInfo> purchaseProductInfo) {
+        StringBuilder sql = new StringBuilder();
+        sql.append(" UPDATE biz_allocateapply_detail SET");
+        sql.append(" sell_price = :sellPrice WHERE id = :id ");
+        batchUpdateForListBean(sql.toString(), purchaseProductInfo);
+    }
 }

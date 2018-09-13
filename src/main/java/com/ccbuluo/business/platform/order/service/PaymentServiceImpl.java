@@ -75,11 +75,11 @@ public class PaymentServiceImpl implements PaymentService {
     private UserHolder userHolder;
     @Autowired
     private ServiceLogService serviceLogService;
-    @ThriftRPCClient("BasicWalletpaymentSerService8")
+    @ThriftRPCClient("BasicWalletpaymentSerService")
     private BizFinanceAccountService bizFinanceAccountService;
     @Resource
     private BizInstockplanDetailDao bizInstockplanDetailDao;
-    @ThriftRPCClient("BasicWalletpaymentSerService8")
+    @ThriftRPCClient("BasicWalletpaymentSerService")
     private BizFinancePaymentbillsService bizFinancePaymentbillsService;
     @Autowired
     private BizServiceSupplierDao bizServiceSupplierDao;

@@ -248,4 +248,11 @@ public interface AllocateApplyService {
      * @date 2018-09-13 13:58:37
      */
     void createPurchaseBill(CreatePurchaseBillDTO createPurchaseBillDTO);
+    /**
+     * 采购单填报价格（确认报价）
+     * @param confirmationQuoteDTO  报价DTO
+     * @author zhangkangjian
+     * @date 2018-09-13 15:45:47
+     */
+    void confirmationQuote(ConfirmationQuoteDTO confirmationQuoteDTO);
 }
