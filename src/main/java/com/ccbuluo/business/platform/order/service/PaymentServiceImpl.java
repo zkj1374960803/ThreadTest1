@@ -19,6 +19,7 @@ import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceorderDetailDao;
+import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.servicelog.service.ServiceLogService;
 import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
@@ -77,12 +78,12 @@ public class PaymentServiceImpl implements PaymentService {
     private ServiceLogService serviceLogService;
     @ThriftRPCClient("BasicWalletpaymentSerService")
     private BizFinanceAccountService bizFinanceAccountService;
-    @Resource
-    private BizInstockplanDetailDao bizInstockplanDetailDao;
     @ThriftRPCClient("BasicWalletpaymentSerService")
     private BizFinancePaymentbillsService bizFinancePaymentbillsService;
     @Autowired
     private BizServiceSupplierDao bizServiceSupplierDao;
+    @Autowired
+    private BizOutstockplanDetailDao bizOutstockplanDetailDao;
 
     /**
      *  支付完成调用接口
@@ -127,6 +128,10 @@ public class PaymentServiceImpl implements PaymentService {
                 bizAllocateApplyDao.updateApplyOrderStatus(applyNo, status);
                 // 更新订单状态
                 bizAllocateTradeorderDao.updateTradeorderStatus(applyNo,OrderStatusEnum.PAYMENTCOMPLETION.name());
+                // 如果是调拨，要更改卖方出库计划状态
+                if(BizAllocateApply.AllocateApplyTypeEnum.SAMELEVEL.toString().equals(ba.getApplyType())){
+                    bizOutstockplanDetailDao.updatePlanStatus(applyNo);
+                }
                 addlog(applyNo,ba.getInstockOrgno()+"支付给"+ba.getOutstockOrgno()+sellTotal+"人民币",BizServiceLog.actionEnum.PAYMENT.name());
             }else{
                 return statusDto;

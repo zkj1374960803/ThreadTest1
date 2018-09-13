@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.outstockplan.dao;
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.constants.StockPlanStatusEnum;
 import com.ccbuluo.business.entity.BizOutstockplanDetail;
 import com.ccbuluo.business.platform.outstock.dto.UpdatePlanStatusDTO;
 import com.ccbuluo.dao.BaseDao;
@@ -217,5 +218,21 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
             .append("  WHERE trade_no = :applyNo AND out_orgno = :orgCode");
 
         return querySingColum(String.class, sql.toString(), params);
+    }
+
+    /**
+     * 根据申请单号更改出库计划状态
+     * @param applyNo 申请单编号
+     * @exception
+     * @author weijb
+     * @Date 2018-08-10 17:37:32
+     */
+    public int updatePlanStatus(String applyNo){
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_outstockplan_detail SET plan_status = :planStatus  WHERE trade_no= :applyNo ");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("planStatus", StockPlanStatusEnum.DOING.toString());
+        return super.updateForMap(sql.toString(), params);
     }
 }

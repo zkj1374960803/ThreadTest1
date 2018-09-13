@@ -21,8 +21,6 @@ public class SameLevelStockInOutCallBack implements StockInOutCallBack{
 
     @Override
     public StatusDto inStockCallBack(String docNo) {
-        // 调拨入库之后要更改申请方入库计划状态
-        bizInstockplanDetailDao.updateCompleteStatus(docNo);
         // 更改申请单状态
         inOutCallBackService.updateApplyStatus(docNo);
         return StatusDto.buildSuccessStatusDto("操作成功！");
@@ -31,6 +29,8 @@ public class SameLevelStockInOutCallBack implements StockInOutCallBack{
     @Override
     public StatusDto outStockCallBack(String docNo) {
         inOutCallBackService.updateApplyOrderStatus(docNo);
+        // 卖方出库之后要更改申请方入库计划状态
+        bizInstockplanDetailDao.updateCompleteStatus(docNo);
         return StatusDto.buildSuccessStatusDto("操作成功！");
     }
 
