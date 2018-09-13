@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.order.dao;
 
+import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceOrder;
 import com.ccbuluo.core.common.UserHolder;
@@ -161,7 +162,7 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
             params.put("serviceType", serviceType);
             sql.append(" AND bso.service_type = :serviceType ");
         }
-        if (StringUtils.isNotBlank(reportOrgno)) {
+        if (StringUtils.isNotBlank(reportOrgno) && !(reportOrgno.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM))) {
             params.put("reportOrgno", reportOrgno);
             sql.append(" AND (bso.report_orgno = :reportOrgno OR bsd.processor_orgno = :reportOrgno)");
         }
