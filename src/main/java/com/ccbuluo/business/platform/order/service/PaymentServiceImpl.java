@@ -127,10 +127,6 @@ public class PaymentServiceImpl implements PaymentService {
                 bizAllocateApplyDao.updateApplyOrderStatus(applyNo, status);
                 // 更新订单状态
                 bizAllocateTradeorderDao.updateTradeorderStatus(applyNo,OrderStatusEnum.PAYMENTCOMPLETION.name());
-                // 如果是调拨，要更改申请方入库计划状态
-                if(BizAllocateApply.AllocateApplyTypeEnum.SAMELEVEL.toString().equals(ba.getApplyType())){
-                    bizInstockplanDetailDao.updateCompleteStatus(applyNo);
-                }
                 addlog(applyNo,ba.getInstockOrgno()+"支付给"+ba.getOutstockOrgno()+sellTotal+"人民币",BizServiceLog.actionEnum.PAYMENT.name());
             }else{
                 return statusDto;
