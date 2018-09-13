@@ -65,6 +65,8 @@ public class FindAllocateApplyDTO {
      */
     @ApiModelProperty(name = "inRepositoryNo", value = "入库仓库编号")
     private String inRepositoryNo;
+
+
     /**
      * 入库组织架构
      */
@@ -164,6 +166,7 @@ public class FindAllocateApplyDTO {
      */
     @ApiModelProperty(name = "totalPrice", value = "付款总额", hidden = true)
     private BigDecimal totalPrice;
+
 
     public String getRemark() {
         return remark;

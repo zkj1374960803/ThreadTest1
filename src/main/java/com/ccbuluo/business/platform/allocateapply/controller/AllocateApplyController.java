@@ -259,6 +259,20 @@ public class AllocateApplyController extends BaseController {
         allocateApplyServiceImpl.createPurchaseBill(createPurchaseBillDTO);
         return StatusDto.buildSuccessStatusDto();
     }
+    /**
+     * 采购单填报价格（确认报价）
+     * @param
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-09-13 15:45:47
+     */
+//    Confirmation of quote
+    @PostMapping("/confirmationquote")
+    @ApiOperation(value = "采购单填报价格（确认报价）", notes = "【张康健】")
+    public StatusDto<String> confirmationQuote(){
+        return null;
+    }
 
 
 
