@@ -630,7 +630,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String outRepositoryNo) {
-        return bizOutstockplanDetailDao.queryOutstockplan(applyNo, outRepositoryNo);
+        return bizOutstockplanDetailDao.queryOutstockplan(applyNo,null, outRepositoryNo);
     }
 
     /**
