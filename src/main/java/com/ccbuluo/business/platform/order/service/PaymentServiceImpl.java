@@ -518,17 +518,8 @@ public class PaymentServiceImpl implements PaymentService {
      */
     @Override
     public StatusDto saveCustomerServiceRefundCounter(String applyNo){
-        List<BizFinancePaymentbills> paymentbills = buildPaymentbills(applyNo);
-        try {
-            StatusDtoThriftList<BizFinancePaymentbills> bizFinancePaymentbillsStatusDtoThriftList = bizFinancePaymentbillsService.saveCustomerServiceAdvanceCounterList(paymentbills);
-            if(bizFinancePaymentbillsStatusDtoThriftList.isSuccess()){
-                return StatusDto.buildSuccessStatusDto("保存成功！");
-            }else{
-                return StatusDto.buildFailure("保存失败！");
-            }
-        } catch (Exception e) {
-            return StatusDto.buildFailure("保存失败！");
-        }
+        // 目前不做实现
+        return null;
     }
 
     /**
@@ -540,17 +531,8 @@ public class PaymentServiceImpl implements PaymentService {
      */
     @Override
     public StatusDto saveCustomerServiceMarketCounter(String claimOrdno){
-        List<BizFinancePaymentbills> paymentbills = buildPaymentbills(claimOrdno);
-        try {
-            StatusDtoThriftList<BizFinancePaymentbills> bizFinancePaymentbillsStatusDtoThriftList = bizFinancePaymentbillsService.saveCustomerServiceAdvanceCounterList(paymentbills);
-            if(bizFinancePaymentbillsStatusDtoThriftList.isSuccess()){
-                return StatusDto.buildSuccessStatusDto("保存成功！");
-            }else{
-                return StatusDto.buildFailure("保存失败！");
-            }
-        } catch (Exception e) {
-            return StatusDto.buildFailure("保存失败！");
-        }
+        // 目前不做实现
+        return null;
     }
 
     private String getSupplierName(String supplierCode){
