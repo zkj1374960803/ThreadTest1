@@ -8,6 +8,7 @@ import com.ccbuluo.http.StatusDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 出入库回调入口
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @version v1.0.0
  * @date 2018-09-13 16:32:16
  */
+@Service
 public class StockInOutCallBackContext {
 
     Logger logger = LoggerFactory.getLogger(getClass());

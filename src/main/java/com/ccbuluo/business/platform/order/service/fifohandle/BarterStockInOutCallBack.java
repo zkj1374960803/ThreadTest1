@@ -17,6 +17,7 @@ import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.http.StatusDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -31,6 +32,7 @@ import java.util.Optional;
  * @version v1.0.0
  * @date 2018-09-13 16:42:46
  */
+@Service
 public class BarterStockInOutCallBack implements StockInOutCallBack{
 
     @Autowired
@@ -45,12 +47,16 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
     private UserHolder userHolder;
     @Autowired
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
+    @Autowired
+    InOutCallBackService inOutCallBackService;
 
     @Override
     public StatusDto inStockCallBack(String docNo) {
         platformInstockCallback(docNo);
         // 调拨入库之后要更改申请方入库计划状态
         bizInstockplanDetailDao.updateCompleteStatus(docNo);
+        // 更改申请单状态
+        inOutCallBackService.updateApplyStatus(docNo);
         return StatusDto.buildSuccessStatusDto("操作成功！");
     }
 
