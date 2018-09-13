@@ -101,7 +101,35 @@ public class StockInOutCallBackContext {
      * @date 2018-09-13 15:55:42
      */
     public StatusDto outStockCallBack(String docNo){
-        return null;
+        StockInOutCallBack callBack = null;
+        // 根据申请单获取申请单详情
+        BizAllocateApply ba = bizAllocateApplyDao.getByNo(docNo);
+        if (null == ba) {
+            return StatusDto.buildFailureStatusDto("申请单不存在！");
+        }
+        BizAllocateApply.AllocateApplyTypeEnum typeEnum = BizAllocateApply.AllocateApplyTypeEnum.valueOf(ba.getApplyType());
+        switch (typeEnum) {
+            case PURCHASE:
+                // 采购
+                callBack = PurchaseStockInOutCallBack;
+                break;
+            case SAMELEVEL:
+                // 调拨
+                callBack = sameLevelStockInOutCallBack;
+                break;
+            case BARTER:
+                // 商品换货
+                callBack = barterStockInOutCallBack;
+                break;
+            case REFUND:
+                //  退货
+                callBack = refundStockInOutCallBack;
+                break;
+            default:
+                logger.error(typeEnum.toString() + "出现了未知处理类型！");
+                break;
+        }
+        return callBack.outStockCallBack(docNo);
     }
 
 }
