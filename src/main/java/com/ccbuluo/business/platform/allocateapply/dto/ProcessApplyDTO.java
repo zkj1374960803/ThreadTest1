@@ -29,7 +29,7 @@ public class ProcessApplyDTO {
     /**
      * 平台决定的处理类型：调拨、采购
      */
-    @ApiModelProperty(name = "processType", value = "平台决定的处理类型(注：TRANSFER调拨、PURCHASE采购)")
+    @ApiModelProperty(name = "processType", value = "平台决定的处理类型(注：TRANSFER调拨、PURCHASE采购)", hidden = true)
     private String processType;
     /**
      * 出库的组织架构的类型
@@ -40,7 +40,7 @@ public class ProcessApplyDTO {
     /**
      * 出库的组织架构
      */
-    @ApiModelProperty(name = "outstockOrgno", value = "出库的组织架构(采购类型时，不必填)")
+    @ApiModelProperty(name = "outstockOrgno", value = "出库的组织架构(采购类型时，不必填)", hidden = true)
     private String outstockOrgno;
 
     /**
@@ -52,6 +52,17 @@ public class ProcessApplyDTO {
     private Long versionNo;
     @ApiModelProperty(name = "applyStatus", value = "申请单状态", hidden = true)
     private String applyStatus;
+
+    @ApiModelProperty(name = "processMemo", value = "驳回理由", hidden = true)
+    private String processMemo;
+
+    public String getProcessMemo() {
+        return processMemo;
+    }
+
+    public void setProcessMemo(String processMemo) {
+        this.processMemo = processMemo;
+    }
 
     public String getApplyType() {
         return applyType;

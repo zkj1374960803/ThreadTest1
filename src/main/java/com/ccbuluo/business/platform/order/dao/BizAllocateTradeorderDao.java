@@ -71,19 +71,19 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
 
     /**
      * 获取调拨申请交易订单详情
-     * @param id  id
-     * @author liuduo
+     * @param applyNo 申请单号
+     * @author zhangkangjian
      * @date 2018-08-07 11:55:41
      */
-    public BizAllocateTradeorder getById(long id) {
+    public List<BizAllocateTradeorder> queryAllocateTradeorderByApplyNo(String applyNo) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,order_no,apply_no,purchaser_orgno,seller_orgno,")
             .append("order_status,total_price,payer,pay_method,payed_time,creator,")
             .append("create_time,operator,operate_time,delete_flag,remark")
-            .append(" FROM biz_allocate_tradeorder WHERE id= :id");
+            .append(" FROM biz_allocate_tradeorder WHERE apply_no = :applyNo");
         Map<String, Object> params = Maps.newHashMap();
-        params.put("id", id);
-        return super.findForBean(BizAllocateTradeorder.class, sql.toString(), params);
+        params.put("applyNo", applyNo);
+        return queryListBean(BizAllocateTradeorder.class, sql.toString(), params);
     }
 
     /**

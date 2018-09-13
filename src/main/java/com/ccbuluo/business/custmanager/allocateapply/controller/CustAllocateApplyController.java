@@ -143,6 +143,20 @@ public class CustAllocateApplyController extends BaseController {
     }
 
     /**
+     * 保存处理申请单
+     * @param processApplyDTO json数据格式
+     * @return StatusDto<String> 状态DTO
+     * @author zhangkangjian
+     * @date 2018-09-12 16:02:08
+     */
+    @ApiOperation(value = "保存申请单", notes = "【张康健】")
+    @PostMapping("/saveprocessapply")
+    public StatusDto<String> saveProcessApply(@ApiParam(name = "processApplyDTO", value = "json数据格式", required = true) @RequestBody ProcessApplyDTO processApplyDTO){
+        allocateApplyServiceImpl.saveProcessApply(processApplyDTO.getProcessApplyDetailDTO());
+        return StatusDto.buildSuccessStatusDto();
+    }
+
+    /**
      * 查询可调拨库存列表
      * @param findStockListDTO 查询条件
      * @return StatusDto<Page<FindStockListDTO>>
@@ -249,8 +263,8 @@ public class CustAllocateApplyController extends BaseController {
     public StatusDto<String> receivingmaterials(Long id, String productNo){
         allocateApplyServiceImpl.receivingmaterials(id, productNo);
         return StatusDto.buildSuccessStatusDto();
-
     }
+
 
 
 

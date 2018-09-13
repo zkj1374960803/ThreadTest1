@@ -46,20 +46,6 @@ public class AllocateApplyController extends BaseController {
         return StatusDto.buildSuccessStatusDto();
     }
 
-    /**
-     * 创建物料或者零配件【调拨】申请
-     * @param allocateApplyDTO 申请实体
-     * @return StatusDto<String> 状态DTO
-     * @author zhangkangjian
-     * @date 2018-09-11 14:50:29
-     */
-    @ApiOperation(value = "创建物料或者零配件【调拨】申请", notes = "【张康健】")
-    @PostMapping("/createtransferapply")
-    public StatusDto<String> createTransferApply(@ApiParam(name = "bizAllocateApply", value = "创建申请json", required = true) @RequestBody AllocateApplyDTO allocateApplyDTO){
-//        allocateApplyServiceImpl.createTransferApply(allocateApplyDTO);
-        return StatusDto.buildSuccessStatusDto();
-    }
-
 
 
     /**
@@ -146,18 +132,30 @@ public class AllocateApplyController extends BaseController {
     /**
      * 处理申请单
      * @param processApplyDTO json数据格式
-     * @return
+     * @return StatusDto<String> 状态DTO
      * @author zhangkangjian
      * @date 2018-08-10 11:24:53
      */
-    @ApiOperation(value = "处理申请单（当选择采购时不显示调拨目标）", notes = "【张康健】")
+    @ApiOperation(value = "提交申请", notes = "【张康健】")
     @PostMapping("/processapply")
     public StatusDto<String> processApply(@ApiParam(name = "processApplyDTO", value = "json数据格式", required = true) @RequestBody ProcessApplyDTO processApplyDTO){
         allocateApplyServiceImpl.processApply(processApplyDTO);
         return StatusDto.buildSuccessStatusDto();
     }
 
-
+    /**
+     * 保存处理申请单
+     * @param processApplyDetailDTO json数组数据格式
+     * @return StatusDto<String> 状态DTO
+     * @author zhangkangjian
+     * @date 2018-09-12 16:02:08
+     */
+    @ApiOperation(value = "保存申请单（填报价格）", notes = "【张康健】")
+    @PostMapping("/saveprocessapply")
+    public StatusDto<String> saveProcessApply(@ApiParam(name = "processApplyDetailDTO", value = "json数组数据格式", required = true) @RequestBody List<ProcessApplyDetailDTO> processApplyDetailDTO){
+        allocateApplyServiceImpl.saveProcessApply(processApplyDetailDTO);
+        return StatusDto.buildSuccessStatusDto();
+    }
 
     /**
      * 撤销申请单
@@ -185,5 +183,73 @@ public class AllocateApplyController extends BaseController {
     public StatusDto<List<BasicUserOrganization>> queryTopPlatform(){
         return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.queryTopPlatform());
     }
+
+
+    /**
+     * 驳回申请
+     * @param applyNo 申请单号
+     * @return StatusDto<String> 申请单号
+     * @author zhangkangjian
+     * @date 2018-09-12 16:10:34
+     */
+    @ApiOperation(value = "驳回申请",notes = "【张康健】")
+    @GetMapping("/rejectapply")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "processMemo", value = "驳回理由", required = true, paramType = "query")
+    })
+    public StatusDto<String> rejectApply(String applyNo, String processMemo){
+        allocateApplyServiceImpl.rejectApply(applyNo, processMemo);
+        return StatusDto.buildSuccessStatusDto();
+    }
+
+    /**
+     * 处理申请(确定出库机构)
+     * @param applyNo 申请单号
+     * @param outstockOrgno 出库机构
+     * @return StatusDto<String>
+     * @author zhangkangjian
+     * @date 2018-09-12 17:47:14
+     */
+    @ApiOperation(value = "处理申请",notes = "【张康健】")
+    @GetMapping("/processoutstockorg")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "outstockOrgno", value = "出库机构", required = true, paramType = "query")
+    })
+    public StatusDto<String> processOutStockOrg(String applyNo, String outstockOrgno){
+        allocateApplyServiceImpl.processOutStockOrg(applyNo, outstockOrgno);
+        return StatusDto.buildSuccessStatusDto();
+    }
+
+    /**
+     * 查询采购列表
+     * @param queryPurchaseListDTO 查询条件
+     * @return StatusDto<Page<QueryPurchaseListDTO>>
+     * @author zhangkangjian
+     * @date 2018-09-13 09:58:35
+     */
+    @PostMapping("/querypurchaselise")
+    @ApiOperation(value = "查询采购列表", notes = "【张康健】")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "applyNo", value = "采购单号", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "applyStatus", value = "商品的编号", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query")
+    })
+    public StatusDto<Page<QueryPurchaseListDTO>> queryPurchaseLise(@ApiIgnore QueryPurchaseListDTO queryPurchaseListDTO){
+        Page<QueryPurchaseListDTO> page = allocateApplyServiceImpl.queryPurchaseLise(queryPurchaseListDTO);
+        return StatusDto.buildDataSuccessStatusDto(page);
+    }
+    /**
+     * 查询采购单的付款信息
+     * @param
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-09-13 11:17:58
+     */
+
+
 
 }
