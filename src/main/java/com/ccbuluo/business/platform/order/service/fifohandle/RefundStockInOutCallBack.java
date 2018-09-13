@@ -26,6 +26,7 @@ public class RefundStockInOutCallBack implements StockInOutCallBack{
 
     @Override
     public StatusDto outStockCallBack(String docNo) {
-        return null;
+        inOutCallBackService.updateApplyOrderStatus(docNo);
+        return StatusDto.buildSuccessStatusDto("操作成功！");
     }
 }
