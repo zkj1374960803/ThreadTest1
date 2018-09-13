@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.order.service.typeassert;
 
 import com.ccbuluo.business.constants.DocTypeEnum;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -14,11 +15,15 @@ import java.util.Map;
 public class OrderTypeAsserterContext {
 
     private Map<DocTypeEnum, OrderTypeAsserter> asserterChain;
+    @Autowired
+    ApplyOrderTypeAsserter applyOrderTypeAsserter;
+    @Autowired
+    ServiceOrderTypeAsserter serviceOrderTypeAsserter;
 
     public OrderTypeAsserterContext(){
         asserterChain = new HashMap<DocTypeEnum, OrderTypeAsserter>();
-        asserterChain.put(DocTypeEnum.APPLY_DOC, new ApplyOrderTypeAsserter());
-        asserterChain.put(DocTypeEnum.SERVICE_DOC, new ServiceOrderTypeAsserter());
+        asserterChain.put(DocTypeEnum.APPLY_DOC, applyOrderTypeAsserter);
+        asserterChain.put(DocTypeEnum.SERVICE_DOC, serviceOrderTypeAsserter);
     }
 
     /**
