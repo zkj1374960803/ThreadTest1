@@ -151,7 +151,7 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT bso.id,bso.service_orderno,bso.order_status,bso.car_vin,bso.customer_name,bso.customer_phone,bso.service_type,bso.report_time")
+        sql.append("SELECT DISTINCT bso.id,bso.service_orderno,bso.order_status,bso.car_vin,bso.customer_name,bso.customer_phone,bso.service_type,bso.report_time")
             .append(" FROM biz_service_order AS bso LEFT JOIN biz_service_dispatch AS bsd ON bsd.service_orderno = bso.service_orderno WHERE  1=1 ");
         if (StringUtils.isNotBlank(orderStatus)) {
             params.put("orderStatus", orderStatus);
