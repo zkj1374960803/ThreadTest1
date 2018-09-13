@@ -412,7 +412,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         // 更新基础数据
         processApplyDTO.setApplyProcessor(userHolder.getLoggedUserId());
         processApplyDTO.setProcessTime(new Date());
-        processApplyDTO.setApplyType(ApplyStatusEnum.WAITINGPAYMENT.name());
+        processApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
         bizAllocateApplyDao.updateAllocateApply(processApplyDTO);
         saveProcessApply(processApplyDTO.getProcessApplyDetailDTO());
         // 生成出入库计划
@@ -538,6 +538,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         allocateApplyDTO.setInstockOrgno(orgCode);
         allocateApplyDTO.setApplyStatus(ApplyStatusEnum.PENDING.name());
         allocateApplyDTO.setProcessType(InstockTypeEnum.PURCHASE.name());
+        allocateApplyDTO.setApplyType(InstockTypeEnum.PURCHASE.name());
         // 保存申请单基础数据
         bizAllocateApplyDao.saveEntity(allocateApplyDTO);
         List<AllocateapplyDetailDTO> allocateapplyDetailList = createPurchaseBillDTO.getAllocateapplyDetailList();
