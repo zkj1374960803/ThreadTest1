@@ -449,6 +449,9 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public StatusDto saveCustomerServiceAdvanceCounter(String applyNo){
         List<BizFinancePaymentbills> paymentbills = buildPaymentbills(applyNo);
+        if(null == paymentbills || paymentbills.size() == 0){
+            throw new CommonException("0", "保存失败！");
+        }
         try {
             StatusDtoThriftList<BizFinancePaymentbills> bizFinancePaymentbillsStatusDtoThriftList = bizFinancePaymentbillsService.saveCustomerServiceAdvanceCounterList(paymentbills);
             if(bizFinancePaymentbillsStatusDtoThriftList.isSuccess()){
@@ -488,23 +491,28 @@ public class PaymentServiceImpl implements PaymentService {
             // 零配件
             if(Constants.PRODUCT_TYPE_FITTINGS.equals(productType)){
                 // 付款
-                bill.setBusinessType(TransactionTypeEnumThrift.SPAREPARTS_EXTERNAL_PURCHASE_PAYMENT.name());
+                bill.setBusinessType(TransactionTypeEnumThrift.SPAREPARTS_EXTERNAL_PURCHASE_PAYMENT.getCode());
             }
             // 物料
             if(Constants.PRODUCT_TYPE_EQUIPMENT.equals(productType)){
                 // 付款
-                bill.setBusinessType(TransactionTypeEnumThrift.MATERIAL_EXTERNAL_PURCHASE_PAYMENT.name());
+                bill.setBusinessType(TransactionTypeEnumThrift.MATERIAL_EXTERNAL_PURCHASE_PAYMENT.getCode());
             }
             List<BizFinanceReceipt> receipts = new ArrayList<BizFinanceReceipt>();
             BizFinanceReceipt receipt = new BizFinanceReceipt();
             // 预付款
-            receipt.setMoney(tradeorder.getPerpayAmount().doubleValue());
+            if(null != tradeorder.getPerpayAmount()){
+                receipt.setMoney(tradeorder.getPerpayAmount().doubleValue());
+            }else{
+                throw new CommonException("0", "金额不能为空！");
+            }
             receipt.setCreateTime(System.currentTimeMillis());
             receipt.setCreator(userHolder.getLoggedUser().getUserId());
             receipt.setReceiptCode(applyNo);
             receipt.setReceiptType("备件采购申请单");
             receipts.add(receipt);
             bill.setBizFinanceReceiptList(receipts);
+            paymentbills.add(bill);
         }
         return paymentbills;
     }
@@ -538,6 +546,9 @@ public class PaymentServiceImpl implements PaymentService {
     private String getSupplierName(String supplierCode){
         // 供应商名称
         String supplierName = "";
+        if(StringUtils.isBlank(supplierCode)){
+            return "";
+        }
         ResultFindSupplierDetailDTO supplier = bizServiceSupplierDao.getByCode(supplierCode);
         if(null != supplier){
             supplierName = supplier.getSupplierName();
