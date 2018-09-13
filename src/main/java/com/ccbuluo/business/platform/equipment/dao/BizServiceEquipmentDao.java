@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -210,5 +211,21 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
             .append(" FROM biz_service_equipment a LEFT JOIN biz_service_equiptype b ON a.equiptype_id = b.id ")
             .append(" WHERE a.equip_code = :equipCode ");
         return findForBean(FindStockListDTO.class, sql.toString(), params);
+    }
+
+    /**
+     * 查询物料的客户经理价格
+     * @param  equipCode 物料的编号
+     * @return BigDecimal 物料的价格
+     * @author zhangkangjian
+     * @date 2018-09-13 20:11:18
+     */
+    public BigDecimal findSuggestedPrice(String equipCode) {
+        StringBuffer sql = new StringBuffer();
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("equipCode", equipCode);
+        sql.append(" SELECT a.suggested_price FROM rel_product_price a ")
+            .append(" WHERE a.product_no = :equipCode ORDER BY a.create_time DESC LIMIT 1 ");
+        return namedParameterJdbcTemplate.queryForObject(sql.toString(), params, BigDecimal.class);
     }
 }

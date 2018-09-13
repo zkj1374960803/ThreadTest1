@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -80,7 +81,11 @@ public class EquipmentServiceImpl implements EquipmentService{
      */
     @Override
     public DetailBizServiceEquipmentDTO getById(Long id) {
-        return bizServiceEquipmentDao.getById(id);
+        // 查询最新生效价格
+        DetailBizServiceEquipmentDTO equipmentDTO = bizServiceEquipmentDao.getById(id);
+        BigDecimal suggestedPrice = bizServiceEquipmentDao.findSuggestedPrice(equipmentDTO.getEquipCode());
+        equipmentDTO.setSuggestedPrice(suggestedPrice);
+        return equipmentDTO;
     }
 
     /**

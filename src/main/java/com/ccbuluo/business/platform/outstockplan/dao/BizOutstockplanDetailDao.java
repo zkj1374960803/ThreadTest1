@@ -5,6 +5,7 @@ import com.ccbuluo.business.entity.BizOutstockplanDetail;
 import com.ccbuluo.business.platform.outstock.dto.UpdatePlanStatusDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -101,8 +102,13 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
             .append("supplier_no,apply_detail_id,cost_price,sales_price,out_repository_no,")
             .append("plan_outstocknum,actual_outstocknum,plan_status,complete_time,")
             .append("creator,create_time,operator,operate_time,delete_flag,remark,version_no,")
-            .append("product_categoryname FROM biz_outstockplan_detail WHERE trade_no= :applyNo AND out_repository_no = :outRepositoryNo");
-
+            .append("product_categoryname FROM biz_outstockplan_detail WHERE 1 = 1 ");
+        if(StringUtils.isNotBlank(applyNo)){
+            sql.append(" AND trade_no= :applyNo ");
+        }
+        if(StringUtils.isNotBlank(outRepositoryNo)){
+            sql.append(" AND out_repository_no = :outRepositoryNo ");
+        }
         return queryListBean(BizOutstockplanDetail.class, sql.toString(), params);
     }
     /**

@@ -13,8 +13,18 @@ import java.math.BigDecimal;
 public class PerpayAmountDTO {
     @ApiModelProperty(name = "supplierCode", value = "供应商code")
     private String supplierCode;
+    @ApiModelProperty(name = "supplierName", value = "供应商名称", hidden = true)
+    private String supplierName;
     @ApiModelProperty(name = "perpayAmount", value = "预付款金额")
     private BigDecimal perpayAmount;
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
 
     public String getSupplierCode() {
         return supplierCode;
