@@ -209,4 +209,35 @@ public interface AllocateApplyService {
      * @date 2018-09-11 16:21:56
      */
     StatusDto<List<ProductStockInfoDTO>> checkRepairOrderStock(CheckRepairOrderStockDTO checkRepairOrderStockDTO);
+    /**
+     * 保存申请单数据
+     * @param processApplyDTO 申请单实体
+     * @author zhangkangjian
+     * @date 2018-09-12 16:07:20
+     */
+    void saveProcessApply(List<ProcessApplyDetailDTO> processApplyDTO);
+    /**
+     * 驳回申请
+     * @param applyNo 申请单号
+     * @param processMemo 驳回理由
+     * @author zhangkangjian
+     * @date 2018-09-12 16:16:17
+     */
+    void rejectApply(String applyNo, String processMemo);
+    /**
+     * 处理申请
+     * @param applyNo 申请单号
+     * @param outstockOrgno 出库机构
+     * @author zhangkangjian
+     * @date 2018-09-12 17:47:14
+     */
+    void processOutStockOrg(String applyNo, String outstockOrgno);
+    /**
+     * 查询采购列表
+     * @param queryPurchaseListDTO 查询条件
+     * @return Page<QueryPurchaseListDTO>
+     * @author zhangkangjian
+     * @date 2018-09-13 09:58:35
+     */
+    Page<QueryPurchaseListDTO> queryPurchaseLise(QueryPurchaseListDTO queryPurchaseListDTO);
 }

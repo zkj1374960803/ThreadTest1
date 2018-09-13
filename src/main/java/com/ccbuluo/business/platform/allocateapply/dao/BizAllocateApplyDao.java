@@ -97,6 +97,32 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         return super.findForBean(AllocateApplyDTO.class, sql.toString(), params);
     }
 
+
+    /**
+     * 查询申请单的总金额
+     * @param queryPurchaseListDTO 查询条件
+     * @return Page<QueryPurchaseListDTO> 分页信息
+     * @author zhangkangjian
+     * @date 2018-08-07 11:55:41
+     */
+    public Page<QueryPurchaseListDTO> queryAllocateApplyByCode(QueryPurchaseListDTO queryPurchaseListDTO) {
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT a.applyorg_no,UNIX_TIMESTAMP(a.create_time) AS 'createTime',a.apply_status, SUM(IFNULL(b.total_price,0)) AS 'totalPurchase' ")
+            .append(" FROM biz_allocate_apply a  ")
+            .append(" LEFT JOIN biz_allocate_tradeorder b ON a.applyorg_no = b.apply_no WHERE 1 = 1 ");
+        if(StringUtils.isNotBlank(queryPurchaseListDTO.getApplyStatus())){
+            sql.append(" AND a.apply_status = :applyStatus ");
+        }
+        if(StringUtils.isNotBlank(queryPurchaseListDTO.getApplyNo())){
+            sql.append(" AND a.apply_no = :applyNo ");
+        }
+        if(StringUtils.isNotBlank(queryPurchaseListDTO.getApplyType())){
+            sql.append(" AND a.apply_type = :applyType ");
+        }
+        sql.append(" GROUP BY a.applyorg_no ");
+        return queryPageForBean(QueryPurchaseListDTO.class, sql.toString(), queryPurchaseListDTO, queryPurchaseListDTO.getOffset(), queryPurchaseListDTO.getPageSize());
+    }
+
     /**
      * 删除物料和零配件调拨的申请
      * @param id  id
@@ -384,9 +410,15 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      */
     public void updateAllocateApply(ProcessApplyDTO processApplyDTO) {
         StringBuilder sql = new StringBuilder();
-        sql.append(" UPDATE biz_allocate_apply SET apply_processor = :applyProcessor,process_time = :processTime ");
+        sql.append(" UPDATE biz_allocate_apply SET  create_time = now()");
         if(StringUtils.isNotBlank(processApplyDTO.getOutstockOrgno())){
             sql.append(" ,outstock_orgno = :outstockOrgno ");
+        }
+        if(StringUtils.isNotBlank(processApplyDTO.getApplyProcessor())){
+            sql.append(" ,apply_processor = :applyProcessor ");
+        }
+        if(processApplyDTO.getProcessTime() != null){
+            sql.append(" ,process_time = :processTime ");
         }
         if(StringUtils.isNotBlank(processApplyDTO.getProcessType())){
             sql.append(" ,process_type = :processType ");
@@ -399,6 +431,9 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         }
         if (StringUtils.isNotBlank(processApplyDTO.getApplyStatus())){
             sql.append(" ,apply_status = :applyStatus ");
+        }
+        if(StringUtils.isNotBlank(processApplyDTO.getProcessMemo())){
+            sql.append(" ,process_memo = :processMemo ");
         }
         sql.append(" WHERE version_no = :versionNo AND apply_no = :applyNo ");
         updateForBean(sql.toString(), processApplyDTO);
