@@ -240,19 +240,6 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
     }
 
     /**
-     *  入库之后回调事件
-     * @param ba 申请单
-     * @author weijb
-     * @param ba 申请单
-     * @return
-     */
-    @Override
-    public StatusDto platformInstockCallback(BizAllocateApply ba){
-        // 调拨入库之后要更改申请方入库计划状态
-        bizInstockplanDetailDao.updateCompleteStatus(ba.getApplyNo());
-        return StatusDto.buildSuccessStatusDto("操作成功！");
-    }
-    /**
      * 买方入库机构构建
      * @param
      * @exception

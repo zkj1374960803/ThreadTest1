@@ -81,13 +81,15 @@ public interface AllocateApplyService {
     void updateApplyOrderStatus(String applyNo, String status);
 
     /**
-     * 根据申请单状态查询申请单
-     * @param applyNoStatus 申请单状态
+     * 根据类型查询申请单
+     * @param productType 商品类型
+     * @param orgCode 当前登录人机构
+     * @param status 申请单状态
      * @return 状态为等待收货的申请单
      * @author liuduo
      * @date 2018-08-11 12:56:39
      */
-    List<String> queryApplyNo(List<String> status, String orgCode, String productType, Integer stockType);
+    List<String> queryApplyNo(String productType, String orgCode, String status);
     /**
      * 查询可调拨库存列表
      * @param orgDTO 查询条件
@@ -211,6 +213,18 @@ public interface AllocateApplyService {
      * @date 2018-09-11 16:21:56
      */
     StatusDto<List<ProductStockInfoDTO>> checkRepairOrderStock(CheckRepairOrderStockDTO checkRepairOrderStockDTO);
+
+    /**
+     * 根据商品类型查询申请单号
+     * @param productType 商品类型
+     * @param orgCode 机构code
+     * @param status 申请单状态
+     * @return 申请单号
+     * @author liuduo
+     * @date 2018-09-13 14:06:06
+     */
+    List<String> queryOutStockApplyNo(String productType, String orgCode, String status);
+
     /**
      * 保存申请单数据
      * @param processApplyDTO 申请单实体

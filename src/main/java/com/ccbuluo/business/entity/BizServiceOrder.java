@@ -90,6 +90,11 @@ public class BizServiceOrder extends AftersaleCommonEntity{
     @ApiModelProperty(name = "curProcessor", value = "当前负责该任务的员工的uuid")
     private String curProcessor;
     /**
+     * 当前负责人所在机构的编号
+     */
+    @ApiModelProperty(name = "processorOrgno", value = "当前负责人所在机构的编号")
+    private String processorOrgno;
+    /**
      * 负责人所在的机构类型：服务中心(SERVICECENTER)、客户经理(CUSTMANAGER)
      */
     @ApiModelProperty(name = "processorOrgtype", value = "负责人所在的机构类型：服务中心(SERVICECENTER)、客户经理(CUSTMANAGER)")
@@ -364,5 +369,13 @@ public class BizServiceOrder extends AftersaleCommonEntity{
 
     public void setCustomerOrgno(String customerOrgno) {
         this.customerOrgno = customerOrgno;
+    }
+
+    public String getProcessorOrgno() {
+        return processorOrgno;
+    }
+
+    public void setProcessorOrgno(String processorOrgno) {
+        this.processorOrgno = processorOrgno;
     }
 }

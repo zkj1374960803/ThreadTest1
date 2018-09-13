@@ -9,7 +9,7 @@ public enum DocTypeEnum {
 
     APPLY_DOC("申请单"),
     SERVICE_DOC("售后服务单"),
-    UNKNOWN("售后服务单");
+    UNKNOWN("未知");
 
 
     DocTypeEnum(String label){

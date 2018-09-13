@@ -43,8 +43,8 @@ public class OutStockPlanServiceImpl implements OutStockPlanService {
      * @date 2018-08-09 14:38:57
      */
     @Override
-    public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String outRepositoryNo) {
-        return bizOutstockplanDetailDao.queryOutstockplan(applyNo, outRepositoryNo);
+    public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String status, String outRepositoryNo) {
+        return bizOutstockplanDetailDao.queryOutstockplan(applyNo, status, outRepositoryNo);
     }
 
     /**

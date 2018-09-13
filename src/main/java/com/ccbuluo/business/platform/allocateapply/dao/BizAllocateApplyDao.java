@@ -506,33 +506,23 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     }
 
     /**
-     * 根据申请单状态查询申请单
+     * 根据类型查询申请单
+     * @param productType 商品类型
+     * @param orgCode 当前登录人机构
      * @param status 申请单状态
-     * @return 申请单
+     * @return 状态为等待收货的申请单
      * @author liuduo
      * @date 2018-08-11 12:56:39
      */
-    public List<String> queryApplyNo(List<String> status, String orgCode, String productType, Integer stockType) {
+    public List<String> queryApplyNo(String productType, String orgCode, String status) {
         Map<String, Object> params = Maps.newHashMap();
-        params.put("status", status);
         params.put("productType", productType);
-        params.put("stockType", stockType);
         params.put("orgCode", orgCode);
+        params.put("status", status);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT DISTINCT baa.apply_no FROM biz_allocate_apply AS baa LEFT JOIN biz_allocateapply_detail AS bad ON bad.apply_no = baa.apply_no")
-            .append("  WHERE baa.apply_status IN(:status) AND bad.product_type = :productType");
-        // 如果是平台入库、出库
-        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-            sql.append(" AND baa.process_orgno = :orgCode");
-        } else if (stockType == Constants.STATUS_FLAG_ZERO) {
-            // 是机构入库
-            sql.append(" AND baa.instock_orgno = :orgCode");
-        } else {
-            // 是机构出库
-            sql.append(" AND baa.outstock_orgno = :orgCode");
-        }
-        sql.append(" ORDER BY baa.operate_time DESC");
+        sql.append("SELECT DISTINCT bio.trade_docno FROM biz_instock_order AS bio LEFT JOIN biz_instockplan_detail AS bid ON bid.trade_no = bio.trade_docno ")
+            .append("  WHERE bid.complete_status = :status AND bid.product_type = :productType AND bio.instock_orgno = :orgCode");
 
         return querySingColum(String.class, sql.toString(), params);
     }
@@ -705,6 +695,28 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         }
         sql.append(" group by a.equip_code ");
         return queryPageForBean(FindStockListDTO.class, sql.toString(), map, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
+    }
+
+    /**
+     * 根据商品类型查询申请单号
+     * @param productType 商品类型
+     * @param orgCode 机构code
+     * @param status 申请单状态
+     * @return 申请单号
+     * @author liuduo
+     * @date 2018-09-13 14:06:06
+     */
+    public List<String> queryOutStockApplyNo(String productType, String orgCode, String status) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("productType", productType);
+        params.put("orgCode", orgCode);
+        params.put("status", status);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("select DISTINCT boo.trade_docno from biz_outstock_order as boo left join biz_outstockplan_detail as bod on bod.trade_no = boo.trade_docno")
+            .append("  WHERE boo.outstock_orgno = :orgCode AND bod.plan_status = :status AND bod.product_type = :productType");
+
+        return querySingColum(String.class, sql.toString(), params);
     }
 
     /**

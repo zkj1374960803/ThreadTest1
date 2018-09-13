@@ -372,41 +372,6 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         }
         return slist;
     }
-    /**
-     *  入库之后回调事件(换货)
-     * @param ba 申请单
-     * @return
-     */
-    @Transactional(rollbackFor = Exception.class)
-    @Override
-    public StatusDto platformInstockCallback(BizAllocateApply ba){
-        String applyNo = ba.getApplyNo();
-        String applyType = ba.getApplyType();
-        // 根据申请单获取申请单详情
-        List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
-        if(null == details || details.size() == 0){
-            return StatusDto.buildFailureStatusDto("申请单为空！");
-        }
-        //获取卖方机构code
-        String productOrgNo = getProductOrgNo(ba);
-        //查询库存列表
-        List<BizStockDetail> stockDetails = bizStockDetailDao.getStockDetailListByApplyNo(applyNo);
-        if(null == stockDetails || stockDetails.size() == 0){
-            return StatusDto.buildFailureStatusDto("库存列表为空！");
-        }
-        List<BizOutstockplanDetail> outstockplans = buildPlatformOutstockplan(ba, details, stockDetails);
-        // 构建平台出库计划并保存(特殊处理，根据平台的入库计划来构建)
-        convertStockDetail(stockDetails);
-        // 保存占用库存
-        int flag = bizStockDetailDao.batchUpdateStockDetil(stockDetails);
-        // 更新失败
-        if(flag == 0){
-            throw new CommonException("0", "更新占用库存失败！");
-        }
-        // 批量保存出库计划详情
-        bizOutstockplanDetailDao.batchOutstockplanDetail(outstockplans);
-        return StatusDto.buildSuccessStatusDto("出库计划生成成功");
-    }
 
     /**
      *  转换平台的出库计划

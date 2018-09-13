@@ -81,39 +81,6 @@ public class ApplyHandleContext {
     }
 
     /**
-     * 入库之后回调事件
-     *
-     * @param applyNo 申请单code
-     * @return StatusDto
-     * @author weijb
-     * @date 2018-08-18 17:47:52
-     */
-    public StatusDto platformInstockCallback(String applyNo) {
-        // 根据申请单获取申请单详情
-        BizAllocateApply ba = bizAllocateApplyDao.getByNo(applyNo);
-        AllocateApplyTypeEnum typeEnum = AllocateApplyTypeEnum.valueOf(ba.getApplyType());
-        ApplyHandleStrategy handle = null;
-        switch (typeEnum) {
-            case PURCHASE:    // 采购
-                handle = purchaseApplyHandleService;
-                break;
-            case SAMELEVEL:    // 调拨
-                handle = serviceAllocateApplyHandleService;
-                break;
-            case BARTER:    // 商品换货
-                handle = barterApplyHandleStrategy;
-                break;
-            case REFUND:    //  退货
-                handle = refundApplyHandleStrategy;
-                break;
-            default:
-                logger.error(typeEnum.toString() + "出现了未知回调类型！");
-                break;
-        }
-        return handle.platformInstockCallback(ba);
-    }
-
-    /**
      * 根据申请类型获取入库计划类型
      *
      * @param applyType 申请类型
