@@ -54,4 +54,31 @@ public interface PaymentService {
      * @date 2018-09-11 14:02:58
      */
     BizServiceOrder getServiceOrdernoPrice(String serviceOrderno);
+
+    /**
+     *  创建预付款单据（采购）
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-09-12 20:02:58
+     */
+    StatusDto saveCustomerServiceAdvanceCounter(String applyNo);
+
+    /**
+     *  创建退货款单据（问题件退货）
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-09-12 20:02:58
+     */
+    StatusDto saveCustomerServiceRefundCounter(String applyNo);
+
+    /**
+     *  创建索赔单付款单据
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-09-12 20:02:58
+     */
+    StatusDto saveCustomerServiceMarketCounter(String claimOrdno);
 }

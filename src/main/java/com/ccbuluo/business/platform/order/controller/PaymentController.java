@@ -1,17 +1,18 @@
 package com.ccbuluo.business.platform.order.controller;
 
+import com.ccbuluo.business.entity.BizAllocateTradeorder;
 import com.ccbuluo.business.entity.BizServiceOrder;
+import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
+import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.order.service.PaymentService;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
-
 import javax.annotation.Resource;
-import java.math.BigDecimal;
+import java.util.List;
 
 /**
  *  支付功能
@@ -82,5 +83,48 @@ public class PaymentController {
     public StatusDto<BizServiceOrder> getServiceOrdernoPrice(@PathVariable String serviceOrderno){
         BizServiceOrder serviceOrder = paymentService.getServiceOrdernoPrice(serviceOrderno);
         return StatusDto.buildDataSuccessStatusDto(serviceOrder);
+    }
+
+    /**
+     *  创建预付款单据（采购）
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-09-12 20:02:58
+     */
+    @ApiOperation(value = "创建预付款单据（平台采购）", notes = "【魏俊标】")
+    @GetMapping("/savecustomerserviceadvancecounter/{applyNo}")
+    @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
+    public StatusDto<String> saveCustomerServiceAdvanceCounter(@PathVariable String applyNo){
+        return paymentService.saveCustomerServiceAdvanceCounter(applyNo);
+    }
+
+    /**
+     *  创建退货款单据（问题件退货）
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-09-12 20:02:58
+     */
+    @ApiOperation(value = "创建退货款单据（问题件退货）", notes = "【魏俊标】")
+    @GetMapping("/savecustomerservicerefundcounter/{applyNo}")
+    @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
+    public StatusDto<String> saveCustomerServiceRefundCounter(@PathVariable String applyNo){
+        return paymentService.saveCustomerServiceRefundCounter(applyNo);
+    }
+
+    /**
+     *  创建索赔单付款单据
+     * @param claimOrdno 索赔单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-09-12 20:02:58
+     */
+    @ApiOperation(value = "创建预付款单据", notes = "【魏俊标】")
+    @GetMapping("/savecustomerservicemarketcounter/{serviceOrderno}")
+    @ApiImplicitParam(name = "claimOrdno", value = "申请单号", required = true, paramType = "path")
+    public StatusDto<String> saveCustomerServiceMarketCounter(@PathVariable String claimOrdno){
+        // TODO 索赔单也可能有多个
+        return paymentService.saveCustomerServiceMarketCounter(claimOrdno);
     }
 }
