@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.order.service.typeassert;
 import com.ccbuluo.business.constants.DocTypeEnum;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -16,6 +17,7 @@ public class OrderTypeAsserterContext {
 
     public OrderTypeAsserterContext(){
         // todo 魏俊标 增加售后服务单类型的asserter
+        asserterChain = new HashMap<>();
         asserterChain.put(DocTypeEnum.APPLY_DOC, new ApplyOrderTypeAsserter());
     }
 
