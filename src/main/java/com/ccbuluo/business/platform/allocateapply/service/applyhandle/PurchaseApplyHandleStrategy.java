@@ -66,13 +66,9 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
             if(null == details || details.size() == 0){
                 throw new CommonException("0", "申请单为空！");
             }
-            // 构建生成订单（采购）
-            List<BizAllocateTradeorder> list = buildOrderEntityList(details);
             // 构建平台入库计划并保存
             List<BizInstockplanDetail> instockplans = buildOutAndInstockplanDetail(details);
             bizInstockplanDetailDao.batchInsertInstockplanDetail(instockplans);
-            // 保存生成订单
-            bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
         } catch (Exception e) {
             logger.error("提交失败！", e);
             throw e;
@@ -170,7 +166,7 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
       * @author weijb
       * @date 2018-08-11 13:35:41
       */
-    private List<BizAllocateTradeorder> buildOrderEntityList(List<AllocateapplyDetailBO> details){
+    public List<BizAllocateTradeorder> buildOrderEntityList(List<AllocateapplyDetailBO> details){
         List<BizAllocateTradeorder> list = new ArrayList<BizAllocateTradeorder>();
         // 构建生成订单(平台到供应商)
         BizAllocateTradeorder platformToSeller = buildOrderEntity(details);

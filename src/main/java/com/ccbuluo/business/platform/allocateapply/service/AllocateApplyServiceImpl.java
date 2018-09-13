@@ -2,18 +2,16 @@ package com.ccbuluo.business.platform.allocateapply.service;
 
 import com.ccbuluo.business.constants.*;
 import com.ccbuluo.business.custmanager.allocateapply.dto.QueryPendingMaterialsDTO;
-import com.ccbuluo.business.entity.BizAllocateApply;
+import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.entity.BizAllocateApply.AllocateApplyTypeEnum;
 import com.ccbuluo.business.entity.BizAllocateApply.ApplyStatusEnum;
-import com.ccbuluo.business.entity.BizInstockplanDetail;
-import com.ccbuluo.business.entity.BizServiceorderDetail;
-import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleContext;
+import com.ccbuluo.business.platform.allocateapply.service.applyhandle.PurchaseApplyHandleStrategy;
 import com.ccbuluo.business.platform.claimorder.dao.ClaimOrderDao;
 import com.ccbuluo.business.platform.claimorder.service.ClaimOrderService;
 import com.ccbuluo.business.platform.custmanager.dao.BizServiceCustmanagerDao;
@@ -21,6 +19,7 @@ import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.instock.service.InstockOrderService;
+import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.order.dto.ProductDetailDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
@@ -93,6 +92,10 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     private InstockOrderService instockOrderService;
     @Resource
     private BizInstockplanDetailDao bizInstockplanDetailDao;
+    @Resource
+    private PurchaseApplyHandleStrategy purchaseApplyHandleStrategy;
+    @Autowired
+    private BizAllocateTradeorderDao bizAllocateTradeorderDao;
 
     /**
      * 创建物料或者零配件申请
@@ -296,7 +299,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         List<String> orgCodes = getOrgCodesByOrgType(orgType);
         // 查询分页的申请列表
         // 如果类型是空的话，全部类型，查询所有的申请数据
-        Page<QueryAllocateApplyListDTO> page;
+        Page<QueryAllocateApplyListDTO> page = new Page<>();
         if(StringUtils.isBlank(orgType)){
             // 查询分页的处理申请列表
             page = bizAllocateApplyDao.findApplyList(productType,orgCodes, processType, applyStatus, applyNo, offset, pageSize, userOrgCode);
@@ -311,8 +314,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         }
         // 查询机构的名称
         Optional.ofNullable(page.getRows()).ifPresent(a ->{
-            List<String> outstockOrgno = a.stream().map(QueryAllocateApplyListDTO::getOutstockOrgno).collect(Collectors.toList());
-            List<String> instockOrgno = a.stream().map(QueryAllocateApplyListDTO::getInstockOrgno).collect(Collectors.toList());
+            List<String> outstockOrgno = a.stream().filter(b -> b.getOutstockOrgno() != null).map(QueryAllocateApplyListDTO::getOutstockOrgno).collect(Collectors.toList());
+            List<String> instockOrgno = a.stream().filter(b -> b.getInstockOrgno() != null).map(QueryAllocateApplyListDTO::getInstockOrgno).collect(Collectors.toList());
             Map<String, BasicUserOrganization> outOrganizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(outstockOrgno);
             Map<String, BasicUserOrganization> inOrganizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(instockOrgno);
             a.stream().forEach(b ->{
@@ -545,6 +548,42 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         allocateApplyDTO.setAllocateapplyDetailList(allocateapplyDetailList);
         // 保存申请单详情数据
         batchInsertForapplyDetailList(allocateApplyDTO, loggedUserId, allocateApplyDTO.getProcessType());
+    }
+
+    /**
+     * 采购单填报价格（确认报价）
+     *
+     * @param confirmationQuoteDTO 报价DTO
+     * @author zhangkangjian
+     * @date 2018-09-13 15:45:47
+     */
+    @Override
+    public void confirmationQuote(ConfirmationQuoteDTO confirmationQuoteDTO) {
+        List<BizAllocateTradeorder> list = Lists.newArrayList();
+        // 批量更新采购申请详单的价格
+        List<PurchaseProductInfo> purchaseProductInfo = confirmationQuoteDTO.getPurchaseProductInfo();
+        bizAllocateApplyDao.batchupdatePurchaseProductInfo(purchaseProductInfo);
+        List<PerpayAmountDTO> perpayAmountDTO = confirmationQuoteDTO.getPerpayAmountDTO();
+        String applyNo = confirmationQuoteDTO.getApplyNo();
+
+        // 根据申请单获取申请单详情
+        List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
+        if(null == details || details.size() == 0){
+            throw new CommonException("0", "申请单为空！");
+        }
+        Map<String, List<AllocateapplyDetailBO>> allocateapplyDetailBOMap = details.stream().collect(Collectors.groupingBy(AllocateapplyDetailBO::getSupplierNo));
+        Map<String, PerpayAmountDTO> perpayAmountDTOMap = perpayAmountDTO.stream().collect(Collectors.toMap(PerpayAmountDTO::getSupplierCode, a -> a,(k1,k2)->k1));
+        allocateapplyDetailBOMap.forEach((key, value) -> {
+            PerpayAmountDTO perpayAmountDTO1 = perpayAmountDTOMap.get(key);
+            List<BizAllocateTradeorder> bizAllocateTradeorderList = purchaseApplyHandleStrategy.buildOrderEntityList(value);
+            BizAllocateTradeorder bizAllocateTradeorder = list.get(0);
+            bizAllocateTradeorder.setPerpayAmount(perpayAmountDTO1.getPerpayAmount());
+            list.addAll(bizAllocateTradeorderList);
+        });
+        // 保存生成订单
+        bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
+        // 生成出入库计划
+        applyHandleContext.applyHandle(confirmationQuoteDTO.getApplyNo());
     }
 
     /**

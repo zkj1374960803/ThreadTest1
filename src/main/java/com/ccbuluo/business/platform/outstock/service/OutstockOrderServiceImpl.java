@@ -89,15 +89,6 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     public StatusDto<String> autoSaveOutstockOrder(String applyNo, List<BizOutstockplanDetail> bizOutstockplanDetailList, String applyNoType) {
         try {
             Map<String, List<BizOutstockplanDetail>> collect = bizOutstockplanDetailList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getOutRepositoryNo));
-            // 根据申请单号查询基本信息
-            FindAllocateApplyDTO detail = new FindAllocateApplyDTO();
-            BizServiceOrder bizServiceOrde = new BizServiceOrder();
-            if (applyNoType.equals(ApplyTypeEnum.APPLYORDER.name())) {
-                detail = allocateApplyService.findDetail(applyNo);
-            } else {
-                bizServiceOrde = bizServiceOrderDao.getByOrderNo(applyNo);
-            }
-
             List<BizOutstockorderDetail> bizOutstockorderDetailList = Lists.newArrayList();
             Date date = new Date();
             for (String outRepositoryNo : collect.keySet()) {
@@ -114,11 +105,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 BizOutstockOrder bizOutstockOrder = new BizOutstockOrder();
                 bizOutstockOrder.setOutstockorderNo(outstockNo);
                 bizOutstockOrder.setOutRepositoryNo(outRepositoryNo);
-                if (applyNoType.equals(ApplyTypeEnum.APPLYORDER.name())) {
-                    bizOutstockOrder.setOutstockOrgno(detail.getOutstockOrgno());
-                } else {
-                    bizOutstockOrder.setOutstockOrgno(bizServiceOrde.getReportOrgno());
-                }
+                bizOutstockOrder.setOutstockOrgno(bizOutstockplanDetail.getOutOrgno());
                 bizOutstockOrder.setOutstockOperator(userHolder.getLoggedUserId());
                 bizOutstockOrder.setTradeDocno(applyNo);
                 bizOutstockOrder.setOutstockType(bizOutstockplanDetail.getOutstockType());
@@ -158,13 +145,13 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 // 4、更新出库计划中的实际出库数量
                 updateActualOutstocknum(bizOutstockorderDetailList1);
                 // 5、更新出库计划中的状态和完成时间
-                List<BizOutstockplanDetail> bizOutstockplanDetailList2 = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
+                List<BizOutstockplanDetail> bizOutstockplanDetailList2 = outStockPlanService.queryOutstockplan(applyNo, StockPlanStatusEnum.DOING.toString(), outRepositoryNo);
                 updatePlanStatus(bizOutstockplanDetailList2);
                 // 6、更改申请单状态
-                if (applyNoType.equals(ApplyTypeEnum.APPLYORDER.name())) {
-                    List<BizOutstockplanDetail> bizOutstockplanDetailList3 = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
-                    updateApplyOrderStatus(applyNo, detail, bizOutstockplanDetailList3);
-                }
+//                if (applyNoType.equals(ApplyTypeEnum.APPLYORDER.name())) {
+//                    List<BizOutstockplanDetail> bizOutstockplanDetailList3 = outStockPlanService.queryOutstockplan(applyNo, StockPlanStatusEnum.DOING.toString(), outRepositoryNo);
+//                    updateApplyOrderStatus(applyNo, bizOutstockplanDetailList3);
+//                }
             }
             return StatusDto.buildSuccessStatusDto("保存成功！");
         } catch (Exception e) {
@@ -200,15 +187,9 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
             // 1、保存出库单
             // 根据申请单号查询基本信息
             FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
-            if (!(detail.getApplyStatus().equals(ApplyStatusEnum.WAITDELIVERY.name())
-                || detail.getApplyStatus().equals(ApplyStatusEnum.OUTSTORE.name())
-                || detail.getApplyStatus().equals(BizAllocateApply.ReturnApplyStatusEnum.WAITINGREFUND.name())
-                || detail.getApplyStatus().equals(BizAllocateApply.ReturnApplyStatusEnum.PLATFORMOUTBOUND.name()))) {
-                throw new CommonException("2004", "该申请单已经出库，请核对！");
-            }
             // 查询出库计划
-            List<BizOutstockplanDetail> bizOutstockplanDetailList = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
-            int outstockorderStatus = saveOutstockOrder(outstockNo, applyNo, transportorderNo, detail, outRepositoryNo);
+            List<BizOutstockplanDetail> bizOutstockplanDetailList = outStockPlanService.queryOutstockplan(applyNo, StockPlanStatusEnum.DOING.toString(), outRepositoryNo);
+            int outstockorderStatus = saveOutstockOrder(outstockNo, applyNo, transportorderNo, bizOutstockplanDetailList.get(0).getOutstockType(), outRepositoryNo);
             if (outstockorderStatus == Constants.FAILURESTATUS) {
                 throw new CommonException("2001", "生成出库单失败！");
             }
@@ -218,7 +199,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 throw new CommonException("2002", "保存出库单详单失败！");
             }
             // 复核库存和计划
-            checkStockAndPlan(applyNo, outRepositoryNo, outstockNo, detail, bizOutstockplanDetailList);
+            checkStockAndPlan(applyNo, outRepositoryNo, outstockNo, bizOutstockplanDetailList);
             return StatusDto.buildSuccessStatusDto("保存成功！");
         } catch (Exception e) {
             logger.error("生成出库单失败！", e.getMessage());
@@ -232,12 +213,11 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      * @param applyNo                   申请单号
      * @param outRepositoryNo           出库仓库编号
      * @param outstockNo                出库单编号
-     * @param detail                    申请单详情
      * @param bizOutstockplanDetailList 出库计划集合
      * @author liuduo
      * @date 2018-08-20 13:57:35
      */
-    private void checkStockAndPlan(String applyNo, String outRepositoryNo, String outstockNo, FindAllocateApplyDTO detail, List<BizOutstockplanDetail> bizOutstockplanDetailList) {
+    private void checkStockAndPlan(String applyNo, String outRepositoryNo, String outstockNo, List<BizOutstockplanDetail> bizOutstockplanDetailList) {
         // 3、修改库存明细
         // 根据出库单号查询出库单详单
         List<BizOutstockorderDetail> bizOutstockorderDetailList1 = outstockorderDetailService.queryByApplyNo(outstockNo);
@@ -245,11 +225,11 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         // 4、更新出库计划中的实际出库数量
         updateActualOutstocknum(bizOutstockorderDetailList1);
         // 5、更新出库计划中的状态和完成时间
-        List<BizOutstockplanDetail> bizOutstockplanDetailList2 = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
+        List<BizOutstockplanDetail> bizOutstockplanDetailList2 = outStockPlanService.queryOutstockplan(applyNo, StockPlanStatusEnum.DOING.toString(), outRepositoryNo);
         updatePlanStatus(bizOutstockplanDetailList2);
         // 6、更改申请单状态
-        List<BizOutstockplanDetail> bizOutstockplanDetailList3 = outStockPlanService.queryOutstockplan(applyNo, outRepositoryNo);
-        updateApplyOrderStatus(applyNo, detail, bizOutstockplanDetailList3);
+//        List<BizOutstockplanDetail> bizOutstockplanDetailList3 = outStockPlanService.queryOutstockplan(applyNo, StockPlanStatusEnum.DOING.toString(), outRepositoryNo);
+//        updateApplyOrderStatus(applyNo, bizOutstockplanDetailList3);
         // 7、更新出库单的复核状态
         bizOutstockOrderDao.updateChecked(outstockNo, Constants.FLAG_ONE, new Date());
     }
@@ -274,11 +254,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 switch (Enum.valueOf(BizAllocateApply.AllocateApplyTypeEnum.class, applyType)) {
                     case PLATFORMALLOCATE:
                     case PURCHASE:
-                        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-                            allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.WAITINGRECEIPT.toString());
-                        } else {
-                            allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.INSTORE.toString());
-                        }
+                        allocateApplyService.updateApplyOrderStatus(applyNo, ApplyStatusEnum.WAITINGRECEIPT.toString());
                         break;
                     case DIRECTALLOCATE:
                     case SAMELEVEL:
@@ -307,22 +283,14 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
 
     /**
      * 查询等待发货的申请单
-     *
+     * @param productType 商品类型
      * @return 申请单号
      * @author liuduo
      * @date 2018-08-11 12:53:03
      */
     @Override
     public List<String> queryApplyNo(String productType) {
-        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
-        List<String> status = Lists.newArrayList();
-        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-            status.add(ApplyStatusEnum.OUTSTORE.name());
-            status.add(BizAllocateApply.ReturnApplyStatusEnum.PLATFORMOUTBOUND.name());
-            return allocateApplyService.queryApplyNo(status, orgCode, productType, Constants.STATUS_FLAG_ONE);
-        }
-        status.add(ApplyStatusEnum.WAITDELIVERY.name());
-        return allocateApplyService.queryApplyNo(status, orgCode, productType, Constants.STATUS_FLAG_ONE);
+        return allocateApplyService.queryOutStockApplyNo(productType, userHolder.getLoggedUser().getOrganization().getOrgCode(), StockPlanStatusEnum.DOING.toString());
     }
 
     /**
@@ -554,12 +522,13 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      *
      * @param applyNo          申请单号
      * @param transportorderNo 物流号
-     * @param detail           申请单信息
+     * @param outStockType           申请单类型
+     * @param outRepositoryNo           出库仓库
      * @return
      * @author liuduo
      * @date 2018-08-09 14:57:11
      */
-    private int saveOutstockOrder(String outstockNo, String applyNo, String transportorderNo, FindAllocateApplyDTO detail, String outRepositoryNo) {
+    private int saveOutstockOrder(String outstockNo, String applyNo, String transportorderNo, String outStockType, String outRepositoryNo) {
         BizOutstockOrder bizOutstockOrder = new BizOutstockOrder();
         Date date = new Date();
         bizOutstockOrder.setOutstockorderNo(outstockNo);
@@ -569,7 +538,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         bizOutstockOrder.setOutstockOrgno(orgCodeByStoreHouseCode);
         bizOutstockOrder.setOutstockOperator(userHolder.getLoggedUserId());
         bizOutstockOrder.setTradeDocno(applyNo);
-        bizOutstockOrder.setOutstockType(applyHandleContext.getOutstockType(detail.getApplyType()));
+        bizOutstockOrder.setOutstockType(applyHandleContext.getOutstockType(outStockType));
         bizOutstockOrder.setOutstockTime(date);
         bizOutstockOrder.setTransportorderNo(transportorderNo);
         bizOutstockOrder.setChecked(Constants.LONG_FLAG_ZERO);
