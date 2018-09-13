@@ -287,4 +287,23 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
 
         return findForObject(sql, map, Boolean.class);
     }
+
+    /**
+     * 获取供应商详情
+     * @param supplierCode  供应商code
+     * @return ResultSupplierListDTO 供应商详情
+     * @author zhangkangjian
+     * @date 2018-07-03 09:14:06
+     */
+    public ResultFindSupplierDetailDTO getByCode(String supplierCode) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,supplier_code,supplier_name,linkman,supplier_phone,")
+                .append("supplier_address,supplier_status,supplier_nature,establish_time,")
+                .append("province_name,province_code,city_name,city_code,area_name,area_code,")
+                .append("major_product ")
+                .append(" FROM biz_service_supplier WHERE supplier_code = :supplierCode");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("supplierCode", supplierCode);
+        return super.findForBean(ResultFindSupplierDetailDTO.class, sql.toString(), params);
+    }
 }

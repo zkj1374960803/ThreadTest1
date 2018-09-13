@@ -514,7 +514,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
                     orgNo = userHolder.getLoggedUser().getOrganization().getOrgCode();
                 }
                 List<BizStockDetail> stockDetailByOrder = bizStockDetailDao.getStockDetailByOrder(saveMerchandiseDTO.getProductNo(), orgNo);
-                long count = stockDetailByOrder.stream().map(BizStockDetail::getValidStock).count();
+                long count = stockDetailByOrder.stream().collect(Collectors.summarizingLong(BizStockDetail::getValidStock)).getSum();
                 if (saveMerchandiseDTO.getAmount() > count) {
                     throw new CommonException("3008", "现有库存小于使用库存，请核对！");
                 }
@@ -824,23 +824,23 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     private void buildOutstockplanAndOut(String orderNo){
         // 查询服务单详情
         List<BizServiceorderDetail> orderDetails = bizServiceorderDetailDao.queryServiceorderDetailList(orderNo);
-        if(null == orderDetails || orderDetails.size() == 0){
-            return;
+        // 有可能只有工时没有使用零配件
+        if(null != orderDetails && orderDetails.size() != 0){
+            List<String> codeList = getProductList(orderDetails);
+            String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+            // 根据卖方code和商品code（list）查出库存列表
+            List<BizStockDetail> stockDetails = bizStockDetailDao.getStockDetailListByOrgAndProduct(orgCode, codeList);
+            // 查询占用关系
+            List<RelOrdstockOccupy> relOrdstockOccupies = bizAllocateTradeorderDao.getRelOrdstockOccupyByApplyNo(orderNo);
+            // 生成出库计划
+            List<BizOutstockplanDetail> outStpcks = buildOutstockplan(orderDetails, stockDetails, relOrdstockOccupies);
+            // 批量保存出库计划详情
+            bizOutstockplanDetailDao.batchOutstockplanDetail(outStpcks);
+            // 查询出库计划
+            List<BizOutstockplanDetail> outstockPlans = bizOutstockplanDetailDao.getOutstockplansByApplyNo(orderNo,orgCode);
+            // 调用自动出库
+            outstockOrderService.autoSaveOutstockOrder(orderNo, outstockPlans,ApplyTypeEnum.SERVICEORDER.name());
         }
-        List<String> codeList = getProductList(orderDetails);
-        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
-        // 根据卖方code和商品code（list）查出库存列表
-        List<BizStockDetail> stockDetails = bizStockDetailDao.getStockDetailListByOrgAndProduct(orgCode, codeList);
-        // 查询占用关系
-        List<RelOrdstockOccupy> relOrdstockOccupies = bizAllocateTradeorderDao.getRelOrdstockOccupyByApplyNo(orderNo);
-        // 生成出库计划
-        List<BizOutstockplanDetail> outStpcks = buildOutstockplan(orderDetails, stockDetails, relOrdstockOccupies);
-        // 批量保存出库计划详情
-        bizOutstockplanDetailDao.batchOutstockplanDetail(outStpcks);
-        // 查询出库计划
-        List<BizOutstockplanDetail> outstockPlans = bizOutstockplanDetailDao.getOutstockplansByApplyNo(orderNo,orgCode);
-        // 调用自动出库
-        outstockOrderService.autoSaveOutstockOrder(orderNo, outstockPlans,ApplyTypeEnum.SERVICEORDER.name());
     }
 
     /**

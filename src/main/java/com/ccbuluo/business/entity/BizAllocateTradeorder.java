@@ -100,6 +100,12 @@ public class BizAllocateTradeorder {
     @ApiModelProperty(name = "tradeType", value = "交易类型（采购或是调拨）")
     private String tradeType;
 
+    /**
+     *  预付款金额
+     */
+    @ApiModelProperty(name = "perpayAmount", value = "预付款金额")
+    private BigDecimal perpayAmount;
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -234,5 +240,13 @@ public class BizAllocateTradeorder {
 
     public void setTradeType(String tradeType) {
         this.tradeType = tradeType;
+    }
+
+    public BigDecimal getPerpayAmount() {
+        return perpayAmount;
+    }
+
+    public void setPerpayAmount(BigDecimal perpayAmount) {
+        this.perpayAmount = perpayAmount;
     }
 }

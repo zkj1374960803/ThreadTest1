@@ -22,13 +22,19 @@ import com.ccbuluo.business.platform.order.dao.BizServiceorderDetailDao;
 import com.ccbuluo.business.platform.servicelog.service.ServiceLogService;
 import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
+import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
+import com.ccbuluo.business.platform.supplier.dto.ResultFindSupplierDetailDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftBean;
+import com.ccbuluo.http.StatusDtoThriftList;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
+import com.ccbuluo.supplier.dto.BizFinancePaymentbills;
+import com.ccbuluo.supplier.dto.BizFinanceReceipt;
+import com.ccbuluo.supplier.service.BizFinancePaymentbillsService;
 import com.ccbuluo.usercoreintf.dto.OrgWorkplaceDTO;
 import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
@@ -69,12 +75,14 @@ public class PaymentServiceImpl implements PaymentService {
     private UserHolder userHolder;
     @Autowired
     private ServiceLogService serviceLogService;
-    @ThriftRPCClient("UserCoreSerService")
-    private BasicUserOrganizationService basicUserOrganizationService;
-//    @ThriftRPCClient("UserCoreSerService")
+    @ThriftRPCClient("BasicWalletpaymentSerService8")
     private BizFinanceAccountService bizFinanceAccountService;
     @Resource
     private BizInstockplanDetailDao bizInstockplanDetailDao;
+    @ThriftRPCClient("BasicWalletpaymentSerService8")
+    private BizFinancePaymentbillsService bizFinancePaymentbillsService;
+    @Autowired
+    private BizServiceSupplierDao bizServiceSupplierDao;
 
     /**
      *  支付完成调用接口
@@ -112,7 +120,7 @@ public class PaymentServiceImpl implements PaymentService {
             // 构建申请单
             List<AccountTransactionDTO> payments = buildApplyPayment(ba,sellTotal,productType);
             // 支付
-            StatusDto statusDto = StatusDto.buildSuccessStatusDto("支付成功！");// TODO bizFinanceAccountService.makeTrading(payments);
+            StatusDto statusDto = bizFinanceAccountService.makeTrading(payments);
             // 如果支付成功
             if(statusDto.isSuccess()){
                 //更新申请单状态
@@ -215,7 +223,7 @@ public class PaymentServiceImpl implements PaymentService {
         List<Pair<String,BigDecimal>> list = getRreceiveInfo(serviceOrderno);
         // 构建申请单
         List<AccountTransactionDTO> payments = buildOrderPayment(list,payerOrgno,serviceOrderno);
-        StatusDto statusDto = StatusDto.buildSuccessStatusDto("支付成功！");// TODO bizFinanceAccountService.makeTrading(payments);
+        StatusDto statusDto = bizFinanceAccountService.makeTrading(payments);
         // 如果支付失败
         if(! statusDto.isSuccess()){
             return statusDto;
@@ -348,8 +356,14 @@ public class PaymentServiceImpl implements PaymentService {
         String receiveOrgno = ba.getOutstockOrgno();//卖出方(接收方)
         TransactionTypeEnumThrift transactionTypeEnum = null;
         List<AccountTransactionDTO> list = new ArrayList<AccountTransactionDTO>();
+        // 付款方
         AccountTransactionDTO accountPayer = buildAccountTransactionDTO(payerOrgno,ba.getApplyNo());
+        // 收款方
         AccountTransactionDTO accountReceive = buildAccountTransactionDTO(receiveOrgno,ba.getApplyNo());
+        // 付款
+        accountPayer.setAmount(0 - sellTotal.doubleValue());
+        // 收款
+        accountReceive.setAmount(sellTotal.doubleValue());
         // 采购
         if(BizAllocateApply.AllocateApplyTypeEnum.PURCHASE.toString().equals(ba.getApplyType())){
             // 零配件
@@ -364,6 +378,8 @@ public class PaymentServiceImpl implements PaymentService {
             }
             // 采购的支付方是平台
             accountPayer.setOrganizationCode(Constants.AFTER_SALE_PLATFORM);
+            // 采购没有收款
+            accountReceive = null;
         }
         // 调拨
         if(BizAllocateApply.AllocateApplyTypeEnum.SAMELEVEL.toString().equals(ba.getApplyType())){
@@ -391,15 +407,11 @@ public class PaymentServiceImpl implements PaymentService {
             // 退货的支付方是平台
             accountPayer.setOrganizationCode(Constants.AFTER_SALE_PLATFORM);
         }
-        // 付款
-        accountPayer.setAmount(0 - sellTotal.doubleValue());
-        // 收款
-        accountPayer.setAmount(sellTotal.doubleValue());
         // 过滤
-        if(StringUtils.isNotBlank(payerOrgno)){
+        if(null != accountPayer){
             list.add(accountPayer);
         }
-        if(StringUtils.isNotBlank(receiveOrgno)){
+        if(null != accountReceive){
             list.add(accountReceive);
         }
         return list;
@@ -422,6 +434,132 @@ public class PaymentServiceImpl implements PaymentService {
         transaction.setAccountTypeEnumThrift(AccountTypeEnumThrift.SMALL_CHANGE);
         // 业务单号
         transaction.setBusinessSourceDocumentNumber(applyNo);
+        // 操作人
+        transaction.setCreator(userHolder.getLoggedUser().getUserId());
         return transaction;
+    }
+
+    /**
+     *  创建预付款单据（采购）
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-09-12 20:02:58
+     */
+    @Override
+    public StatusDto saveCustomerServiceAdvanceCounter(String applyNo){
+        List<BizFinancePaymentbills> paymentbills = buildPaymentbills(applyNo);
+        try {
+            StatusDtoThriftList<BizFinancePaymentbills> bizFinancePaymentbillsStatusDtoThriftList = bizFinancePaymentbillsService.saveCustomerServiceAdvanceCounterList(paymentbills);
+            if(bizFinancePaymentbillsStatusDtoThriftList.isSuccess()){
+                return StatusDto.buildSuccessStatusDto("保存成功！");
+            }else{
+                return StatusDto.buildFailure("保存失败！");
+            }
+        } catch (Exception e) {
+            return StatusDto.buildFailure("保存失败！");
+        }
+    }
+    /**
+     *  构建单据
+     * @param applyNo 申请单编号
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-09-13 11:22:25
+     */
+    private List<BizFinancePaymentbills> buildPaymentbills(String applyNo){
+        // 根据申请单获取交易单（一个供应商就是一条记录）
+        List<BizAllocateTradeorder> tradeorders = bizAllocateTradeorderDao.getAllocateTradeorderByApplyNo(applyNo);
+        // 根据申请单获取申请单详情
+        List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
+        if(null == details || details.size() == 0){
+            throw new CommonException("0", "无效的申请单！");
+        }
+        // 商品类型
+        String productType = details.get(0).getProductType();
+        List<BizFinancePaymentbills> paymentbills = new ArrayList<BizFinancePaymentbills>();
+        for(BizAllocateTradeorder tradeorder : tradeorders){
+            BizFinancePaymentbills bill = new BizFinancePaymentbills();
+            bill.setBillsDate(System.currentTimeMillis());
+            // 卖方机构（供应商编号）
+            bill.setSupplierCode(tradeorder.getSellerOrgno());
+            bill.setSupplierName(getSupplierName(tradeorder.getSellerOrgno()));
+            // 零配件
+            if(Constants.PRODUCT_TYPE_FITTINGS.equals(productType)){
+                // 付款
+                bill.setBusinessType(TransactionTypeEnumThrift.SPAREPARTS_EXTERNAL_PURCHASE_PAYMENT.name());
+            }
+            // 物料
+            if(Constants.PRODUCT_TYPE_EQUIPMENT.equals(productType)){
+                // 付款
+                bill.setBusinessType(TransactionTypeEnumThrift.MATERIAL_EXTERNAL_PURCHASE_PAYMENT.name());
+            }
+            List<BizFinanceReceipt> receipts = new ArrayList<BizFinanceReceipt>();
+            BizFinanceReceipt receipt = new BizFinanceReceipt();
+            // 预付款
+            receipt.setMoney(tradeorder.getPerpayAmount().doubleValue());
+            receipt.setCreateTime(System.currentTimeMillis());
+            receipt.setCreator(userHolder.getLoggedUser().getUserId());
+            receipt.setReceiptCode(applyNo);
+            receipt.setReceiptType("备件采购申请单");
+            receipts.add(receipt);
+            bill.setBizFinanceReceiptList(receipts);
+        }
+        return paymentbills;
+    }
+
+    /**
+     *  创建退货款单据（问题件退货）
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-09-12 20:02:58
+     */
+    @Override
+    public StatusDto saveCustomerServiceRefundCounter(String applyNo){
+        List<BizFinancePaymentbills> paymentbills = buildPaymentbills(applyNo);
+        try {
+            StatusDtoThriftList<BizFinancePaymentbills> bizFinancePaymentbillsStatusDtoThriftList = bizFinancePaymentbillsService.saveCustomerServiceAdvanceCounterList(paymentbills);
+            if(bizFinancePaymentbillsStatusDtoThriftList.isSuccess()){
+                return StatusDto.buildSuccessStatusDto("保存成功！");
+            }else{
+                return StatusDto.buildFailure("保存失败！");
+            }
+        } catch (Exception e) {
+            return StatusDto.buildFailure("保存失败！");
+        }
+    }
+
+    /**
+     *  创建索赔单付款单据
+     * @param claimOrdno 索赔单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-09-12 20:02:58
+     */
+    @Override
+    public StatusDto saveCustomerServiceMarketCounter(String claimOrdno){
+        List<BizFinancePaymentbills> paymentbills = buildPaymentbills(claimOrdno);
+        try {
+            StatusDtoThriftList<BizFinancePaymentbills> bizFinancePaymentbillsStatusDtoThriftList = bizFinancePaymentbillsService.saveCustomerServiceAdvanceCounterList(paymentbills);
+            if(bizFinancePaymentbillsStatusDtoThriftList.isSuccess()){
+                return StatusDto.buildSuccessStatusDto("保存成功！");
+            }else{
+                return StatusDto.buildFailure("保存失败！");
+            }
+        } catch (Exception e) {
+            return StatusDto.buildFailure("保存失败！");
+        }
+    }
+
+    private String getSupplierName(String supplierCode){
+        // 供应商名称
+        String supplierName = "";
+        ResultFindSupplierDetailDTO supplier = bizServiceSupplierDao.getByCode(supplierCode);
+        if(null != supplier){
+            supplierName = supplier.getSupplierName();
+        }
+        return supplierName;
     }
 }
