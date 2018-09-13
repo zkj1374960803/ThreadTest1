@@ -104,17 +104,6 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
     }
 
     /**
-     *  入库之后回调事件
-     * @param ba 申请单
-     * @return
-     */
-    @Override
-    public StatusDto platformInstockCallback(BizAllocateApply ba){
-        // 采购没有回调
-        return StatusDto.buildSuccessStatusDto("操作成功！");
-    }
-
-    /**
      *  构建出库和入库计划并保存
      * @param details 申请单详情
      * @author weijb

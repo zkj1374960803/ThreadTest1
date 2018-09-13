@@ -16,9 +16,9 @@ public class OrderTypeAsserterContext {
     private Map<DocTypeEnum, OrderTypeAsserter> asserterChain;
 
     public OrderTypeAsserterContext(){
-        // todo 魏俊标 增加售后服务单类型的asserter
-        asserterChain = new HashMap<>();
+        asserterChain = new HashMap<DocTypeEnum, OrderTypeAsserter>();
         asserterChain.put(DocTypeEnum.APPLY_DOC, new ApplyOrderTypeAsserter());
+        asserterChain.put(DocTypeEnum.SERVICE_DOC, new ServiceOrderTypeAsserter());
     }
 
     /**

@@ -1,5 +1,7 @@
 package com.ccbuluo.business.platform.order.service.typeassert;
 
+import com.ccbuluo.business.entity.BizAllocateApply;
+import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +13,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class ApplyOrderTypeAsserter implements OrderTypeAsserter{
 
-    // todo 魏俊标 注入申请单实体Dao实例
+    @Autowired
+    private BizAllocateApplyDao bizAllocateApplyDao;
 
     @Override
-    public boolean orderTypeMatched(String docNo) {
-        return false;
+    public boolean orderTypeMatched(String applyNo) {
+        // 根据申请单获取申请单详情
+        BizAllocateApply apply = bizAllocateApplyDao.getByNo(applyNo);
+        if(null == apply){
+            return false;
+        }else {
+            return true;
+        }
     }
 }
