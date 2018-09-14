@@ -461,7 +461,7 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
         if (statusFlagZero == Constants.STATUS_FLAG_ZERO) {
             sql.append(" AND store_code = orgCode AND store_assigned = :storeAssigned");
         } else {
-            sql.append(" AND cusmanager_uuid = :orgCode");
+            sql.append(" AND cusmanager_uuid = :orgCode AND store_assigned = :storeAssigned");
         }
         sql.append(" AND delete_flag = :deleteFlag");
 
