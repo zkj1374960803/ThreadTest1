@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import redis.clients.jedis.JedisCluster;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Random;
 
@@ -183,6 +184,10 @@ public class GenerateProjectCodeService {
                 parkNum = Integer.parseInt(code);
             }
             String format = String.format("%0"+autoIncreasedcodeSize+"d", parkNum);
+            // 车辆特殊处理
+            if(CodePrefixEnum.FJ.name().equals(prefix)){
+                format = getTime() + format;
+            }
             // 获取随机数
             String randomCode = getRandom(randomlength);
             String newCode = getNewCode(prefix,format,randomCode,order);
@@ -210,6 +215,14 @@ public class GenerateProjectCodeService {
             logger.error(String.format("前缀%s生成编码时异常"), exp);
             throw exp;
         }
+    }
+
+    // 获取年月日十分字符串
+    private String getTime(){
+        LocalDateTime localDateTime = LocalDateTime.now();
+        StringBuilder sb = new StringBuilder();
+        sb.append(localDateTime.getYear()).append(String.format("%0"+2+"d", localDateTime.getMonthValue())).append(String.format("%0"+2+"d", localDateTime.getDayOfMonth()));
+        return sb.toString().substring(2,8);
     }
 
 
