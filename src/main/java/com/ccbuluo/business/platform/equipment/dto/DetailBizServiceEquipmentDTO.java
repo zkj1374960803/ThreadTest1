@@ -6,6 +6,8 @@ import com.ccbuluo.business.entity.IdEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.math.BigDecimal;
+
 /**
  * 物料实体
  * @author liuduo
@@ -44,6 +46,17 @@ public class DetailBizServiceEquipmentDTO extends IdEntity {
      */
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
+
+    @ApiModelProperty(name = "suggestedPrice", value = "销售给客户经理的价格")
+    private BigDecimal suggestedPrice;
+
+    public BigDecimal getSuggestedPrice() {
+        return suggestedPrice;
+    }
+
+    public void setSuggestedPrice(BigDecimal suggestedPrice) {
+        this.suggestedPrice = suggestedPrice;
+    }
 
     public void setEquipCode(String equipCode) {
         this.equipCode = equipCode;

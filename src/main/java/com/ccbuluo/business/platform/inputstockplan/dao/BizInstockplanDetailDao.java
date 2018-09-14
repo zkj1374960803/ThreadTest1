@@ -5,6 +5,7 @@ import com.ccbuluo.business.constants.Constants;
 
 import com.ccbuluo.business.constants.StockPlanStatusEnum;
 import com.ccbuluo.business.entity.BizInstockplanDetail;
+import com.ccbuluo.business.platform.allocateapply.dto.PerpayAmountDTO;
 import com.ccbuluo.business.platform.outstock.dto.UpdatePlanStatusDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
@@ -270,9 +271,13 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
             .append("trade_no,supplier_no,instock_repository_no,cost_price,")
             .append("IFNULL(plan_instocknum,0) AS planInstocknum,IFNULL(actual_instocknum,0) AS actualInstocknum,complete_status,complete_time,")
             .append("outstock_planid")
-            .append(" FROM biz_instockplan_detail WHERE trade_no= :applyNo")
-            .append(" AND instock_repository_no = :inRepositoryNo");
-
+            .append(" FROM biz_instockplan_detail WHERE 1 = 1 ");
+        if(StringUtils.isNotBlank(applyNo)){
+            sql.append(" AND trade_no= :applyNo ");
+        }
+        if(StringUtils.isNotBlank(inRepositoryNo)){
+            sql.append(" AND instock_repository_no = :inRepositoryNo ");
+        }
         return super.queryListBean(BizInstockplanDetail.class, sql.toString(), params);
     }
 
@@ -307,4 +312,5 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
         params.put("completeStatus", StockPlanStatusEnum.DOING.toString());
         return super.updateForMap(sql.toString(), params);
     }
+
 }

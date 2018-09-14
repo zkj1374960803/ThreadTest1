@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.controller;
 
 import com.ccbuluo.business.entity.BizInstockplanDetail;
+import com.ccbuluo.business.entity.BizOutstockplanDetail;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
@@ -134,7 +135,7 @@ public class AllocateApplyController extends BaseController {
     }
 
     /**
-     * 处理申请单
+     * 提交申请
      * @param processApplyDTO json数据格式
      * @return StatusDto<String> 状态DTO
      * @author zhangkangjian
@@ -269,28 +270,57 @@ public class AllocateApplyController extends BaseController {
      */
     @PostMapping("/confirmationquote")
     @ApiOperation(value = "采购单填报价格（确认报价）", notes = "【张康健】")
-    public StatusDto<String> confirmationQuote(@RequestBody ConfirmationQuoteDTO confirmationQuoteDTO){
+    public StatusDto<String> confirmationQuote(@ApiParam(name = "ConfirmationQuoteDTO", value = "采购单填报价格（确认报价）", required = true) @RequestBody ConfirmationQuoteDTO confirmationQuoteDTO){
         allocateApplyServiceImpl.confirmationQuote(confirmationQuoteDTO);
-
-        return null;
+        return StatusDto.buildSuccessStatusDto();
     }
 
 
 
     /**
      * 查询采购单的付款信息
-     * @param
-     * @exception
-     * @return
+     * @param applyNo 采购单号
+     * @return StatusDto<List<PerpayAmountDTO>>
      * @author zhangkangjian
      * @date 2018-09-13 11:17:58
      */
     @PostMapping("/querypaymentinfo")
     @ApiOperation(value = "查询采购单的付款信息", notes = "【张康健】")
-    public StatusDto<List<BizInstockplanDetail>> queryPaymentInfo(@ApiIgnore QueryPurchaseListDTO queryPurchaseListDTO){
+    @ApiImplicitParam(name = "applyNo", value = "采购单号", required = true, paramType = "query")
+    public StatusDto<List<PerpayAmountDTO>> queryPaymentInfo(String applyNo){
+        List<PerpayAmountDTO> perpayAmountDTO = allocateApplyServiceImpl.queryPaymentInfo(applyNo);
+        return StatusDto.buildDataSuccessStatusDto(perpayAmountDTO);
+    }
 
-//        bizInstockplanDetailDao.queryPaymentInfo();
-        return null;
+
+    /**
+     * 根据申请单号和入库仓库查询入库计划
+     * @param applyNo 申请单号
+     * @param inRepositoryNo 入库仓库
+     * @return 入库计划
+     * @author zhangkangjian
+     * @date 2018-09-13 11:17:58
+     */
+    @GetMapping("/queryinstockplan")
+    @ApiOperation(value = "查询入库计划", notes = "【张康健】")
+    @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query")
+    public List<BizInstockplanDetail> queryInStockplan(String applyNo, String inRepositoryNo) {
+        return allocateApplyServiceImpl.queryListByApplyNoAndInReNo(applyNo, inRepositoryNo);
+    }
+
+    /**
+     * 根据申请单号查询出库计划
+     * @param applyNo 申请单号
+     * @param outRepositoryNo 出库仓库编号
+     * @return 出库计划
+     * @author zhangkangjian
+     * @date 2018-09-13 11:17:58
+     */
+    @GetMapping("/queryoutstockplan")
+    @ApiOperation(value = "查询出库计划", notes = "【张康健】")
+    @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query")
+    public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String outRepositoryNo) {
+        return allocateApplyServiceImpl.queryOutstockplan(applyNo, outRepositoryNo);
     }
 
 

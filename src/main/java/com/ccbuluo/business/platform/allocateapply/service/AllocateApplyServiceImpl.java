@@ -21,6 +21,7 @@ import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.instock.service.InstockOrderService;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.order.dto.ProductDetailDTO;
+import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
@@ -96,6 +97,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     private PurchaseApplyHandleStrategy purchaseApplyHandleStrategy;
     @Autowired
     private BizAllocateTradeorderDao bizAllocateTradeorderDao;
+    @Resource
+    private BizOutstockplanDetailDao bizOutstockplanDetailDao;
 
     /**
      * 创建物料或者零配件申请
@@ -558,10 +561,11 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      * @date 2018-09-13 15:45:47
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void confirmationQuote(ConfirmationQuoteDTO confirmationQuoteDTO) {
         List<BizAllocateTradeorder> list = Lists.newArrayList();
         // 批量更新采购申请详单的价格
-        List<PurchaseProductInfo> purchaseProductInfo = confirmationQuoteDTO.getPurchaseProductInfo();
+         List<PurchaseProductInfo> purchaseProductInfo = confirmationQuoteDTO.getPurchaseProductInfo();
         bizAllocateApplyDao.batchupdatePurchaseProductInfo(purchaseProductInfo);
         List<PerpayAmountDTO> perpayAmountDTO = confirmationQuoteDTO.getPerpayAmountDTO();
         String applyNo = confirmationQuoteDTO.getApplyNo();
@@ -576,14 +580,57 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         allocateapplyDetailBOMap.forEach((key, value) -> {
             PerpayAmountDTO perpayAmountDTO1 = perpayAmountDTOMap.get(key);
             List<BizAllocateTradeorder> bizAllocateTradeorderList = purchaseApplyHandleStrategy.buildOrderEntityList(value);
-            BizAllocateTradeorder bizAllocateTradeorder = list.get(0);
-            bizAllocateTradeorder.setPerpayAmount(perpayAmountDTO1.getPerpayAmount());
+            BizAllocateTradeorder bizAllocateTradeorder = bizAllocateTradeorderList.get(0);
+            if(perpayAmountDTO1 != null){
+                bizAllocateTradeorder.setSellerOrgno(key);
+                bizAllocateTradeorder.setPerpayAmount(perpayAmountDTO1.getPerpayAmount());
+                bizAllocateTradeorder.setTradeType(InstockTypeEnum.PURCHASE.name());
+            }
             list.addAll(bizAllocateTradeorderList);
         });
         // 保存生成订单
         bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
         // 生成出入库计划
         applyHandleContext.applyHandle(confirmationQuoteDTO.getApplyNo());
+    }
+
+    /**
+     * 查询采购单的付款信息
+     *
+     * @param applyNo 采购单号
+     * @return List<PerpayAmountDTO>
+     * @author zhangkangjian
+     * @date 2018-09-13 11:17:58
+     */
+    @Override
+    public List<PerpayAmountDTO> queryPaymentInfo(String applyNo) {
+        return bizAllocateTradeorderDao.queryPaymentInfo(applyNo);
+    }
+
+    /**
+     * 根据申请单号和入库仓库查询入库计划
+     * @param applyNo 申请单号
+     * @param inRepositoryNo 入库仓库
+     * @return 入库计划
+     * @author zhangkangjian
+     * @date 2018-08-11 13:17:42
+     */
+    @Override
+    public List<BizInstockplanDetail> queryListByApplyNoAndInReNo(String applyNo, String inRepositoryNo) {
+        return bizInstockplanDetailDao.queryListByApplyNoAndInReNo(applyNo, inRepositoryNo);
+    }
+
+    /**
+     * 根据申请单号查询出库计划
+     * @param applyNo         申请单号
+     * @param outRepositoryNo 出库仓库编号
+     * @return 出库计划
+     * @author zhangkangjian
+     * @date 2018-09-13 11:17:58
+     */
+    @Override
+    public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String outRepositoryNo) {
+        return bizOutstockplanDetailDao.queryOutstockplan(applyNo,null, outRepositoryNo);
     }
 
     /**

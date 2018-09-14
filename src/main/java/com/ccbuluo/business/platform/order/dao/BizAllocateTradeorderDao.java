@@ -4,14 +4,17 @@ package com.ccbuluo.business.platform.order.dao;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizAllocateTradeorder;
 import com.ccbuluo.business.entity.RelOrdstockOccupy;
+import com.ccbuluo.business.platform.allocateapply.dto.PerpayAmountDTO;
 import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelConfiguration;
 import com.ccbuluo.dao.BaseDao;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -112,10 +115,10 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
         sql.append("INSERT INTO biz_allocate_tradeorder ( order_no,apply_no,")
                 .append("purchaser_orgno,seller_orgno,order_status,total_price,payer,")
                 .append("pay_method,payed_time,creator,create_time,operator,operate_time,")
-                .append("delete_flag,remark,trade_type ) VALUES (  :orderNo, :applyNo, :purchaserOrgno,")
+                .append("delete_flag,remark,trade_type,perpay_amount ) VALUES (  :orderNo, :applyNo, :purchaserOrgno,")
                 .append(" :sellerOrgno, :orderStatus, :totalPrice, :payer, :payMethod,")
                 .append(" :payedTime, :creator, :createTime, :operator, :operateTime,")
-                .append(" :deleteFlag, :remark ,:tradeType)");
+                .append(" :deleteFlag, :remark ,:tradeType, :perpayAmount)");
         List<Long> longs = super.batchInsertForListBean(sql.toString(), list);
         return longs;
     }
@@ -254,4 +257,24 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
         return super.queryListBean(BizAllocateTradeorder.class, sql.toString(), params);
     }
 
+    /**
+     * 查询采购单的付款信息
+     * @param applyNo 采购单号
+     * @return List<PerpayAmountDTO>
+     * @author zhangkangjian
+     * @date 2018-09-13 11:17:58
+     */
+    public List<PerpayAmountDTO> queryPaymentInfo(String applyNo) {
+        HashMap<String, Object> map = Maps.newHashMap();
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT b.supplier_code,b.supplier_name,a.perpay_amount  ")
+            .append(" FROM biz_allocate_tradeorder a  ")
+            .append(" LEFT JOIN biz_service_supplier b ON a.seller_orgno = b.supplier_code ")
+            .append(" WHERE 1 = 1 ");
+        if(StringUtils.isNotBlank(applyNo)){
+            map.put("applyNo", applyNo);
+            sql.append(" AND a.apply_no = :applyNo ");
+        }
+        return queryListBean(PerpayAmountDTO.class, sql.toString(), map);
+    }
 }
