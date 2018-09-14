@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.allocateapply.dao;
 
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.constants.InstockTypeEnum;
 import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
@@ -110,7 +111,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         sql.append(" SELECT a.apply_no,UNIX_TIMESTAMP(a.create_time) AS 'applyTime',a.apply_status, SUM(IFNULL(b.total_price,0)) AS 'totalPurchase' ")
             .append(" FROM biz_allocate_apply a  ")
             .append(" LEFT JOIN biz_allocate_tradeorder b ON a.apply_no = b.apply_no  ")
-            .append(" LEFT JOIN biz_allocateapply_detail c on  a.apply_no  = b.apply_no ")
+            .append(" LEFT JOIN (SELECT a.apply_no,a.product_type FROM biz_allocateapply_detail a GROUP BY a.apply_no) c on  a.apply_no  = c.apply_no ")
             .append(" WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(queryPurchaseListDTO.getApplyStatus())){
             sql.append(" AND a.apply_status = :applyStatus ");
@@ -124,7 +125,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         if(StringUtils.isNotBlank(queryPurchaseListDTO.getProductType())){
             sql.append(" AND c.product_type = :productType ");
         }
-        sql.append(" GROUP BY a.apply_no ");
+        sql.append(" GROUP BY a.apply_no order by a.create_time ");
         return queryPageForBean(QueryPurchaseListDTO.class, sql.toString(), queryPurchaseListDTO, queryPurchaseListDTO.getOffset(), queryPurchaseListDTO.getPageSize());
     }
 
@@ -207,6 +208,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      */
     public Page<QueryAllocateApplyListDTO> findApplyList(String productType, List<String> orgCodes, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode) {
         HashMap<String, Object> map = Maps.newHashMap();
+        map.put("processType", InstockTypeEnum.TRANSFER.name());
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.process_orgno,a.instock_orgno,a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.apply_status,a.process_type,a.process_orgtype as 'orgType',a.outstock_orgno ")
             .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE ")
@@ -285,10 +287,11 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      */
     public Page<QueryAllocateApplyListDTO> findProcessApplyList(List<String> orgCode, String productType,List<String> orgCodesByOrgType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode) {
         HashMap<String, Object> map = Maps.newHashMap();
+        map.put("processType", InstockTypeEnum.TRANSFER.name());
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.process_orgno,a.instock_orgno,a.outstock_orgno,a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.process_type,a.apply_status ")
             .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE ")
-            .append(" a.process_type IN (:processTypeList) ");
+            .append(" a.process_type IN (:processTypeList) AND a.process_type = :processType ");
         map.put("processTypeList", List.of(BizAllocateApply.ProcessTypeEnum.TRANSFER.name(), BizAllocateApply.ProcessTypeEnum.PURCHASE.name()));
         if(StringUtils.isNotBlank(userOrgCode)){
             map.put("userOrgCode", userOrgCode);
@@ -484,7 +487,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             sql.append(" AND  a.org_no in (:orgCode) ");
         }
         String orgNo = findStockListDTO.getOrgNo();
-        if(StringUtils.isNoneBlank(orgNo)){
+        if(StringUtils.isNotBlank(orgNo)){
             map.put("orgNo", orgNo);
             sql.append(" AND  a.org_no = :orgNo ");
         }
