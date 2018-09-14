@@ -316,6 +316,11 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }
         }
         // 查询机构的名称
+        findOrgName(page);
+        return page;
+    }
+
+    private void findOrgName(Page<QueryAllocateApplyListDTO> page) {
         Optional.ofNullable(page.getRows()).ifPresent(a ->{
             List<String> outstockOrgno = a.stream().filter(b -> b.getOutstockOrgno() != null).map(QueryAllocateApplyListDTO::getOutstockOrgno).collect(Collectors.toList());
             List<String> instockOrgno = a.stream().filter(b -> b.getInstockOrgno() != null).map(QueryAllocateApplyListDTO::getInstockOrgno).collect(Collectors.toList());
@@ -332,7 +337,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                 }
             });
         });
-        return page;
     }
 
     /**
@@ -369,22 +373,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }
         }
         // 查询机构的名称
-        Optional.ofNullable(page.getRows()).ifPresent(a ->{
-            List<String> outstockOrgno = a.stream().filter(b -> b.getOutstockOrgno() != null).map(QueryAllocateApplyListDTO::getOutstockOrgno).collect(Collectors.toList());
-            List<String> instockOrgno = a.stream().filter(b -> b.getInstockOrgno() != null).map(QueryAllocateApplyListDTO::getInstockOrgno).collect(Collectors.toList());
-            Map<String, BasicUserOrganization> outOrganizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(outstockOrgno);
-            Map<String, BasicUserOrganization> inOrganizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(instockOrgno);
-            a.stream().forEach(b ->{
-                BasicUserOrganization outOrganization = outOrganizationMap.get(b.getOutstockOrgno());
-                BasicUserOrganization inOrganization = inOrganizationMap.get(b.getInstockOrgno());
-                if(outOrganization != null){
-                    b.setOutstockOrgname(outOrganization.getOrgName());
-                }
-                if(inOrganization != null){
-                    b.setInstockOrgName(inOrganization.getOrgName());
-                }
-            });
-        });
+        findOrgName(page);
         return page;
     }
 
