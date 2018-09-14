@@ -305,8 +305,9 @@ public class AllocateApplyController extends BaseController {
     @GetMapping("/queryinstockplan")
     @ApiOperation(value = "查询入库计划", notes = "【张康健】")
     @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query")
-    public List<BizInstockplanDetail> queryInStockplan(String applyNo, String inRepositoryNo) {
-        return allocateApplyServiceImpl.queryListByApplyNoAndInReNo(applyNo, inRepositoryNo);
+    public StatusDto<List<BizInstockplanDetail>> queryInStockplan(String applyNo, String inRepositoryNo) {
+        List<BizInstockplanDetail> bizInstockplanDetails = allocateApplyServiceImpl.queryListByApplyNoAndInReNo(applyNo, inRepositoryNo);
+        return StatusDto.buildDataSuccessStatusDto(bizInstockplanDetails);
     }
 
     /**
@@ -320,8 +321,9 @@ public class AllocateApplyController extends BaseController {
     @GetMapping("/queryoutstockplan")
     @ApiOperation(value = "查询出库计划", notes = "【张康健】")
     @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query")
-    public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String outRepositoryNo) {
-        return allocateApplyServiceImpl.queryOutstockplan(applyNo, outRepositoryNo);
+    public StatusDto<List<BizOutstockplanDetail>> queryOutstockplan(String applyNo, String outRepositoryNo) {
+        List<BizOutstockplanDetail> bizOutstockplanDetails = allocateApplyServiceImpl.queryOutstockplan(applyNo, outRepositoryNo);
+        return StatusDto.buildDataSuccessStatusDto(bizOutstockplanDetails);
     }
 
 
