@@ -135,7 +135,7 @@ public class AllocateApplyController extends BaseController {
     }
 
     /**
-     * 处理申请单
+     * 提交申请
      * @param processApplyDTO json数据格式
      * @return StatusDto<String> 状态DTO
      * @author zhangkangjian

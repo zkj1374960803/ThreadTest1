@@ -1,6 +1,8 @@
 package com.ccbuluo.business.custmanager.allocateapply.controller;
 
 import com.ccbuluo.business.custmanager.allocateapply.dto.QueryPendingMaterialsDTO;
+import com.ccbuluo.business.entity.BizInstockplanDetail;
+import com.ccbuluo.business.entity.BizOutstockplanDetail;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
@@ -128,19 +130,6 @@ public class CustAllocateApplyController extends BaseController {
         return StatusDto.buildDataSuccessStatusDto(page);
     }
 
-    /**
-     * 处理申请单
-     * @param processApplyDTO json数据格式
-     * @return
-     * @author zhangkangjian
-     * @date 2018-08-10 11:24:53
-     */
-    @ApiOperation(value = "处理申请单（当选择采购时不显示调拨目标）", notes = "【张康健】")
-    @PostMapping("/processapply")
-    public StatusDto<String> processApply(@ApiParam(name = "processApplyDTO", value = "json数据格式", required = true) @RequestBody ProcessApplyDTO processApplyDTO){
-        allocateApplyServiceImpl.processApply(processApplyDTO);
-        return StatusDto.buildSuccessStatusDto();
-    }
 
     /**
      * 保存处理申请单
@@ -265,7 +254,95 @@ public class CustAllocateApplyController extends BaseController {
         return StatusDto.buildSuccessStatusDto();
     }
 
+    /**
+     * 根据申请单号和入库仓库查询入库计划
+     * @param applyNo 申请单号
+     * @param inRepositoryNo 入库仓库
+     * @return 入库计划
+     * @author zhangkangjian
+     * @date 2018-09-13 11:17:58
+     */
+    @GetMapping("/queryinstockplan")
+    @ApiOperation(value = "查询入库计划", notes = "【张康健】")
+    @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query")
+    public List<BizInstockplanDetail> queryInStockplan(String applyNo, String inRepositoryNo) {
+        return allocateApplyServiceImpl.queryListByApplyNoAndInReNo(applyNo, inRepositoryNo);
+    }
 
+    /**
+     * 根据申请单号查询出库计划
+     * @param applyNo 申请单号
+     * @param outRepositoryNo 出库仓库编号
+     * @return 出库计划
+     * @author zhangkangjian
+     * @date 2018-09-13 11:17:58
+     */
+    @GetMapping("/queryoutstockplan")
+    @ApiOperation(value = "查询出库计划", notes = "【张康健】")
+    @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query")
+    public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String outRepositoryNo) {
+        return allocateApplyServiceImpl.queryOutstockplan(applyNo, outRepositoryNo);
+    }
+
+    /**
+     * 驳回申请
+     * @param applyNo 申请单号
+     * @return StatusDto<String> 申请单号
+     * @author zhangkangjian
+     * @date 2018-09-12 16:10:34
+     */
+    @ApiOperation(value = "驳回申请",notes = "【张康健】")
+    @GetMapping("/rejectapply")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "processMemo", value = "驳回理由", required = true, paramType = "query")
+    })
+    public StatusDto<String> rejectApply(String applyNo, String processMemo){
+        allocateApplyServiceImpl.rejectApply(applyNo, processMemo);
+        return StatusDto.buildSuccessStatusDto();
+    }
+
+    /**
+     * 提交申请
+     * @param processApplyDTO json数据格式
+     * @return StatusDto<String> 状态DTO
+     * @author zhangkangjian
+     * @date 2018-08-10 11:24:53
+     */
+    @ApiOperation(value = "提交申请", notes = "【张康健】")
+    @PostMapping("/processapply")
+    public StatusDto<String> processApply(@ApiParam(name = "processApplyDTO", value = "json数据格式", required = true) @RequestBody ProcessApplyDTO processApplyDTO){
+        allocateApplyServiceImpl.processApply(processApplyDTO);
+        return StatusDto.buildSuccessStatusDto();
+    }
+
+    /**
+     * 保存处理申请单
+     * @param processApplyDetailDTO json数组数据格式
+     * @return StatusDto<String> 状态DTO
+     * @author zhangkangjian
+     * @date 2018-09-12 16:02:08
+     */
+    @ApiOperation(value = "保存申请单（填报价格）", notes = "【张康健】")
+    @PostMapping("/saveprocessapply")
+    public StatusDto<String> saveProcessApply(@ApiParam(name = "processApplyDetailDTO", value = "json数组数据格式", required = true) @RequestBody List<ProcessApplyDetailDTO> processApplyDetailDTO){
+        allocateApplyServiceImpl.saveProcessApply(processApplyDetailDTO);
+        return StatusDto.buildSuccessStatusDto();
+    }
+
+    /**
+     * 撤销申请单
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-20 12:02:58
+     */
+    @ApiOperation(value = "撤销申请单", notes = "【魏俊标】")
+    @GetMapping("/cancelapply/{applyNo}")
+    @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
+    public StatusDto cancelApply(@PathVariable String applyNo){
+        return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.cancelApply(applyNo));
+    }
 
 
 }
