@@ -419,6 +419,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         processApplyDTO.setApplyProcessor(userHolder.getLoggedUserId());
         processApplyDTO.setProcessTime(new Date());
         processApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
+        Long versionNo = bizAllocateApplyDao.findVersionNo(processApplyDTO.getApplyNo());
+        processApplyDTO.setVersionNo(versionNo);
         bizAllocateApplyDao.updateAllocateApply(processApplyDTO);
         saveProcessApply(processApplyDTO.getProcessApplyDetailDTO());
         // 生成出入库计划
