@@ -37,9 +37,9 @@ public class BizServiceLogDao extends BaseDao<BizServiceLog> {
      */
     public int saveBizServiceLog(BizServiceLog entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO biz_service_log ( model,action,log_content,owner_orgno,")
+        sql.append("INSERT INTO biz_service_log ( model,action,subject_type,subject_keyvalue,log_content,owner_orgno,")
             .append("owner_orgname,creator,create_time,operator,operate_time,delete_flag,")
-            .append("remark ) VALUES (  :model, :action, :logContent, :ownerOrgno,")
+            .append("remark ) VALUES (  :model, :action, :subjectType,:subjectKeyvalue,:logContent, :ownerOrgno,")
             .append(" :ownerOrgname, :creator, :createTime, :operator, :operateTime,")
             .append(" :deleteFlag, :remark )");
         return super.save(sql.toString(), entity);
