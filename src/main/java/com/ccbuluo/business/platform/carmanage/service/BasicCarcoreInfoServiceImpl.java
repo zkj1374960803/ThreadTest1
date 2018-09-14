@@ -368,11 +368,9 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
         StatusDto<String> statusDto = innerUserInfoService.checkAppIdAndSecretId(updateCarcoreInfoByVinDTO.getAppId(), updateCarcoreInfoByVinDTO.getSecretId());
         // 权限校验
         if(Constants.ERROR_CODE.equals(statusDto.getCode())){
-            System.out.println("3、应用验证美国！");
             return statusDto;
         }
         int flag =  basicCarcoreInfoDao.batchUpdateCarcoreInfoByVin(updateCarcoreInfoByVinDTO.getCarcoreInfoList());
-        System.out.println("4、dao被调用了！");
         if (flag != Constants.STATUS_FLAG_ZERO) {
             return StatusDto.buildSuccessStatusDto("操作成功！");
         }
