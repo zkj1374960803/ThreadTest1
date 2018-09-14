@@ -177,7 +177,9 @@ public class BasicCarcoreInfoController extends BaseController {
     @ApiOperation(value = "根据车辆vin批量更新车辆的门店信息", notes = "【魏俊标】")
     @PostMapping("/batchupdatecarcoreinfobyvin")
     public StatusDto updateCarcoreInfoByVin(@ApiParam(name = "UpdateCarcoreInfoByVinDTO", value = "传入UpdateCarcoreInfoByVinDTO对象", required = true)@RequestBody UpdateCarcoreInfoByVinDTO updateCarcoreInfoByVinDTO) {
+        System.out.println("1、最外边的进来了");
         if(null == updateCarcoreInfoByVinDTO.getCarcoreInfoList() || updateCarcoreInfoByVinDTO.getCarcoreInfoList().size() == 0){
+            System.out.println("2、参数不能为空！");
             return StatusDto.buildFailureStatusDto("参数不能为空！");
         }
         return basicCarcoreInfoService.batchUpdateCarcoreInfoByVin(updateCarcoreInfoByVinDTO);
