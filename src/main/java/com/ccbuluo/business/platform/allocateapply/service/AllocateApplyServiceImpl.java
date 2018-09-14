@@ -566,6 +566,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         List<BizAllocateTradeorder> list = Lists.newArrayList();
         ProcessApplyDTO processApplyDTO = new ProcessApplyDTO();
         // 更新基础数据
+        processApplyDTO.setApplyNo(confirmationQuoteDTO.getApplyNo());
         processApplyDTO.setApplyProcessor(userHolder.getLoggedUserId());
         processApplyDTO.setProcessTime(new Date());
         processApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());

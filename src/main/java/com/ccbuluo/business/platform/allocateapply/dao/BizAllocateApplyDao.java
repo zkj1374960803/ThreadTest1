@@ -487,7 +487,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             sql.append(" AND  a.org_no in (:orgCode) ");
         }
         String orgNo = findStockListDTO.getOrgNo();
-        if(StringUtils.isNoneBlank(orgNo)){
+        if(StringUtils.isNotBlank(orgNo)){
             map.put("orgNo", orgNo);
             sql.append(" AND  a.org_no = :orgNo ");
         }
