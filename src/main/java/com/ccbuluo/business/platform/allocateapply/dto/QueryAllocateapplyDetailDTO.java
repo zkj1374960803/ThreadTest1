@@ -75,7 +75,10 @@ public class QueryAllocateapplyDetailDTO {
 
 
     public Double getTotalPrice(){
-        return sellPrice.doubleValue() * applyNum;
+        if(sellPrice != null){
+            return sellPrice.doubleValue() * applyNum;
+        }
+        return 0D;
     }
 
     public Long getId() {
