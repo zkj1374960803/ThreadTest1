@@ -166,7 +166,16 @@ public class FindAllocateApplyDTO {
      */
     @ApiModelProperty(name = "totalPrice", value = "付款总额", hidden = true)
     private BigDecimal totalPrice;
+    @ApiModelProperty(name = "processMemo", value = "驳回理由", hidden = true)
+    private String processMemo;
 
+    public String getProcessMemo() {
+        return processMemo;
+    }
+
+    public void setProcessMemo(String processMemo) {
+        this.processMemo = processMemo;
+    }
 
     public String getRemark() {
         return remark;
