@@ -28,13 +28,13 @@ public class StockInOutCallBackContext {
     @Autowired
     private ServiceStockInOutCallBack serviceStockInOutCallBack;
     @Autowired
-    PurchaseStockInOutCallBack PurchaseStockInOutCallBack;
+    private PurchaseStockInOutCallBack PurchaseStockInOutCallBack;
     @Autowired
-    SameLevelStockInOutCallBack sameLevelStockInOutCallBack;
+    private SameLevelStockInOutCallBack sameLevelStockInOutCallBack;
     @Autowired
-    RefundStockInOutCallBack refundStockInOutCallBack;
+    private RefundStockInOutCallBack refundStockInOutCallBack;
     @Autowired
-    BarterStockInOutCallBack barterStockInOutCallBack;
+    private BarterStockInOutCallBack barterStockInOutCallBack;
     /**
      * 对单据做完入库后的回调方法
      * @param docNo 单据编号
