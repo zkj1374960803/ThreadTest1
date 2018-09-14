@@ -46,7 +46,7 @@ public class QueryAllocateapplyDetailDTO {
      * 申请的商品数量
      */
     @ApiModelProperty(name = "applyNum", value = "申请的商品数量")
-    private Long applyNum;
+    private Long applyNum = 0L;
     /**
      * 计量单位，用作展示冗余
      */
@@ -56,12 +56,12 @@ public class QueryAllocateapplyDetailDTO {
      * 销售单价
      */
     @ApiModelProperty(name = "sellPrice", value = "销售单价")
-    private BigDecimal sellPrice;
+    private BigDecimal sellPrice = new BigDecimal(0);
     /**
      * 成本单价
      */
     @ApiModelProperty(name = "costPrice", value = "成本单价")
-    private BigDecimal costPrice;
+    private BigDecimal costPrice = new BigDecimal(0);
     /**
      * 当集团采购时，可以设置供应商，将调拨申请单作为采购单
      */
@@ -73,6 +73,10 @@ public class QueryAllocateapplyDetailDTO {
     @ApiModelProperty(name = "supplierName", value = "供应商的名称")
     private String supplierName;
 
+
+    public Double getTotalPrice(){
+        return sellPrice.doubleValue() * applyNum;
+    }
 
     public Long getId() {
         return id;

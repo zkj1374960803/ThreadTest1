@@ -267,7 +267,7 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
     public List<PerpayAmountDTO> queryPaymentInfo(String applyNo) {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT b.supplier_code,b.supplier_name,a.perpay_amount  ")
+        sql.append(" SELECT b.supplier_code,b.supplier_name,a.perpay_amount,a.total_price  ")
             .append(" FROM biz_allocate_tradeorder a  ")
             .append(" LEFT JOIN biz_service_supplier b ON a.seller_orgno = b.supplier_code ")
             .append(" WHERE 1 = 1 ");

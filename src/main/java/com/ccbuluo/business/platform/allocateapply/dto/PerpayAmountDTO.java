@@ -17,6 +17,16 @@ public class PerpayAmountDTO {
     private String supplierName;
     @ApiModelProperty(name = "perpayAmount", value = "预付款金额")
     private BigDecimal perpayAmount;
+    @ApiModelProperty(name = "totalPrice", value = "订单中所有商品的总价")
+    private BigDecimal totalPrice;
+
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
 
     public String getSupplierName() {
         return supplierName;
