@@ -368,15 +368,20 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                 page = bizAllocateApplyDao.findProcessApplyList(orgCodeStatus, productType,orgCodesByOrgType, applyStatus, applyNo, offset, pageSize, userOrgCode);
             }
         }
-        // 查询机构的名称和类型
+        // 查询机构的名称
         Optional.ofNullable(page.getRows()).ifPresent(a ->{
-            List<String> orgCode = a.stream().map(QueryAllocateApplyListDTO::getApplyorgNo).collect(Collectors.toList());
-            Map<String, BasicUserOrganization> basicUserOrganizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(orgCode);
+            List<String> outstockOrgno = a.stream().filter(b -> b.getOutstockOrgno() != null).map(QueryAllocateApplyListDTO::getOutstockOrgno).collect(Collectors.toList());
+            List<String> instockOrgno = a.stream().filter(b -> b.getInstockOrgno() != null).map(QueryAllocateApplyListDTO::getInstockOrgno).collect(Collectors.toList());
+            Map<String, BasicUserOrganization> outOrganizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(outstockOrgno);
+            Map<String, BasicUserOrganization> inOrganizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(instockOrgno);
             a.stream().forEach(b ->{
-                BasicUserOrganization basicUserOrganization = basicUserOrganizationMap.get(b.getApplyorgNo());
-                if(basicUserOrganization != null){
-                    b.setOrgName(basicUserOrganization.getOrgName());
-                    b.setOrgType(basicUserOrganization.getOrgType());
+                BasicUserOrganization outOrganization = outOrganizationMap.get(b.getOutstockOrgno());
+                BasicUserOrganization inOrganization = inOrganizationMap.get(b.getInstockOrgno());
+                if(outOrganization != null){
+                    b.setOutstockOrgname(outOrganization.getOrgName());
+                }
+                if(inOrganization != null){
+                    b.setInstockOrgName(inOrganization.getOrgName());
                 }
             });
         });
