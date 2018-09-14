@@ -107,9 +107,11 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      */
     public Page<QueryPurchaseListDTO> queryAllocateApplyByCode(QueryPurchaseListDTO queryPurchaseListDTO) {
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.applyorg_no,UNIX_TIMESTAMP(a.create_time) AS 'createTime',a.apply_status, SUM(IFNULL(b.total_price,0)) AS 'totalPurchase' ")
+        sql.append(" SELECT a.apply_no,UNIX_TIMESTAMP(a.create_time) AS 'applyTime',a.apply_status, SUM(IFNULL(b.total_price,0)) AS 'totalPurchase' ")
             .append(" FROM biz_allocate_apply a  ")
-            .append(" LEFT JOIN biz_allocate_tradeorder b ON a.applyorg_no = b.apply_no WHERE 1 = 1 ");
+            .append(" LEFT JOIN biz_allocate_tradeorder b ON a.apply_no = b.apply_no  ")
+            .append(" LEFT JOIN biz_allocateapply_detail c on  a.apply_no  = b.apply_no ")
+            .append(" WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(queryPurchaseListDTO.getApplyStatus())){
             sql.append(" AND a.apply_status = :applyStatus ");
         }
@@ -118,6 +120,9 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         }
         if(StringUtils.isNotBlank(queryPurchaseListDTO.getApplyType())){
             sql.append(" AND a.apply_type = :applyType ");
+        }
+        if(StringUtils.isNotBlank(queryPurchaseListDTO.getProductType())){
+            sql.append(" AND c.product_type = :productType ");
         }
         sql.append(" GROUP BY a.applyorg_no ");
         return queryPageForBean(QueryPurchaseListDTO.class, sql.toString(), queryPurchaseListDTO, queryPurchaseListDTO.getOffset(), queryPurchaseListDTO.getPageSize());

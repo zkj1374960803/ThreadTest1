@@ -38,8 +38,14 @@ public class QueryPurchaseListDTO {
     /**
      *
      */
-    @ApiModelProperty(name = "applyType", value = "采购状态")
+    @ApiModelProperty(name = "applyType", value = "采购类型")
     private String applyType;
+
+    /**
+     *商品的类型
+     */
+    @ApiModelProperty(name = "productType", value = "商品的类型")
+    private String productType;
 
     /**
      * 偏移量
@@ -52,6 +58,14 @@ public class QueryPurchaseListDTO {
      */
     @ApiModelProperty(name = "pageSize", value = "每页显示的数量")
     private Integer pageSize;
+
+    public String getProductType() {
+        return productType;
+    }
+
+    public void setProductType(String productType) {
+        this.productType = productType;
+    }
 
     public String getApplyType() {
         return applyType;
