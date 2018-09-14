@@ -18,6 +18,8 @@ import com.ccbuluo.business.platform.custmanager.dao.BizServiceCustmanagerDao;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
+import com.ccbuluo.business.platform.instock.dao.BizInstockOrderDao;
+import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
 import com.ccbuluo.business.platform.instock.service.InstockOrderService;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.order.dto.ProductDetailDTO;
@@ -36,6 +38,7 @@ import com.ccbuluo.http.*;
 import com.ccbuluo.merchandiseintf.carparts.category.service.CarpartsCategoryService;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
+import com.ccbuluo.usercoreintf.dto.QueryNameByUseruuidsDTO;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
@@ -99,6 +102,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     private BizAllocateTradeorderDao bizAllocateTradeorderDao;
     @Resource
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
+    @Resource
+    private BizInstockOrderDao bizInstockOrderDao;
 
     /**
      * 创建物料或者零配件申请
@@ -551,7 +556,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
 
     /**
      * 采购单填报价格（确认报价）
-     *
      * @param confirmationQuoteDTO 报价DTO
      * @author zhangkangjian
      * @date 2018-09-13 15:45:47
@@ -560,6 +564,14 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     @Transactional(rollbackFor = Exception.class)
     public void confirmationQuote(ConfirmationQuoteDTO confirmationQuoteDTO) {
         List<BizAllocateTradeorder> list = Lists.newArrayList();
+        ProcessApplyDTO processApplyDTO = new ProcessApplyDTO();
+        // 更新基础数据
+        processApplyDTO.setApplyProcessor(userHolder.getLoggedUserId());
+        processApplyDTO.setProcessTime(new Date());
+        processApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
+        Long versionNo = bizAllocateApplyDao.findVersionNo(processApplyDTO.getApplyNo());
+        processApplyDTO.setVersionNo(versionNo);
+        bizAllocateApplyDao.updateAllocateApply(processApplyDTO);
         // 批量更新采购申请详单的价格
          List<PurchaseProductInfo> purchaseProductInfo = confirmationQuoteDTO.getPurchaseProductInfo();
         bizAllocateApplyDao.batchupdatePurchaseProductInfo(purchaseProductInfo);
@@ -613,7 +625,17 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public List<BizInstockplanDetail> queryListByApplyNoAndInReNo(String applyNo, String inRepositoryNo) {
-        return bizInstockplanDetailDao.queryListByApplyNoAndInReNo(applyNo, inRepositoryNo);
+        List<BizInstockplanDetail> bizInstockplanDetails = bizInstockplanDetailDao.queryListByApplyNoAndInReNo(applyNo, inRepositoryNo);
+        // todo
+        // 查询入库单
+        BizInstockOrderDTO bizInstockOrderDTO = bizInstockOrderDao.getByInstockNo(bizInstockplanDetails.get(0).getProductNo());
+        // 封装入库人
+        StatusDtoThriftList<QueryNameByUseruuidsDTO> queryNameByUseruuidsDTOStatusDtoThriftList = innerUserInfoService.queryNameByUseruuids(com.google.common.collect.Lists.newArrayList(bizInstockOrderDTO.getInstockOperator()));
+        StatusDto<List<QueryNameByUseruuidsDTO>> resolve = StatusDtoThriftUtils.resolve(queryNameByUseruuidsDTOStatusDtoThriftList, QueryNameByUseruuidsDTO.class);
+        List<QueryNameByUseruuidsDTO> userNames = resolve.getData();
+        Map<String, String> collect = userNames.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, QueryNameByUseruuidsDTO::getName));
+        bizInstockOrderDTO.setInstockOperatorName(collect.get(bizInstockOrderDTO.getInstockOperator()));
+        return null;
     }
 
     /**
