@@ -4,6 +4,7 @@ import com.ccbuluo.business.constants.DocTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,11 +21,14 @@ public class OrderTypeAsserterContext {
     @Autowired
     ServiceOrderTypeAsserter serviceOrderTypeAsserter;
 
-    public OrderTypeAsserterContext(){
+    @PostConstruct
+    public void init(){
         asserterChain = new HashMap<DocTypeEnum, OrderTypeAsserter>();
         asserterChain.put(DocTypeEnum.APPLY_DOC, applyOrderTypeAsserter);
         asserterChain.put(DocTypeEnum.SERVICE_DOC, serviceOrderTypeAsserter);
     }
+
+
 
     /**
      * 根据单据号确定单据类型

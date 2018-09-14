@@ -48,16 +48,16 @@ public class RefundStockInOutCallBack implements StockInOutCallBack{
     private BizAllocateTradeorderDao bizAllocateTradeorderDao;
 
     @Override
-    public StatusDto inStockCallBack(String docNo) {
+    public StatusDto inStockCallBack(String docNo,String inRepositoryNo) {
         // 平台还要出库
         platformInstockCallback(docNo);
         // 更改申请单状态
-        inOutCallBackService.updateApplyStatus(docNo);
+        inOutCallBackService.updateApplyStatus(docNo,inRepositoryNo);
         return StatusDto.buildSuccessStatusDto("操作成功！");
     }
 
     @Override
-    public StatusDto outStockCallBack(String docNo) {
+    public StatusDto outStockCallBack(String docNo,String inRepositoryNo) {
         inOutCallBackService.updateApplyOrderStatus(docNo);
         return StatusDto.buildSuccessStatusDto("操作成功！");
     }
@@ -316,7 +316,7 @@ public class RefundStockInOutCallBack implements StockInOutCallBack{
                     // 交易类型
                     outstockplanSeller.setOutstockType(OutstockTypeEnum.TRANSFER.toString());
                     // 未执行
-                    outstockplanSeller.setPlanStatus(StockPlanStatusEnum.NOTEFFECTIVE.toString());
+                    outstockplanSeller.setPlanStatus(StockPlanStatusEnum.DOING.toString());
                     outList.add(outstockplanSeller);
                     continue;
                 }

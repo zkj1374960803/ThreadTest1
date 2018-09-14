@@ -23,20 +23,22 @@ public interface StockInOutCallBack {
     /**
      * 对单据做完入库后的回调方法
      * @param docNo 单据编号
+     * @param inRepositoryNo 仓库编号
      * @return
      * @author liupengfei
      * @date 2018-09-13 15:54:41
      */
-    StatusDto inStockCallBack(String docNo);
+    StatusDto inStockCallBack(String docNo,String inRepositoryNo);
 
 
     /**
      * 对单据做了出库后的回调方法接口
      * @param docNo 单据编号
+     * @param inRepositoryNo 仓库编号
      * @return
      * @author liupengfei
      * @date 2018-09-13 15:55:42
      */
-    StatusDto outStockCallBack(String docNo);
+    StatusDto outStockCallBack(String docNo,String inRepositoryNo);
 
 }

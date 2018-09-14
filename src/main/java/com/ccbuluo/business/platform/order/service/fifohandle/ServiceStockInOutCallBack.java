@@ -14,12 +14,12 @@ import org.springframework.stereotype.Service;
 public class ServiceStockInOutCallBack implements StockInOutCallBack {
 
     @Override
-    public StatusDto inStockCallBack(String docNo) {
+    public StatusDto inStockCallBack(String docNo,String inRepositoryNo) {
         return null;
     }
 
     @Override
-    public StatusDto outStockCallBack(String docNo) {
+    public StatusDto outStockCallBack(String docNo,String inRepositoryNo) {
         return null;
     }
 }

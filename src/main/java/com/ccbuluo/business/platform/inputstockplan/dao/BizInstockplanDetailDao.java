@@ -306,10 +306,11 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
      */
     public int updateCompleteStatus(String applyNo){
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_instockplan_detail SET complete_status = :completeStatus  WHERE trade_no= :applyNo ");
+        sql.append("UPDATE biz_instockplan_detail SET complete_status = :completeStatus  WHERE complete_status = :status and trade_no= :applyNo ");
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNo", applyNo);
         params.put("completeStatus", StockPlanStatusEnum.DOING.toString());
+        params.put("status", StockPlanStatusEnum.NOTEFFECTIVE.toString());
         return super.updateForMap(sql.toString(), params);
     }
 

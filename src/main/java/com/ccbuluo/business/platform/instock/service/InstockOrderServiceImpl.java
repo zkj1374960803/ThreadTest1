@@ -190,7 +190,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         // 7、如果是平台入库后则改变申请单状态为 平台待出库，如果是机构入库后则改变申请单的状态为  确认收货
 //        List<BizInstockplanDetail> bizInstockplanDetails3 = inputStockPlanService.queryListByApplyNoAndInReNo(applyNo, inRepositoryNo);
 //        List<BizInstockplanDetail> collect = bizInstockplanDetails3.stream().filter(item -> item.getCompleteStatus().equals(StockPlanStatusEnum.COMPLETE.name())).collect(Collectors.toList());
-        stockInOutCallBackContext.inStockCallBack(applyNo);
+        stockInOutCallBackContext.inStockCallBack(applyNo,inRepositoryNo);
 //        updateApplyStatus(applyNo, bizInstockplanDetails3, collect);
         // 8、更新入库单的复核状态
         bizInstockOrderDao.updateChecked(instockNo, Constants.FLAG_ONE, new Date());

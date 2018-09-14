@@ -46,13 +46,13 @@ public class InOutCallBackService {
     /**
      * 更改申请单状态(入库回调用)
      * @param applyNo 申请单号
+     * @param  inRepositoryNo 仓库编号
      * @author liuduo
      * @date 2018-08-21 18:52:48
      */
-    public void updateApplyStatus(String applyNo) {
-        BizAllocateApply apply = bizAllocateApplyDao.getByNo(applyNo);
+    public void updateApplyStatus(String applyNo,String inRepositoryNo) {
         FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
-        List<BizInstockplanDetail> bizInstockplanDetails3 = inputStockPlanService.queryListByApplyNoAndInReNo(applyNo, apply.getInRepositoryNo());
+        List<BizInstockplanDetail> bizInstockplanDetails3 = inputStockPlanService.queryListByApplyNoAndInReNo(applyNo, inRepositoryNo);
         List<BizInstockplanDetail> collect = bizInstockplanDetails3.stream().filter(item -> item.getCompleteStatus().equals(StockPlanStatusEnum.COMPLETE.name())).collect(Collectors.toList());
         if (collect.size() == bizInstockplanDetails3.size()) {
             String applyType = detail.getApplyType();

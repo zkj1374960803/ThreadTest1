@@ -253,7 +253,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
      * @date 2018-09-03 10:18:33
      */
     private void convertCostPrice(FindAllocateApplyDTO allocateApplyDTO){
-        List<StockDetailDTO> list = problemStockDetailDao.queryStockDetailListByAppNo(allocateApplyDTO.getApplyorgNo());
+         List<StockDetailDTO> list = problemStockDetailDao.queryStockDetailListByAppNo(allocateApplyDTO.getApplyorgNo());
         for(QueryAllocateapplyDetailDTO applyDetail : allocateApplyDTO.getQueryAllocateapplyDetailDTO()){
             Optional<StockDetailDTO> applyFilter = list.stream() .filter(stockDetail -> applyDetail.getProductNo().equals(stockDetail.getProductNo())) .findFirst();
             if (applyFilter.isPresent()) {

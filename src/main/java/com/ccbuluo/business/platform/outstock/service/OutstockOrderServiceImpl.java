@@ -154,7 +154,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 if (applyNoType.equals(ApplyTypeEnum.APPLYORDER.name())) {
 //                    List<BizOutstockplanDetail> bizOutstockplanDetailList3 = outStockPlanService.queryOutstockplan(applyNo, StockPlanStatusEnum.DOING.toString(), outRepositoryNo);
 //                    updateApplyOrderStatus(applyNo, bizOutstockplanDetailList3);
-                    stockInOutCallBackContext.outStockCallBack(applyNo);
+                    stockInOutCallBackContext.outStockCallBack(applyNo,outRepositoryNo);
                 }
             }
             return StatusDto.buildSuccessStatusDto("保存成功！");
@@ -234,7 +234,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         // 6、更改申请单状态
 //        List<BizOutstockplanDetail> bizOutstockplanDetailList3 = outStockPlanService.queryOutstockplan(applyNo, StockPlanStatusEnum.DOING.toString(), outRepositoryNo);
 //        updateApplyOrderStatus(applyNo, bizOutstockplanDetailList3);
-        stockInOutCallBackContext.outStockCallBack(applyNo);
+        stockInOutCallBackContext.outStockCallBack(applyNo,outRepositoryNo);
         // 7、更新出库单的复核状态
         bizOutstockOrderDao.updateChecked(outstockNo, Constants.FLAG_ONE, new Date());
     }

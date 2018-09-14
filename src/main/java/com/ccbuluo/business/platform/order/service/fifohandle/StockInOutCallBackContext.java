@@ -38,11 +38,12 @@ public class StockInOutCallBackContext {
     /**
      * 对单据做完入库后的回调方法
      * @param docNo 单据编号
+     * @param inRepositoryNo 仓库编号
      * @return
      * @author liupengfei
      * @date 2018-09-13 15:54:41
      */
-    public StatusDto inStockCallBack(String docNo){
+    public StatusDto inStockCallBack(String docNo,String inRepositoryNo){
         try {
             DocTypeEnum docTypeEnum = orderTypeAsserterContext.getOrderType(docNo);
             StockInOutCallBack callBack = null;
@@ -85,7 +86,7 @@ public class StockInOutCallBackContext {
                     logger.error(docTypeEnum.toString() + "出现了未知处理类型！");
                     break;
             }
-            return callBack.inStockCallBack(docNo);
+            return callBack.inStockCallBack(docNo,inRepositoryNo);
         } catch (Exception e) {
             logger.error("提交失败！", e);
             throw e;
@@ -96,11 +97,12 @@ public class StockInOutCallBackContext {
     /**
      * 对单据做了出库后的回调方法接口
      * @param docNo 单据编号
+     * @param inRepositoryNo 仓库编号
      * @return
      * @author liupengfei
      * @date 2018-09-13 15:55:42
      */
-    public StatusDto outStockCallBack(String docNo){
+    public StatusDto outStockCallBack(String docNo,String inRepositoryNo){
         StockInOutCallBack callBack = null;
         // 根据申请单获取申请单详情
         BizAllocateApply ba = bizAllocateApplyDao.getByNo(docNo);
@@ -129,7 +131,7 @@ public class StockInOutCallBackContext {
                 logger.error(typeEnum.toString() + "出现了未知处理类型！");
                 break;
         }
-        return callBack.outStockCallBack(docNo);
+        return callBack.outStockCallBack(docNo,inRepositoryNo);
     }
 
 }
