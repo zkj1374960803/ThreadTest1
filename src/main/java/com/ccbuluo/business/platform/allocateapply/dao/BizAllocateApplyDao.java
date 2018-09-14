@@ -124,7 +124,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         if(StringUtils.isNotBlank(queryPurchaseListDTO.getProductType())){
             sql.append(" AND c.product_type = :productType ");
         }
-        sql.append(" GROUP BY a.applyorg_no ");
+        sql.append(" GROUP BY a.apply_no ");
         return queryPageForBean(QueryPurchaseListDTO.class, sql.toString(), queryPurchaseListDTO, queryPurchaseListDTO.getOffset(), queryPurchaseListDTO.getPageSize());
     }
 
