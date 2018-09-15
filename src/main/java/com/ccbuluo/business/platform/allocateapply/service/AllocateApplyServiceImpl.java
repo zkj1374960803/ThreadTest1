@@ -651,8 +651,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     public Map<String, Object> queryListByApplyNoAndInReNo(String applyNo) {
         // 查询申请详情
         FindAllocateApplyDTO allocateApplyDTO = bizAllocateApplyDao.findDetail(applyNo);
-
-
         String userOrgCode = getUserOrgCode();
         HashMap<String, Object> map = Maps.newHashMap();
         // 根据申请单号查询出库单号

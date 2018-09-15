@@ -110,10 +110,9 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.apply_no,UNIX_TIMESTAMP(a.create_time) AS 'applyTime',a.apply_status, SUM(IFNULL(b.total_price,0)) AS 'totalPurchase' ")
             .append(" FROM biz_allocate_apply a  ")
-            .append(" LEFT JOIN biz_allocate_tradeorder b ON a.apply_no = b.apply_no  ")
+            .append(" LEFT JOIN biz_allocate_tradeorder b ON a.apply_no = b.apply_no  AND b.delete_flag = :deleteFlag ")
             .append(" LEFT JOIN (SELECT a.apply_no,a.product_type FROM biz_allocateapply_detail a GROUP BY a.apply_no) c on  a.apply_no  = c.apply_no ")
-            .append(" WHERE 1 = 1 AND b.delete_flag = :deleteFlag");
-
+            .append(" WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(queryPurchaseListDTO.getApplyStatus())){
             sql.append(" AND a.apply_status = :applyStatus ");
         }
