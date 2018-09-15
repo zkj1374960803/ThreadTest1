@@ -81,7 +81,7 @@ public class BizOutstockorderDetailDao extends BaseDao<BizOutstockorderDetail> {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT bod.id,bod.outstock_orderno,bod.outstock_planid,bod.product_no,bod.product_name,")
             .append("bod.product_type,bod.product_categoryname,bod.supplier_no,bod.outstock_num,bod.unit,")
-            .append("bod.cost_price,bod.actual_price,bodd.out_repository_no,bss.supplier_name FROM biz_outstockorder_detail AS bod ")
+            .append("IFNULL(bod.cost_price,0) AS costPrice,IFNULL(bod.actual_price,0) AS actualPrice,bodd.out_repository_no,bss.supplier_name FROM biz_outstockorder_detail AS bod ")
             .append(" LEFT JOIN biz_outstockplan_detail AS bodd ON bodd.id = bod.outstock_planid")
             .append(" LEFT JOIN biz_service_supplier AS bss ON bss.supplier_code = bod.supplier_no")
             .append(" WHERE bod.outstock_orderno= :outstockNo");
