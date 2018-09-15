@@ -78,7 +78,7 @@ public class BizInstockplanDetail extends AftersaleCommonEntity{
      * 实际入库数量
      */
     @ApiModelProperty(name = "actualInstocknum", value = "实际入库数量")
-    private Long actualInstocknum;
+    private Long actualInstocknum = 0L;
     /**
      * 完成状态（入库中，完成）
      */
@@ -126,6 +126,15 @@ public class BizInstockplanDetail extends AftersaleCommonEntity{
      */
     @ApiModelProperty(name = "sellerOrgno", value = "卖方机构的编号")
     private String sellerOrgno;
+
+    public double getTotalPrice(){
+        if(costPrice != null){
+            return actualInstocknum * costPrice.doubleValue();
+        }
+        return 0D;
+    }
+
+
 
     public void setInstockType(String instockType) {
         this.instockType = instockType;
