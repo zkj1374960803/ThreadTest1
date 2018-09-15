@@ -125,7 +125,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         if(StringUtils.isNotBlank(queryPurchaseListDTO.getProductType())){
             sql.append(" AND c.product_type = :productType ");
         }
-        sql.append(" GROUP BY a.apply_no order by a.create_time ");
+        sql.append(" GROUP BY a.apply_no order by a.create_time DESC ");
         return queryPageForBean(QueryPurchaseListDTO.class, sql.toString(), queryPurchaseListDTO, queryPurchaseListDTO.getOffset(), queryPurchaseListDTO.getPageSize());
     }
 
@@ -529,8 +529,8 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         params.put("status", status);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT DISTINCT bio.trade_docno FROM biz_instock_order AS bio LEFT JOIN biz_instockplan_detail AS bid ON bid.trade_no = bio.trade_docno ")
-            .append("  WHERE bid.complete_status = :status AND bid.product_type = :productType AND bio.instock_orgno = :orgCode");
+        sql.append("SELECT DISTINCT baa.apply_no FROM biz_allocate_apply AS baa LEFT JOIN biz_instockplan_detail AS bid ON bid.trade_no = baa.apply_no ")
+            .append("  WHERE bid.complete_status = :status AND bid.product_type = :productType AND bid.instock_orgno = :orgCode");
 
         return querySingColum(String.class, sql.toString(), params);
     }
@@ -721,8 +721,8 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         params.put("status", status);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("select DISTINCT boo.trade_docno from biz_outstock_order as boo left join biz_outstockplan_detail as bod on bod.trade_no = boo.trade_docno")
-            .append("  WHERE boo.outstock_orgno = :orgCode AND bod.plan_status = :status AND bod.product_type = :productType");
+        sql.append("select DISTINCT baa.apply_no from biz_allocate_apply as baa left join biz_outstockplan_detail as bod on bod.trade_no = baa.apply_no")
+            .append("  WHERE bod.out_orgno = :orgCode AND bod.plan_status = :status AND bod.product_type = :productType");
 
         return querySingColum(String.class, sql.toString(), params);
     }

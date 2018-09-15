@@ -126,16 +126,20 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
      */
     public List<BizOutstockplanDetail> getOutstockplansByApplyNo(String applyNo,String applyorgNo) {
         Map<String, Object> params = Maps.newHashMap();
-        params.put("applyNo", applyNo);
-        params.put("applyorgNo", applyorgNo);
-
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,outstock_type,stock_id,product_no,product_type,trade_no,")
                 .append("supplier_no,apply_detail_id,cost_price,sales_price,out_repository_no,")
                 .append("plan_outstocknum,actual_outstocknum,plan_status,complete_time,")
                 .append("creator,create_time,operator,operate_time,delete_flag,remark,version_no,")
-                .append("product_categoryname,out_orgno,stock_type FROM biz_outstockplan_detail WHERE trade_no= :applyNo and out_orgno= :applyorgNo");
-
+                .append("product_categoryname,out_orgno,stock_type FROM biz_outstockplan_detail WHERE 1 = 1 ");
+        if(StringUtils.isNotBlank(applyNo)){
+            params.put("applyNo", applyNo);
+            sql.append(" AND trade_no= :applyNo ");
+        }
+        if(StringUtils.isNotBlank(applyorgNo)){
+            params.put("applyorgNo", applyorgNo);
+            sql.append(" AND out_orgno = :applyorgNo ");
+        }
         return queryListBean(BizOutstockplanDetail.class, sql.toString(), params);
     }
 

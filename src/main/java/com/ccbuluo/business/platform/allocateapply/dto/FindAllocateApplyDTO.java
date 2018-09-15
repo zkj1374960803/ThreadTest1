@@ -56,6 +56,11 @@ public class FindAllocateApplyDTO {
     @ApiModelProperty(name = "outstockOrgName", value = "出库的组织架构名称")
     private String outstockOrgName;
     /**
+     * 出库机构类型
+     */
+    @ApiModelProperty(name = "outstockOrgType", value = "出库机构类型")
+    private String outstockOrgType;
+    /**
      * 入库组织架构
      */
     @ApiModelProperty(name = "instockOrgno", value = "入库组织架构(采购类型时，不必填)")
@@ -72,6 +77,11 @@ public class FindAllocateApplyDTO {
      */
     @ApiModelProperty(name = "instockOrgName", value = "入库的组织架构名称")
     private String instockOrgName;
+    /**
+     * 入库机构类型
+     */
+    @ApiModelProperty(name = "instockOrgType", value = "入库机构类型")
+    private String instockOrgType;
     /**
      * 仓库名称
      */
@@ -160,7 +170,6 @@ public class FindAllocateApplyDTO {
 
     @ApiModelProperty(name = "sellTotalPrice", value = "销售总价")
     private BigDecimal sellTotalPrice;
-
     /**
      * 付款总额(退换货用)
      */
@@ -168,6 +177,24 @@ public class FindAllocateApplyDTO {
     private BigDecimal totalPrice;
     @ApiModelProperty(name = "processMemo", value = "驳回理由", hidden = true)
     private String processMemo;
+
+
+
+    public String getOutstockOrgType() {
+        return outstockOrgType;
+    }
+
+    public void setOutstockOrgType(String outstockOrgType) {
+        this.outstockOrgType = outstockOrgType;
+    }
+
+    public String getInstockOrgType() {
+        return instockOrgType;
+    }
+
+    public void setInstockOrgType(String instockOrgType) {
+        this.instockOrgType = instockOrgType;
+    }
 
     public String getProcessMemo() {
         return processMemo;

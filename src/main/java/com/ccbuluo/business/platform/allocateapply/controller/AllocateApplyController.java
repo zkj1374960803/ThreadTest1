@@ -295,9 +295,8 @@ public class AllocateApplyController extends BaseController {
         return StatusDto.buildDataSuccessStatusDto(perpayAmountDTO);
     }
 
-
     /**
-     * 查询出入库计划
+     * 查询出入库计划基本信息
      * @param applyNo 申请单号
      * @return 入库计划
      * @author zhangkangjian
@@ -310,6 +309,10 @@ public class AllocateApplyController extends BaseController {
         Map<String, Object> map = allocateApplyServiceImpl.queryListByApplyNoAndInReNo(applyNo);
         return StatusDto.buildDataSuccessStatusDto(map);
     }
+
+
+
+
 
 
 
