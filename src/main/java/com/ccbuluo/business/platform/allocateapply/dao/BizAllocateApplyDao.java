@@ -208,12 +208,11 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      */
     public Page<QueryAllocateApplyListDTO> findApplyList(String productType, List<String> orgCodes, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode) {
         HashMap<String, Object> map = Maps.newHashMap();
-        map.put("processType", InstockTypeEnum.TRANSFER.name());
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.process_orgno,a.instock_orgno,a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.apply_status,a.process_type,a.process_orgtype as 'orgType',a.outstock_orgno ")
             .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE ")
             .append(" a.process_type IN (:processTypeList) ");
-        map.put("processTypeList", List.of(BizAllocateApply.ProcessTypeEnum.TRANSFER.name(), BizAllocateApply.ProcessTypeEnum.PURCHASE.name()));
+        map.put("processTypeList", List.of(BizAllocateApply.ProcessTypeEnum.TRANSFER.name()));
         if(StringUtils.isNotBlank(userOrgCode)){
             map.put("userOrgCode", userOrgCode);
             sql.append(" AND (a.applyorg_no = :userOrgCode or a.instock_orgno = :userOrgCode) ");
