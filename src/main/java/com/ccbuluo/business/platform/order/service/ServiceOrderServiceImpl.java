@@ -582,7 +582,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      */
     private void returnStock(SaveOrderDetailDTO saveOrderDetailDTO) {
         // 查询关联关系
-        List<RelOrdstockOccupy> relOrdstockOccupyByApplyNo = bizAllocateTradeorderDao.getRelOrdstockOccupyByApplyNo(saveOrderDetailDTO.getServiceOrderno());
+        List<RelOrdstockOccupy> relOrdstockOccupyByApplyNo = bizAllocateTradeorderDao.getRelOrdstockOccupy(saveOrderDetailDTO.getServiceOrderno(), userHolder.getLoggedUser().getOrganization().getOrgCode());
         List<BizStockDetail> bizStockDetailList = Lists.newArrayList();
         if (!relOrdstockOccupyByApplyNo.isEmpty()) {
             relOrdstockOccupyByApplyNo.forEach(item -> {
