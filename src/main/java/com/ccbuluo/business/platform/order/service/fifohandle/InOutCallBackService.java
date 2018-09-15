@@ -62,7 +62,7 @@ public class InOutCallBackService {
                 switch (Enum.valueOf(BizAllocateApply.AllocateApplyTypeEnum.class, applyType)) {
                     case PURCHASE:
                     case SAMELEVEL:
-                        allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ApplyStatusEnum.CONFIRMRECEIPT.toString());
+                        allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ApplyStatusEnum.APPLICATIONCOMPLETED.toString());
                         break;
                     case BARTER:
                         if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
