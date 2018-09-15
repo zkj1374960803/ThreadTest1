@@ -65,6 +65,7 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
     private BasicCarmodelManageService basicCarmodelManageService;
     @Autowired
     private BasicCarmodelManageDao basicCarmodelManageDao;
+    @ThriftRPCClient("BasicWalletpaymentSerService")
     private BizFinanceAccountService bizFinanceAccountService;
     /**
      * 生成索赔单
@@ -292,7 +293,7 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
         // 构建申请单
         List<AccountTransactionDTO> payments = buildClaimPayment(claimorder,actualAmount);
         // 支付
-        StatusDto statusDto = bizFinanceAccountService.makeTrading(payments);
+        StatusDto statusDto = StatusDto.buildSuccessStatusDto("支付成功！");// TODO 目前没有账号，不能进行支付。bizFinanceAccountService.makeTrading(payments);
         // 如果支付成功
         if(statusDto.isSuccess()){
             // 更新索赔单状态和支付时间
@@ -343,6 +344,7 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
         transaction.setBusinessSourceDocumentNumber(applyNo);
         // 交易类型
         transaction.setTransactionTypeEnumThrift(TransactionTypeEnumThrift.THREE_PACK_SUPPLIER_REFUND);
+        transaction.setCreator(userHolder.getLoggedUserId());
         return transaction;
     }
 }
