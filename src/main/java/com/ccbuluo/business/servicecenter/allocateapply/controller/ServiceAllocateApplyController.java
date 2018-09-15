@@ -17,6 +17,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 申请管理（服务中心）
@@ -192,37 +193,19 @@ public class ServiceAllocateApplyController extends BaseController {
 
 
     /**
-     * 根据申请单号和入库仓库查询入库计划
+     * 查询出入库计划
      * @param applyNo 申请单号
-     * @param inRepositoryNo 入库仓库
      * @return 入库计划
      * @author zhangkangjian
      * @date 2018-09-13 11:17:58
      */
-    @GetMapping("/queryinstockplan")
-    @ApiOperation(value = "查询入库计划", notes = "【张康健】")
+    @GetMapping("/queryinandoutstockplan")
+    @ApiOperation(value = "查询出入库计划", notes = "【张康健】")
     @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query")
-    public StatusDto<List<BizInstockplanDetail>> queryInStockplan(String applyNo, String inRepositoryNo) {
-        List<BizInstockplanDetail> bizInstockplanDetails = allocateApplyServiceImpl.queryListByApplyNoAndInReNo(applyNo, inRepositoryNo);
-        return StatusDto.buildDataSuccessStatusDto(bizInstockplanDetails);
+    public StatusDto<Map<String, Object>> queryInStockplan(String applyNo) {
+        Map<String, Object> map = allocateApplyServiceImpl.queryListByApplyNoAndInReNo(applyNo);
+        return StatusDto.buildDataSuccessStatusDto(map);
     }
-
-    /**
-     * 根据申请单号查询出库计划
-     * @param applyNo 申请单号
-     * @param outRepositoryNo 出库仓库编号
-     * @return 出库计划
-     * @author zhangkangjian
-     * @date 2018-09-13 11:17:58
-     */
-    @GetMapping("/queryoutstockplan")
-    @ApiOperation(value = "查询出库计划", notes = "【张康健】")
-    @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query")
-    public StatusDto<List<BizOutstockplanDetail>> queryOutstockplan(String applyNo, String outRepositoryNo) {
-        List<BizOutstockplanDetail> bizOutstockplanDetails = allocateApplyServiceImpl.queryOutstockplan(applyNo, outRepositoryNo);
-        return StatusDto.buildDataSuccessStatusDto(bizOutstockplanDetails);
-    }
-
     /**
      * 驳回申请
      * @param applyNo 申请单号

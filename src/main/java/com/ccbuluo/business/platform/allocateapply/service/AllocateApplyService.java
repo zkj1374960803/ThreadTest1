@@ -5,6 +5,7 @@ import com.ccbuluo.business.entity.BizInstockplanDetail;
 import com.ccbuluo.business.entity.BizOutstockplanDetail;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
+import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -283,12 +284,11 @@ public interface AllocateApplyService {
     /**
      * 根据申请单号和入库仓库查询入库计划
      * @param applyNo 申请单号
-     * @param inRepositoryNo 入库仓库
      * @return 入库计划
      * @author zhangkangjian
      * @date 2018-08-11 13:17:42
      */
-    List<BizInstockplanDetail> queryListByApplyNoAndInReNo(String applyNo, String inRepositoryNo);
+    Map<String, Object> queryListByApplyNoAndInReNo(String applyNo);
 
     /**
      * 根据申请单号查询出库计划

@@ -23,6 +23,8 @@ import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
 import com.ccbuluo.business.platform.instock.service.InstockOrderService;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.order.dto.ProductDetailDTO;
+import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
+import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
@@ -104,6 +106,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
     @Resource
     private BizInstockOrderDao bizInstockOrderDao;
+    @Resource
+    private BizOutstockOrderDao bizOutstockOrderDao;
 
     /**
      * 创建物料或者零配件申请
@@ -619,24 +623,40 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     /**
      * 根据申请单号和入库仓库查询入库计划
      * @param applyNo 申请单号
-     * @param inRepositoryNo 入库仓库
      * @return 入库计划
      * @author zhangkangjian
      * @date 2018-08-11 13:17:42
      */
     @Override
-    public List<BizInstockplanDetail> queryListByApplyNoAndInReNo(String applyNo, String inRepositoryNo) {
-        List<BizInstockplanDetail> bizInstockplanDetails = bizInstockplanDetailDao.queryListByApplyNoAndInReNo(applyNo, inRepositoryNo);
-        // todo
-        // 查询入库单
-        BizInstockOrderDTO bizInstockOrderDTO = bizInstockOrderDao.getByInstockNo(bizInstockplanDetails.get(0).getProductNo());
-        // 封装入库人
-        StatusDtoThriftList<QueryNameByUseruuidsDTO> queryNameByUseruuidsDTOStatusDtoThriftList = innerUserInfoService.queryNameByUseruuids(com.google.common.collect.Lists.newArrayList(bizInstockOrderDTO.getInstockOperator()));
-        StatusDto<List<QueryNameByUseruuidsDTO>> resolve = StatusDtoThriftUtils.resolve(queryNameByUseruuidsDTOStatusDtoThriftList, QueryNameByUseruuidsDTO.class);
-        List<QueryNameByUseruuidsDTO> userNames = resolve.getData();
-        Map<String, String> collect = userNames.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, QueryNameByUseruuidsDTO::getName));
-        bizInstockOrderDTO.setInstockOperatorName(collect.get(bizInstockOrderDTO.getInstockOperator()));
-        return null;
+    public Map<String, Object> queryListByApplyNoAndInReNo(String applyNo) {
+        HashMap<String, Object> map = Maps.newHashMap();
+        // 根据申请单号查询出库单号
+        BizOutstockOrderDTO outstockOrderDTO = bizOutstockOrderDao.getByTradeDocno(applyNo);
+        if(outstockOrderDTO != null){
+            BizOutstockOrderDTO bizOutstockOrderDTO = bizOutstockOrderDao.getByOutstockNo(outstockOrderDTO.getOutstockorderNo());
+            // 封装入库人
+            StatusDtoThriftList<QueryNameByUseruuidsDTO> queryNameByUseruuidsDTOStatusDtoThriftList = innerUserInfoService.queryNameByUseruuids(com.google.common.collect.Lists.newArrayList(bizOutstockOrderDTO.getOutstockOperator()));
+            StatusDto<List<QueryNameByUseruuidsDTO>> resolve = StatusDtoThriftUtils.resolve(queryNameByUseruuidsDTOStatusDtoThriftList, QueryNameByUseruuidsDTO.class);
+            List<QueryNameByUseruuidsDTO> userNames = resolve.getData();
+            Map<String, String> collect = userNames.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, QueryNameByUseruuidsDTO::getName));
+            bizOutstockOrderDTO.setOutstockOperatorName(collect.get(bizOutstockOrderDTO.getOutstockOperator()));
+            map.put("bizOutstockOrderDTO", bizOutstockOrderDTO);
+        }
+
+
+        // 根据单号查询入库单号
+        BizInstockOrderDTO instockOrderDTO = bizInstockOrderDao.getByTradeDocno(applyNo);
+        if(instockOrderDTO != null){
+            BizInstockOrderDTO bizInstockOrderDTO = bizInstockOrderDao.getByInstockNo(instockOrderDTO.getInstockOrderno());
+            // 封装入库人
+            StatusDtoThriftList<QueryNameByUseruuidsDTO> queryNameByUseruuidsDTOStatusDtoThriftList = innerUserInfoService.queryNameByUseruuids(com.google.common.collect.Lists.newArrayList(bizInstockOrderDTO.getInstockOperator()));
+            StatusDto<List<QueryNameByUseruuidsDTO>> resolve = StatusDtoThriftUtils.resolve(queryNameByUseruuidsDTOStatusDtoThriftList, QueryNameByUseruuidsDTO.class);
+            List<QueryNameByUseruuidsDTO> userNames = resolve.getData();
+            Map<String, String> collect = userNames.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, QueryNameByUseruuidsDTO::getName));
+            bizInstockOrderDTO.setInstockOperatorName(collect.get(bizInstockOrderDTO.getInstockOperator()));
+            map.put("bizInstockOrderDTO", bizInstockOrderDTO);
+        }
+        return map;
     }
 
     /**

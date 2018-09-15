@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.instock.dao;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.entity.BizInstockOrder;
 import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
+import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
@@ -34,6 +35,23 @@ public class BizInstockOrderDao extends BaseDao<BizInstockOrder> {
     @Autowired
     private UserHolder userHolder;
 
+
+    /**
+     * 根据申请单号查询出库单详情
+     * @param tradeDocno 申请单号
+     * @return 出库单详情
+     * @author weijb
+     * @date 2018-08-20 15:14:39
+     */
+    public BizInstockOrderDTO getByTradeDocno(String tradeDocno) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("tradeDocno", tradeDocno);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,instock_orderno,trade_docno,instock_type,instock_time,instock_operator,transportorder_no")
+            .append("  FROM biz_instock_order WHERE trade_docno = :tradeDocno");
+        return findForBean(BizInstockOrderDTO.class, sql.toString(), params);
+    }
     /**
      * 保存 实体
      * @param entity 实体

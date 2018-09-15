@@ -34,10 +34,8 @@ import com.ccbuluo.core.entity.BusinessUser;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
-import com.ccbuluo.http.StatusDto;
-import com.ccbuluo.http.StatusDtoThriftBean;
-import com.ccbuluo.http.StatusDtoThriftPage;
-import com.ccbuluo.http.StatusDtoThriftUtils;
+import com.ccbuluo.http.*;
+import com.ccbuluo.usercoreintf.dto.QueryNameByUseruuidsDTO;
 import com.ccbuluo.usercoreintf.dto.ServiceCenterDTO;
 import com.ccbuluo.usercoreintf.dto.ServiceCenterWorkplaceDTO;
 import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
@@ -958,7 +956,19 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     public StatusDto<List<BizServiceLog>> orderLog(String serviceOrderno) {
         // 操作的主体的类型
         String subjectType = "ServiceOrderServiceImpl";
-        return StatusDto.buildDataSuccessStatusDto(bizServiceLogDao.orderLog(serviceOrderno, subjectType));
+        List<BizServiceLog> bizServiceLogs = bizServiceLogDao.orderLog(serviceOrderno, subjectType);
+        List<String> uuids = bizServiceLogs.stream().map(BizServiceLog::getCreator).collect(Collectors.toList());
+        if (uuids.isEmpty()) {
+            return StatusDto.buildDataSuccessStatusDto(Lists.newArrayList());
+        }
+        StatusDtoThriftList<QueryNameByUseruuidsDTO> queryNameByUseruuids = innerUserInfoService.queryNameByUseruuids(uuids);
+        List<QueryNameByUseruuidsDTO> data = StatusDtoThriftUtils.resolve(queryNameByUseruuids, QueryNameByUseruuidsDTO.class).getData();
+        Map<String, QueryNameByUseruuidsDTO> collect = data.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, Function.identity()));
+        bizServiceLogs.forEach(item -> {
+            QueryNameByUseruuidsDTO queryNameByUseruuidsDTO = collect.get(item.getCreator());
+            item.setOperator(queryNameByUseruuidsDTO.getName());
+        });
+        return StatusDto.buildDataSuccessStatusDto(bizServiceLogs);
     }
 
     /**
