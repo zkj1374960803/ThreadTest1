@@ -337,7 +337,7 @@ public class BizAllocateApply {
      */
     public enum ApplyStatusEnum {
         PENDING("10", "申请提交"), CANCEL("15", "申请撤销"),REJECT("16", "驳回申请"), WAITINGPAYMENT("20", "等待付款"),
-        WAITDELIVERY("30", "等待发货"), OUTSTORE("40", "平台出库"), INSTORE("50", "平台入库"),
+        WAITDELIVERY("30", "等待发货"),
         WAITINGRECEIPT("60", "等待收货"), CONFIRMRECEIPT("70", "确认收货"), APPLICATIONCOMPLETED("80", "申请完成");
         // 成员变量
         private String key;
