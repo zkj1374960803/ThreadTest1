@@ -971,7 +971,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         return StatusDto.buildDataSuccessStatusDto(bizServiceLogs);
     }
 
-    /**
+    /**BasicCarcoreInfoServiceImpl
      * 查询维修单的工时详情和零配件详情
      * @param serviceOrderno 维修单的编号
      * @return Map<String , List < ProductDetailDTO>>
