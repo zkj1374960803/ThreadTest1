@@ -221,7 +221,7 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
      */
     public void updateDispatchTimes(BizServiceOrder bizServiceOrder) {
         StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE biz_service_order SET dispatch_times = :longFlagTwo,processor_orgno = :processorOrgno,")
+        sql.append("UPDATE biz_service_order SET dispatch_times = :dispatchTimes,processor_orgno = :processorOrgno,")
             .append(" processor_orgtype = :processorOrgtype WHERE service_orderno = :serviceOrderno");
 
         updateForBean(sql.toString(), bizServiceOrder);
