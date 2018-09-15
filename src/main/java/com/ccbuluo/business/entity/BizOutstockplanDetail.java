@@ -86,6 +86,11 @@ public class BizOutstockplanDetail extends AftersaleCommonEntity{
     @ApiModelProperty(name = "outOrgno", value = "出库机构编号")
     private String outOrgno;
     /**
+     * 出库机构名称
+     */
+    @ApiModelProperty(name = "outOrgName", value = "出库机构名称")
+    private String outOrgName;
+    /**
      * 计划出库数量
      */
     @ApiModelProperty(name = "planOutstocknum", value = "计划出库数量")
@@ -136,6 +141,14 @@ public class BizOutstockplanDetail extends AftersaleCommonEntity{
      */
     @ApiModelProperty(name = "stockType", value = "库存类型（正常库存、问题库存、报损件库存，等等）")
     private String stockType;
+
+    public String getOutOrgName() {
+        return outOrgName;
+    }
+
+    public void setOutOrgName(String outOrgName) {
+        this.outOrgName = outOrgName;
+    }
 
     public void setOutstockType(String outstockType) {
         this.outstockType = outstockType;

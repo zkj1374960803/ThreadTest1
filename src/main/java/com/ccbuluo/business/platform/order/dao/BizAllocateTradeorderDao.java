@@ -266,15 +266,38 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
      */
     public List<PerpayAmountDTO> queryPaymentInfo(String applyNo) {
         HashMap<String, Object> map = Maps.newHashMap();
+        map.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT b.supplier_code,b.supplier_name,a.perpay_amount,a.total_price  ")
             .append(" FROM biz_allocate_tradeorder a  ")
             .append(" LEFT JOIN biz_service_supplier b ON a.seller_orgno = b.supplier_code ")
-            .append(" WHERE 1 = 1 ");
+            .append(" WHERE 1 = 1 AND a.delete_flag = :deleteFlag");
         if(StringUtils.isNotBlank(applyNo)){
             map.put("applyNo", applyNo);
             sql.append(" AND a.apply_no = :applyNo ");
         }
         return queryListBean(PerpayAmountDTO.class, sql.toString(), map);
+    }
+
+    /**
+     * 根据维修单编号和当前登录人查询占用关系
+     * @param serviceOrderno 维修单编号
+     * @param orgCode 当前登录人的机构code
+     * @return 占用关系
+     * @author liuduo
+     * @date 2018-09-15 18:09:59
+     */
+    public List<RelOrdstockOccupy> getRelOrdstockOccupy(String serviceOrderno, String orgCode) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("serviceOrderno", serviceOrderno);
+        params.put("orgCode", orgCode);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT roo.order_type,roo.doc_no,roo.stock_id,roo.occupy_num,roo.occupy_status,roo.occupy_starttime,roo.occupy_endtime,")
+            .append(" roo.creator,roo.create_time,roo.delete_flag FROM rel_ordstock_occupy AS roo ")
+            .append(" LEFT JOIN biz_serviceorder_detail AS bsd ON bsd.order_no = roo.doc_no")
+            .append(" WHERE roo.doc_no = :serviceOrderno AND bsd.service_orgno = :orgCode");
+
+        return queryListBean(RelOrdstockOccupy.class, sql.toString(), params);
     }
 }
