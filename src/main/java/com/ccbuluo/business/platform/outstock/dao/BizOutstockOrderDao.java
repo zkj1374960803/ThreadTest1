@@ -143,7 +143,7 @@ public class BizOutstockOrderDao extends BaseDao<BizOutstockOrder> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("tradeDocno", tradeDocno);
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,outstockorder_no,outstock_type,outstock_time,trade_docno,outstock_operator,transportorder_no")
+        sql.append("SELECT id,outstockorder_no,outstock_orgno,outstock_type,outstock_time,trade_docno,outstock_operator,transportorder_no")
                 .append(" FROM biz_outstock_order WHERE trade_docno = :tradeDocno");
         return findForBean(BizOutstockOrderDTO.class, sql.toString(), params);
     }
