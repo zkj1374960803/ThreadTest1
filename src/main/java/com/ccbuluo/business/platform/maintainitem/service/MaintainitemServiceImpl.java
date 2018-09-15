@@ -1,12 +1,14 @@
 package com.ccbuluo.business.platform.maintainitem.service;
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.entity.BizServiceLog;
 import com.ccbuluo.business.entity.BizServiceMaintainitem;
 import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.platform.maintainitem.dao.BizServiceMaintainitemDao;
 import com.ccbuluo.business.platform.maintainitem.dto.DetailBizServiceMaintainitemDTO;
 import com.ccbuluo.business.platform.maintainitem.dto.SaveBizServiceMaintainitemDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
+import com.ccbuluo.business.platform.servicelog.service.ServiceLogService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -31,6 +33,8 @@ public class MaintainitemServiceImpl implements MaintainitemService{
     private MultiplepriceServiceImpl multiplepriceService;
     @Autowired
     private UserHolder userHolder;
+    @Autowired
+    private ServiceLogService serviceLogService;
 
     /**
      * 保存工时
@@ -59,7 +63,16 @@ public class MaintainitemServiceImpl implements MaintainitemService{
         bizServiceMaintainitem.setMaintainitemName(saveBizServiceMaintainitemDTO.getMaintainitemName());
         bizServiceMaintainitem.setUnitPrice(saveBizServiceMaintainitemDTO.getUnitPrice());
         bizServiceMaintainitem.preInsert(userHolder.getLoggedUserId());
-
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.BASIC.name());
+        bizServiceLog.setAction(BizServiceLog.actionEnum.SAVE.name());
+        bizServiceLog.setSubjectType("MaintainitemServiceImpl");
+        bizServiceLog.setSubjectKeyvalue(serviceCenterCode);
+        bizServiceLog.setLogContent("保存工时");
+        bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+        bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+        serviceLogService.create(bizServiceLog);
         return bizServiceMaintainitemDao.saveEntity(bizServiceMaintainitem);
     }
 
@@ -94,6 +107,16 @@ public class MaintainitemServiceImpl implements MaintainitemService{
         bizServiceMaintainitem.setUnitPrice(saveBizServiceMaintainitemDTO.getUnitPrice());
         bizServiceMaintainitem.preUpdate(userHolder.getLoggedUserId());
         bizServiceMaintainitem.setId(saveBizServiceMaintainitemDTO.getId());
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.BASIC.name());
+        bizServiceLog.setAction(BizServiceLog.actionEnum.UPDATE.name());
+        bizServiceLog.setSubjectType("MaintainitemServiceImpl");
+        bizServiceLog.setSubjectKeyvalue(saveBizServiceMaintainitemDTO.getMaintainitemName());
+        bizServiceLog.setLogContent("编辑工时");
+        bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+        bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+        serviceLogService.create(bizServiceLog);
         return bizServiceMaintainitemDao.update(bizServiceMaintainitem);
     }
 

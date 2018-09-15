@@ -1,8 +1,10 @@
 package com.ccbuluo.business.platform.storehouse.service;
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.entity.BizServiceLog;
 import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.entity.BizServiceStorehouse;
+import com.ccbuluo.business.platform.servicelog.service.ServiceLogService;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.dto.SaveBizServiceStorehouseDTO;
@@ -42,6 +44,8 @@ public class StoreHouseServiceImpl implements StoreHouseService{
     private UserHolder userHolder;
     @ThriftRPCClient("UserCoreSerService")
     private BasicUserOrganizationService orgService;
+    @Autowired
+    private ServiceLogService serviceLogService;
 
 
     Logger logger = LoggerFactory.getLogger(getClass());
@@ -74,6 +78,16 @@ public class StoreHouseServiceImpl implements StoreHouseService{
             BizServiceStorehouse bizServiceStorehouse = create(saveBizServiceStorehouseDTO);
             bizServiceStorehouse.setStorehouseCode(code);
             bizServiceStorehouse.preInsert(userHolder.getLoggedUserId());
+            BizServiceLog bizServiceLog = new BizServiceLog();
+            bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
+            bizServiceLog.setAction(BizServiceLog.actionEnum.SAVE.name());
+            bizServiceLog.setSubjectType("StoreHouseServiceImpl");
+            bizServiceLog.setSubjectKeyvalue(code);
+            bizServiceLog.setLogContent("保存仓库");
+            bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+            bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+            bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+            serviceLogService.create(bizServiceLog);
             return bizServiceStorehouseDao.saveEntity(bizServiceStorehouse);
         } catch (Exception e) {
             logger.error("保存仓库失败！",e);
@@ -91,6 +105,16 @@ public class StoreHouseServiceImpl implements StoreHouseService{
      */
     @Override
     public int editStoreHouseStatus(Long id, Integer storeHouseStatus) {
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
+        bizServiceLog.setAction(BizServiceLog.actionEnum.UPDATE.name());
+        bizServiceLog.setSubjectType("StoreHouseServiceImpl");
+        bizServiceLog.setSubjectKeyvalue(String.valueOf(id));
+        bizServiceLog.setLogContent("启停仓库");
+        bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+        bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+        serviceLogService.create(bizServiceLog);
         return bizServiceStorehouseDao.editStoreHouseStatus(id, storeHouseStatus,userHolder.getLoggedUserId());
     }
 
@@ -112,6 +136,16 @@ public class StoreHouseServiceImpl implements StoreHouseService{
             BizServiceStorehouse bizServiceStorehouse = create(saveBizServiceStorehouseDTO);
             bizServiceStorehouse.setId(saveBizServiceStorehouseDTO.getId());
             bizServiceStorehouse.preUpdate(userHolder.getLoggedUserId());
+            BizServiceLog bizServiceLog = new BizServiceLog();
+            bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
+            bizServiceLog.setAction(BizServiceLog.actionEnum.UPDATE.name());
+            bizServiceLog.setSubjectType("StoreHouseServiceImpl");
+            bizServiceLog.setSubjectKeyvalue(saveBizServiceStorehouseDTO.getServicecenterCode());
+            bizServiceLog.setLogContent("编辑仓库");
+            bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+            bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+            bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+            serviceLogService.create(bizServiceLog);
             return bizServiceStorehouseDao.update(bizServiceStorehouse);
         } catch (Exception e) {
             logger.error("编辑仓库失败！", e);
