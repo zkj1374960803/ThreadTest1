@@ -23,6 +23,7 @@ import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.BusinessUser;
 import com.ccbuluo.core.entity.Organization;
+import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -284,6 +285,9 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
      */
     @Override
     public StatusDto billOfPayment(String claimOrdno, String docStatus, BigDecimal actualAmount) {
+        if(null == actualAmount){
+            throw new CommonException("0", "请填写付款金额！");
+        }
         BizServiceClaimorder claimorder = claimOrderDao.findClaimOrderDetail(claimOrdno);
         // 构建申请单
         List<AccountTransactionDTO> payments = buildClaimPayment(claimorder,actualAmount);
