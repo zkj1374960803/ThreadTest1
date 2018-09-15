@@ -47,12 +47,12 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
         sql.append("INSERT INTO biz_service_order ( service_orderno,car_no,car_vin,")
             .append("service_type,report_orgno,report_orgtype,report_time,customer_name,customer_orgno,")
             .append("customer_phone,reserve_contacter,reserve_phone,order_status,")
-            .append("dispatch_times,cur_processor,processor_orgtype,service_time,")
+            .append("dispatch_times,cur_processor,processor_orgtype,processor_orgno,service_time,")
             .append("order_cost,payed,problem_content,creator,create_time,operator,")
             .append("operate_time,delete_flag,remark ) VALUES (  :serviceOrderno, :carNo,")
             .append(" :carVin, :serviceType, :reportOrgno, :reportOrgtype, :reportTime,")
             .append(" :customerName, :customerOrgno,:customerPhone, :reserveContacter, :reservePhone,")
-            .append(" :orderStatus, :dispatchTimes, :curProcessor, :processorOrgtype,")
+            .append(" :orderStatus, :dispatchTimes, :curProcessor, :processorOrgtype,:processorOrgno,")
             .append(" :serviceTime, :orderCost, :payed, :problemContent, :creator,")
             .append(" :createTime, :operator, :operateTime, :deleteFlag, :remark )");
         return super.save(sql.toString(), entity);
@@ -71,7 +71,7 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
             .append("car_no = :carNo,car_vin = :carVin,service_type = :serviceType,")
             .append("customer_name = :customerName,customer_phone = :customerPhone,customer_orgno = :customerOrgno,")
             .append("reserve_contacter = :reserveContacter,reserve_phone = :reservePhone,")
-            .append("cur_processor = :curProcessor,processor_orgtype = :processorOrgtype,")
+            .append("cur_processor = :curProcessor,processor_orgtype = :processorOrgtype,processor_orgno = :processorOrgno,")
             .append("service_time = :serviceTime,problem_content = :problemContent,")
             .append("operator = :operator,operate_time = :operateTime WHERE service_orderno= :serviceOrderno");
         return super.updateForBean(sql.toString(), entity);
@@ -89,7 +89,7 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
             .append("bso.service_type,bso.report_orgno,bso.report_orgtype,bso.report_time,")
             .append("bso.customer_name,bso.customer_orgno,bso.customer_phone,bso.reserve_contacter,")
             .append("bso.reserve_phone,bso.order_status,bso.dispatch_times,")
-            .append("bso.cur_processor,bso.processor_orgtype,bso.service_time,")
+            .append("bso.cur_processor,bso.processor_orgtype,bso.processor_orgno,bso.service_time,")
             .append("bso.order_cost,bso.payed,bso.problem_content,bso.creator,")
             .append("bso.create_time,bso.operator,bso.operate_time,bso.delete_flag,")
             .append("bso.remark FROM biz_service_order AS bso WHERE bso.id= :id");
@@ -129,7 +129,7 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
             .append(" bso.service_type,bso.report_orgno,bso.report_orgtype,bso.report_time,")
             .append(" bso.customer_name,bso.customer_orgno,bso.customer_phone,bso.reserve_contacter,")
             .append(" bso.reserve_phone,bso.order_status,bso.dispatch_times,")
-            .append(" bso.cur_processor,bso.processor_orgtype,bso.service_time,")
+            .append(" bso.cur_processor,bso.processor_orgtype,bso.processor_orgno,bso.service_time,")
             .append(" bso.order_cost,bso.payed,bso.problem_content ")
             .append(" FROM biz_service_order AS bso WHERE bso.service_orderno= :orderNo");
         return super.findForBean(BizServiceOrder.class, sql.toString(), params);
@@ -237,9 +237,9 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT bso.id,bso.service_orderno,bso.car_no,bso.car_vin,")
                 .append("bso.service_type,bso.report_orgno,bso.report_orgtype,bso.report_time,")
-                .append("bso.customer_name,bso.customer_phone,bso.reserve_contacter,")
+                .append("bso.customer_name,bso.customer_phone,bso.customer_orgno,bso.reserve_contacter,")
                 .append("bso.reserve_phone,bso.order_status,bso.dispatch_times,")
-                .append("bso.cur_processor,bso.processor_orgtype,bso.service_time,")
+                .append("bso.cur_processor,bso.processor_orgtype,bso.processor_orgno,bso.service_time,")
                 .append("bso.order_cost,bso.payed,bso.problem_content,bso.creator,")
                 .append("bso.create_time,bso.operator,bso.operate_time,bso.delete_flag,")
                 .append("bso.remark FROM biz_service_order AS bso WHERE bso.service_orderno= :serviceOrderno");
