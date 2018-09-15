@@ -649,6 +649,10 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public Map<String, Object> queryListByApplyNoAndInReNo(String applyNo) {
+        // 查询申请详情
+        FindAllocateApplyDTO allocateApplyDTO = bizAllocateApplyDao.findDetail(applyNo);
+
+
         String userOrgCode = getUserOrgCode();
         HashMap<String, Object> map = Maps.newHashMap();
         // 根据申请单号查询出库单号
@@ -662,12 +666,14 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             Map<String, String> collect = userNames.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, QueryNameByUseruuidsDTO::getName));
             bizOutstockOrderDTO.setOutstockOperatorName(collect.get(bizOutstockOrderDTO.getOutstockOperator()));
             map.put("bizOutstockOrderDTO", bizOutstockOrderDTO);
-            if(outstockOrderDTO.getOutstockOrgno().equals(userOrgCode)){
-                List<BizOutstockplanDetail> outstockplansByApplyNo = bizOutstockplanDetailDao.getOutstockplansByApplyNo(applyNo, null);
-                paddingOrgName(outstockplansByApplyNo);
-                map.put("stockPlanList", outstockplansByApplyNo);
-            }
         }
+
+        if(allocateApplyDTO.getOutstockOrgno().equals(userOrgCode)){
+            List<BizOutstockplanDetail> outstockplansByApplyNo = bizOutstockplanDetailDao.getOutstockplansByApplyNo(applyNo, null);
+            paddingOrgName(outstockplansByApplyNo);
+            map.put("stockPlanList", outstockplansByApplyNo);
+        }
+
         // 根据单号查询入库单号
         BizInstockOrderDTO instockOrderDTO = bizInstockOrderDao.getByTradeDocno(applyNo);
         if(instockOrderDTO != null){
@@ -679,11 +685,12 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             Map<String, String> collect = userNames.stream().collect(Collectors.toMap(QueryNameByUseruuidsDTO::getUseruuid, QueryNameByUseruuidsDTO::getName));
             bizInstockOrderDTO.setInstockOperatorName(collect.get(bizInstockOrderDTO.getInstockOperator()));
             map.put("bizInstockOrderDTO", bizInstockOrderDTO);
-            if(instockOrderDTO.getInstockOrgno().equals(userOrgCode)){
-                List<BizOutstockplanDetail> instockplansByApplyNo = bizInstockplanDetailDao.getInstockplansByApplyNo(applyNo);
-                paddingOrgName(instockplansByApplyNo);
-                map.put("stockPlanList", instockplansByApplyNo);
-            }
+        }
+
+        if(allocateApplyDTO.getInstockOrgno().equals(userOrgCode)){
+            List<BizOutstockplanDetail> instockplansByApplyNo = bizInstockplanDetailDao.getInstockplansByApplyNo(applyNo);
+            paddingOrgName(instockplansByApplyNo);
+            map.put("stockPlanList", instockplansByApplyNo);
         }
         return map;
     }
