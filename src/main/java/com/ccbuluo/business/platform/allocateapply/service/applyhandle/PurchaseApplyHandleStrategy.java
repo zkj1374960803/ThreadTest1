@@ -123,8 +123,8 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
             BizInstockplanDetail instockplanPlatform = new BizInstockplanDetail();
             // 平台入库计划
             instockplanPlatform = buildBizInstockplanDetail(ad);
-            // 成本价（从详单上获取）
-            instockplanPlatform.setCostPrice(ad.getCostPrice());
+            // 成本价（从详单上获取填写的销售价格）
+            instockplanPlatform.setCostPrice(ad.getSellPrice());
             // 平台仓库编号
             instockplanPlatform.setInstockRepositoryNo(ad.getInRepositoryNo());
             // 平台机构编号
