@@ -7,6 +7,7 @@ import com.ccbuluo.account.OrganizationTypeEnumThrift;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceLabel;
+import com.ccbuluo.business.entity.BizServiceLog;
 import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.entity.BizServiceStorehouse;
 import com.ccbuluo.business.platform.label.dto.LabelServiceCenterDTO;
@@ -16,6 +17,7 @@ import com.ccbuluo.business.platform.servicecenter.dto.SaveServiceCenterDTO;
 import com.ccbuluo.business.platform.servicecenter.dto.SearchListDTO;
 import com.ccbuluo.business.platform.servicecenter.dto.SearchServiceCenterDTO;
 import com.ccbuluo.business.platform.servicecenter.servicecenterenum.ServiceCenterEnum;
+import com.ccbuluo.business.platform.servicelog.service.ServiceLogService;
 import com.ccbuluo.business.platform.storehouse.dto.SaveBizServiceStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.service.StoreHouseServiceImpl;
 import com.ccbuluo.core.common.UserHolder;
@@ -65,6 +67,8 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
     private InnerUserInfoService userService;
     @ThriftRPCClient("BasicWalletpaymentSerService")
     private BizFinanceAccountService bizFinanceAccountService;
+    @Autowired
+    private ServiceLogService serviceLogService;
 
     private static final String AFTERSALESERVICECENTER = "(售后服务中心所属职场)";
     private static final String SAVEFAILURE = "保存失败！";
@@ -126,6 +130,16 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
             if (null != code && code.equals(Constants.ERROR_CODE)) {
                 throw new IllegalAccessException(stringStatusDto.getMessage());
             }
+            BizServiceLog bizServiceLog = new BizServiceLog();
+            bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
+            bizServiceLog.setAction(BizServiceLog.actionEnum.SAVE.name());
+            bizServiceLog.setSubjectType("ServiceCenterServiceImpl");
+            bizServiceLog.setSubjectKeyvalue(serviceCenterCode);
+            bizServiceLog.setLogContent("保存服务中心");
+            bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+            bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+            bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+            serviceLogService.create(bizServiceLog);
             return StatusDto.buildSuccessStatusDto(SAVESUCCESS);
         } catch (Exception e) {
             logger.error(SAVEFAILURE, e);
@@ -211,6 +225,17 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
         if (status.getCode().equals(Constants.ERROR_CODE)) {
             return StatusDto.buildFailure(status.getMessage());
         }
+
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
+        bizServiceLog.setAction(BizServiceLog.actionEnum.UPDATE.name());
+        bizServiceLog.setSubjectType("ServiceCenterServiceImpl");
+        bizServiceLog.setSubjectKeyvalue(serviceCenterCode);
+        bizServiceLog.setLogContent("编辑服务中心");
+        bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+        bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+        serviceLogService.create(bizServiceLog);
         return StatusDto.buildSuccessStatusDto("编辑成功！");
     }
 
@@ -285,6 +310,16 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
      */
     @Override
     public StatusDto<String> editOrgStatus(String serviceCenterCode, Integer serviceCenterStatus) {
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
+        bizServiceLog.setAction(BizServiceLog.actionEnum.UPDATE.name());
+        bizServiceLog.setSubjectType("ServiceCenterServiceImpl");
+        bizServiceLog.setSubjectKeyvalue(serviceCenterCode);
+        bizServiceLog.setLogContent("服务中心启停");
+        bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+        bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+        serviceLogService.create(bizServiceLog);
         return orgService.editOrgStatus(serviceCenterCode, serviceCenterStatus, userHolder.getLoggedUserId());
     }
 

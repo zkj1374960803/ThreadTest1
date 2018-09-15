@@ -1,11 +1,13 @@
 package com.ccbuluo.business.platform.maintainitem.service;
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.entity.BizServiceLog;
 import com.ccbuluo.business.entity.BizServiceMultipleprice;
 import com.ccbuluo.business.platform.maintainitem.dao.BizServiceMultiplepriceDao;
 import com.ccbuluo.business.platform.maintainitem.dto.CorrespondAreaDTO;
 import com.ccbuluo.business.platform.maintainitem.dto.SaveBizServiceMultiplepriceDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
+import com.ccbuluo.business.platform.servicelog.service.ServiceLogService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.db.Page;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,8 @@ public class MultiplepriceServiceImpl implements MultiplepriceService{
     private UserHolder userHolder;
     @Autowired
     private GenerateProjectCodeService generateProjectCodeService;
+    @Autowired
+    private ServiceLogService serviceLogService;
 
     /**
      * 保存地区倍数
@@ -104,6 +108,16 @@ public class MultiplepriceServiceImpl implements MultiplepriceService{
         if (ints.length > 0) {
             return Constants.SUCCESSSTATUS;
         }
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.BASIC.name());
+        bizServiceLog.setAction(BizServiceLog.actionEnum.SAVE.name());
+        bizServiceLog.setSubjectType("MultiplepriceServiceImpl");
+        bizServiceLog.setSubjectKeyvalue(saveBizServiceMultiplepriceDTO.getMaintainitemCode());
+        bizServiceLog.setLogContent("保存地区倍数");
+        bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+        bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+        serviceLogService.create(bizServiceLog);
         return Constants.FAILURESTATUS;
     }
 
@@ -132,6 +146,16 @@ public class MultiplepriceServiceImpl implements MultiplepriceService{
      */
     @Override
     public int deleteById(Long id) {
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.BASIC.name());
+        bizServiceLog.setAction(BizServiceLog.actionEnum.DELETE.name());
+        bizServiceLog.setSubjectType("MultiplepriceServiceImpl");
+        bizServiceLog.setSubjectKeyvalue(String.valueOf(id));
+        bizServiceLog.setLogContent("删除地区倍数");
+        bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+        bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+        serviceLogService.create(bizServiceLog);
         return bizServiceMultiplepriceDao.deleteById(id);
     }
 

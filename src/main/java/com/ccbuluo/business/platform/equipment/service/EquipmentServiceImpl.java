@@ -3,12 +3,14 @@ package com.ccbuluo.business.platform.equipment.service;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.ProductUnitEnum;
 import com.ccbuluo.business.entity.BizServiceEquipment;
+import com.ccbuluo.business.entity.BizServiceLog;
 import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
 import com.ccbuluo.business.platform.equipment.dto.DetailBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.equipment.dto.SaveBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
+import com.ccbuluo.business.platform.servicelog.service.ServiceLogService;
 import com.ccbuluo.business.platform.supplier.service.SupplierService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.db.Page;
@@ -39,6 +41,8 @@ public class EquipmentServiceImpl implements EquipmentService{
     private SupplierService supplierService;
     @Autowired
     private AllocateApplyService allocateApplyService;
+    @Autowired
+    private ServiceLogService serviceLogService;
 
     /**
      * 保存物料
@@ -69,6 +73,16 @@ public class EquipmentServiceImpl implements EquipmentService{
         bizServiceEquipment.setEquipUnit(saveBizServiceEquipmentDTO.getEquipUnit());
         bizServiceEquipment.preInsert(userHolder.getLoggedUserId());
         bizServiceEquipment.setRemark(saveBizServiceEquipmentDTO.getRemark());
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.BASIC.name());
+        bizServiceLog.setAction(BizServiceLog.actionEnum.SAVE.name());
+        bizServiceLog.setSubjectType("EquipmentServiceImpl");
+        bizServiceLog.setSubjectKeyvalue(serviceCenterCode);
+        bizServiceLog.setLogContent("保存物料");
+        bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+        bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+        serviceLogService.create(bizServiceLog);
         return bizServiceEquipmentDao.saveEntity(bizServiceEquipment);
     }
 
@@ -109,6 +123,16 @@ public class EquipmentServiceImpl implements EquipmentService{
         bizServiceEquipment.preUpdate(userHolder.getLoggedUserId());
         bizServiceEquipment.setId(saveBizServiceEquipmentDTO.getId());
         bizServiceEquipment.setRemark(saveBizServiceEquipmentDTO.getRemark());
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.BASIC.name());
+        bizServiceLog.setAction(BizServiceLog.actionEnum.UPDATE.name());
+        bizServiceLog.setSubjectType("EquipmentServiceImpl");
+        bizServiceLog.setSubjectKeyvalue(saveBizServiceEquipmentDTO.getEquipName());
+        bizServiceLog.setLogContent("编辑物料");
+        bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+        bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+        serviceLogService.create(bizServiceLog);
         return bizServiceEquipmentDao.update(bizServiceEquipment);
     }
 
@@ -173,6 +197,16 @@ public class EquipmentServiceImpl implements EquipmentService{
         if (aboolean || bboolean) {
             return Constants.FAILURE_ONE;
         }
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.BASIC.name());
+        bizServiceLog.setAction(BizServiceLog.actionEnum.DELETE.name());
+        bizServiceLog.setSubjectType("EquipmentServiceImpl");
+        bizServiceLog.setSubjectKeyvalue(equipCode);
+        bizServiceLog.setLogContent("删除物料");
+        bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+        bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+        serviceLogService.create(bizServiceLog);
         // 删除物料
         return bizServiceEquipmentDao.delete(equipCode);
     }
