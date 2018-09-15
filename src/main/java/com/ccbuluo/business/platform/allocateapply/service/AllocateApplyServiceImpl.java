@@ -701,7 +701,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     private void paddingOrgName(List<BizOutstockplanDetail> outstockplansByApplyNo) {
         Optional.ofNullable(outstockplansByApplyNo).ifPresent(a ->{
-            List<String> collect1 = outstockplansByApplyNo.stream().map(BizOutstockplanDetail::getOutOrgno).collect(Collectors.toList());
+            List<String> collect1 = outstockplansByApplyNo.stream().filter(BizOutstockplanDetail -> BizOutstockplanDetail.getOutOrgno() !=null).map(BizOutstockplanDetail::getOutOrgno).collect(Collectors.toList());
             Map<String, BasicUserOrganization> organizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(collect1);
             outstockplansByApplyNo.forEach(b ->{
                 BasicUserOrganization basicUserOrganization = organizationMap.get(b.getOutOrgno());
