@@ -26,7 +26,7 @@ public class PurchaseStockInOutCallBack implements StockInOutCallBack{
 
     @Override
     public StatusDto outStockCallBack(String docNo,String outRepositoryNo) {
-        inOutCallBackService.updateApplyOrderStatus(docNo);
+        inOutCallBackService.updateApplyOrderStatus(docNo,outRepositoryNo);
         return StatusDto.buildSuccessStatusDto("操作成功！");
     }
 }

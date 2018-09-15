@@ -120,7 +120,7 @@ public class PaymentController {
      * @author weijb
      * @date 2018-09-12 20:02:58
      */
-    @ApiOperation(value = "创建预付款单据", notes = "【魏俊标】")
+    @ApiOperation(value = "创建索赔单付款单据", notes = "【魏俊标】")
     @GetMapping("/savecustomerservicemarketcounter/{serviceOrderno}")
     @ApiImplicitParam(name = "claimOrdno", value = "申请单号", required = true, paramType = "path")
     public StatusDto<String> saveCustomerServiceMarketCounter(@PathVariable String claimOrdno){
