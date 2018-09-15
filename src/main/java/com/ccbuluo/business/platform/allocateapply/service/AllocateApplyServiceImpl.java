@@ -109,6 +109,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     @Resource
     private BizOutstockOrderDao bizOutstockOrderDao;
 
+
     /**
      * 创建物料或者零配件申请
      * @param allocateApplyDTO 申请单实体
@@ -262,8 +263,14 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         StatusDto<BasicUserOrganization> outstockOrgNameresolve = StatusDtoThriftUtils.resolve(outstockOrgName, BasicUserOrganization.class);
         StatusDto<BasicUserOrganization> instockOrgNameresolve = StatusDtoThriftUtils.resolve(instockOrgName, BasicUserOrganization.class);
         StatusDto<BasicUserOrganization> applyorgNameResolve = StatusDtoThriftUtils.resolve(applyorgName, BasicUserOrganization.class);
-        Optional.ofNullable(outstockOrgNameresolve.getData()).ifPresent(a -> allocateApplyDTO.setOutstockOrgName(a.getOrgName()));
-        Optional.ofNullable(instockOrgNameresolve.getData()).ifPresent(a -> allocateApplyDTO.setInstockOrgName(a.getOrgName()));
+        Optional.ofNullable(outstockOrgNameresolve.getData()).ifPresent(a -> {
+            allocateApplyDTO.setOutstockOrgName(a.getOrgName());
+            allocateApplyDTO.setOutstockOrgType(a.getOrgType());
+        });
+        Optional.ofNullable(instockOrgNameresolve.getData()).ifPresent(a -> {
+            allocateApplyDTO.setInstockOrgName(a.getOrgName());
+            allocateApplyDTO.setInstockOrgType(a.getOrgType());
+        });
         Optional.ofNullable(applyorgNameResolve.getData()).ifPresent(a -> {
                 String orgName = a.getOrgName();
                 String orgType = a.getOrgType();
@@ -295,6 +302,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }
         }
         allocateApplyDTO.setQueryAllocateapplyDetailDTO(queryAllocateapplyDetailDTOS);
+
+
         return allocateApplyDTO;
     }
 
@@ -643,7 +652,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             map.put("bizOutstockOrderDTO", bizOutstockOrderDTO);
         }
 
-
         // 根据单号查询入库单号
         BizInstockOrderDTO instockOrderDTO = bizInstockOrderDao.getByTradeDocno(applyNo);
         if(instockOrderDTO != null){
@@ -656,6 +664,11 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             bizInstockOrderDTO.setInstockOperatorName(collect.get(bizInstockOrderDTO.getInstockOperator()));
             map.put("bizInstockOrderDTO", bizInstockOrderDTO);
         }
+
+        List<BizOutstockplanDetail> outstockplansByApplyNo = bizOutstockplanDetailDao.getOutstockplansByApplyNo(applyNo, null);
+        List<BizInstockplanDetail> bizInstockplanDetails = bizInstockplanDetailDao.queryListByApplyNoAndInReNo(applyNo, null);
+//        map.put("outstockplans", outstockoutstockplansByApplyNoplans);
+
         return map;
     }
 
