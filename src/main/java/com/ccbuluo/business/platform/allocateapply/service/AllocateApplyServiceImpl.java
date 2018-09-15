@@ -667,8 +667,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
 
         List<BizOutstockplanDetail> outstockplansByApplyNo = bizOutstockplanDetailDao.getOutstockplansByApplyNo(applyNo, null);
         List<BizInstockplanDetail> bizInstockplanDetails = bizInstockplanDetailDao.queryListByApplyNoAndInReNo(applyNo, null);
-//        map.put("outstockplans", outstockoutstockplansByApplyNoplans);
-
+        map.put("outStockPlanList", outstockplansByApplyNo);
+        map.put("inStockPlanList", bizInstockplanDetails);
         return map;
     }
 
