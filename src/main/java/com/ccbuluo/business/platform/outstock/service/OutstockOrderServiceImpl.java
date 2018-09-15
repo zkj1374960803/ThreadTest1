@@ -15,6 +15,7 @@ import com.ccbuluo.business.platform.outstock.dto.OutstockorderDetailDTO;
 import com.ccbuluo.business.platform.outstock.dto.UpdatePlanStatusDTO;
 import com.ccbuluo.business.platform.outstockplan.service.OutStockPlanService;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
+import com.ccbuluo.business.platform.servicelog.service.ServiceLogService;
 import com.ccbuluo.business.platform.stockdetail.dto.UpdateStockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.service.StockDetailService;
 import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
@@ -76,6 +77,8 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     private BizServiceOrderDao bizServiceOrderDao;
     @Autowired
     private StockInOutCallBackContext stockInOutCallBackContext;
+    @Autowired
+    private ServiceLogService serviceLogService;
 
     /**
      * 自动保存出库单
@@ -204,6 +207,16 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
             }
             // 复核库存和计划
             checkStockAndPlan(applyNo, outRepositoryNo, outstockNo, bizOutstockplanDetailList);
+            BizServiceLog bizServiceLog = new BizServiceLog();
+            bizServiceLog.setModel(BizServiceLog.modelEnum.ERP.name());
+            bizServiceLog.setAction(BizServiceLog.actionEnum.SAVE.name());
+            bizServiceLog.setSubjectType("OutstockOrderServiceImpl");
+            bizServiceLog.setSubjectKeyvalue(outstockNo);
+            bizServiceLog.setLogContent("保存出库单");
+            bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+            bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+            bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+            serviceLogService.create(bizServiceLog);
             return StatusDto.buildSuccessStatusDto("保存成功！");
         } catch (Exception e) {
             logger.error("生成出库单失败！", e.getMessage());

@@ -108,7 +108,7 @@ public class PaymentServiceImpl implements PaymentService {
             String status = BizAllocateApply.ApplyStatusEnum.WAITDELIVERY.name();// 等待发货
             // 支付成功之后，如果是采购，则状态为平台待入库
             if(ba.getApplyType().equals(BizAllocateApply.AllocateApplyTypeEnum.PURCHASE.name())){
-                status = BizAllocateApply.ApplyStatusEnum.INSTORE.name();// 等待平台入库
+                status = BizAllocateApply.ApplyStatusEnum.WAITINGRECEIPT.name();// 等待收货
             }
             // 根据申请单获取申请单详情
             List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(ba.getApplyNo());

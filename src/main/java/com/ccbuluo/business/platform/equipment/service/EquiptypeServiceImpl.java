@@ -3,9 +3,11 @@ package com.ccbuluo.business.platform.equipment.service;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceEquipment;
 import com.ccbuluo.business.entity.BizServiceEquiptype;
+import com.ccbuluo.business.entity.BizServiceLog;
 import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
 import com.ccbuluo.business.platform.equipment.dao.BizServiceEquiptypeDao;
 import com.ccbuluo.business.platform.equipment.dto.SaveBizServiceEquiptypeDTO;
+import com.ccbuluo.business.platform.servicelog.service.ServiceLogService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.http.StatusDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,8 @@ public class EquiptypeServiceImpl implements EquiptypeService{
     private BizServiceEquipmentDao bizServiceEquipmentDao;
     @Autowired
     private UserHolder userHolder;
+    @Autowired
+    private ServiceLogService serviceLogService;
 
     /**
      * 保存物料类型
@@ -51,6 +55,16 @@ public class EquiptypeServiceImpl implements EquiptypeService{
         SaveBizServiceEquiptypeDTO successData = new SaveBizServiceEquiptypeDTO();
         successData.setId(aLong);
         successData.setTypeName(saveBizServiceEquiptypeDTO.getTypeName());
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.BASIC.name());
+        bizServiceLog.setAction(BizServiceLog.actionEnum.SAVE.name());
+        bizServiceLog.setSubjectType("EquiptypeServiceImpl");
+        bizServiceLog.setSubjectKeyvalue(saveBizServiceEquiptypeDTO.getTypeName());
+        bizServiceLog.setLogContent("保存物料类型");
+        bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+        bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+        serviceLogService.create(bizServiceLog);
         return StatusDto.buildDataSuccessStatusDto(successData);
     }
 
@@ -84,6 +98,16 @@ public class EquiptypeServiceImpl implements EquiptypeService{
         bizServiceEquiptype.setRemark(saveBizServiceEquiptypeDTO.getRemark());
         bizServiceEquiptype.preUpdate(userHolder.getLoggedUserId());
         bizServiceEquiptype.setId(saveBizServiceEquiptypeDTO.getId());
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.BASIC.name());
+        bizServiceLog.setAction(BizServiceLog.actionEnum.UPDATE.name());
+        bizServiceLog.setSubjectType("EquiptypeServiceImpl");
+        bizServiceLog.setSubjectKeyvalue(saveBizServiceEquiptypeDTO.getTypeName());
+        bizServiceLog.setLogContent("编辑物料类型");
+        bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+        bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+        serviceLogService.create(bizServiceLog);
         return bizServiceEquiptypeDao.update(bizServiceEquiptype);
     }
 
@@ -101,6 +125,16 @@ public class EquiptypeServiceImpl implements EquiptypeService{
         if (aboolean) {
             return Constants.FAILURE_ONE;
         }
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.BASIC.name());
+        bizServiceLog.setAction(BizServiceLog.actionEnum.DELETE.name());
+        bizServiceLog.setSubjectType("EquiptypeServiceImpl");
+        bizServiceLog.setSubjectKeyvalue(String.valueOf(id));
+        bizServiceLog.setLogContent("删除物料类型");
+        bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+        bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+        serviceLogService.create(bizServiceLog);
         return bizServiceEquiptypeDao.deleteById(id);
     }
 }
