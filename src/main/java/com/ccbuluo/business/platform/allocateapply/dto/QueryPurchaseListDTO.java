@@ -52,12 +52,22 @@ public class QueryPurchaseListDTO {
      */
     @ApiModelProperty(name = "offset", value = "偏移量")
     private Integer offset;
+    @ApiModelProperty(name = "deleteFlag", value = "删除标识")
+    private int deleteFlag;
 
     /**
      * 每页显示的数量
      */
     @ApiModelProperty(name = "pageSize", value = "每页显示的数量")
     private Integer pageSize;
+
+    public int getDeleteFlag() {
+        return deleteFlag;
+    }
+
+    public void setDeleteFlag(int deleteFlag) {
+        this.deleteFlag = deleteFlag;
+    }
 
     public String getProductType() {
         return productType;

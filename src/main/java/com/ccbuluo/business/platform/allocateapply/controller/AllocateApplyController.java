@@ -265,6 +265,22 @@ public class AllocateApplyController extends BaseController {
     }
 
     /**
+     * 保存价格(采购单)
+     * @param
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-09-15 15:36:20
+     */
+    @PostMapping("/saveQuote")
+    @ApiOperation(value = "保存价格(采购单)", notes = "【张康健】")
+    public StatusDto<String> saveQuote(@ApiParam(name = "CreatePurchaseBillDTO", value = "保存价格(采购单)", required = true) @RequestBody CreatePurchaseBillDTO createPurchaseBillDTO){
+        allocateApplyServiceImpl.createPurchaseBill(createPurchaseBillDTO);
+        return StatusDto.buildSuccessStatusDto();
+    }
+
+
+    /**
      * 采购单填报价格（确认报价）
      * @param confirmationQuoteDTO  报价DTO
      * @return  StatusDto<String>
@@ -277,25 +293,6 @@ public class AllocateApplyController extends BaseController {
         allocateApplyServiceImpl.confirmationQuote(confirmationQuoteDTO);
         return StatusDto.buildSuccessStatusDto();
     }
-
-
-    /**
-     *  采购单（修改价格）
-     * @param
-     * @exception
-     * @return
-     * @author zhangkangjian
-     * @date 2018-09-15 14:40:00
-     */
-    @PostMapping("/modifyprice")
-    @ApiOperation(value = "采购单（修改价格)", notes = "【张康健】")
-    public StatusDto<String> modifyPrice(@ApiParam(name = "ConfirmationQuoteDTO", value = "采购单（修改价格)", required = true) @RequestBody ConfirmationQuoteDTO confirmationQuoteDTO){
-//        allocateApplyServiceImpl.confirmationQuote();
-        return null;
-    }
-
-
-
 
 
     /**

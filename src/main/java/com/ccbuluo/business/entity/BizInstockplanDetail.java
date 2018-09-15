@@ -59,6 +59,13 @@ public class BizInstockplanDetail extends AftersaleCommonEntity{
      */
     @ApiModelProperty(name = "instockOrgno", value = "入库机构编号")
     private String instockOrgno;
+
+    /**
+     * 入库机构名称
+     */
+    @ApiModelProperty(name = "instockOrgName", value = "入库机构名称")
+    private String instockOrgName;
+
     /**
      * 成本单价
      */
@@ -135,6 +142,13 @@ public class BizInstockplanDetail extends AftersaleCommonEntity{
     }
 
 
+    public String getInstockOrgName() {
+        return instockOrgName;
+    }
+
+    public void setInstockOrgName(String instockOrgName) {
+        this.instockOrgName = instockOrgName;
+    }
 
     public void setInstockType(String instockType) {
         this.instockType = instockType;

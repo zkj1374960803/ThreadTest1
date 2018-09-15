@@ -5,6 +5,7 @@ import com.ccbuluo.business.constants.Constants;
 
 import com.ccbuluo.business.constants.StockPlanStatusEnum;
 import com.ccbuluo.business.entity.BizInstockplanDetail;
+import com.ccbuluo.business.entity.BizOutstockplanDetail;
 import com.ccbuluo.business.platform.allocateapply.dto.PerpayAmountDTO;
 import com.ccbuluo.business.platform.outstock.dto.UpdatePlanStatusDTO;
 import com.ccbuluo.dao.BaseDao;
@@ -280,6 +281,31 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
         }
         return super.queryListBean(BizInstockplanDetail.class, sql.toString(), params);
     }
+
+    /**
+     * 查询入库计划
+     * @param
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-09-15 16:02:58
+     */
+    public List<BizOutstockplanDetail> getInstockplansByApplyNo(String applyNo){
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,instock_type,product_no,product_name,product_type,product_categoryname,seller_orgno AS 'outOrgno',")
+            .append("trade_no,supplier_no,instock_repository_no,cost_price,")
+            .append("IFNULL(plan_instocknum,0) AS planInstocknum,IFNULL(actual_instocknum,0) AS actualInstocknum,complete_status,complete_time,")
+            .append("outstock_planid")
+            .append(" FROM biz_instockplan_detail WHERE 1 = 1 ");
+        if(StringUtils.isNotBlank(applyNo)){
+            sql.append(" AND trade_no= :applyNo ");
+        }
+        return super.queryListBean(BizOutstockplanDetail.class, sql.toString(), params);
+    }
+
+
 
     /**
      * 根据入库计划id查询版本号

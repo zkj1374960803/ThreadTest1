@@ -576,6 +576,17 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void confirmationQuote(ConfirmationQuoteDTO confirmationQuoteDTO) {
+        updateAllocateTradeorder(confirmationQuoteDTO);
+        // 生成出入库计划
+        applyHandleContext.applyHandle(confirmationQuoteDTO.getApplyNo());
+    }
+    /**
+     * 更新交易订单
+     * @param confirmationQuoteDTO
+     * @author zhangkangjian
+     * @date 2018-09-15 16:42:03
+     */
+    private void updateAllocateTradeorder(ConfirmationQuoteDTO confirmationQuoteDTO) {
         List<BizAllocateTradeorder> list = Lists.newArrayList();
         ProcessApplyDTO processApplyDTO = new ProcessApplyDTO();
         // 更新基础数据
@@ -587,7 +598,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         processApplyDTO.setVersionNo(versionNo);
         bizAllocateApplyDao.updateAllocateApply(processApplyDTO);
         // 批量更新采购申请详单的价格
-         List<PurchaseProductInfo> purchaseProductInfo = confirmationQuoteDTO.getPurchaseProductInfo();
+        List<PurchaseProductInfo> purchaseProductInfo = confirmationQuoteDTO.getPurchaseProductInfo();
         bizAllocateApplyDao.batchupdatePurchaseProductInfo(purchaseProductInfo);
         List<PerpayAmountDTO> perpayAmountDTO = confirmationQuoteDTO.getPerpayAmountDTO();
         String applyNo = confirmationQuoteDTO.getApplyNo();
@@ -610,10 +621,10 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }
             list.addAll(bizAllocateTradeorderList);
         });
+        // 删除订单
+        bizAllocateTradeorderDao.deleteAllocateTradeorderByApplyNo(confirmationQuoteDTO.getApplyNo());
         // 保存生成订单
         bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
-        // 生成出入库计划
-        applyHandleContext.applyHandle(confirmationQuoteDTO.getApplyNo());
     }
 
     /**
@@ -653,6 +664,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             map.put("bizOutstockOrderDTO", bizOutstockOrderDTO);
             if(outstockOrderDTO.getOutstockOrgno().equals(userOrgCode)){
                 List<BizOutstockplanDetail> outstockplansByApplyNo = bizOutstockplanDetailDao.getOutstockplansByApplyNo(applyNo, null);
+                paddingOrgName(outstockplansByApplyNo);
                 map.put("stockPlanList", outstockplansByApplyNo);
             }
         }
@@ -668,11 +680,31 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             bizInstockOrderDTO.setInstockOperatorName(collect.get(bizInstockOrderDTO.getInstockOperator()));
             map.put("bizInstockOrderDTO", bizInstockOrderDTO);
             if(instockOrderDTO.getInstockOrgno().equals(userOrgCode)){
-                List<BizInstockplanDetail> bizInstockplanDetails = bizInstockplanDetailDao.queryListByApplyNoAndInReNo(applyNo, null);
-                map.put("stockPlanList", bizInstockplanDetails);
+                List<BizOutstockplanDetail> instockplansByApplyNo = bizInstockplanDetailDao.getInstockplansByApplyNo(applyNo);
+                paddingOrgName(instockplansByApplyNo);
+                map.put("stockPlanList", instockplansByApplyNo);
             }
         }
         return map;
+    }
+
+    /**
+     * 填充出库计划机构名称
+     * @param outstockplansByApplyNo
+     * @author zhangkangjian
+     * @date 2018-09-15 16:44:46
+     */
+    private void paddingOrgName(List<BizOutstockplanDetail> outstockplansByApplyNo) {
+        Optional.ofNullable(outstockplansByApplyNo).ifPresent(a ->{
+            List<String> collect1 = outstockplansByApplyNo.stream().map(BizOutstockplanDetail::getOutOrgno).collect(Collectors.toList());
+            Map<String, BasicUserOrganization> organizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(collect1);
+            outstockplansByApplyNo.forEach(b ->{
+                BasicUserOrganization basicUserOrganization = organizationMap.get(b.getOutOrgno());
+                if(basicUserOrganization != null){
+                    b.setOutOrgName(basicUserOrganization.getOrgName());
+                }
+            });
+        });
     }
 
     /**
@@ -686,30 +718,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     @Override
     public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String outRepositoryNo) {
         return bizOutstockplanDetailDao.queryOutstockplan(applyNo,null, outRepositoryNo);
-    }
-
-    /**
-     *  更新申请单的详单数据
-     * @param processApplyDTO
-     * @param applyNo
-     * @exception
-     * @return
-     * @author zhangkangjian
-     * @date 2018-08-30 11:15:58
-     */
-    private void batchUpdateForApplyDetail(ProcessApplyDTO processApplyDTO, String applyNo) {
-        List<QueryAllocateapplyDetailDTO> queryAllocateapplyDetailDTOS = bizAllocateApplyDao.queryAllocateapplyDetail(applyNo);
-        Optional.ofNullable(queryAllocateapplyDetailDTOS).ifPresent(a ->{
-            Map<Long, QueryAllocateapplyDetailDTO> map = a.stream().collect(Collectors.toMap(QueryAllocateapplyDetailDTO::getId, b -> b,(k1, k2)->k1));
-            List<ProcessApplyDetailDTO> processApplyDetailDTO = processApplyDTO.getProcessApplyDetailDTO();
-            processApplyDetailDTO.stream().forEach(c ->{
-                QueryAllocateapplyDetailDTO queryAllocateapplyDetailDTO = map.get(c.getId());
-                if(queryAllocateapplyDetailDTO != null){
-                    c.setSupplierNo(queryAllocateapplyDetailDTO.getSupplierNo());
-                }
-            });
-        });
-        bizAllocateApplyDao.batchUpdateForApplyDetail(processApplyDTO.getProcessApplyDetailDTO());
     }
 
 

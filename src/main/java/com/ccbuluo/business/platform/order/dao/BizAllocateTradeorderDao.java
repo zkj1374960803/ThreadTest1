@@ -266,11 +266,12 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
      */
     public List<PerpayAmountDTO> queryPaymentInfo(String applyNo) {
         HashMap<String, Object> map = Maps.newHashMap();
+        map.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT b.supplier_code,b.supplier_name,a.perpay_amount,a.total_price  ")
             .append(" FROM biz_allocate_tradeorder a  ")
             .append(" LEFT JOIN biz_service_supplier b ON a.seller_orgno = b.supplier_code ")
-            .append(" WHERE 1 = 1 ");
+            .append(" WHERE 1 = 1 AND a.delete_flag = :deleteFlag");
         if(StringUtils.isNotBlank(applyNo)){
             map.put("applyNo", applyNo);
             sql.append(" AND a.apply_no = :applyNo ");
