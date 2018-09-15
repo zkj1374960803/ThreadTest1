@@ -576,24 +576,25 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void confirmationQuote(ConfirmationQuoteDTO confirmationQuoteDTO) {
-        updateAllocateTradeorder(confirmationQuoteDTO);
+        ProcessApplyDTO processApplyDTO = new ProcessApplyDTO();
+        processApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
+        updateAllocateTradeorder(confirmationQuoteDTO, processApplyDTO);
         // 生成出入库计划
         applyHandleContext.applyHandle(confirmationQuoteDTO.getApplyNo());
     }
+
     /**
      * 更新交易订单
      * @param confirmationQuoteDTO
      * @author zhangkangjian
      * @date 2018-09-15 16:42:03
      */
-    private void updateAllocateTradeorder(ConfirmationQuoteDTO confirmationQuoteDTO) {
+    private void updateAllocateTradeorder(ConfirmationQuoteDTO confirmationQuoteDTO, ProcessApplyDTO processApplyDTO) {
         List<BizAllocateTradeorder> list = Lists.newArrayList();
-        ProcessApplyDTO processApplyDTO = new ProcessApplyDTO();
         // 更新基础数据
         processApplyDTO.setApplyNo(confirmationQuoteDTO.getApplyNo());
         processApplyDTO.setApplyProcessor(userHolder.getLoggedUserId());
         processApplyDTO.setProcessTime(new Date());
-        processApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
         Long versionNo = bizAllocateApplyDao.findVersionNo(processApplyDTO.getApplyNo());
         processApplyDTO.setVersionNo(versionNo);
         bizAllocateApplyDao.updateAllocateApply(processApplyDTO);
@@ -722,6 +723,19 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     @Override
     public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String outRepositoryNo) {
         return bizOutstockplanDetailDao.queryOutstockplan(applyNo,null, outRepositoryNo);
+    }
+
+    /**
+     * 保存采购单
+     *
+     * @param confirmationQuoteDTO@exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-09-15 18:35:07
+     */
+    @Override
+    public void saveQuote(ConfirmationQuoteDTO confirmationQuoteDTO) {
+        updateAllocateTradeorder(confirmationQuoteDTO, new ProcessApplyDTO());
     }
 
 

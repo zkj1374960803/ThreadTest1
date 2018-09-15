@@ -274,8 +274,8 @@ public class AllocateApplyController extends BaseController {
      */
     @PostMapping("/saveQuote")
     @ApiOperation(value = "保存价格(采购单)", notes = "【张康健】")
-    public StatusDto<String> saveQuote(@ApiParam(name = "CreatePurchaseBillDTO", value = "保存价格(采购单)", required = true) @RequestBody CreatePurchaseBillDTO createPurchaseBillDTO){
-        allocateApplyServiceImpl.createPurchaseBill(createPurchaseBillDTO);
+    public StatusDto<String> saveQuote(@ApiParam(name = "ConfirmationQuoteDTO", value = "采购单填报价格（确认报价）", required = true) @RequestBody ConfirmationQuoteDTO confirmationQuoteDTO){
+        allocateApplyServiceImpl.saveQuote(confirmationQuoteDTO);
         return StatusDto.buildSuccessStatusDto();
     }
 

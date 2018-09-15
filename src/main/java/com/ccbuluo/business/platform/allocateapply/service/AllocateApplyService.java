@@ -299,4 +299,13 @@ public interface AllocateApplyService {
      * @date 2018-09-13 11:17:58
      */
     List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String outRepositoryNo);
+    /**
+     *  保存采购单
+     * @param
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-09-15 18:35:07
+     */
+    void saveQuote(ConfirmationQuoteDTO confirmationQuoteDTO);
 }
