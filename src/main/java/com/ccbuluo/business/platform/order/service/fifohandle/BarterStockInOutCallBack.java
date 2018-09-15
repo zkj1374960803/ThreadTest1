@@ -52,7 +52,13 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
 
     @Override
     public StatusDto inStockCallBack(String docNo,String inRepositoryNo) {
-        platformInstockCallback(docNo);
+        BizAllocateApply apply = bizAllocateApplyDao.getByNo(docNo);
+        // 调拨入库之后要更改申请方入库计划状态
+        String curretOrgNo = userHolder.getLoggedUser().getOrganization().getOrgCode();
+        // 只有卖方机构入库的时候才生成出库计划
+        if(curretOrgNo.equals(apply.getOutstockOrgno())){
+            platformInstockCallback(docNo);
+        }
 //        // 调拨入库之后要更改申请方入库计划状态
 //        bizInstockplanDetailDao.updateCompleteStatus(docNo);
         // 更改申请单状态
@@ -62,10 +68,14 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
 
     @Override
     public StatusDto outStockCallBack(String docNo,String outRepositoryNo) {
+        BizAllocateApply apply = bizAllocateApplyDao.getByNo(docNo);
         // 调拨入库之后要更改申请方入库计划状态
-        bizInstockplanDetailDao.updateCompleteStatus(docNo);
+        String curretOrgNo = userHolder.getLoggedUser().getOrganization().getOrgCode();
+        if(curretOrgNo.equals(apply.getOutstockOrgno())){
+            bizInstockplanDetailDao.updateCompleteStatus(docNo);
+        }
         // 更改申请单状态
-        inOutCallBackService.updateApplyOrderStatus(docNo);
+        inOutCallBackService.updateApplyOrderStatus(docNo,outRepositoryNo);
         return StatusDto.buildSuccessStatusDto("操作成功！");
     }
 

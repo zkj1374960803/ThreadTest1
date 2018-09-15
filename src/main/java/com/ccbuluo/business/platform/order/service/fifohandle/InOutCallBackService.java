@@ -90,15 +90,9 @@ public class InOutCallBackService {
      * @author liuduo
      * @date 2018-08-11 13:05:07
      */
-    public void updateApplyOrderStatus(String applyNo) {
+    public void updateApplyOrderStatus(String applyNo,String outRepositoryNo) {
         BizAllocateApply apply = bizAllocateApplyDao.getByNo(applyNo);
         FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
-        // 根据申请单编号查询订单占用库存关系表
-        List<RelOrdstockOccupy> relOrdstock = bizAllocateTradeorderDao.getRelOrdstockOccupyByApplyNo(applyNo);
-        String outRepositoryNo = "";
-        if(null != relOrdstock && relOrdstock.size() > 0){
-            outRepositoryNo = relOrdstock.get(0).getOutstockOrgno();
-        }
         List<BizOutstockplanDetail> bizOutstockplanDetailList = outStockPlanService.queryOutstockplan(applyNo, StockPlanStatusEnum.DOING.toString(),outRepositoryNo);
         List<BizOutstockplanDetail> collect = bizOutstockplanDetailList.stream().filter(item -> item.getPlanStatus().equals(StockPlanStatusEnum.COMPLETE.name())).collect(Collectors.toList());
         String applyType = detail.getApplyType();
