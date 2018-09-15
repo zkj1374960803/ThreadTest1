@@ -144,6 +144,7 @@ public class ClaimOrderDao extends BaseDao<ClaimOrderDao> {
             map.put("docStatus", docStatus);
             sql.append(" AND a.doc_status =:docStatus");
         }
+        sql.append("  ORDER BY b.operate_time DESC");
         return queryPageForBean(QueryClaimorderListDTO.class, sql.toString(), map, offset, pageSize);
     }
 

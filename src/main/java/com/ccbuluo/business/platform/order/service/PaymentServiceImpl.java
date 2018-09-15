@@ -132,7 +132,7 @@ public class PaymentServiceImpl implements PaymentService {
                 if(BizAllocateApply.AllocateApplyTypeEnum.SAMELEVEL.toString().equals(ba.getApplyType())){
                     bizOutstockplanDetailDao.updatePlanStatus(applyNo);
                 }
-                addlog(applyNo,ba.getInstockOrgno()+"支付给"+ba.getOutstockOrgno()+sellTotal+"人民币",BizServiceLog.actionEnum.PAYMENT.name());
+                addlog(applyNo,ba.getInstockOrgno()+"支付给"+ba.getOutstockOrgno()+sellTotal+"人民币",BizServiceLog.actionEnum.PAYMENT.name(),BizServiceLog.modelEnum.ERP.name());
             }else{
                 return statusDto;
             }
@@ -233,7 +233,7 @@ public class PaymentServiceImpl implements PaymentService {
             String receiveOrgno = pair.getLeft();
             BigDecimal price = pair.getRight();
             // 记录日志
-            addlog(serviceOrderno,payerOrgno+"支付给"+receiveOrgno+price+"人民币",BizServiceLog.actionEnum.PAYMENT.name());
+            addlog(serviceOrderno,payerOrgno+"支付给"+receiveOrgno+price+"人民币",BizServiceLog.actionEnum.PAYMENT.name(),BizServiceLog.modelEnum.SERVICE.name());
         }
         // 付款完成，状态改为待验收
         bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.WAITING_CHECKING.name());
@@ -277,10 +277,11 @@ public class PaymentServiceImpl implements PaymentService {
      * @param applyNo 申请单号
      * @param content 日志内容
      * @param action 动作
+     * @param mode 功能所属的模块
      */
-    private void addlog(String applyNo,String content,String action){
+    private void addlog(String applyNo,String content,String action,String mode){
         BizServiceLog bizServiceLog = new BizServiceLog();
-        bizServiceLog.setModel(BizServiceLog.modelEnum.ERP.name());
+        bizServiceLog.setModel(mode);
         // BizServiceLog.actionEnum.UPDATE.name()
         bizServiceLog.setAction(action);
         bizServiceLog.setSubjectType("PaymentServiceImpl");
