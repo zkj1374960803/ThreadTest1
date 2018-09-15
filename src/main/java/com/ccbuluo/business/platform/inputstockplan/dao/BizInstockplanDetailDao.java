@@ -294,13 +294,13 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNo", applyNo);
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,instock_type,product_no,product_name,product_type,product_categoryname,seller_orgno AS 'outOrgno',")
-            .append("trade_no,supplier_no,instock_repository_no,cost_price,")
-            .append("IFNULL(plan_instocknum,0) AS planInstocknum,IFNULL(actual_instocknum,0) AS actualInstocknum,complete_status,complete_time,")
-            .append("outstock_planid")
-            .append(" FROM biz_instockplan_detail WHERE 1 = 1 ");
+        sql.append("SELECT a.id,a.instock_type,a.product_no,a.product_unit,a.product_name,a.product_type,a.product_categoryname,a.seller_orgno AS 'outOrgno',")
+            .append("a.trade_no,a.supplier_no,a.instock_repository_no,a.cost_price,b.supplier_name,")
+            .append("IFNULL(a.plan_instocknum,0) AS planOutstocknum,IFNULL(a.actual_instocknum,0) AS actualInstocknum,a.complete_status,a.complete_time")
+            .append(" FROM biz_instockplan_detail a left join biz_service_supplier b on a.supplier_no = b.supplier_code")
+            .append(" WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(applyNo)){
-            sql.append(" AND trade_no= :applyNo ");
+            sql.append(" AND a.trade_no= :applyNo ");
         }
         return super.queryListBean(BizOutstockplanDetail.class, sql.toString(), params);
     }

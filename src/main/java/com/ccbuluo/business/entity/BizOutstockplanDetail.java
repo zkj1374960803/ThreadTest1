@@ -3,6 +3,7 @@ package com.ccbuluo.business.entity;
 import com.ccbuluo.business.constants.StockPlanStatusEnum;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -146,6 +147,13 @@ public class BizOutstockplanDetail extends AftersaleCommonEntity{
         return outOrgName;
     }
 
+    public double getTotalPrice(){
+        if(costPrice != null){
+            return costPrice.doubleValue() * planOutstocknum;
+        }
+        return 0D;
+    }
+
     public void setOutOrgName(String outOrgName) {
         this.outOrgName = outOrgName;
     }
@@ -287,9 +295,11 @@ public class BizOutstockplanDetail extends AftersaleCommonEntity{
     }
 
     public String getStatusName() {
-        return StockPlanStatusEnum.valueOf(planStatus).getLabel();
+        if(planStatus != null){
+            return StockPlanStatusEnum.valueOf(planStatus).getLabel();
+        }
+        return StringUtils.EMPTY;
     }
-
     public Long getVersionNo() {
         return versionNo;
     }
