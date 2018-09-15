@@ -279,6 +279,24 @@ public class AllocateApplyController extends BaseController {
     }
 
 
+    /**
+     *  采购单（修改价格）
+     * @param
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-09-15 14:40:00
+     */
+    @PostMapping("/modifyprice")
+    @ApiOperation(value = "采购单（修改价格)", notes = "【张康健】")
+    public StatusDto<String> modifyPrice(@ApiParam(name = "ConfirmationQuoteDTO", value = "采购单（修改价格)", required = true) @RequestBody ConfirmationQuoteDTO confirmationQuoteDTO){
+//        allocateApplyServiceImpl.confirmationQuote();
+        return null;
+    }
+
+
+
+
 
     /**
      * 查询采购单的付款信息
