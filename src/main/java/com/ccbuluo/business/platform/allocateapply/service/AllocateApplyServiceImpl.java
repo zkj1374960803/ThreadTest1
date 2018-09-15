@@ -684,7 +684,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             bizInstockOrderDTO.setInstockOperatorName(collect.get(bizInstockOrderDTO.getInstockOperator()));
             map.put("bizInstockOrderDTO", bizInstockOrderDTO);
         }
-
         if(allocateApplyDTO.getInstockOrgno().equals(userOrgCode)){
             List<BizOutstockplanDetail> instockplansByApplyNo = bizInstockplanDetailDao.getInstockplansByApplyNo(applyNo);
             paddingOrgName(instockplansByApplyNo);
