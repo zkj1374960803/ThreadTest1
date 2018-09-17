@@ -527,6 +527,9 @@ public class PaymentServiceImpl implements PaymentService {
             BigDecimal costPrice = applyFilter.get().getCostPrice();
             // 数量
             BigDecimal appNum = BigDecimal.valueOf(applyFilter.get().getApplyNum());
+            if(BigDecimal.valueOf(money).compareTo(costPrice.multiply(appNum)) > 0){
+                throw new CommonException("0", "尾款金额大于总金额！");
+            }
             bigDecimal = BigDecimal.valueOf(money).subtract(costPrice.multiply(appNum));
         }
         return bigDecimal.doubleValue();
