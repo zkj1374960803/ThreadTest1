@@ -455,8 +455,10 @@ public class PaymentServiceImpl implements PaymentService {
      * @date 2018-09-12 10:07:36
      */
     private List<AccountTransactionDTO> buildApplyPayment(BizAllocateApply ba,BigDecimal sellTotal,String productType){
-        String payerOrgno = ba.getInstockOrgno();// 买入方(支付方)
-        String receiveOrgno = ba.getOutstockOrgno();//卖出方(接收方)
+        // 付款方
+        String payerOrgno = Constants.AFTER_SALE_PLATFORM;
+        // 收款方
+        String receiveOrgno = ba.getOutstockOrgno();
         TransactionTypeEnumThrift transactionTypeEnum = null;
         List<AccountTransactionDTO> list = new ArrayList<AccountTransactionDTO>();
         // 付款方
@@ -515,7 +517,7 @@ public class PaymentServiceImpl implements PaymentService {
             list.add(accountPayer);
         }
         if(null != accountReceive){
-            list.add(accountReceive);
+//            list.add(accountReceive);
         }
         return list;
     }
