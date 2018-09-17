@@ -148,8 +148,8 @@ public class BizOutstockplanDetail extends AftersaleCommonEntity{
     }
 
     public double getTotalPrice(){
-        if(costPrice != null){
-            return costPrice.doubleValue() * planOutstocknum;
+        if(salesPrice != null){
+            return salesPrice.doubleValue() * planOutstocknum;
         }
         return 0D;
     }
