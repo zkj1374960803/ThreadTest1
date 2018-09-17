@@ -469,7 +469,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     public Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO, List<String> productCode, List<String> orgCode) {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.id,a.product_no,sum(ifnull(a.valid_stock,0) + ifnull(a.occupy_stock,0) + ifnull(a.problem_stock,0) + ifnull(a.damaged_stock,0) + ifnull(a.transit_stock,0) + ifnull(a.freeze_stock,0)) as 'total',a.product_name as 'productName',a.product_categoryname as 'productCategoryname',a.product_unit as 'unit'")
+        sql.append(" SELECT a.id,a.product_no,sum(ifnull(a.valid_stock,0) + ifnull(a.occupy_stock,0)) as 'total',a.product_name as 'productName',a.product_categoryname as 'productCategoryname',a.product_unit as 'unit'")
             .append(" FROM biz_stock_detail a ")
             .append(" WHERE 1 = 1 ");
         if(productCode != null && productCode.size() > 0){
@@ -681,7 +681,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.equip_code AS 'productNo', a.equip_name AS 'productName',a.equip_unit AS 'unit',c.type_name AS 'productCategoryname', ")
-            .append(" SUM(IFNULL(b.valid_stock,0) + IFNULL(b.occupy_stock,0) + IFNULL(b.problem_stock,0)) AS 'total' ")
+            .append(" SUM(IFNULL(b.valid_stock,0) + IFNULL(b.occupy_stock,0)) AS 'total' ")
             .append(" FROM biz_service_equipment a ")
             .append(" LEFT JOIN biz_stock_detail b ON a.equip_code = b.product_no ")
             .append(" LEFT JOIN biz_service_equiptype c ON c.id = a.equiptype_id ")

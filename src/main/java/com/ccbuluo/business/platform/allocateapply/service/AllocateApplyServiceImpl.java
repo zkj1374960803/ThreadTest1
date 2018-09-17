@@ -342,16 +342,23 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         Optional.ofNullable(page.getRows()).ifPresent(a ->{
             List<String> outstockOrgno = a.stream().filter(b -> b.getOutstockOrgno() != null).map(QueryAllocateApplyListDTO::getOutstockOrgno).collect(Collectors.toList());
             List<String> instockOrgno = a.stream().filter(b -> b.getInstockOrgno() != null).map(QueryAllocateApplyListDTO::getInstockOrgno).collect(Collectors.toList());
+            List<String> applyorgNo = a.stream().filter(b -> b.getApplyorgNo() != null).map(QueryAllocateApplyListDTO::getApplyorgNo).collect(Collectors.toList());
             Map<String, BasicUserOrganization> outOrganizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(outstockOrgno);
             Map<String, BasicUserOrganization> inOrganizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(instockOrgno);
+            Map<String, BasicUserOrganization> applyorgNoMap = basicUserOrganizationService.queryOrganizationByOrgCodes(applyorgNo);
             a.stream().forEach(b ->{
                 BasicUserOrganization outOrganization = outOrganizationMap.get(b.getOutstockOrgno());
                 BasicUserOrganization inOrganization = inOrganizationMap.get(b.getInstockOrgno());
+                BasicUserOrganization applyOrganization = applyorgNoMap.get(b.getApplyorgNo());
                 if(outOrganization != null){
                     b.setOutstockOrgname(outOrganization.getOrgName());
                 }
                 if(inOrganization != null){
                     b.setInstockOrgName(inOrganization.getOrgName());
+                }
+                if(applyOrganization != null){
+                    b.setOrgType(applyOrganization.getOrgType());
+                    b.setOrgName(applyOrganization.getOrgName());
                 }
             });
         });
