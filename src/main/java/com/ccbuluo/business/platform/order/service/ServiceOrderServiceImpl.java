@@ -507,7 +507,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      */
     private void occupyStock(SaveOrderDetailDTO saveOrderDetailDTO) {
         List<SaveMerchandiseDTO> saveMerchandiseDTOS = saveOrderDetailDTO.getSaveMerchandiseDTOS();
-        List<SaveMerchandiseDTO> collect = saveMerchandiseDTOS.stream().filter(item -> item.getServiceUserid() == null).collect(Collectors.toList());
+        List<SaveMerchandiseDTO> collect = saveMerchandiseDTOS.stream().filter(item -> item.getServiceUserid() == null || item.getServiceUserid() == userHolder.getLoggedUserId()).collect(Collectors.toList());
         if (!collect.isEmpty()) {
             String orgCode = "";
             List<BizStockDetail> bizStockDetailList = Lists.newArrayList();
