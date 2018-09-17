@@ -216,6 +216,9 @@ public class PaymentServiceImpl implements PaymentService {
             }
             // 商品类型
             String productType = details.get(0).getProductType();
+            if(null == actualAmount){
+                actualAmount = BigDecimal.ZERO;
+            }
             // 构建申请单
             List<AccountTransactionDTO> payments = buildApplyPayment(ba,actualAmount,productType);
             // 支付
