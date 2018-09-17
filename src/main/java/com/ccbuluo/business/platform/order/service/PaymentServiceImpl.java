@@ -30,6 +30,7 @@ import com.ccbuluo.supplier.dto.BizFinanceReceipt;
 import com.ccbuluo.supplier.service.BizFinancePaymentbillsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,18 +99,6 @@ public class PaymentServiceImpl implements PaymentService {
             if(ba.getApplyType().equals(BizAllocateApply.AllocateApplyTypeEnum.PURCHASE.name())){
                 status = BizAllocateApply.ApplyStatusEnum.WAITINGRECEIPT.name();// 等待收货
             }
-            // 根据申请单获取申请单详情
-            List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(ba.getApplyNo());
-            if(null == details || details.size() == 0){
-                throw new CommonException("0", "无效的申请单！");
-            }
-            BigDecimal sellTotal = getSellTotal(details);
-            // 商品类型
-            String productType = details.get(0).getProductType();
-            // 构建申请单
-            List<AccountTransactionDTO> payments = buildApplyPayment(ba,sellTotal,productType);
-            // 支付
-            StatusDto statusDto = bizFinanceAccountService.makeTrading(payments);
             // 创建预付款单据（采购）
             StatusDto advanceStatusDto = saveCustomerServiceAdvanceCounter(applyNo);
             // 如果记录失败
@@ -117,7 +106,7 @@ public class PaymentServiceImpl implements PaymentService {
                 return advanceStatusDto;
             }
             // 如果支付成功
-            if(statusDto.isSuccess()){
+            if(advanceStatusDto.isSuccess()){
                 //更新申请单状态
                 bizAllocateApplyDao.updateApplyOrderStatus(applyNo, status);
                 // 更新订单状态
@@ -126,14 +115,14 @@ public class PaymentServiceImpl implements PaymentService {
                 if(BizAllocateApply.AllocateApplyTypeEnum.SAMELEVEL.toString().equals(ba.getApplyType())){
                     bizOutstockplanDetailDao.updatePlanStatus(applyNo);
                 }
-                addlog(applyNo,ba.getInstockOrgno()+"支付给"+ba.getOutstockOrgno()+sellTotal+"人民币",BizServiceLog.actionEnum.PAYMENT.name(),BizServiceLog.modelEnum.ERP.name());
+                addlog(applyNo,ba.getInstockOrgno()+"创建预付款单据到"+ba.getOutstockOrgno(),BizServiceLog.actionEnum.PAYMENT.name(),BizServiceLog.modelEnum.ERP.name());
             }else{
-                return statusDto;
+                return advanceStatusDto;
             }
-            return StatusDto.buildSuccessStatusDto("支付成功！");
+            return StatusDto.buildSuccessStatusDto("创建预付款单据成功！");
 
         } catch (Exception e) {
-            logger.error("支付失败！", e);
+            logger.error("创建预付款单据失败！", e);
             throw e;
         }
     }
@@ -511,10 +500,10 @@ public class PaymentServiceImpl implements PaymentService {
             receipt.setReceiptType("备件采购申请单");
             receipts.add(receipt);
             // 尾款
-//            BeanUtil.copyPropertiesWithoutNull(receipt, receiptSurplus);
-//            Double surplus = getSurplus(tradeorder, receipt.getMoney(), details);
-//            receiptSurplus.setMoney(surplus);
-//            receipts.add(receiptSurplus);
+            BeanUtils.copyProperties(receipt, receiptSurplus);
+            Double surplus = getSurplus(tradeorder, receipt.getMoney(), details);
+            receiptSurplus.setMoney(surplus);
+            receipts.add(receiptSurplus);
 
             bill.setBizFinanceReceiptList(receipts);
             paymentbills.add(bill);
