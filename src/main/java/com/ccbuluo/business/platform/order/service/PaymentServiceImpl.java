@@ -509,6 +509,8 @@ public class PaymentServiceImpl implements PaymentService {
             accountReceive.setTransactionTypeEnumThrift(TransactionTypeEnumThrift.PROBLEM_PIECE_REFUND_RECEIPT);
             // 退货的支付方是平台
             accountPayer.setOrganizationCode(Constants.AFTER_SALE_PLATFORM);
+            // 收款机构是申请方
+            accountReceive.setOrganizationCode(ba.getApplyorgNo());
         }
         // 过滤
         if(null != accountPayer){
