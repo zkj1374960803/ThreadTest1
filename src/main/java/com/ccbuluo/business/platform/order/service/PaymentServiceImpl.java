@@ -13,33 +13,21 @@ import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
-import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleStrategy;
-import com.ccbuluo.business.platform.claimorder.service.ClaimOrderService;
-import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceorderDetailDao;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.servicelog.service.ServiceLogService;
-import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
-import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
 import com.ccbuluo.business.platform.supplier.dto.ResultFindSupplierDetailDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
-import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
-import com.ccbuluo.http.StatusDtoThriftBean;
 import com.ccbuluo.http.StatusDtoThriftList;
-import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.supplier.dto.BizFinancePaymentbills;
 import com.ccbuluo.supplier.dto.BizFinanceReceipt;
 import com.ccbuluo.supplier.service.BizFinancePaymentbillsService;
-import com.ccbuluo.usercoreintf.dto.OrgWorkplaceDTO;
-import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
-import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
-import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,6 +110,12 @@ public class PaymentServiceImpl implements PaymentService {
             List<AccountTransactionDTO> payments = buildApplyPayment(ba,sellTotal,productType);
             // 支付
             StatusDto statusDto = bizFinanceAccountService.makeTrading(payments);
+            // 创建预付款单据（采购）
+            StatusDto advanceStatusDto = saveCustomerServiceAdvanceCounter(applyNo);
+            // 如果记录失败
+            if(! advanceStatusDto.isSuccess()){
+                return advanceStatusDto;
+            }
             // 如果支付成功
             if(statusDto.isSuccess()){
                 //更新申请单状态
@@ -501,7 +495,10 @@ public class PaymentServiceImpl implements PaymentService {
                 bill.setBusinessType(TransactionTypeEnumThrift.MATERIAL_EXTERNAL_PURCHASE_PAYMENT.getLabel());
             }
             List<BizFinanceReceipt> receipts = new ArrayList<BizFinanceReceipt>();
+            // 预付款
             BizFinanceReceipt receipt = new BizFinanceReceipt();
+            // 尾款
+            BizFinanceReceipt receiptSurplus = new BizFinanceReceipt();
             // 预付款
             if(null != tradeorder.getPerpayAmount()){
                 receipt.setMoney(tradeorder.getPerpayAmount().doubleValue());
@@ -513,11 +510,39 @@ public class PaymentServiceImpl implements PaymentService {
             receipt.setReceiptCode(applyNo);
             receipt.setReceiptType("备件采购申请单");
             receipts.add(receipt);
+            // 尾款
+//            BeanUtil.copyPropertiesWithoutNull(receipt, receiptSurplus);
+//            Double surplus = getSurplus(tradeorder, receipt.getMoney(), details);
+//            receiptSurplus.setMoney(surplus);
+//            receipts.add(receiptSurplus);
+
             bill.setBizFinanceReceiptList(receipts);
             paymentbills.add(bill);
         }
         return paymentbills;
     }
+
+    /**
+     *  计算尾款
+     * @param
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-09-17 16:37:23
+     */
+    private Double getSurplus(BizAllocateTradeorder tradeorder,Double money,List<AllocateapplyDetailBO> details){
+        BigDecimal bigDecimal = BigDecimal.ZERO;
+        Optional<AllocateapplyDetailBO> applyFilter = details.stream() .filter(applyDetail -> tradeorder.getSellerOrgno().equals(applyDetail.getOutstockOrgno())) .findFirst();
+        if (applyFilter.isPresent()) {
+            //单价
+            BigDecimal costPrice = applyFilter.get().getCostPrice();
+            // 数量
+            BigDecimal appNum = BigDecimal.valueOf(applyFilter.get().getApplyNum());
+            bigDecimal = BigDecimal.valueOf(money).subtract(costPrice.multiply(appNum));
+        }
+        return bigDecimal.doubleValue();
+    }
+
 
     /**
      *  创建退货款单据（问题件退货）
@@ -557,4 +582,5 @@ public class PaymentServiceImpl implements PaymentService {
         }
         return supplierName;
     }
+
 }

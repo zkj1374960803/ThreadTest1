@@ -153,7 +153,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      */
     public List<BizStockDetail> getStockDetailListByOrgAndProduct(String sellerOrgNo, List<String> codes){
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,repository_no,org_no,product_no,product_type,trade_no,")
+        sql.append("SELECT id,repository_no,org_no,product_no,product_type,trade_no,product_categoryname,product_name,product_unit,")
                 .append("supplier_no,valid_stock,occupy_stock,problem_stock,damaged_stock,")
                 .append("transit_stock,freeze_stock,seller_orgno,IFNULL(cost_price,0) AS costPrice,instock_planid,")
                 .append("latest_correct_time,creator,create_time,operator,operate_time,")
