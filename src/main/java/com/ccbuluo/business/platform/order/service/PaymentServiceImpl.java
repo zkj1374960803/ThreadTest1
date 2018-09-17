@@ -121,7 +121,7 @@ public class PaymentServiceImpl implements PaymentService {
             // 构建申请单
             List<AccountTransactionDTO> payments = buildApplyPayment(ba,sellTotal,productType);
             // 支付
-            StatusDto statusDto = StatusDto.buildSuccessStatusDto("支付成功！");// TODO 目前没有账号，不能进行支付。bizFinanceAccountService.makeTrading(payments);
+            StatusDto statusDto = bizFinanceAccountService.makeTrading(payments);
             // 如果支付成功
             if(statusDto.isSuccess()){
                 //更新申请单状态
@@ -224,7 +224,7 @@ public class PaymentServiceImpl implements PaymentService {
         List<Pair<String,BigDecimal>> list = getRreceiveInfo(serviceOrderno);
         // 构建申请单
         List<AccountTransactionDTO> payments = buildOrderPayment(list,payerOrgno,serviceOrderno);
-        StatusDto statusDto = StatusDto.buildSuccessStatusDto("支付成功！");// TODO 目前没有账号，不能进行支付。bizFinanceAccountService.makeTrading(payments);
+        StatusDto statusDto = bizFinanceAccountService.makeTrading(payments);
         // 如果支付失败
         if(! statusDto.isSuccess()){
             return statusDto;
@@ -235,8 +235,8 @@ public class PaymentServiceImpl implements PaymentService {
             // 记录日志
             addlog(serviceOrderno,payerOrgno+"支付给"+receiveOrgno+price+"人民币",BizServiceLog.actionEnum.PAYMENT.name(),BizServiceLog.modelEnum.SERVICE.name());
         }
-        // 付款完成，状态改为待验收
-        bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.WAITING_CHECKING.name());
+        // 付款完成，状态改为已完成
+        bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.COMPLETED.name());
         return StatusDto.buildSuccessStatusDto("支付成功！");
     }
     private List<Pair<String,BigDecimal>> getRreceiveInfo(String serviceOrderno){
