@@ -492,8 +492,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             List<UserInfoDTO> userInfoList = Optional.ofNullable(data).orElse(Collections.EMPTY_LIST);
             List<String> collect = userInfoList.stream().map(UserInfoDTO::getOrgCode).collect(Collectors.toList());
             Map<String, UserInfoDTO> userInfoMap = userInfoList.stream().collect(Collectors.toMap(UserInfoDTO::getUseruuid, a -> a,(k1,k2)->k1));
-
-            List<String> orgCodeList = rows.stream().map(QueryCustManagerListDTO::getServiceCenter).collect(Collectors.toList());
+            List<String> orgCodeList = rows.stream().filter(a -> null != a.getServiceCenter()).map(QueryCustManagerListDTO::getServiceCenter).collect(Collectors.toList());
             organizationMap = orgService.queryOrganizationByOrgCodes(orgCodeList);
             List<BizServiceStorehouse> queryStorehouseDTOList = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(collect);
 
