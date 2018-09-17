@@ -488,7 +488,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
                     item.setServiceOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
                     item.setServiceOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
                     item.setServiceUserid(userHolder.getLoggedUserId());
-                    item.setServiceUsername(userHolder.getLoggedUser().getUsername());
+                    item.setServiceUsername(userHolder.getLoggedUser().getName());
                 }
                 item.preInsert(userHolder.getLoggedUserId());
                 item.setServiceOrderno(saveOrderDetailDTO.getServiceOrderno());
@@ -507,11 +507,12 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      */
     private void occupyStock(SaveOrderDetailDTO saveOrderDetailDTO) {
         List<SaveMerchandiseDTO> saveMerchandiseDTOS = saveOrderDetailDTO.getSaveMerchandiseDTOS();
-        if (!saveMerchandiseDTOS.isEmpty()) {
+        List<SaveMerchandiseDTO> collect = saveMerchandiseDTOS.stream().filter(item -> item.getServiceUserid() == null).collect(Collectors.toList());
+        if (!collect.isEmpty()) {
             String orgCode = "";
             List<BizStockDetail> bizStockDetailList = Lists.newArrayList();
             List<RelOrdstockOccupy> relOrdstockOccupyList = Lists.newArrayList();
-            for (SaveMerchandiseDTO saveMerchandiseDTO : saveMerchandiseDTOS) {
+            for (SaveMerchandiseDTO saveMerchandiseDTO : collect) {
                 // 根据商品编号和使用人查询库存
                 String orgNo = "";
                 if (StringUtils.isNotBlank(saveMerchandiseDTO.getServiceOrgno())) {
@@ -618,7 +619,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
                     item.setServiceOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
                     item.setServiceOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
                     item.setServiceUserid(userHolder.getLoggedUserId());
-                    item.setServiceUsername(userHolder.getLoggedUser().getUsername());
+                    item.setServiceUsername(userHolder.getLoggedUser().getName());
                 }
                 item.preInsert(userHolder.getLoggedUserId());
                 item.setServiceOrderno(saveOrderDetailDTO.getServiceOrderno());
