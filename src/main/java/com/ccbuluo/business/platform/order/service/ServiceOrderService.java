@@ -159,4 +159,17 @@ public interface ServiceOrderService {
      * @date 2018-09-10 17:41:01
      */
     Map<String,List<ProductDetailDTO>> querymaintainitemAndFittingDetail(String serviceOrderno);
+
+    /**
+     * 查询维修单列表(门店用)
+     * @param orderStatus 维修单状态
+     * @param serviceType 服务类型
+     * @param keyword 关键字
+     * @param offset 起始数
+     * @param pagesize 每页数
+     * @return 维修单列表
+     * @author liuduo
+     * @date 2018-09-04 15:06:55
+     */
+    StatusDto<Page<BizServiceOrder>> queryStoreList(String orderStatus, String serviceType, String reportOrgno, String keyword, Integer offset, Integer pagesize);
 }

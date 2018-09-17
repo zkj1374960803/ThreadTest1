@@ -95,9 +95,9 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     public StatusDto<String> autoSaveOutstockOrder(String applyNo, List<BizOutstockplanDetail> bizOutstockplanDetailList, String applyNoType) {
         try {
             Map<String, List<BizOutstockplanDetail>> collect = bizOutstockplanDetailList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getOutRepositoryNo));
-            List<BizOutstockorderDetail> bizOutstockorderDetailList = Lists.newArrayList();
             Date date = new Date();
             for (String outRepositoryNo : collect.keySet()) {
+                List<BizOutstockorderDetail> bizOutstockorderDetailList = Lists.newArrayList();
                 List<BizOutstockplanDetail> bizOutstockplanDetails = collect.get(outRepositoryNo);
                 BizOutstockplanDetail bizOutstockplanDetail = bizOutstockplanDetails.get(0);
                 // 生成出库单号

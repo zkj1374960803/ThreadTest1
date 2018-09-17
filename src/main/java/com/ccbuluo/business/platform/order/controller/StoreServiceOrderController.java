@@ -73,7 +73,7 @@ public class StoreServiceOrderController extends BaseController {
 
 
     /**
-     * 查询维修单列表
+     * 查询维修单列表(门店用)
      * @param orderStatus 维修单状态
      * @param serviceType 服务类型
      * @param keyword 关键字
@@ -97,7 +97,7 @@ public class StoreServiceOrderController extends BaseController {
                                                       @RequestParam(required = false) String keyword,
                                                       @RequestParam(defaultValue = "0") Integer offset,
                                                       @RequestParam(defaultValue = "10") Integer pagesize) {
-        return serviceOrderService.queryList(orderStatus, serviceType, reportOrgno, keyword, offset, pagesize);
+        return serviceOrderService.queryStoreList(orderStatus, serviceType, reportOrgno, keyword, offset, pagesize);
     }
 
 
