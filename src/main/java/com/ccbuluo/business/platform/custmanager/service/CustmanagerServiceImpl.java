@@ -1,5 +1,9 @@
 package com.ccbuluo.business.platform.custmanager.service;
 
+import com.ccbuluo.account.BizFinanceAccountService;
+import com.ccbuluo.account.BusinessItemTypeEnumThrift;
+import com.ccbuluo.account.BusinessTypeEnumThrift;
+import com.ccbuluo.account.OrganizationTypeEnumThrift;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.OrganizationTypeEnum;
@@ -88,6 +92,8 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     private AllocateApplyService allocateApplyService;
     @Resource
     private BizServiceStorehouseDao bizServiceStorehouseDao;
+    @ThriftRPCClient("BasicWalletpaymentSerService")
+    private BizFinanceAccountService bizFinanceAccountService;
 
     /**
      * 创建客户经理
@@ -183,9 +189,9 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     }
 
     /**
-     *  保存基础用户信息,保存成功返回uuid
+     *  保存基础用户信息。创建用户，机构（服务中心），仓库，支付钱包
      * @param userInfoDTO 用户的信息
-     * @param bizServiceCustmanager
+     * @param bizServiceCustmanager 客户经理信息
      * @exception CommonException 自定义异常
      * @return StatusDto<String> 状态
      * @author zhangkangjian
@@ -227,6 +233,17 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         StatusDto<String> orgAndUser = innerUserInfoService.createOrgAndUser(buo, userInfoDTO);
         if(!orgAndUser.isSuccess()){
             throw new CommonException(orgAndUser.getCode(), orgAndUser.getMessage());
+        }
+        // 创建支付钱包
+        StatusDto<String> financeAccountStatusDto = bizFinanceAccountService.saveBizFinanceAccount(buo.getOrgName(),
+            BusinessTypeEnumThrift.AFTER_SALE,
+            BusinessItemTypeEnumThrift.ACCOUNT_MANAGER,
+            code,
+            buo.getOrgName(),
+            OrganizationTypeEnumThrift.PERSONAL,
+            userHolder.getLoggedUser().getOrganization().getOrgCode());
+        if(!financeAccountStatusDto.isSuccess()){
+            throw new CommonException(financeAccountStatusDto.getCode(), financeAccountStatusDto.getMessage());
         }
         userInfoDTO.setUseruuid(orgAndUser.getData());
         // 给用户添加角色
