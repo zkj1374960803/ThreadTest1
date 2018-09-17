@@ -886,6 +886,9 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     private List<BizOutstockplanDetail> buildOutstockplan(List<BizServiceorderDetail> orderDetails, List<BizStockDetail> stockDetails, List<RelOrdstockOccupy> relOrdstockOccupies){
         List<BizOutstockplanDetail> outStockList = new ArrayList<BizOutstockplanDetail>();
         for(RelOrdstockOccupy ro : relOrdstockOccupies){
+            if(distinctOutStockPlan(ro,outStockList)){
+                continue;
+            }
             BizOutstockplanDetail outPlan = new BizOutstockplanDetail();
             for(BizStockDetail stock : stockDetails){
                 if(ro.getStockId().intValue() == stock.getId().intValue()){// 关系库存批次id和库存批次id相等
@@ -916,12 +919,36 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
                     outPlan.setOutRepositoryNo(stock.getRepositoryNo());
                     // 库存编号id
                     outPlan.setStockId(stock.getId());
+                    outPlan.setCostPrice(stock.getCostPrice());
                     outStockList.add(outPlan);
                     continue;
                 }
             }
         }
         return outStockList;
+    }
+
+    /**
+     *  对出库计划合并
+     * @param
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-09-17 15:31:45
+     */
+    private boolean distinctOutStockPlan(RelOrdstockOccupy ro, List<BizOutstockplanDetail> outStockList){
+        boolean flag = false;
+        if(null == outStockList || outStockList.size() == 0){
+            return flag;
+        }
+        for(BizOutstockplanDetail outPlan : outStockList){
+            flag = ro.getProductNo().equals(outPlan.getProductNo()) && ro.getSupplierNo().equals(outPlan.getSupplierNo()) && ro.getCostPrice().compareTo(outPlan.getCostPrice()) == 0;
+            // 如果同一个商品的供应商和价格都相同，那么就合并
+            if(flag){
+                outPlan.setPlanOutstocknum(outPlan.getPlanOutstocknum() + ro.getOccupyNum());
+            }
+        }
+        return flag;
     }
 
     /**
