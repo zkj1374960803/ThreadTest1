@@ -475,42 +475,35 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         List<BizStockDetail> bizStockDetails = new ArrayList<>();
         // 获取出库计划的id和出库计划
         Map<Long, BizOutstockplanDetail> collect = bizOutstockplanDetailList.stream().collect(Collectors.toMap(BizOutstockplanDetail::getId, Function.identity()));
-        // 获取到所有的库存明细id
-        List<Long> collect1 = bizOutstockplanDetailList.stream().map(item -> item.getStockId()).collect(Collectors.toList());
-        // 根据库存明细id查询所有库存明细的占用库存
-        List<UpdateStockBizStockDetailDTO> updateStockBizStockDetailDTOList = stockDetailService.getOutstockDetail(collect1);
-        // 库存明细
-        Map<Long, UpdateStockBizStockDetailDTO> collect2 = updateStockBizStockDetailDTOList.stream().collect(Collectors.toMap(UpdateStockBizStockDetailDTO::getId, Function.identity()));
         bizOutstockorderDetailList.forEach(item -> {
             BizOutstockplanDetail bizOutstockplanDetail = collect.get(item.getOutstockPlanid());
             // 如果根据出库单中的出库计划id取到出库计划，那么则说明可以更改库存明细中的占用库存
             if (bizOutstockplanDetail != null) {
-                UpdateStockBizStockDetailDTO updateStockBizStockDetailDTO = collect2.get(bizOutstockplanDetail.getStockId());
-                long versionNo = updateStockBizStockDetailDTO.getVersionNo() + Constants.LONG_FLAG_ONE;
+                // 查询库存版本号
+                Integer versionNoById = stockDetailService.getVersionNoById(bizOutstockplanDetail.getStockId());
+                long versionNo = versionNoById + Constants.LONG_FLAG_ONE;
                 // 拿出出库数量，与库存明细进行计算，并更新出库单的实际出库数量
                 Long outstockNum = item.getOutstockNum();// 出库单上的出库数量
-                Long occupyStock;
-                if (updateStockBizStockDetailDTO != null) {
-                    BizStockDetail bizStockDetail = new BizStockDetail();
-                    if (item.getStockType().equals(BizStockDetail.StockTypeEnum.VALIDSTOCK.toString())) {
-                        bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
-                        bizStockDetail.setOccupyStock(outstockNum);
-                        bizStockDetail.setVersionNo(versionNo);
-                        bizStockDetail.preUpdate(userHolder.getLoggedUserId());
-                        bizStockDetails.add(bizStockDetail);
-                    } else if (item.getStockType().equals(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.toString())) {
-                        bizStockDetail.setId(updateStockBizStockDetailDTO.getId());
-                        bizStockDetail.setProblemStock(outstockNum);
-                        bizStockDetail.setVersionNo(versionNo);
-                        bizStockDetail.preUpdate(userHolder.getLoggedUserId());
-                        bizStockDetails.add(bizStockDetail);
-                    }
+                BizStockDetail bizStockDetail = new BizStockDetail();
+                if (item.getStockType().equals(BizStockDetail.StockTypeEnum.VALIDSTOCK.toString())) {
+                    bizStockDetail.setId(bizOutstockplanDetail.getStockId());
+                    bizStockDetail.setOccupyStock(outstockNum);
+                    bizStockDetail.setVersionNo(versionNo);
+                    bizStockDetail.preUpdate(userHolder.getLoggedUserId());
+                    bizStockDetails.add(bizStockDetail);
+                    // 更新库存明细中的占用库存
+                    stockDetailService.updateOccupyStock(bizStockDetails);
+                } else if (item.getStockType().equals(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.toString())) {
+                    bizStockDetail.setId(bizOutstockplanDetail.getStockId());
+                    bizStockDetail.setProblemStock(outstockNum);
+                    bizStockDetail.setVersionNo(versionNo);
+                    bizStockDetail.preUpdate(userHolder.getLoggedUserId());
+                    bizStockDetails.add(bizStockDetail);
+                    // 更新库存明细中的占用库存
+                    stockDetailService.updateOccupyStock(bizStockDetails);
                 }
-
             }
         });
-        // 更新库存明细中的占用库存
-        stockDetailService.updateOccupyStock(bizStockDetails);
     }
 
     /**
