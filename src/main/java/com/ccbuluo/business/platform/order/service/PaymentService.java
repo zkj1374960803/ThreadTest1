@@ -21,13 +21,21 @@ import java.util.List;
 public interface PaymentService {
 
     /**
-     *  支付完成调用接口
+     *  支付完成调用接口（采购）
      * @param applyNo 申请单号
      * @return StatusDto
      * @author weijb
      * @date 2018-08-22 17:02:58
      */
-    StatusDto paymentCompletion(String applyNo);
+    StatusDto purchasePayment(String applyNo);
+    /**
+     *  支付完成调用接口（调拨）
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-22 17:02:58
+     */
+    StatusDto samelevelPayment(String applyNo);
     /**
      *  根据申请单获取总价格
      * @param applyNo 申请单号

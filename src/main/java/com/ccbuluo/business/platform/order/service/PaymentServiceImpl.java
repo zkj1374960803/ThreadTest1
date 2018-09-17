@@ -83,7 +83,7 @@ public class PaymentServiceImpl implements PaymentService {
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public StatusDto paymentCompletion(String applyNo){
+    public StatusDto purchasePayment(String applyNo){
         try {
             // 根据申请单获取申请单详情
             BizAllocateApply ba = bizAllocateApplyDao.getByNo(applyNo);
@@ -94,19 +94,22 @@ public class PaymentServiceImpl implements PaymentService {
             if ( !ba.getApplyStatus().equals(BizAllocateApply.ApplyStatusEnum.WAITINGPAYMENT.name())) {
                 throw new CommonException("0", "只有待付款的申请才可以支付！");
             }
-            String status = BizAllocateApply.ApplyStatusEnum.WAITDELIVERY.name();// 等待发货
+            // 等待发货
+            String status = BizAllocateApply.ApplyStatusEnum.WAITDELIVERY.name();
+            // 根据申请单获取申请单详情
+            List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(ba.getApplyNo());
+            if(null == details || details.size() == 0){
+                throw new CommonException("0", "无效的申请单！");
+            }
+            // 创建预付款单据（只有采购的时候创建）
+            StatusDto statusDto = saveCustomerServiceAdvanceCounter(applyNo);
             // 支付成功之后，如果是采购，则状态为平台待入库
             if(ba.getApplyType().equals(BizAllocateApply.AllocateApplyTypeEnum.PURCHASE.name())){
-                status = BizAllocateApply.ApplyStatusEnum.WAITINGRECEIPT.name();// 等待收货
-            }
-            // 创建预付款单据（采购）
-            StatusDto advanceStatusDto = saveCustomerServiceAdvanceCounter(applyNo);
-            // 如果记录失败
-            if(! advanceStatusDto.isSuccess()){
-                return advanceStatusDto;
+                // 等待收货
+                status = BizAllocateApply.ApplyStatusEnum.WAITINGRECEIPT.name();
             }
             // 如果支付成功
-            if(advanceStatusDto.isSuccess()){
+            if(statusDto.isSuccess()){
                 //更新申请单状态
                 bizAllocateApplyDao.updateApplyOrderStatus(applyNo, status);
                 // 更新订单状态
@@ -117,7 +120,68 @@ public class PaymentServiceImpl implements PaymentService {
                 }
                 addlog(applyNo,ba.getInstockOrgno()+"创建预付款单据到"+ba.getOutstockOrgno(),BizServiceLog.actionEnum.PAYMENT.name(),BizServiceLog.modelEnum.ERP.name());
             }else{
-                return advanceStatusDto;
+                return statusDto;
+            }
+            return StatusDto.buildSuccessStatusDto("创建预付款单据成功！");
+
+        } catch (Exception e) {
+            logger.error("创建预付款单据失败！", e);
+            throw e;
+        }
+    }
+
+    /**
+     *  支付完成调用接口
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-22 17:02:58
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public StatusDto samelevelPayment(String applyNo){
+        try {
+            // 根据申请单获取申请单详情
+            BizAllocateApply ba = bizAllocateApplyDao.getByNo(applyNo);
+            if(null == ba){
+                throw new CommonException("0", "无效的申请单！");
+            }
+            // 只有等待付款的状态才可以支付
+            if ( !ba.getApplyStatus().equals(BizAllocateApply.ApplyStatusEnum.WAITINGPAYMENT.name())) {
+                throw new CommonException("0", "只有待付款的申请才可以支付！");
+            }
+            // 等待发货
+            String status = BizAllocateApply.ApplyStatusEnum.WAITDELIVERY.name();
+            // 根据申请单获取申请单详情
+            List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(ba.getApplyNo());
+            if(null == details || details.size() == 0){
+                throw new CommonException("0", "无效的申请单！");
+            }
+            // 支付成功之后，如果是采购，则状态为平台待入库
+            if(ba.getApplyType().equals(BizAllocateApply.AllocateApplyTypeEnum.PURCHASE.name())){
+                // 等待收货
+                status = BizAllocateApply.ApplyStatusEnum.WAITINGRECEIPT.name();
+            }
+            BigDecimal sellTotal = getSellTotal(details);
+            // 商品类型
+            String productType = details.get(0).getProductType();
+            // 构建申请单
+            List<AccountTransactionDTO> payments = buildApplyPayment(ba,sellTotal,productType);
+            // 支付
+            StatusDto statusDto = bizFinanceAccountService.makeTrading(payments);
+            // 如果支付成功
+            if(statusDto.isSuccess()){
+                //更新申请单状态
+                bizAllocateApplyDao.updateApplyOrderStatus(applyNo, status);
+                // 更新订单状态
+                bizAllocateTradeorderDao.updateTradeorderStatus(applyNo,OrderStatusEnum.PAYMENTCOMPLETION.name());
+                // 如果是调拨，要更改卖方出库计划状态
+                if(BizAllocateApply.AllocateApplyTypeEnum.SAMELEVEL.toString().equals(ba.getApplyType())){
+                    bizOutstockplanDetailDao.updatePlanStatus(applyNo);
+                }
+                addlog(applyNo,ba.getInstockOrgno()+"支付给"+ba.getOutstockOrgno()+sellTotal+"人民币",BizServiceLog.actionEnum.PAYMENT.name(),BizServiceLog.modelEnum.ERP.name());
+            }else{
+                return statusDto;
             }
             return StatusDto.buildSuccessStatusDto("创建预付款单据成功！");
 
