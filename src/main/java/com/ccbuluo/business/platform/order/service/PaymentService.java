@@ -36,6 +36,15 @@ public interface PaymentService {
      * @date 2018-08-22 17:02:58
      */
     StatusDto samelevelPayment(String applyNo);
+
+    /**
+     *  支付完成调用接口（退货）
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-22 17:02:58
+     */
+    StatusDto refundPayment(String applyNo,BigDecimal actualAmount);
     /**
      *  根据申请单获取总价格
      * @param applyNo 申请单号

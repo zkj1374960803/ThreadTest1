@@ -9,9 +9,11 @@ import com.ccbuluo.business.platform.order.service.PaymentService;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -64,10 +66,13 @@ public class PaymentController {
      * @date 2018-08-22 17:02:58
      */
     @ApiOperation(value = "申请单支付功能（退货）", notes = "【魏俊标】")
-    @GetMapping("/refundpayment/{applyNo}")
-    @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
-    public StatusDto<FindAllocateApplyDTO> refundPayment(@PathVariable String applyNo){
-        return paymentService.samelevelPayment(applyNo);
+    @PostMapping("/refundpayment")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "actualAmount", value = "实际退货的金额", required = true, paramType = "query")
+    })
+    public StatusDto<FindAllocateApplyDTO> refundPayment(String applyNo, BigDecimal actualAmount){
+        return paymentService.refundPayment(applyNo,actualAmount);
     }
 
     /**
