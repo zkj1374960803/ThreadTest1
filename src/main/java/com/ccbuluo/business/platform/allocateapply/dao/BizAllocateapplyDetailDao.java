@@ -173,4 +173,35 @@ public class BizAllocateapplyDetailDao extends BaseDao<AllocateapplyDetailDTO> {
         return queryPageForBean(QueryPendingMaterialsDTO.class, sql.toString(), map, offset, pageSize);
     }
 
+    /**
+     * 查询客户经理领取的物料
+     * @param useruuid
+     * @param productType 商品的类型
+     * @param completeStatus 领取的状态
+     * @return List<QueryPendingMaterialsDTO>
+     * @author zhangkangjian
+     * @date 2018-09-17 11:11:05
+     */
+    public List<QueryPendingMaterialsDTO> queryCustReceiveMaterials(List<String> useruuid, String productType, String completeStatus){
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT b.applyer as 'applyeruuid',b.apply_status,a.product_no,a.product_name,COUNT(a.product_no) ")
+            .append(" FROM biz_instockplan_detail a LEFT JOIN biz_allocate_apply b ON a.trade_no = b.apply_no  ")
+            .append(" WHERE 1 = 1 ");
+        Map<String, Object> map = Maps.newHashMap();
+        if(useruuid != null && useruuid.size() > 0){
+            map.put("useruuid", useruuid);
+            sql.append(" AND b.applyer in (:useruuid) ");
+        }
+        if(StringUtils.isNotBlank(productType)){
+            map.put("productType", productType);
+            sql.append(" AND a.product_type = :productType ");
+        }
+        if (StringUtils.isNotBlank(completeStatus)){
+            map.put("completeStatus", completeStatus);
+            sql.append(" AND a.complete_status = :completeStatus ");
+        }
+        sql.append(" GROUP BY a.product_no ");
+        return queryListBean(QueryPendingMaterialsDTO.class, sql.toString(), map);
+    }
+
 }

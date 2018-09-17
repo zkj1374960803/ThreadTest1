@@ -12,6 +12,9 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(value = "QueryPendingMaterialsDTO", description = "查询待领取物料列表")
 public class QueryPendingMaterialsDTO {
     private Long id;
+
+    @ApiModelProperty(name = "applyeruuid", value = "申请人的uuid")
+    private String applyeruuid;
     /**
      * 商品编号
      */
@@ -59,6 +62,14 @@ public class QueryPendingMaterialsDTO {
      */
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
+
+    public String getApplyeruuid() {
+        return applyeruuid;
+    }
+
+    public void setApplyeruuid(String applyeruuid) {
+        this.applyeruuid = applyeruuid;
+    }
 
     public String getRemark() {
         return remark;

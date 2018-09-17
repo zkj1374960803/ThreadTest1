@@ -7,12 +7,16 @@ import com.ccbuluo.account.OrganizationTypeEnumThrift;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.OrganizationTypeEnum;
+import com.ccbuluo.business.constants.StockPlanStatusEnum;
+import com.ccbuluo.business.custmanager.allocateapply.dto.QueryPendingMaterialsDTO;
 import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.entity.BizServiceStorehouse;
+import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryCustManagerListDTO;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.carmanage.dto.CusmanagerCarCountDTO;
 import com.ccbuluo.business.platform.carmanage.service.BasicCarcoreInfoService;
+import com.ccbuluo.business.platform.claimorder.dto.BizServiceClaimorder;
 import com.ccbuluo.business.platform.custmanager.dao.BizServiceCustmanagerDao;
 import com.ccbuluo.business.platform.custmanager.dto.CustManagerDetailDTO;
 import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
@@ -94,6 +98,8 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     private BizServiceStorehouseDao bizServiceStorehouseDao;
     @ThriftRPCClient("BasicWalletpaymentSerService")
     private BizFinanceAccountService bizFinanceAccountService;
+    @Resource
+    private BizAllocateapplyDetailDao bizAllocateapplyDetailDao;
 
     /**
      * 创建客户经理
@@ -352,6 +358,19 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         }
         // 组装分页信息
         Page<QueryUserListDTO> page = buildCustManagerData(userInfoStatusDto, custManagerList);
+        // 统计客户经理数量
+        List<QueryPendingMaterialsDTO> queryPendingMaterialsDTOS = bizAllocateapplyDetailDao.queryCustReceiveMaterials(useruudis, Constants.PRODUCT_TYPE_EQUIPMENT, StockPlanStatusEnum.COMPLETE.name());
+        Optional.ofNullable(queryPendingMaterialsDTOS).ifPresent(a ->{
+            Map<String, List<QueryPendingMaterialsDTO>> collect = a.stream().collect(Collectors.groupingBy(QueryPendingMaterialsDTO::getApplyeruuid));
+            Optional.ofNullable(page.getRows()).ifPresent(b ->{
+                b.forEach(item ->{
+                    List<QueryPendingMaterialsDTO> queryPendingMaterialsDTOS1 = collect.get(item.getUseruuid());
+                    if(queryPendingMaterialsDTOS1 != null && queryPendingMaterialsDTOS1.size() > 0){
+                        item.setMaterialsNumber(Long.valueOf(queryPendingMaterialsDTOS1.size()));
+                    }
+                });
+            });
+        });
         return StatusDto.buildDataSuccessStatusDto(page);
     }
 
@@ -514,6 +533,20 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     @Override
     public List<BizServiceCustmanager> queryCustManagerListByOrgCode(List<String> orgCodes) {
         return bizServiceCustmanagerDao.queryCustManagerListByOrgCode(orgCodes);
+    }
+
+    /**
+     * 查询客户经理物料的信息
+     * @param useruuid 客户经理uuid
+     * @return List<QueryUserListDTO> 物料列表
+     * @author zhangkangjian
+     * @date 2018-09-17 13:58:30
+     */
+    @Override
+    public List<QueryPendingMaterialsDTO> queryCustMaterials(String useruuid) {
+        // 统计客户经理数量
+        List<QueryPendingMaterialsDTO> queryPendingMaterialsDTOS = bizAllocateapplyDetailDao.queryCustReceiveMaterials(List.of(useruuid), Constants.PRODUCT_TYPE_EQUIPMENT, StockPlanStatusEnum.COMPLETE.name());
+        return queryPendingMaterialsDTOS;
     }
 
     /**

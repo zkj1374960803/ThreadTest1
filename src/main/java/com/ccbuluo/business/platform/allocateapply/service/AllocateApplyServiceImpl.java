@@ -46,6 +46,7 @@ import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -585,6 +586,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     public void confirmationQuote(ConfirmationQuoteDTO confirmationQuoteDTO) {
         ProcessApplyDTO processApplyDTO = new ProcessApplyDTO();
         processApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
+        processApplyDTO.setApplyProcessor(userHolder.getLoggedUserId());
+        processApplyDTO.setProcessTime(new Date());
         updateAllocateTradeorder(confirmationQuoteDTO, processApplyDTO);
         // 生成出入库计划
         applyHandleContext.applyHandle(confirmationQuoteDTO.getApplyNo());
@@ -1105,6 +1108,14 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         return listStatusDto;
     }
 
+    /**
+     * 比较库存申请数量和实际数量
+     * @param map 实际数量
+     * @param allocateapplyDetailList 申请数量
+     * @return StatusDto<List<ProductStockInfoDTO>>
+     * @author zhangkangjian
+     * @date 2018-09-17 14:57:31
+     */
     private StatusDto<List<ProductStockInfoDTO>> getListStatusDto(Map<String, Object> map, List<ProductStockInfoDTO> allocateapplyDetailList) {
         String flag = Constants.SUCCESS_CODE;
         String message = "成功";
@@ -1114,8 +1125,13 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             Object obj = map.get(productno);
             if(obj != null){
                 Long applyNum = allocateapplyDetailDTO.getApplyProductNum();
-                BigDecimal bd = (BigDecimal)obj;
-                Long res = bd.longValue();
+                Long res = 0L;
+                if(obj instanceof Long){
+                    res = (Long) obj;
+                }
+                if(obj instanceof BigDecimal){
+                    res = ((BigDecimal) obj).longValue();
+                }
                 if(applyNum > res){
                     allocateapplyDetailDTO.setRealProductNum(res);
                     flag = Constants.ERROR_CODE;
@@ -1135,7 +1151,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
 
     /**
      * 维修单检查库存
-     * @param checkStockQuantityDTO
+     * @param checkStockQuantityDTO 维修单申请库存的数量
      * @return StatusDto<List < ProductStockInfoDTO>>
      * @author zhangkangjian
      * @date 2018-09-11 16:21:56
@@ -1155,7 +1171,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             Object stockNum = map.get(a.getProductNo());
             if(stockNum != null){
                 Long amount = a.getAmount();
-                map.put(a.getProductNo(), (Long)stockNum + amount);
+                BigDecimal ret = (BigDecimal) stockNum;
+                map.put(a.getProductNo(), ret.longValue() + amount);
             }
         });
         List<ProductStockInfoDTO> allocateapplyDetailList = checkStockQuantityDTO.getProductInfoList();

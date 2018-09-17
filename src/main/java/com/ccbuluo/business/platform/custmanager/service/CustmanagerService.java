@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.custmanager.service;
 
+import com.ccbuluo.business.custmanager.allocateapply.dto.QueryPendingMaterialsDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryCustManagerListDTO;
 import com.ccbuluo.business.platform.custmanager.dto.CustManagerDetailDTO;
 import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
@@ -88,5 +89,12 @@ public interface CustmanagerService {
      * @date 2018-09-05 15:54:48
      */
     List<BizServiceCustmanager> queryCustManagerListByOrgCode(List<String> orgCodes);
-
+    /**
+     *  查询客户经理物料的信息
+     * @param useruuid 客户经理uuid
+     * @return List<QueryUserListDTO> 物料列表
+     * @author zhangkangjian
+     * @date 2018-09-17 13:58:30
+     */
+    List<QueryPendingMaterialsDTO> queryCustMaterials(String useruuid);
 }
