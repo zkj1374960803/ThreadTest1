@@ -202,10 +202,6 @@ public class PaymentServiceImpl implements PaymentService {
             if(null == ba){
                 throw new CommonException("0", "无效的申请单！");
             }
-            // 只有等待付款的状态才可以支付
-            if ( !ba.getApplyStatus().equals(BizAllocateApply.ApplyStatusEnum.WAITINGPAYMENT.name())) {
-                throw new CommonException("0", "只有待付款的申请才可以支付！");
-            }
             // 等待发货
             String status = BizAllocateApply.ApplyStatusEnum.WAITDELIVERY.name();
             // 根据申请单获取申请单详情
