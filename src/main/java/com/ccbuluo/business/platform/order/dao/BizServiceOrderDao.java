@@ -152,7 +152,8 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT DISTINCT bso.id,bso.service_orderno,bso.order_status,bso.car_vin,bso.customer_name,bso.customer_phone,bso.service_type,bso.report_time")
+        sql.append("SELECT DISTINCT bso.id,bso.service_orderno,bso.order_status,bso.car_vin,bso.customer_name,bso.customer_phone,bso.service_type,bso.report_time,")
+            .append(" bso.cur_processor,bso.processor_orgno,bso.processor_orgtype")
             .append(" FROM biz_service_order AS bso LEFT JOIN biz_service_dispatch AS bsd ON bsd.service_orderno = bso.service_orderno WHERE  1=1 ");
         if (StringUtils.isNotBlank(orderStatus)) {
             params.put("orderStatus", orderStatus);
@@ -246,5 +247,46 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("serviceOrderno", serviceOrderno);
         return super.findForBean(BizServiceOrder.class, sql.toString(), params);
+    }
+
+    /**
+     * 查询订单列表(门店用)
+     * @param orderStatus 订单状态
+     * @param serviceType 服务类型
+     * @param keyword 关键字
+     * @param offset 起始数
+     * @param pagesize 每页数
+     * @return 订单列表
+     * @author liuduo
+     * @date 2018-09-04 15:06:55
+     */
+    public Page<BizServiceOrder> queryStoreList(String orderStatus, String serviceType, String reportOrgno, String keyword, Integer offset, Integer pagesize) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT DISTINCT bso.id,bso.service_orderno,bso.order_status,bso.car_vin,bso.customer_name,bso.customer_phone,bso.service_type,bso.report_time,")
+            .append(" bso.cur_processor,bso.processor_orgno,bso.processor_orgtype")
+            .append(" FROM biz_service_order AS bso LEFT JOIN biz_service_dispatch AS bsd ON bsd.service_orderno = bso.service_orderno WHERE  1=1 ");
+        if (StringUtils.isNotBlank(orderStatus)) {
+            params.put("orderStatus", orderStatus);
+            sql.append(" AND bso.order_status = :orderStatus ");
+        }
+        if (StringUtils.isNotBlank(serviceType)) {
+            params.put("serviceType", serviceType);
+            sql.append(" AND bso.service_type = :serviceType ");
+        }
+        if (StringUtils.isNotBlank(reportOrgno)) {
+            params.put("reportOrgno", reportOrgno);
+            sql.append(" AND bso.customer_orgno = :reportOrgno");
+        }
+        if (StringUtils.isNotBlank(keyword)) {
+            params.put("keyword", keyword);
+            sql.append(" AND (bso.service_orderno LIKE CONCAT('%',:keyword,'%') or bso.car_vin LIKE CONCAT('%',:keyword,'%') OR ")
+                .append(" bso.customer_name LIKE CONCAT('%',:keyword,'%') OR bso.customer_phone LIKE CONCAT('%',:keyword,'%'))");
+        }
+        sql.append(" AND bso.delete_flag = :deleteFlag ORDER BY bso.operate_time DESC");
+
+        return queryPageForBean(BizServiceOrder.class, sql.toString(), params, offset, pagesize);
     }
 }

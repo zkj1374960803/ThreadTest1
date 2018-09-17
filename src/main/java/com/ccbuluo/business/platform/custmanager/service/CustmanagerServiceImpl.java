@@ -310,8 +310,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     public StatusDto<Page<QueryUserListDTO>> queryUserList(UserInfoDTO userInfoDTO) {
         userInfoDTO.setAppId(SystemPropertyHolder.getBaseAppid());
         userInfoDTO.setSecretId(SystemPropertyHolder.getBaseSecret());
-//        userInfoDTO.setOrgCode(BusinessPropertyHolder.ORGCODE_TOP_CUSMANAGER);
-        List<String> orgCodeList = allocateApplyService.getOrgCodesByOrgType(OrganizationTypeEnum.PLATFORM.name());
+        List<String> orgCodeList = allocateApplyService.getOrgCodesByOrgType(OrganizationTypeEnum.CUSTMANAGER.name());
         userInfoDTO.setOrgCodes(orgCodeList);
         // 排序字段
         userInfoDTO.setSortField(Constants.SORT_FIELD_OPERATE);
@@ -477,7 +476,6 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     @Override
     public Page<QueryCustManagerListDTO> queryCustManagerList(QueryCustManagerListDTO queryCustManagerListDTO) {
         // 查询客户经理的信息
-
         Page<QueryCustManagerListDTO> queryCustManagerListDTOPage = bizServiceCustmanagerDao.queryCustManagerList(queryCustManagerListDTO);
         List<QueryCustManagerListDTO> rows = queryCustManagerListDTOPage.getRows();
         Map<String, BasicUserOrganization> organizationMap;
@@ -492,12 +490,10 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             List<UserInfoDTO> userInfoList = Optional.ofNullable(data).orElse(Collections.EMPTY_LIST);
             List<String> collect = userInfoList.stream().map(UserInfoDTO::getOrgCode).collect(Collectors.toList());
             Map<String, UserInfoDTO> userInfoMap = userInfoList.stream().collect(Collectors.toMap(UserInfoDTO::getUseruuid, a -> a,(k1,k2)->k1));
-
-            List<String> orgCodeList = rows.stream().map(QueryCustManagerListDTO::getServiceCenter).collect(Collectors.toList());
+            List<String> orgCodeList = rows.stream().filter(a -> null != a.getServiceCenter()).map(QueryCustManagerListDTO::getServiceCenter).collect(Collectors.toList());
             organizationMap = orgService.queryOrganizationByOrgCodes(orgCodeList);
             List<BizServiceStorehouse> queryStorehouseDTOList = bizServiceStorehouseDao.queryStorehouseByServiceCenterCode(collect);
-
-            rows.stream().forEach(c -> {
+            rows.forEach(c -> {
                 UserInfoDTO userInfoDTO1 = userInfoMap.get(c.getUseruuid());
                 if(userInfoDTO1 != null){
                     c.setOrgCode(userInfoDTO1.getOrgCode());
@@ -510,7 +506,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
 
             Optional.ofNullable(queryStorehouseDTOList).ifPresent(a ->{
                 Map<String, BizServiceStorehouse> queryStorehouseDTOMap = a.stream().collect(Collectors.toMap(BizServiceStorehouse::getServicecenterCode, b -> b,(k1,k2)->k1));
-                rows.stream().forEach(c ->{
+                rows.forEach(c ->{
                     String orgCode = c.getOrgCode();
                     BizServiceStorehouse queryStorehouseDTO = queryStorehouseDTOMap.get(orgCode);
                     if(queryStorehouseDTO != null){
@@ -545,8 +541,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     @Override
     public List<QueryPendingMaterialsDTO> queryCustMaterials(String useruuid) {
         // 统计客户经理数量
-        List<QueryPendingMaterialsDTO> queryPendingMaterialsDTOS = bizAllocateapplyDetailDao.queryCustReceiveMaterials(List.of(useruuid), Constants.PRODUCT_TYPE_EQUIPMENT, StockPlanStatusEnum.COMPLETE.name());
-        return queryPendingMaterialsDTOS;
+        return bizAllocateapplyDetailDao.queryCustReceiveMaterials(List.of(useruuid), Constants.PRODUCT_TYPE_EQUIPMENT, StockPlanStatusEnum.COMPLETE.name());
     }
 
     /**

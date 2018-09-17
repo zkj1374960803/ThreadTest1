@@ -1158,7 +1158,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public StatusDto<List<ProductStockInfoDTO>> checkRepairOrderStock(CheckRepairOrderStockDTO checkStockQuantityDTO) {
-
         // 查询出库机构下所有库存
         Map<String, Object> map = bizAllocateApplyDao.queryStockQuantity(checkStockQuantityDTO.getOutstockOrgno(), null);
         ProductDetailDTO productDetailDTO = new ProductDetailDTO();
@@ -1176,7 +1175,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }
         });
         List<ProductStockInfoDTO> allocateapplyDetailList = checkStockQuantityDTO.getProductInfoList();
-
         StatusDto<List<ProductStockInfoDTO>> listStatusDto = getListStatusDto(map, allocateapplyDetailList);
         return listStatusDto;
     }
