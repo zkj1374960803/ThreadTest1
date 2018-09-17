@@ -218,7 +218,6 @@ public class PaymentServiceImpl implements PaymentService {
                 // 等待收货
                 status = BizAllocateApply.ApplyStatusEnum.WAITINGRECEIPT.name();
             }
-            BigDecimal sellTotal = getSellTotal(details);
             // 商品类型
             String productType = details.get(0).getProductType();
             // 构建申请单
@@ -235,7 +234,7 @@ public class PaymentServiceImpl implements PaymentService {
                 if(BizAllocateApply.AllocateApplyTypeEnum.SAMELEVEL.toString().equals(ba.getApplyType())){
                     bizOutstockplanDetailDao.updatePlanStatus(applyNo);
                 }
-                addlog(applyNo,ba.getInstockOrgno()+"支付给"+ba.getOutstockOrgno()+sellTotal+"人民币",BizServiceLog.actionEnum.PAYMENT.name(),BizServiceLog.modelEnum.ERP.name());
+                addlog(applyNo,ba.getInstockOrgno()+"支付给"+ba.getOutstockOrgno()+actualAmount+"人民币",BizServiceLog.actionEnum.PAYMENT.name(),BizServiceLog.modelEnum.ERP.name());
             }else{
                 return statusDto;
             }
