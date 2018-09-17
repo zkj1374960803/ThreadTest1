@@ -160,6 +160,24 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
     }
 
     /**
+     * 根据申请单编号查询订单占用库存关系表
+     * @param applyNo  applyNo
+     * @return 影响条数
+     * @author weijb
+     * @date 2018-08-07 13:55:41
+     */
+    public List<RelOrdstockOccupy> getRelOrdstockOccupyBy(String applyNo,String orgCode){
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT o.order_type,o.doc_no,o.stock_id,o.occupy_num,o.occupy_status,o.occupy_starttime, ")
+                .append("o.occupy_endtime,o.creator,o.create_time,o.delete_flag ")
+                .append(" FROM rel_ordstock_occupy o,biz_stock_detail s WHERE o.stock_id=s.id and s.org_no= :orgCode and o.doc_no= :applyNo");
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("orgCode", orgCode);
+        return super.queryListBean(RelOrdstockOccupy.class, sql.toString(), params);
+    }
+
+    /**
      * 根据申请单编号删除订单占用库存关系表
      * @param applyNo  申请单编号
      * @return 影响条数

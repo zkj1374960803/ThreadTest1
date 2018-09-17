@@ -235,8 +235,8 @@ public class PaymentServiceImpl implements PaymentService {
             // 记录日志
             addlog(serviceOrderno,payerOrgno+"支付给"+receiveOrgno+price+"人民币",BizServiceLog.actionEnum.PAYMENT.name(),BizServiceLog.modelEnum.SERVICE.name());
         }
-        // 付款完成，状态改为待验收
-        bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.WAITING_CHECKING.name());
+        // 付款完成，状态改为已完成
+        bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.COMPLETED.name());
         return StatusDto.buildSuccessStatusDto("支付成功！");
     }
     private List<Pair<String,BigDecimal>> getRreceiveInfo(String serviceOrderno){

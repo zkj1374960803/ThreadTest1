@@ -837,26 +837,39 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      * @author weijb
      * @date 2018-09-07 14:10:11
      */
-    private void buildOutstockplanAndOut(String orderNo){
+    @Transactional(rollbackFor = Exception.class)
+    public void buildOutstockplanAndOut(String orderNo){
         // 查询服务单详情
         List<BizServiceorderDetail> orderDetails = bizServiceorderDetailDao.queryServiceorderDetailList(orderNo);
         // 有可能只有工时没有使用零配件
         if(null != orderDetails && orderDetails.size() != 0){
-            List<String> codeList = getProductList(orderDetails);
-            String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
-            // 根据卖方code和商品code（list）查出库存列表
-            List<BizStockDetail> stockDetails = bizStockDetailDao.getStockDetailListByOrgAndProduct(orgCode, codeList);
-            // 查询占用关系
-            List<RelOrdstockOccupy> relOrdstockOccupies = bizAllocateTradeorderDao.getRelOrdstockOccupyByApplyNo(orderNo);
-            // 生成出库计划
-            List<BizOutstockplanDetail> outStpcks = buildOutstockplan(orderDetails, stockDetails, relOrdstockOccupies);
-            // 批量保存出库计划详情
-            bizOutstockplanDetailDao.batchOutstockplanDetail(outStpcks);
+            List<String> orderOrgNo = getServiceOrgNo(orderDetails);
+            // 有多个维修点情况
+            for (String orgCode : orderOrgNo){
+                List<String> codeList = getProductList(orderDetails);
+                // 根据卖方code和商品code（list）查出库存列表
+                List<BizStockDetail> stockDetails = bizStockDetailDao.getStockDetailListByOrgAndProduct(orgCode, codeList);
+                // 查询占用关系
+                List<RelOrdstockOccupy> relOrdstockOccupies = bizAllocateTradeorderDao.getRelOrdstockOccupyBy(orderNo,orgCode);
+                // 生成出库计划
+                List<BizOutstockplanDetail> outStpcks = buildOutstockplan(orderDetails, stockDetails, relOrdstockOccupies);
+                // 批量保存出库计划详情
+                bizOutstockplanDetailDao.batchOutstockplanDetail(outStpcks);
+            }
             // 查询出库计划
-            List<BizOutstockplanDetail> outstockPlans = bizOutstockplanDetailDao.getOutstockplansByApplyNo(orderNo,orgCode);
+            List<BizOutstockplanDetail> outstockPlans = bizOutstockplanDetailDao.getOutstockplansByApplyNo(orderNo,null);
             // 调用自动出库
             outstockOrderService.autoSaveOutstockOrder(orderNo, outstockPlans,ApplyTypeEnum.SERVICEORDER.name());
         }
+    }
+    private List<String> getServiceOrgNo(List<BizServiceorderDetail> orderDetails){
+        List<String> list = new ArrayList<String>();
+        for(BizServiceorderDetail order : orderDetails){
+            if(! list.contains(order.getServiceOrgno())){
+                list.add(order.getServiceOrgno());
+            }
+        }
+        return list;
     }
 
     /**
