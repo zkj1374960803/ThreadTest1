@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.custmanager.controller;
 
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.custmanager.allocateapply.dto.QueryPendingMaterialsDTO;
 import com.ccbuluo.business.platform.custmanager.dto.CustManagerDetailDTO;
 import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
@@ -94,6 +95,22 @@ public class CustmanagerController extends BaseController {
         return custmanagerServiceImpl.queryUserList(userInfoDTO);
 
     }
+
+    /**
+     * 查询客户经理物料的信息
+     * @param useruuid 客户经理uuid
+     * @return StatusDto<List<QueryUserListDTO>>
+     * @author zhangkangjian
+     * @date 2018-09-17 13:53:28
+     */
+    @GetMapping("/querycustmaterials")
+    @ApiOperation(value = "查询客户经理物料的信息", notes = "【张康健】")
+    @ApiImplicitParam(name = "useruuid", value = "用户uuid", required = true, paramType = "query")
+    public StatusDto<List<QueryPendingMaterialsDTO>> queryCustMaterials(String useruuid){
+        return StatusDto.buildDataSuccessStatusDto(custmanagerServiceImpl.queryCustMaterials(useruuid));
+    }
+
+
     /**
      * 编辑客户经理
      * @param

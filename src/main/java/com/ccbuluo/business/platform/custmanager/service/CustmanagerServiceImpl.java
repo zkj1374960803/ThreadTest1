@@ -536,6 +536,20 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     }
 
     /**
+     * 查询客户经理物料的信息
+     * @param useruuid 客户经理uuid
+     * @return List<QueryUserListDTO> 物料列表
+     * @author zhangkangjian
+     * @date 2018-09-17 13:58:30
+     */
+    @Override
+    public List<QueryPendingMaterialsDTO> queryCustMaterials(String useruuid) {
+        // 统计客户经理数量
+        List<QueryPendingMaterialsDTO> queryPendingMaterialsDTOS = bizAllocateapplyDetailDao.queryCustReceiveMaterials(List.of(useruuid), Constants.PRODUCT_TYPE_EQUIPMENT, StockPlanStatusEnum.COMPLETE.name());
+        return queryPendingMaterialsDTOS;
+    }
+
+    /**
      *  查询客户经理并填充信息
      * @param useruuid 用户的uuid
      * @param custManagerDetailDTO 客户经理的信息
