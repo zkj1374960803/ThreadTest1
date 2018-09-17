@@ -169,7 +169,7 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
     public List<RelOrdstockOccupy> getRelOrdstockOccupyBy(String applyNo,String orgCode){
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT o.order_type,o.doc_no,o.stock_id,o.occupy_num,o.occupy_status,o.occupy_starttime, ")
-                .append("o.occupy_endtime,o.creator,o.create_time,o.delete_flag ")
+                .append("o.occupy_endtime,o.creator,o.create_time,o.delete_flag,s.supplier_no,s.cost_price,s.product_no ")
                 .append(" FROM rel_ordstock_occupy o,biz_stock_detail s WHERE o.stock_id=s.id and s.org_no= :orgCode and o.doc_no= :applyNo");
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNo", applyNo);

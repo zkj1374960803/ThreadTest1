@@ -66,6 +66,23 @@ public class RelOrdstockOccupy extends AftersaleCommonEntity{
     @ApiModelProperty(name = "stockType", value = "库存类型（正常库存、问题库存、报损件库存，等等）")
     private String stockType;
 
+    /**
+     * 供应商
+     */
+    @ApiModelProperty(name = "supplierNo", value = "")
+    private String supplierNo;
+    /**
+     * 成本价
+     */
+    @ApiModelProperty(name = "costPrice", value = "")
+    private BigDecimal costPrice;
+
+    /**
+     * 商品编号
+     */
+    @ApiModelProperty(name = "productNo", value = "商品编号")
+    private String productNo;
+
     public String getOrderType() {
         return orderType;
     }
@@ -144,5 +161,29 @@ public class RelOrdstockOccupy extends AftersaleCommonEntity{
 
     public void setStockType(String stockType) {
         this.stockType = stockType;
+    }
+
+    public String getSupplierNo() {
+        return supplierNo;
+    }
+
+    public void setSupplierNo(String supplierNo) {
+        this.supplierNo = supplierNo;
+    }
+
+    public BigDecimal getCostPrice() {
+        return costPrice;
+    }
+
+    public void setCostPrice(BigDecimal costPrice) {
+        this.costPrice = costPrice;
+    }
+
+    public String getProductNo() {
+        return productNo;
+    }
+
+    public void setProductNo(String productNo) {
+        this.productNo = productNo;
     }
 }
