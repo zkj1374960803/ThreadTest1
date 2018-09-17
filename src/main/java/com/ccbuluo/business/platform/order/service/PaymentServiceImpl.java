@@ -121,7 +121,7 @@ public class PaymentServiceImpl implements PaymentService {
             // 构建申请单
             List<AccountTransactionDTO> payments = buildApplyPayment(ba,sellTotal,productType);
             // 支付
-            StatusDto statusDto = StatusDto.buildSuccessStatusDto("支付成功！");// TODO 目前没有账号，不能进行支付。bizFinanceAccountService.makeTrading(payments);
+            StatusDto statusDto = bizFinanceAccountService.makeTrading(payments);
             // 如果支付成功
             if(statusDto.isSuccess()){
                 //更新申请单状态
@@ -224,7 +224,7 @@ public class PaymentServiceImpl implements PaymentService {
         List<Pair<String,BigDecimal>> list = getRreceiveInfo(serviceOrderno);
         // 构建申请单
         List<AccountTransactionDTO> payments = buildOrderPayment(list,payerOrgno,serviceOrderno);
-        StatusDto statusDto = StatusDto.buildSuccessStatusDto("支付成功！");// TODO 目前没有账号，不能进行支付。bizFinanceAccountService.makeTrading(payments);
+        StatusDto statusDto = bizFinanceAccountService.makeTrading(payments);
         // 如果支付失败
         if(! statusDto.isSuccess()){
             return statusDto;

@@ -293,7 +293,7 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
         // 构建申请单
         List<AccountTransactionDTO> payments = buildClaimPayment(claimorder,actualAmount);
         // 支付
-        StatusDto statusDto = StatusDto.buildSuccessStatusDto("支付成功！");// TODO 目前没有账号，不能进行支付。bizFinanceAccountService.makeTrading(payments);
+        StatusDto statusDto = bizFinanceAccountService.makeTrading(payments);
         // 如果支付成功
         if(statusDto.isSuccess()){
             // 更新索赔单状态和支付时间
