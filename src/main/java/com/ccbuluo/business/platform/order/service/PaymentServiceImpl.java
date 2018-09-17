@@ -164,7 +164,7 @@ public class PaymentServiceImpl implements PaymentService {
             }
             BigDecimal sellTotal = getSellTotal(details);
             // 商品类型
-            String productType = details.get(0).getProductType();
+            String productType = details.get(0).getProductType(); 
             // 构建申请单
             List<AccountTransactionDTO> payments = buildApplyPayment(ba,sellTotal,productType);
             // 支付
@@ -183,10 +183,10 @@ public class PaymentServiceImpl implements PaymentService {
             }else{
                 return statusDto;
             }
-            return StatusDto.buildSuccessStatusDto("创建预付款单据成功！");
+            return StatusDto.buildSuccessStatusDto("支付成功！");
 
         } catch (Exception e) {
-            logger.error("创建预付款单据失败！", e);
+            logger.error("支付失败！", e);
             throw e;
         }
     }

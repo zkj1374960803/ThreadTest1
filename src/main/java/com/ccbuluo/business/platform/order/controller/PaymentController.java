@@ -57,6 +57,20 @@ public class PaymentController {
     }
 
     /**
+     *  申请单支付功能（退货）
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-22 17:02:58
+     */
+    @ApiOperation(value = "申请单支付功能（退货）", notes = "【魏俊标】")
+    @GetMapping("/refundpayment/{applyNo}")
+    @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
+    public StatusDto<FindAllocateApplyDTO> refundPayment(@PathVariable String applyNo){
+        return paymentService.samelevelPayment(applyNo);
+    }
+
+    /**
      *  根据申请单获取总价格
      * @param applyNo 申请单号
      * @return StatusDto
