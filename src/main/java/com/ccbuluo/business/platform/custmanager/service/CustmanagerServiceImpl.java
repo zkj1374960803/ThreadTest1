@@ -241,7 +241,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             code,
             buo.getOrgName(),
             OrganizationTypeEnumThrift.PERSONAL,
-            userHolder.getLoggedUser().getOrganization().getOrgCode());
+            userHolder.getLoggedUserId());
         if(!financeAccountStatusDto.isSuccess()){
             throw new CommonException(financeAccountStatusDto.getCode(), financeAccountStatusDto.getMessage());
         }

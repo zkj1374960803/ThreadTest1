@@ -125,7 +125,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
                                                                                                 serviceCenterCode,
                                                                                                 saveServiceCenterDTO.getServiceCenterName(),
                                                                                                 OrganizationTypeEnumThrift.ORGANIZATION,
-                                                                                                userHolder.getLoggedUser().getOrganization().getOrgCode());
+                                                                                                userHolder.getLoggedUserId());
             String code = stringStatusDto.getCode();
             if (null != code && code.equals(Constants.ERROR_CODE)) {
                 throw new IllegalAccessException(stringStatusDto.getMessage());
