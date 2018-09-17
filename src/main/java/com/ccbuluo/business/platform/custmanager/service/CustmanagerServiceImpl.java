@@ -310,8 +310,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
     public StatusDto<Page<QueryUserListDTO>> queryUserList(UserInfoDTO userInfoDTO) {
         userInfoDTO.setAppId(SystemPropertyHolder.getBaseAppid());
         userInfoDTO.setSecretId(SystemPropertyHolder.getBaseSecret());
-//        userInfoDTO.setOrgCode(BusinessPropertyHolder.ORGCODE_TOP_CUSMANAGER);
-        List<String> orgCodeList = allocateApplyService.getOrgCodesByOrgType(OrganizationTypeEnum.PLATFORM.name());
+        List<String> orgCodeList = allocateApplyService.getOrgCodesByOrgType(OrganizationTypeEnum.CUSTMANAGER.name());
         userInfoDTO.setOrgCodes(orgCodeList);
         // 排序字段
         userInfoDTO.setSortField(Constants.SORT_FIELD_OPERATE);
