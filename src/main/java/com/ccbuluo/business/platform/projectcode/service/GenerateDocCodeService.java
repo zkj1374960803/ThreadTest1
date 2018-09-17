@@ -109,16 +109,19 @@ public class GenerateDocCodeService {
             // 根据前缀从redis中获取最大code
             String redisKey = buildRedisKey(prefix);
             String redisCodeStr = jedisCluster.get(redisKey);
+            Long redisCode = 0L;
             if (StringUtils.isNotBlank(redisCodeStr)) {
-                Long redisCode = Long.valueOf(redisCodeStr);
+                redisCode = Long.valueOf(redisCodeStr);
                 redisCode++;
                 newCode = produceCode(redisCode);
-                // 重新放入redis，
-                jedisCluster.set(redisKey, String.valueOf(redisCode));
             }else{
-                // 第一次为空赋值为1
-                jedisCluster.set(redisKey, "1");
+                // 第一次设置为1
+                redisCodeStr = "1";
+                redisCode = Long.valueOf(redisCodeStr);
+                newCode = produceCode(redisCode);
             }
+            // 放入redis，
+            jedisCluster.set(redisKey, String.valueOf(redisCode));
         }catch (Exception exp){
             logger.error(String.format("前缀%s生成编码时异常"), exp);
             throw exp;
