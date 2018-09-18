@@ -317,7 +317,7 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
     private List<AccountTransactionDTO> buildClaimPayment(BizServiceClaimorder claimorder, BigDecimal actualAmount){
         List<AccountTransactionDTO> list = new ArrayList<AccountTransactionDTO>();
         //  付款方
-        AccountTransactionDTO accountPayer = buildAccountTransactionDTO(Constants.AFTER_SALE_PLATFORM,claimorder.getClaimOrdno());
+        AccountTransactionDTO accountPayer = buildAccountTransactionDTO(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM,claimorder.getClaimOrdno());
         // 收款方
         AccountTransactionDTO accountReceive = buildAccountTransactionDTO(claimorder.getClaimOrgno(),claimorder.getClaimOrdno());
         // 付款金额

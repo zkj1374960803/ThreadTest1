@@ -141,11 +141,6 @@ public class Constants {
      */
     public static final String PRODUCT_TYPE_EQUIPMENT = "EQUIPMENT";
 
-    /**
-     * 平台支付账号编号（支付用）
-     */
-    public static final String AFTER_SALE_PLATFORM = "AFTER_SALE_PLATFORM";
-
 
 
 

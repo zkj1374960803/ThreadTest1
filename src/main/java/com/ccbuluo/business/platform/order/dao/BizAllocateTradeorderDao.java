@@ -313,8 +313,7 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT roo.order_type,roo.doc_no,roo.stock_id,roo.occupy_num,roo.occupy_status,roo.occupy_starttime,roo.occupy_endtime,")
             .append(" roo.creator,roo.create_time,roo.delete_flag FROM rel_ordstock_occupy AS roo ")
-            .append(" LEFT JOIN biz_serviceorder_detail AS bsd ON bsd.order_no = roo.doc_no")
-            .append(" WHERE roo.doc_no = :serviceOrderno AND bsd.service_orgno = :orgCode");
+            .append(" WHERE roo.doc_no = :serviceOrderno");
 
         return queryListBean(RelOrdstockOccupy.class, sql.toString(), params);
     }
