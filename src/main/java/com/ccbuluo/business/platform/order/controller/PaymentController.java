@@ -9,9 +9,11 @@ import com.ccbuluo.business.platform.order.service.PaymentService;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -29,17 +31,48 @@ public class PaymentController {
     PaymentService paymentService;
 
     /**
-     *  申请单支付功能
+     *  申请单支付功能（采购）
      * @param applyNo 申请单号
      * @return StatusDto
      * @author weijb
      * @date 2018-08-22 17:02:58
      */
-    @ApiOperation(value = "申请单支付功能", notes = "【魏俊标】")
-    @GetMapping("/paymentcompletion/{applyNo}")
+    @ApiOperation(value = "申请单支付功能（采购）", notes = "【魏俊标】")
+    @GetMapping("/purchasepayment/{applyNo}")
     @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
-    public StatusDto<FindAllocateApplyDTO> paymentCompletion(@PathVariable String applyNo){
-        return paymentService.paymentCompletion(applyNo);
+    public StatusDto<FindAllocateApplyDTO> purchasePayment(@PathVariable String applyNo){
+        return paymentService.purchasePayment(applyNo);
+    }
+
+    /**
+     *  申请单支付功能（调拨）
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-22 17:02:58
+     */
+    @ApiOperation(value = "申请单支付功能（调拨）", notes = "【魏俊标】")
+    @GetMapping("/samelevelpayment/{applyNo}")
+    @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
+    public StatusDto<FindAllocateApplyDTO> samelevelPayment(@PathVariable String applyNo){
+        return paymentService.samelevelPayment(applyNo);
+    }
+
+    /**
+     *  申请单支付功能（退货）
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-22 17:02:58
+     */
+    @ApiOperation(value = "申请单支付功能（退货）", notes = "【魏俊标】")
+    @PostMapping("/refundpayment")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "actualAmount", value = "实际退货的金额", required = true, paramType = "query")
+    })
+    public StatusDto<FindAllocateApplyDTO> refundPayment(String applyNo, BigDecimal actualAmount){
+        return paymentService.refundPayment(applyNo,actualAmount);
     }
 
     /**
