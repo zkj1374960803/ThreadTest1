@@ -528,8 +528,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     @Override
     public Page<QueryPurchaseListDTO> queryPurchaseLise(QueryPurchaseListDTO queryPurchaseListDTO) {
         queryPurchaseListDTO.setApplyType(InstockTypeEnum.PURCHASE.name());
-        Page<QueryPurchaseListDTO> allocateApplyByCode = bizAllocateApplyDao.queryAllocateApplyByCode(queryPurchaseListDTO);
-        return allocateApplyByCode;
+        return bizAllocateApplyDao.queryAllocateApplyByCode(queryPurchaseListDTO);
     }
 
     /**
