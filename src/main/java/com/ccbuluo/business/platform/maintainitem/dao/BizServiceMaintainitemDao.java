@@ -156,4 +156,21 @@ public class BizServiceMaintainitemDao extends BaseDao<BizServiceMaintainitem> {
 
         return queryPageForBean(DetailBizServiceMaintainitemDTO.class, sql.toString(), params, offset, pagesize);
     }
+
+    /**
+     * 根据code删除工时
+     * @param maintainitemCode 工时code
+     * @return 删除是否成功
+     * @author liuduo
+     * @date 2018-09-18 14:32:56
+     */
+    public int delete(String maintainitemCode) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("maintainitemCode", maintainitemCode);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE  FROM biz_service_maintainitem WHERE maintainitem_code = :maintainitemCode");
+
+        return super.updateForMap(sql.toString(), params);
+    }
 }
