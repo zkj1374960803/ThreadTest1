@@ -413,12 +413,20 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
                 return StatusDto.buildDataSuccessStatusDto(new Page<>());
             }
             // 获取当前登录人的地址
-            StatusDtoThriftBean<UserInfoDTO> userDetail = innerUserInfoService.findUserDetail(userHolder.getLoggedUserId());
-            UserInfoDTO data = StatusDtoThriftUtils.resolve(userDetail, UserInfoDTO.class).getData();
-            StatusDtoThriftBean<ServiceCenterWorkplaceDTO> workplaceByCode = basicUserWorkplaceService.getWorkplaceByCode(data.getOrgCode());
-            ServiceCenterWorkplaceDTO data1 = StatusDtoThriftUtils.resolve(workplaceByCode, ServiceCenterWorkplaceDTO.class).getData();
-            String province = data1.getProvince();
-            String city = data1.getCity();
+            String province = "";
+            String city = "";
+            if (userHolder.getLoggedUser().getOrganization().getOrgType().equals(BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name())) {
+                BizServiceCustmanager bizServiceCustmanager = bizServiceCustmanagerDao.queryCustManagerByUuid(userHolder.getLoggedUserId());
+                StatusDtoThriftBean<ServiceCenterWorkplaceDTO> workplaceByCode = basicUserWorkplaceService.getWorkplaceByCode(bizServiceCustmanager.getServicecenterCode());
+                ServiceCenterWorkplaceDTO data1 = StatusDtoThriftUtils.resolve(workplaceByCode, ServiceCenterWorkplaceDTO.class).getData();
+                province = data1.getProvince();
+                city = data1.getCity();
+            } else {
+                StatusDtoThriftBean<ServiceCenterWorkplaceDTO> workplaceByCode = basicUserWorkplaceService.getWorkplaceByCode(userHolder.getLoggedUser().getOrganization().getOrgCode());
+                ServiceCenterWorkplaceDTO data1 = StatusDtoThriftUtils.resolve(workplaceByCode, ServiceCenterWorkplaceDTO.class).getData();
+                province = data1.getProvince();
+                city = data1.getCity();
+            }
             // 查询地区倍数
             List<BizServiceMultipleprice> bizServiceMultiplepriceList = multiplepriceService.queryMultiple(codes, province, city);
             Map<String, BizServiceMultipleprice> collect = bizServiceMultiplepriceList.stream().collect(Collectors.toMap(BizServiceMultipleprice::getMaintainitemCode, Function.identity()));
@@ -507,12 +515,12 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      */
     private void occupyStock(SaveOrderDetailDTO saveOrderDetailDTO) {
         List<SaveMerchandiseDTO> saveMerchandiseDTOS = saveOrderDetailDTO.getSaveMerchandiseDTOS();
-        List<SaveMerchandiseDTO> collect = saveMerchandiseDTOS.stream().filter(item -> item.getServiceUserid() == null || item.getServiceUserid() == userHolder.getLoggedUserId()).collect(Collectors.toList());
+        List<SaveMerchandiseDTO> collect = saveMerchandiseDTOS.stream().filter(item -> item.getServiceUserid() == null || item.getServiceUserid().equals(userHolder.getLoggedUserId())).collect(Collectors.toList());
         if (!collect.isEmpty()) {
             String orgCode = "";
-            List<BizStockDetail> bizStockDetailList = Lists.newArrayList();
-            List<RelOrdstockOccupy> relOrdstockOccupyList = Lists.newArrayList();
             for (SaveMerchandiseDTO saveMerchandiseDTO : collect) {
+                List<RelOrdstockOccupy> relOrdstockOccupyList = Lists.newArrayList();
+                List<BizStockDetail> bizStockDetailList = Lists.newArrayList();
                 // 根据商品编号和使用人查询库存
                 String orgNo = "";
                 if (StringUtils.isNotBlank(saveMerchandiseDTO.getServiceOrgno())) {
