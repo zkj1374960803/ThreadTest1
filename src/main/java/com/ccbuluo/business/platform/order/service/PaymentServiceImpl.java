@@ -636,9 +636,13 @@ public class PaymentServiceImpl implements PaymentService {
             bill.setBizFinanceReceiptList(receipts);
             surplusbill.setBizFinanceReceiptList(surplusreceipts);
             // 预付款
-            paymentbills.add(bill);
+            if(receipt.getMoney().intValue() > 0){
+                paymentbills.add(bill);
+            }
             // 尾款
-            surplusbills.add(surplusbill);
+            if(receiptSurplus.getMoney().intValue() > 0){
+                surplusbills.add(surplusbill);
+            }
         }
         return Pair.of(paymentbills, surplusbills);
     }
@@ -657,11 +661,11 @@ public class PaymentServiceImpl implements PaymentService {
         BigDecimal perpay = BigDecimal.ZERO;
         // 总价
         if(null != tradeorder){
-            total = tradeorder.getTotalPrice();
+            total = tradeorder.getTotalPrice() == null ? BigDecimal.ZERO : tradeorder.getTotalPrice();
         }
         // 预付款
         if(null != tradeorder){
-            perpay = tradeorder.getPerpayAmount();
+            perpay = tradeorder.getPerpayAmount() == null ? BigDecimal.ZERO : tradeorder.getPerpayAmount();
         }
         if(perpay.compareTo(total) > 0){
             throw new CommonException("0", "尾款金额大于总金额！");
