@@ -109,9 +109,12 @@ public class ClaimOrderController{
      */
     @ApiOperation(value = "查询支付索赔单金额", notes = "【张康健】")
     @GetMapping("/findpaymentamount")
-    @ApiImplicitParam(name = "serviceOrdno", value = "维修单号", required = true, paramType = "query")
-    public StatusDto<Map<String, Double>> findPaymentAmount(String serviceOrdno){
-        Map<String, Double> paymentAmount = claimOrderServiceImpl.findPaymentAmount(serviceOrdno);
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "serviceOrdno", value = "维修单号", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "claimOrdno", value = "索赔单号", required = true, paramType = "query"),
+    })
+    public StatusDto<Map<String, Double>> findPaymentAmount(String serviceOrdno, String claimOrdno){
+        Map<String, Double> paymentAmount = claimOrderServiceImpl.findPaymentAmount(serviceOrdno, claimOrdno);
         return StatusDto.buildDataSuccessStatusDto(paymentAmount);
     }
 
