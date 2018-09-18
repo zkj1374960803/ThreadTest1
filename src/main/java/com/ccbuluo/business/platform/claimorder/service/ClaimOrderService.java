@@ -86,9 +86,10 @@ public interface ClaimOrderService {
     /**
      * 查询支付价格
      * @param serviceOrdno 维修单号
+     * @param claimOrdno
      * @return  Map<String, Double>
      * @author zhangkangjian
      * @date 2018-09-12 14:02:21
      */
-    Map<String, Double> findPaymentAmount(String serviceOrdno);
+    Map<String, Double> findPaymentAmount(String serviceOrdno, String claimOrdno);
 }

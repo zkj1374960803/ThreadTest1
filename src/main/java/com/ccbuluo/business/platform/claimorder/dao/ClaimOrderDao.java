@@ -111,6 +111,9 @@ public class ClaimOrderDao extends BaseDao<ClaimOrderDao> {
         if(StringUtils.isNotBlank(productDetailDTO.getWarrantyType())){
             sql.append(" AND a.warranty_type = :warrantyType ");
         }
+        if(StringUtils.isNotBlank(productDetailDTO.getServiceOrgno())){
+            sql.append(" AND a.service_orgno = :serviceOrgno ");
+        }
         SqlParameterSource param = new BeanPropertySqlParameterSource(productDetailDTO);
         return queryListBean(ProductDetailDTO.class, sql.toString(), param);
     }

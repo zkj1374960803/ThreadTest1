@@ -481,8 +481,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         processApplyDTO.setVersionNo(versionNo);
         if(ApplyStatusEnum.PENDING.name().equals(applyStatus)){
             String processOrgno = detail.getProcessOrgno();
-            if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(userOrgCode) ||
-                BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(processOrgno)){
+            if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(userOrgCode)
+                || !BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(processOrgno)){
                 // 可以驳回
                 bizAllocateApplyDao.updateAllocateApply(processApplyDTO);
             }else {

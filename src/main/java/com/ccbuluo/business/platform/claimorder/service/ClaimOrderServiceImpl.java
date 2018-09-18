@@ -1,12 +1,10 @@
 package com.ccbuluo.business.platform.claimorder.service;
 
-import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
 import com.ccbuluo.account.AccountTransactionDTO;
 import com.ccbuluo.account.AccountTypeEnumThrift;
 import com.ccbuluo.account.BizFinanceAccountService;
 import com.ccbuluo.account.TransactionTypeEnumThrift;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
-import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.DocCodePrefixEnum;
 import com.ccbuluo.business.constants.OrganizationTypeEnum;
 import com.ccbuluo.business.entity.BizServiceOrder;
@@ -41,7 +39,6 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
 
 /**
  * @author zhangkangjian
@@ -139,7 +136,9 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
      */
     @Override
     public BizServiceClaimorder findClaimOrderDetail(BizServiceClaimorder bizServiceClaimorder) {
+        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         ProductDetailDTO productDetailDTO = new ProductDetailDTO();
+        productDetailDTO.setServiceOrgno(orgCode);
         // 查询基础信息
         BizServiceClaimorder serviceClaimorderDetail = claimOrderDao.findClaimOrderDetailByClaimOrdno(bizServiceClaimorder);
         // 查询车牌号
@@ -165,13 +164,19 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
      /**
       * 查询支付价格
       * @param serviceOrdno 维修单号
+      * @param claimOrdno
       * @return  Map<String, Double>
       * @author zhangkangjian
       * @date 2018-09-12 14:02:21
       */
      @Override
-     public Map<String, Double> findPaymentAmount(String serviceOrdno){
+     public Map<String, Double> findPaymentAmount(String serviceOrdno, String claimOrdno){
+         BizServiceClaimorder bizServiceClaimorder = new BizServiceClaimorder();
+         bizServiceClaimorder.setClaimOrdno(claimOrdno);
+         BizServiceClaimorder claimOrderDetailByClaimOrdno = claimOrderDao.findClaimOrderDetailByClaimOrdno(bizServiceClaimorder);
+         String claimOrgno = claimOrderDetailByClaimOrdno.getClaimOrgno();
          ProductDetailDTO productDetailDTO = new ProductDetailDTO();
+         productDetailDTO.setServiceOrgno(claimOrgno);
          productDetailDTO.setWarrantyType(BizServiceorderDetail.WarrantyTypeEnum.INSHELFLIFE.name());
          productDetailDTO.setProductType(BizServiceorderDetail.ProductTypeEnum.MAINTAINITEM.name());
          productDetailDTO.setServiceOrderno(serviceOrdno);
@@ -189,8 +194,6 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
          map.put("maintainitemAndFittingPrice", maintainitemPrice + fittingPrice);
          return map;
      }
-
-
 
 
     /**
