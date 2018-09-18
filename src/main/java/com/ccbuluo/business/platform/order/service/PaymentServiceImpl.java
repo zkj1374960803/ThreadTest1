@@ -6,6 +6,7 @@ import com.ccbuluo.account.AccountTransactionDTO;
 import com.ccbuluo.account.AccountTypeEnumThrift;
 import com.ccbuluo.account.BizFinanceAccountService;
 import com.ccbuluo.account.TransactionTypeEnumThrift;
+import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.OrderStatusEnum;
 import com.ccbuluo.business.entity.*;
@@ -480,7 +481,7 @@ public class PaymentServiceImpl implements PaymentService {
                 accountPayer.setTransactionTypeEnumThrift(TransactionTypeEnumThrift.MATERIAL_EXTERNAL_PURCHASE_PAYMENT);
             }
             // 采购的支付方是平台
-            accountPayer.setOrganizationCode(Constants.AFTER_SALE_PLATFORM);
+            accountPayer.setOrganizationCode(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
             // 采购没有收款
             accountReceive = null;
         }
@@ -508,7 +509,7 @@ public class PaymentServiceImpl implements PaymentService {
             // 收款
             accountReceive.setTransactionTypeEnumThrift(TransactionTypeEnumThrift.PROBLEM_PIECE_REFUND_RECEIPT);
             // 退货的支付方是平台
-            accountPayer.setOrganizationCode(Constants.AFTER_SALE_PLATFORM);
+            accountPayer.setOrganizationCode(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
             // 收款机构是申请方
             accountReceive.setOrganizationCode(ba.getApplyorgNo());
         }
@@ -553,13 +554,13 @@ public class PaymentServiceImpl implements PaymentService {
      */
     @Override
     public StatusDto saveCustomerServiceAdvanceCounter(String applyNo){
-        List<BizFinancePaymentbills> paymentbills = buildPaymentbills(applyNo);
-        if(null == paymentbills || paymentbills.size() == 0){
-            throw new CommonException("0", "保存失败！");
-        }
+        Pair<List<BizFinancePaymentbills>,List<BizFinancePaymentbills>> pair = buildPaymentbills(applyNo);
         try {
-            StatusDtoThriftList<BizFinancePaymentbills> bizFinancePaymentbillsStatusDtoThriftList = bizFinancePaymentbillsService.saveCustomerServiceAdvanceCounterList(paymentbills);
-            if(bizFinancePaymentbillsStatusDtoThriftList.isSuccess()){
+            // 预付款
+            StatusDtoThriftList<BizFinancePaymentbills> paymentStatusDtoThriftList = bizFinancePaymentbillsService.saveCustomerServiceAdvanceCounterList(pair.getLeft());
+            // 尾款
+            StatusDtoThriftList<BizFinancePaymentbills> surplusStatusDtoThriftList = bizFinancePaymentbillsService.saveCustomerServiceMarketCounterList(pair.getRight());
+            if(paymentStatusDtoThriftList.isSuccess() && surplusStatusDtoThriftList.isSuccess()){
                 return StatusDto.buildSuccessStatusDto("保存成功！");
             }else{
                 return StatusDto.buildFailure("保存失败！");
@@ -576,7 +577,7 @@ public class PaymentServiceImpl implements PaymentService {
      * @author weijb
      * @date 2018-09-13 11:22:25
      */
-    private List<BizFinancePaymentbills> buildPaymentbills(String applyNo){
+    private Pair<List<BizFinancePaymentbills>,List<BizFinancePaymentbills>>  buildPaymentbills(String applyNo){
         // 根据申请单获取交易单（一个供应商就是一条记录）
         List<BizAllocateTradeorder> tradeorders = bizAllocateTradeorderDao.getAllocateTradeorderByApplyNo(applyNo);
         // 根据申请单获取申请单详情
@@ -586,9 +587,14 @@ public class PaymentServiceImpl implements PaymentService {
         }
         // 商品类型
         String productType = details.get(0).getProductType();
+        // 预付款
         List<BizFinancePaymentbills> paymentbills = new ArrayList<BizFinancePaymentbills>();
+        // 尾款
+        List<BizFinancePaymentbills> surplusbills = new ArrayList<BizFinancePaymentbills>();
+
         for(BizAllocateTradeorder tradeorder : tradeorders){
             BizFinancePaymentbills bill = new BizFinancePaymentbills();
+            BizFinancePaymentbills surplusbill = new BizFinancePaymentbills();
             bill.setBillsDate(System.currentTimeMillis());
             // 卖方机构（供应商编号）
             bill.setSupplierCode(tradeorder.getSellerOrgno());
@@ -603,7 +609,9 @@ public class PaymentServiceImpl implements PaymentService {
                 // 付款
                 bill.setBusinessType(TransactionTypeEnumThrift.MATERIAL_EXTERNAL_PURCHASE_PAYMENT.getLabel());
             }
+            BeanUtils.copyProperties(bill, surplusbill);
             List<BizFinanceReceipt> receipts = new ArrayList<BizFinanceReceipt>();
+            List<BizFinanceReceipt> surplusreceipts = new ArrayList<BizFinanceReceipt>();
             // 预付款
             BizFinanceReceipt receipt = new BizFinanceReceipt();
             // 尾款
@@ -621,14 +629,18 @@ public class PaymentServiceImpl implements PaymentService {
             receipts.add(receipt);
             // 尾款
             BeanUtils.copyProperties(receipt, receiptSurplus);
-            Double surplus = getSurplus(tradeorder, receipt.getMoney(), details);
+            Double surplus = getSurplus(tradeorder);
             receiptSurplus.setMoney(surplus);
-            receipts.add(receiptSurplus);
+            surplusreceipts.add(receiptSurplus);
 
             bill.setBizFinanceReceiptList(receipts);
+            surplusbill.setBizFinanceReceiptList(surplusreceipts);
+            // 预付款
             paymentbills.add(bill);
+            // 尾款
+            surplusbills.add(surplusbill);
         }
-        return paymentbills;
+        return Pair.of(paymentbills, surplusbills);
     }
 
     /**
@@ -639,19 +651,22 @@ public class PaymentServiceImpl implements PaymentService {
      * @author weijb
      * @date 2018-09-17 16:37:23
      */
-    private Double getSurplus(BizAllocateTradeorder tradeorder,Double money,List<AllocateapplyDetailBO> details){
+    private Double getSurplus(BizAllocateTradeorder tradeorder){
         BigDecimal bigDecimal = BigDecimal.ZERO;
-        Optional<AllocateapplyDetailBO> applyFilter = details.stream() .filter(applyDetail -> tradeorder.getSellerOrgno().equals(applyDetail.getSupplierNo())) .findFirst();
-        if (applyFilter.isPresent()) {
-            //单价
-            BigDecimal sellPrice = applyFilter.get().getSellPrice();
-            // 数量
-            BigDecimal appNum = BigDecimal.valueOf(applyFilter.get().getApplyNum());
-            if(BigDecimal.valueOf(money).compareTo(sellPrice.multiply(appNum)) > 0){
-                throw new CommonException("0", "尾款金额大于总金额！");
-            }
-            bigDecimal = sellPrice.multiply(appNum).subtract(BigDecimal.valueOf(money));
+        BigDecimal total = BigDecimal.ZERO;
+        BigDecimal perpay = BigDecimal.ZERO;
+        // 总价
+        if(null != tradeorder){
+            total = tradeorder.getTotalPrice();
         }
+        // 预付款
+        if(null != tradeorder){
+            perpay = tradeorder.getPerpayAmount();
+        }
+        if(perpay.compareTo(total) > 0){
+            throw new CommonException("0", "尾款金额大于总金额！");
+        }
+        bigDecimal = total.subtract(perpay);
         return bigDecimal.doubleValue();
     }
 
