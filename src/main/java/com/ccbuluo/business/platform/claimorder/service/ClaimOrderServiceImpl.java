@@ -5,6 +5,7 @@ import com.ccbuluo.account.AccountTypeEnumThrift;
 import com.ccbuluo.account.BizFinanceAccountService;
 import com.ccbuluo.account.TransactionTypeEnumThrift;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.DocCodePrefixEnum;
 import com.ccbuluo.business.constants.OrganizationTypeEnum;
 import com.ccbuluo.business.entity.BizServiceOrder;
@@ -136,11 +137,22 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
      */
     @Override
     public BizServiceClaimorder findClaimOrderDetail(BizServiceClaimorder bizServiceClaimorder) {
-        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+
+
         ProductDetailDTO productDetailDTO = new ProductDetailDTO();
+        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         productDetailDTO.setServiceOrgno(orgCode);
         // 查询基础信息
         BizServiceClaimorder serviceClaimorderDetail = claimOrderDao.findClaimOrderDetailByClaimOrdno(bizServiceClaimorder);
+        if(serviceClaimorderDetail == null){
+            throw new CommonException(Constants.ERROR_CODE,"索赔单数据异常");
+        }
+        // 如果当前登陆人是平台
+        if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(orgCode)){
+            String claimOrgno = serviceClaimorderDetail.getClaimOrgno();
+            productDetailDTO.setServiceOrgno(claimOrgno);
+        }
+
         // 查询车牌号
         BizServiceOrder byOrderNo = bizServiceOrderDao.getByOrderNo(serviceClaimorderDetail.getServiceOrdno());
         String carNo = byOrderNo.getCarNo();
