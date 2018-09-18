@@ -506,12 +506,12 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      */
     private void occupyStock(SaveOrderDetailDTO saveOrderDetailDTO) {
         List<SaveMerchandiseDTO> saveMerchandiseDTOS = saveOrderDetailDTO.getSaveMerchandiseDTOS();
-        List<SaveMerchandiseDTO> collect = saveMerchandiseDTOS.stream().filter(item -> item.getServiceUserid() == null || item.getServiceUserid() == userHolder.getLoggedUserId()).collect(Collectors.toList());
+        List<SaveMerchandiseDTO> collect = saveMerchandiseDTOS.stream().filter(item -> item.getServiceUserid() == null || item.getServiceUserid().equals(userHolder.getLoggedUserId())).collect(Collectors.toList());
         if (!collect.isEmpty()) {
             String orgCode = "";
-            List<BizStockDetail> bizStockDetailList = Lists.newArrayList();
-            List<RelOrdstockOccupy> relOrdstockOccupyList = Lists.newArrayList();
             for (SaveMerchandiseDTO saveMerchandiseDTO : collect) {
+                List<RelOrdstockOccupy> relOrdstockOccupyList = Lists.newArrayList();
+                List<BizStockDetail> bizStockDetailList = Lists.newArrayList();
                 // 根据商品编号和使用人查询库存
                 String orgNo = "";
                 if (StringUtils.isNotBlank(saveMerchandiseDTO.getServiceOrgno())) {
