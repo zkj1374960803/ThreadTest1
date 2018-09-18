@@ -139,7 +139,9 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
      */
     @Override
     public BizServiceClaimorder findClaimOrderDetail(BizServiceClaimorder bizServiceClaimorder) {
+        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         ProductDetailDTO productDetailDTO = new ProductDetailDTO();
+        productDetailDTO.setServiceOrgno(orgCode);
         // 查询基础信息
         BizServiceClaimorder serviceClaimorderDetail = claimOrderDao.findClaimOrderDetailByClaimOrdno(bizServiceClaimorder);
         // 查询车牌号
@@ -175,6 +177,8 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
          productDetailDTO.setWarrantyType(BizServiceorderDetail.WarrantyTypeEnum.INSHELFLIFE.name());
          productDetailDTO.setProductType(BizServiceorderDetail.ProductTypeEnum.MAINTAINITEM.name());
          productDetailDTO.setServiceOrderno(serviceOrdno);
+         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+         productDetailDTO.setServiceOrgno(orgCode);
          List<ProductDetailDTO> maintainitemDetail = claimOrderDao.queryMaintainitemDetail(productDetailDTO);
          // 查询零配件信息
          productDetailDTO.setProductType(BizServiceorderDetail.ProductTypeEnum.FITTING.name());
@@ -189,8 +193,6 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
          map.put("maintainitemAndFittingPrice", maintainitemPrice + fittingPrice);
          return map;
      }
-
-
 
 
     /**
