@@ -339,8 +339,7 @@ public class SupplierServiceImpl implements SupplierService{
      */
     @Override
     public List<QuerySupplierInfoDTO> querySupplierInfo(String code, String type) {
-        List<QuerySupplierInfoDTO> list = bizServiceSupplierDao.querySupplierInfo(code, type);
-        return list;
+        return bizServiceSupplierDao.querySupplierInfo(code, type);
     }
 
     /**

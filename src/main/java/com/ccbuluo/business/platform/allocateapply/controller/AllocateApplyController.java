@@ -9,12 +9,17 @@ import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.core.controller.BaseController;
+import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftBean;
+import com.ccbuluo.http.StatusDtoThriftList;
+import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
+import com.ccbuluo.usercoreintf.dto.QueryServiceCenterListDTO;
 import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
+import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import io.swagger.annotations.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +43,8 @@ public class AllocateApplyController extends BaseController {
     private CustmanagerService custmanagerService;
     @Resource
     BizInstockplanDetailDao bizInstockplanDetailDao;
+    @ThriftRPCClient("UserCoreSerService")
+    private BasicUserOrganizationService orgService;
 
     /**
      * 创建物料或者零配件申请
@@ -325,9 +332,29 @@ public class AllocateApplyController extends BaseController {
         return StatusDto.buildDataSuccessStatusDto(map);
     }
 
-
-
-
+    /**
+     * 查询可用的服务中心
+     * @param province 省
+     * @param city 市
+     * @param area 区
+     * @param name 服务中心名字
+     * @return 可用的服务中心
+     * @author liuduo
+     * @date 2018-07-06 10:00:52
+     */
+    @ApiOperation(value = "查询可用的服务中心", notes = "【刘铎】")
+    @ApiImplicitParams({@ApiImplicitParam(name = "province", value = "省",  required = false, paramType = "query"),
+        @ApiImplicitParam(name = "city", value = "市",  required = false, paramType = "query"),
+        @ApiImplicitParam(name = "area", value = "区",  required = false, paramType = "query"),
+        @ApiImplicitParam(name = "name", value = "服务中心名字",  required = false, paramType = "query")})
+    @GetMapping("/queryusableservicecenter")
+    public StatusDto<List<QueryServiceCenterListDTO>> queryUsableServiceCenter(@RequestParam(required = false) String province,
+                                                                              @RequestParam(required = false) String city,
+                                                                              @RequestParam(required = false) String area,
+                                                                              @RequestParam(required = false) String name) {
+        StatusDtoThriftList<QueryServiceCenterListDTO> queryServiceCenterListDTOStatusDtoThriftList = orgService.findUsableServiceCenter(province, city, area, name);
+        return StatusDtoThriftUtils.resolve(queryServiceCenterListDTOStatusDtoThriftList, QueryServiceCenterListDTO.class);
+    }
 
 
 
