@@ -413,11 +413,20 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
                 return StatusDto.buildDataSuccessStatusDto(new Page<>());
             }
             // 获取当前登录人的地址
-            BizServiceCustmanager bizServiceCustmanager = bizServiceCustmanagerDao.queryCustManagerByUuid(userHolder.getLoggedUserId());
-            StatusDtoThriftBean<ServiceCenterWorkplaceDTO> workplaceByCode = basicUserWorkplaceService.getWorkplaceByCode(bizServiceCustmanager.getServicecenterCode());
-            ServiceCenterWorkplaceDTO data1 = StatusDtoThriftUtils.resolve(workplaceByCode, ServiceCenterWorkplaceDTO.class).getData();
-            String province = data1.getProvince();
-            String city = data1.getCity();
+            String province = "";
+            String city = "";
+            if (userHolder.getLoggedUser().getOrganization().getOrgType().equals(BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name())) {
+                BizServiceCustmanager bizServiceCustmanager = bizServiceCustmanagerDao.queryCustManagerByUuid(userHolder.getLoggedUserId());
+                StatusDtoThriftBean<ServiceCenterWorkplaceDTO> workplaceByCode = basicUserWorkplaceService.getWorkplaceByCode(bizServiceCustmanager.getServicecenterCode());
+                ServiceCenterWorkplaceDTO data1 = StatusDtoThriftUtils.resolve(workplaceByCode, ServiceCenterWorkplaceDTO.class).getData();
+                province = data1.getProvince();
+                city = data1.getCity();
+            } else {
+                StatusDtoThriftBean<ServiceCenterWorkplaceDTO> workplaceByCode = basicUserWorkplaceService.getWorkplaceByCode(userHolder.getLoggedUser().getOrganization().getOrgCode());
+                ServiceCenterWorkplaceDTO data1 = StatusDtoThriftUtils.resolve(workplaceByCode, ServiceCenterWorkplaceDTO.class).getData();
+                province = data1.getProvince();
+                city = data1.getCity();
+            }
             // 查询地区倍数
             List<BizServiceMultipleprice> bizServiceMultiplepriceList = multiplepriceService.queryMultiple(codes, province, city);
             Map<String, BizServiceMultipleprice> collect = bizServiceMultiplepriceList.stream().collect(Collectors.toMap(BizServiceMultipleprice::getMaintainitemCode, Function.identity()));
