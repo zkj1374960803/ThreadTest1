@@ -119,5 +119,17 @@ public class ClaimOrderController{
         return StatusDto.buildDataSuccessStatusDto(paymentAmount);
     }
 
+    /**
+     * 查询维修单各种状态数据的数量
+     * @return StatusDto<Map<String, Long>>
+     * @author zhangkangjian
+     * @date 2018-09-19 17:02:50
+     */
+    @ApiOperation(value = "查询维修单各种状态数据的数量", notes = "【张康健】")
+    @GetMapping("/countclaimorderstatusnum")
+    public StatusDto<Map<String, Long>> countClaimorderStatusNum(){
+        return StatusDto.buildDataSuccessStatusDto(claimOrderServiceImpl.countClaimorderStatusNum());
+    }
+
 
 }
