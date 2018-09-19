@@ -388,7 +388,7 @@ public class PaymentServiceImpl implements PaymentService {
         bizServiceLog.setAction(action);
         bizServiceLog.setSubjectType("PaymentServiceImpl");
         bizServiceLog.setSubjectKeyvalue(applyNo);
-        if (userHolder.getLoggedUser().getOrganization().getOrgType().equals(BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name())) {
+        if (BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name().equals(userHolder.getLoggedUser().getOrganization().getOrgType())) {
             bizServiceLog.setLogContent("客户经理:"+content);
         } else {
             bizServiceLog.setLogContent("服务中心:"+content);

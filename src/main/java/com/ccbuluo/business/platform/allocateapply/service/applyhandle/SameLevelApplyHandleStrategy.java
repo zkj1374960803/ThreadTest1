@@ -351,7 +351,7 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
         bizServiceLog.setAction(action);
         bizServiceLog.setSubjectType("SameLevelApplyHandleStrategy");
         bizServiceLog.setSubjectKeyvalue(applyNo);
-        if (userHolder.getLoggedUser().getOrganization().getOrgType().equals(BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name())) {
+        if (BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name().equals(userHolder.getLoggedUser().getOrganization().getOrgType())) {
             bizServiceLog.setLogContent("客户经理"+content);
         } else {
             bizServiceLog.setLogContent("服务中心"+content);
