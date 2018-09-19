@@ -56,7 +56,7 @@ public class BizServiceClaimorder {
 
     // 赔偿时间
     @ApiModelProperty(name = "repayTime", value = "赔偿时间")
-    private Date repayTime;
+    private Long repayTime;
 
     // 创建人
     @ApiModelProperty(name = "creator", value = "创建人")
@@ -237,11 +237,11 @@ public class BizServiceClaimorder {
         this.actualAmount = actualAmount;
     }
 
-    public Date getRepayTime() {
+    public Long getRepayTime() {
         return this.repayTime;
     }
 
-    public void setRepayTime(Date repayTime) {
+    public void setRepayTime(Long repayTime) {
         this.repayTime = repayTime;
     }
 
