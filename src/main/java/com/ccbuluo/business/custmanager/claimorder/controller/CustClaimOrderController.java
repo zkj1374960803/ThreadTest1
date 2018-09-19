@@ -80,7 +80,7 @@ public class CustClaimOrderController {
         @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query"),
     })
-    public StatusDto<Page<QueryClaimorderListDTO>> queryClaimorderList(String claimOrdno,  int offset, int pageSize){
+    public StatusDto<Page<QueryClaimorderListDTO>> queryClaimorderList(String claimOrdno, int offset, int pageSize){
         return claimOrderServiceImpl.queryClaimorderList(claimOrdno, null, null, offset, pageSize);
     }
 
