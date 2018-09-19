@@ -1079,8 +1079,23 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         List<BizServiceOrder> statusList = bizServiceOrderDao.queryOrderStatusNum(reportOrgno);
         Map<String, Long> map = Maps.newHashMap();
         if (!statusList.isEmpty()) {
-            map = statusList.stream().collect(Collectors.groupingBy(BizServiceOrder::getOrderStatus, Collectors.counting()));
             map.put("all", Long.valueOf(statusList.size()));
+            long draftCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.DRAFT.name())).count();
+            map.put("DRAFT", draftCount);
+            long waitingReceiveCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.WAITING_RECEIVE.name())).count();
+            map.put("WAITING_RECEIVE", waitingReceiveCount);
+            long waitingPerfectionCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.WAITING_PERFECTION.name())).count();
+            map.put("WAITING_PERFECTION", waitingPerfectionCount);
+            long processingCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.PROCESSING.name())).count();
+            map.put("PROCESSING", processingCount);
+            long waitingCheckingCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.WAITING_CHECKING.name())).count();
+            map.put("WAITING_CHECKING", waitingCheckingCount);
+            long waitingPaymentCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.WAITING_PAYMENT.name())).count();
+            map.put("WAITING_PAYMENT", waitingPaymentCount);
+            long completedCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.COMPLETED.name())).count();
+            map.put("COMPLETED", completedCount);
+            long canceledCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.CANCELED.name())).count();
+            map.put("CANCELED", canceledCount);
         }
         return map;
     }
@@ -1093,11 +1108,26 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      */
     @Override
     public Map<String, Long> queryStoreOrderStatusNum(String reportOrgno) {
-        List<BizServiceOrder> statusList = bizServiceOrderDao.queryStoreOrderStatusNum(reportOrgno);
+        List<BizServiceOrder> statusList = bizServiceOrderDao.queryOrderStatusNum(reportOrgno);
         Map<String, Long> map = Maps.newHashMap();
         if (!statusList.isEmpty()) {
-            map = statusList.stream().collect(Collectors.groupingBy(BizServiceOrder::getOrderStatus, Collectors.counting()));
             map.put("all", Long.valueOf(statusList.size()));
+            long draftCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.DRAFT.name())).count();
+            map.put("DRAFT", draftCount);
+            long waitingReceiveCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.WAITING_RECEIVE.name())).count();
+            map.put("WAITING_RECEIVE", waitingReceiveCount);
+            long waitingPerfectionCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.WAITING_PERFECTION.name())).count();
+            map.put("WAITING_PERFECTION", waitingPerfectionCount);
+            long processingCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.PROCESSING.name())).count();
+            map.put("PROCESSING", processingCount);
+            long waitingCheckingCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.WAITING_CHECKING.name())).count();
+            map.put("WAITING_CHECKING", waitingCheckingCount);
+            long waitingPaymentCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.WAITING_PAYMENT.name())).count();
+            map.put("WAITING_PAYMENT", waitingPaymentCount);
+            long completedCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.COMPLETED.name())).count();
+            map.put("COMPLETED", completedCount);
+            long canceledCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.CANCELED.name())).count();
+            map.put("CANCELED", canceledCount);
         }
         return map;
     }
