@@ -216,11 +216,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
                 bizServiceLog.setAction(BizServiceLog.actionEnum.UPDATE.name());
                 bizServiceLog.setSubjectType("ServiceOrderServiceImpl");
                 bizServiceLog.setSubjectKeyvalue(serviceOrderno);
-                if (userHolder.getLoggedUser().getOrganization().getOrgType().equals(BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name())) {
-                    bizServiceLog.setLogContent("客户经理接单");
-                } else {
-                    bizServiceLog.setLogContent("服务中心接单");
-                }
+                bizServiceLog.setLogContent("维修单接单");
                 bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
                 bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
                 bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
@@ -302,7 +298,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
                 return StatusDto.buildDataSuccessStatusDto(new Page<>());
             }
             // 查询客户经理
-            if (StringUtils.isNotBlank(orgType) && orgType.equals(BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name())) {
+            if (StringUtils.isNotBlank(orgType) && BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name().equals(orgType)) {
                 List<BizServiceCustmanager> bizServiceCustmanagers = custmanagerService.queryCustManagerListByOrgCode(orgCodes);
                 Map<String, BizServiceCustmanager> collect = bizServiceCustmanagers.stream().collect(Collectors.toMap(a -> a.getServicecenterCode(), Function.identity()));
                 rows.forEach(item -> {
@@ -415,7 +411,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             // 获取当前登录人的地址
             String province = "";
             String city = "";
-            if (userHolder.getLoggedUser().getOrganization().getOrgType().equals(BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name())) {
+            if (BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name().equals(userHolder.getLoggedUser().getOrganization().getOrgType())) {
                 BizServiceCustmanager bizServiceCustmanager = bizServiceCustmanagerDao.queryCustManagerByUuid(userHolder.getLoggedUserId());
                 StatusDtoThriftBean<ServiceCenterWorkplaceDTO> workplaceByCode = basicUserWorkplaceService.getWorkplaceByCode(bizServiceCustmanager.getServicecenterCode());
                 ServiceCenterWorkplaceDTO data1 = StatusDtoThriftUtils.resolve(workplaceByCode, ServiceCenterWorkplaceDTO.class).getData();
@@ -1057,6 +1053,18 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     @Override
     public StatusDto<Page<BizServiceOrder>> queryStoreList(String orderStatus, String serviceType, String reportOrgno, String keyword, Integer offset, Integer pagesize) {
         return StatusDto.buildDataSuccessStatusDto(bizServiceOrderDao.queryStoreList(orderStatus, serviceType, reportOrgno, keyword, offset, pagesize));
+    }
+
+    /**
+     * 根据工时code查询公司是否被引用
+     * @param maintainitemCode 工时code
+     * @return 工时是否被引用
+     * @author liuduo
+     * @date 2018-09-18 14:36:12
+     */
+    @Override
+    public Boolean getByProductCode(String maintainitemCode) {
+        return bizServiceOrderDao.getByProductCode(maintainitemCode);
     }
 
 }

@@ -172,4 +172,14 @@ public interface ServiceOrderService {
      * @date 2018-09-04 15:06:55
      */
     StatusDto<Page<BizServiceOrder>> queryStoreList(String orderStatus, String serviceType, String reportOrgno, String keyword, Integer offset, Integer pagesize);
+
+    /**
+     * 根据工时code查询公司是否被引用
+     * @param maintainitemCode 工时code
+     * @return 工时是否被引用
+     * @author liuduo
+     * @date 2018-09-18 14:36:12
+     */
+    Boolean getByProductCode(String maintainitemCode);
+
 }

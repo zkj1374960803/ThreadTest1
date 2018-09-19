@@ -98,4 +98,25 @@ public class MaintainitemController extends BaseController {
                                                                       @RequestParam(defaultValue = "10") Integer pagesize) {
         return StatusDto.buildDataSuccessStatusDto(maintainitemService.queryList(keyword, offset, pagesize));
     }
+
+
+    /**
+     * 根据code删除工时
+     * @param equipCode 工时code
+     * @return 删除是否成功
+     * @author liuduo
+     * @date 2018-09-18 14:32:56
+     */
+    @ApiOperation(value = "工时删除", notes = "【刘铎】")
+    @ApiImplicitParam(name = "equipCode", value = "工时编号", paramType = "query",required = true)
+    @DeleteMapping("/delete")
+    public StatusDto delete(@RequestParam String equipCode) {
+        int status = maintainitemService.delete(equipCode);
+        if (status == Constants.FAILURE_ONE) {
+            return StatusDto.buildFailure("该服务项已被引用，无法删除！");
+        } else if (status == Constants.FAILURESTATUS) {
+            return StatusDto.buildFailure("删除失败！");
+        }
+        return StatusDto.buildSuccessStatusDto();
+    }
 }

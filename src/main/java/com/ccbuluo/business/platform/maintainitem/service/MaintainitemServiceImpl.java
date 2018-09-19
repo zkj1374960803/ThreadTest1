@@ -7,6 +7,7 @@ import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.platform.maintainitem.dao.BizServiceMaintainitemDao;
 import com.ccbuluo.business.platform.maintainitem.dto.DetailBizServiceMaintainitemDTO;
 import com.ccbuluo.business.platform.maintainitem.dto.SaveBizServiceMaintainitemDTO;
+import com.ccbuluo.business.platform.order.service.ServiceOrderService;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.business.platform.servicelog.service.ServiceLogService;
 import com.ccbuluo.core.common.UserHolder;
@@ -35,6 +36,8 @@ public class MaintainitemServiceImpl implements MaintainitemService{
     private UserHolder userHolder;
     @Autowired
     private ServiceLogService serviceLogService;
+    @Autowired
+    private ServiceOrderService serviceOrderService;
 
     /**
      * 保存工时
@@ -85,7 +88,14 @@ public class MaintainitemServiceImpl implements MaintainitemService{
      */
     @Override
     public DetailBizServiceMaintainitemDTO getById(Long id) {
-        return bizServiceMaintainitemDao.getById(id);
+        DetailBizServiceMaintainitemDTO byId = bizServiceMaintainitemDao.getById(id);
+        Boolean aboolean = serviceOrderService.getByProductCode(byId.getMaintainitemCode());
+        if (aboolean) {
+            byId.setQuote(Constants.STATUS_FLAG_ZERO);
+        } else {
+            byId.setQuote(Constants.STATUS_FLAG_ONE);
+        }
+        return byId;
     }
 
     /**
@@ -132,5 +142,23 @@ public class MaintainitemServiceImpl implements MaintainitemService{
     @Override
     public Page<DetailBizServiceMaintainitemDTO> queryList(String keyword, Integer offset, Integer pagesize) {
         return bizServiceMaintainitemDao.queryList(keyword, offset, pagesize);
+    }
+
+    /**
+     * 根据code删除工时
+     * @param maintainitemCode 工时code
+     * @return 删除是否成功
+     * @author liuduo
+     * @date 2018-09-18 14:32:56
+     */
+    @Override
+    public int delete(String maintainitemCode) {
+        // 查询工时是否被引用
+        Boolean aboolean = serviceOrderService.getByProductCode(maintainitemCode);
+        if (aboolean) {
+            return Constants.FAILURE_ONE;
+        }
+        // 删除工时
+        return bizServiceMaintainitemDao.delete(maintainitemCode);
     }
 }

@@ -50,4 +50,13 @@ public interface MaintainitemService {
      * @date 2018-07-17 20:10:35
      */
     Page<DetailBizServiceMaintainitemDTO> queryList(String keyword, Integer offset, Integer pagesize);
+
+    /**
+     * 根据code删除工时
+     * @param equipCode 工时code
+     * @return 删除是否成功
+     * @author liuduo
+     * @date 2018-09-18 14:32:56
+     */
+    int delete(String equipCode);
 }
