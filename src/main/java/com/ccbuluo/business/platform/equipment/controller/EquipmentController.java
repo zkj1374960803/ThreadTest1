@@ -97,14 +97,16 @@ public class EquipmentController extends BaseController {
     @ApiOperation(value = "物料列表", notes = "【刘铎】")
     @ApiImplicitParams({@ApiImplicitParam(name = "equiptypeId", value = "物料类型id", paramType = "query", dataType = "int"),
         @ApiImplicitParam(name = "keywork", value = "关键字", paramType = "query"),
+        @ApiImplicitParam(name = "carpartsPriceType", value = "(注:无价格:NOPRICE，有价格:HAVEPRICE）", required = false, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "起始数", paramType = "query", dataType = "int",required = true),
         @ApiImplicitParam(name = "pagesize", value = "每页数", paramType = "query", dataType = "int",required = true)})
     @GetMapping("/list")
     public StatusDto<Page<DetailBizServiceEquipmentDTO>> queryList(@RequestParam(required = false) Long equiptypeId,
                                                                    @RequestParam(required = false) String keyword,
+                                                                   @RequestParam(required = false) String carpartsPriceType,
                                                                    @RequestParam(defaultValue = "0") Integer offset,
                                                                    @RequestParam(defaultValue = "10") Integer pagesize) {
-        return StatusDto.buildDataSuccessStatusDto(equipmentService.queryList(equiptypeId, keyword, offset, pagesize));
+        return StatusDto.buildDataSuccessStatusDto(equipmentService.queryList(equiptypeId, keyword,carpartsPriceType, offset, pagesize));
     }
 
 

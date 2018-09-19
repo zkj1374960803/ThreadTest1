@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -136,6 +137,9 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
 
     /**
      * 查询物料列表
+     *
+     * @param carpartsPriceType
+     * @param productNoList
      * @param equiptypeId 物料类型id
      * @param keyword 关键字
      * @param offset 起始数
@@ -144,7 +148,7 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
      * @author liuduo
      * @date 2018-07-17 20:10:35
      */
-    public Page<DetailBizServiceEquipmentDTO> queryList(Long equiptypeId, String keyword, Integer offset, Integer pagesize) {
+    public Page<DetailBizServiceEquipmentDTO> queryList(String carpartsPriceType, List<String> productNoList, Long equiptypeId, String keyword, Integer offset, Integer pagesize) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
 
@@ -158,6 +162,17 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
         if (StringUtils.isNotBlank(keyword)) {
             params.put("keywork", keyword);
             sql.append(" AND (bse.equip_name LIKE CONCAT('%',:keywork,'%') OR bse.equip_code LIKE CONCAT('%',:keywork,'%'))");
+        }
+        if(productNoList == null || productNoList.size() == 0){
+            productNoList = List.of("null");
+        }
+        if("HAVEPRICE".equals(carpartsPriceType)){
+            params.put("productNoList", productNoList);
+            sql.append(" AND bse.equip_code in (:productNoList)");
+        }
+        if("NOPRICE".equals(carpartsPriceType)){
+            params.put("productNoList", productNoList);
+            sql.append(" AND bse.equip_code not in (:productNoList)");
         }
         sql.append(" AND bse.delete_flag = :deleteFlag ORDER BY bse.operate_time DESC");
 
@@ -227,5 +242,19 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
         sql.append(" SELECT ifnull(a.suggested_price,0) FROM rel_product_price a ")
             .append(" WHERE a.product_no = :equipCode ORDER BY a.create_time DESC LIMIT 1 ");
         return namedParameterJdbcTemplate.queryForObject(sql.toString(), params, BigDecimal.class);
+    }
+
+    /**
+     *  查询有价格的物料code
+     * @param productTypeEquipment 物料类型
+     * @return List<String>
+     * @author zhangkangjian
+     * @date 2018-09-19 19:23:28
+     */
+    public List<String> queryProductPrice(String productTypeEquipment) {
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("productTypeEquipment", productTypeEquipment);
+        String sql = "SELECT a.product_no FROM rel_product_price a WHERE a.product_type = :productTypeEquipment";
+        return querySingColum(String.class, sql, map);
     }
 }

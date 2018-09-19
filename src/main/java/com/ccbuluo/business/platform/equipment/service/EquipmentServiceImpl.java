@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.equipment.service;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.ProductUnitEnum;
+import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.entity.BizServiceEquipment;
 import com.ccbuluo.business.entity.BizServiceLog;
 import com.ccbuluo.business.entity.BizServiceProjectcode;
@@ -145,6 +146,7 @@ public class EquipmentServiceImpl implements EquipmentService{
      * 查询物料列表
      * @param equiptypeId 物料类型id
      * @param keyword 关键字
+     * @param carpartsPriceType
      * @param offset 起始数
      * @param pagesize 每页数
      * @return 物料列表
@@ -152,8 +154,10 @@ public class EquipmentServiceImpl implements EquipmentService{
      * @date 2018-07-17 20:10:35
      */
     @Override
-    public Page<DetailBizServiceEquipmentDTO> queryList(Long equiptypeId, String keyword, Integer offset, Integer pagesize) {
-        return bizServiceEquipmentDao.queryList(equiptypeId, keyword, offset, pagesize);
+    public Page<DetailBizServiceEquipmentDTO> queryList(Long equiptypeId, String keyword, String carpartsPriceType, Integer offset, Integer pagesize) {
+        // 查询有价格的物料code
+        List<String> productNoList = bizServiceEquipmentDao.queryProductPrice(Constants.PRODUCT_TYPE_EQUIPMENT);
+        return bizServiceEquipmentDao.queryList(carpartsPriceType, productNoList, equiptypeId, keyword, offset, pagesize);
     }
 
     /**
