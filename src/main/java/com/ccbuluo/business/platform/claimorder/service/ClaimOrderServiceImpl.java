@@ -223,14 +223,19 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
      */
     @Override
     public Map<String, Long> countClaimorderStatusNum() {
+        HashMap<String, Long> statusMap = Maps.newHashMap();
+        statusMap.put(BizServiceClaimorder.DocStatusEnum.WAITACCEPTANCE.name(), 0L);
+        statusMap.put(BizServiceClaimorder.DocStatusEnum.COMPLETED.name(), 0L);
+        statusMap.put(BizServiceClaimorder.DocStatusEnum.PENDINGPAYMENT.name(), 0L);
+        statusMap.put(BizServiceClaimorder.DocStatusEnum.PENDINGSUBMISSION.name(), 0L);
         Page<QueryClaimorderListDTO> queryClaimorderListDTOPage = queryClaimorderPage(null, null, null, 0, Integer.MAX_VALUE);
         List<QueryClaimorderListDTO> rows = queryClaimorderListDTOPage.getRows();
-        Map<String,Long> map = null;
         if(rows != null && rows.size() > 0){
-            map = rows.stream().collect(Collectors.groupingBy(QueryClaimorderListDTO::getDocStatus,Collectors.counting()));
-            map.put("ALL", Long.valueOf(rows.size()));
+            Map<String,Long> map = rows.stream().collect(Collectors.groupingBy(QueryClaimorderListDTO::getDocStatus,Collectors.counting()));
+            map.put("ALL", (long) rows.size());
+            map.forEach(statusMap::put);
         }
-        return map;
+        return statusMap;
     }
 
 
