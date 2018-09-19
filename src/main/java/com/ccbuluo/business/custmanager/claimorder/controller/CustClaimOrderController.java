@@ -80,8 +80,20 @@ public class CustClaimOrderController {
         @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query"),
     })
-    public StatusDto<Page<QueryClaimorderListDTO>> queryClaimorderList(String claimOrdno,  int offset, int pageSize){
+    public StatusDto<Page<QueryClaimorderListDTO>> queryClaimorderList(String claimOrdno, int offset, int pageSize){
         return claimOrderServiceImpl.queryClaimorderList(claimOrdno, null, null, offset, pageSize);
+    }
+
+    /**
+     * 查询维修单各种状态数据的数量
+     * @return StatusDto<Map<String, Long>>
+     * @author zhangkangjian
+     * @date 2018-09-19 17:02:50
+     */
+    @ApiOperation(value = "查询维修单各种状态数据的数量", notes = "【张康健】")
+    @GetMapping("/countclaimorderstatusnum")
+    public StatusDto<Map<String, Long>> countClaimorderStatusNum(){
+        return StatusDto.buildDataSuccessStatusDto(claimOrderServiceImpl.countClaimorderStatusNum());
     }
 
 

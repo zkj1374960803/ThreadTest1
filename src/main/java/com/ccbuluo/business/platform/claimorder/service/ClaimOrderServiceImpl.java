@@ -215,6 +215,29 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
          return map;
      }
 
+    /**
+     * 查询维修单各种状态数据的数量
+     * @return Map<String,Long>
+     * @author zhangkangjian
+     * @date 2018-09-19 17:10:39
+     */
+    @Override
+    public Map<String, Long> countClaimorderStatusNum() {
+        HashMap<String, Long> statusMap = Maps.newHashMap();
+        statusMap.put(BizServiceClaimorder.DocStatusEnum.WAITACCEPTANCE.name(), 0L);
+        statusMap.put(BizServiceClaimorder.DocStatusEnum.COMPLETED.name(), 0L);
+        statusMap.put(BizServiceClaimorder.DocStatusEnum.PENDINGPAYMENT.name(), 0L);
+        statusMap.put(BizServiceClaimorder.DocStatusEnum.PENDINGSUBMISSION.name(), 0L);
+        Page<QueryClaimorderListDTO> queryClaimorderListDTOPage = queryClaimorderPage(null, null, null, 0, Integer.MAX_VALUE);
+        List<QueryClaimorderListDTO> rows = queryClaimorderListDTOPage.getRows();
+        if(rows != null && rows.size() > 0){
+            Map<String,Long> map = rows.stream().collect(Collectors.groupingBy(QueryClaimorderListDTO::getDocStatus,Collectors.counting()));
+            map.put("ALL", (long) rows.size());
+            map.forEach(statusMap::put);
+        }
+        return statusMap;
+    }
+
 
     /**
      * 查询零配件列表信息
@@ -265,14 +288,7 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
      */
     @Override
     public StatusDto<Page<QueryClaimorderListDTO>> queryClaimorderList(String claimOrdno, String keyword, String docStatus, int offset, int pageSize) {
-        BusinessUser loggedUser = userHolder.getLoggedUser();
-        Organization organization = loggedUser.getOrganization();
-        String orgCode = organization.getOrgCode();
-        // 如果时平台的话，查询所有的索赔单
-        if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(orgCode)){
-            orgCode = null;
-        }
-        Page<QueryClaimorderListDTO> queryClaimorderListDTOPage = claimOrderDao.queryClaimorderList(claimOrdno, keyword, docStatus, orgCode, offset, pageSize);
+        Page<QueryClaimorderListDTO> queryClaimorderListDTOPage = queryClaimorderPage(claimOrdno, keyword, docStatus, offset, pageSize);
         Optional.ofNullable(queryClaimorderListDTOPage.getRows()).ifPresent(a ->{
             StatusDtoThriftPage<QueryServiceCenterDTO> serviceCenterList = basicUserOrganizationService.queryServiceCenterList(null, null ,null ,null,null,0,Integer.MAX_VALUE);
             StatusDto<Page<QueryServiceCenterDTO>> queryServiceCenterDTOPage = StatusDtoThriftUtils.resolve(serviceCenterList, QueryServiceCenterDTO.class);
@@ -288,6 +304,28 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
             });
         });
         return StatusDto.buildDataSuccessStatusDto(queryClaimorderListDTOPage);
+    }
+
+    /**
+     * 查询索赔单的分页列表
+     * @param claimOrdno 索赔单号
+     * @param keyword 查询条件
+     * @param docStatus 索赔单状态
+     * @param offset 偏移量
+     * @param pageSize 每页显示数量
+     * @return Page<QueryClaimorderListDTO> 分页的索赔单信息
+     * @author zhangkangjian
+     * @date 2018-09-19 17:16:52
+     */
+    private Page<QueryClaimorderListDTO> queryClaimorderPage(String claimOrdno, String keyword, String docStatus, int offset, int pageSize) {
+        BusinessUser loggedUser = userHolder.getLoggedUser();
+        Organization organization = loggedUser.getOrganization();
+        String orgCode = organization.getOrgCode();
+        // 如果时平台的话，查询所有的索赔单
+        if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(orgCode)){
+            orgCode = null;
+        }
+        return claimOrderDao.queryClaimorderList(claimOrdno, keyword, docStatus, orgCode, offset, pageSize);
     }
 
     /**

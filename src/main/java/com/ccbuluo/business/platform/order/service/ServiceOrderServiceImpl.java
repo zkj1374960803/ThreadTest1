@@ -57,6 +57,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -1065,6 +1066,56 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     @Override
     public Boolean getByProductCode(String maintainitemCode) {
         return bizServiceOrderDao.getByProductCode(maintainitemCode);
+    }
+
+    /**
+     * 查询维修单状态数量
+     * @return 维修单各种状态的数量
+     * @author liuduo
+     * @date 2018-09-19 17:21:44
+     */
+    @Override
+    public Map<String, Long> queryOrderStatusNum(String reportOrgno) {
+        List<BizServiceOrder> statusList = bizServiceOrderDao.queryOrderStatusNum(reportOrgno);
+        Map<String, Long> map = buildMap();
+        if (!statusList.isEmpty()) {
+            Map<String, Long> collect = statusList.stream().collect(Collectors.groupingBy(BizServiceOrder::getOrderStatus, Collectors.counting()));
+            collect.forEach(map::put);
+            map.put("all", (long) statusList.size());
+        }
+        return map;
+    }
+
+
+    /**
+     * 查询维修单状态数量(门店用)
+     * @return 维修单各种状态的数量
+     * @author liuduo
+     * @date 2018-09-19 17:21:44
+     */
+    @Override
+    public Map<String, Long> queryStoreOrderStatusNum(String reportOrgno) {
+        List<BizServiceOrder> statusList = bizServiceOrderDao.queryStoreOrderStatusNum(reportOrgno);
+        Map<String, Long> map = buildMap();
+        if (!statusList.isEmpty()) {
+            Map<String, Long> collect = statusList.stream().collect(Collectors.groupingBy(BizServiceOrder::getOrderStatus, Collectors.counting()));
+            collect.forEach(map::put);
+            map.put("all", (long) statusList.size());
+        }
+        return map;
+    }
+
+    private Map<String, Long> buildMap() {
+        Map<String, Long> map = Maps.newHashMap();
+        map.put(BizServiceOrder.OrderStatusEnum.DRAFT.name(), 0L);
+        map.put(BizServiceOrder.OrderStatusEnum.WAITING_RECEIVE.name(), 0L);
+        map.put(BizServiceOrder.OrderStatusEnum.WAITING_PERFECTION.name(), 0L);
+        map.put(BizServiceOrder.OrderStatusEnum.PROCESSING.name(), 0L);
+        map.put(BizServiceOrder.OrderStatusEnum.WAITING_CHECKING.name(), 0L);
+        map.put(BizServiceOrder.OrderStatusEnum.WAITING_PAYMENT.name(), 0L);
+        map.put(BizServiceOrder.OrderStatusEnum.COMPLETED.name(), 0L);
+        map.put(BizServiceOrder.OrderStatusEnum.CANCELED.name(), 0L);
+        return map;
     }
 
 }
