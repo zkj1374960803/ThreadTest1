@@ -462,7 +462,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
 
     /**
      * 驳回申请
-     *
      * @param applyNo     申请单号
      * @param processMemo 驳回理由
      * @author zhangkangjian
@@ -488,12 +487,9 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }else {
                 throw new CommonException(Constants.ERROR_CODE, "不可以驳回申请");
             }
-
         }else {
             throw new CommonException(Constants.ERROR_CODE, "申请单状态不正确，不可以驳回申请");
         }
-
-
     }
 
     /**

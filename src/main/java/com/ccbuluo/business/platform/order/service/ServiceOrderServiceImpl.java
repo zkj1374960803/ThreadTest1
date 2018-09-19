@@ -1059,4 +1059,16 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         return StatusDto.buildDataSuccessStatusDto(bizServiceOrderDao.queryStoreList(orderStatus, serviceType, reportOrgno, keyword, offset, pagesize));
     }
 
+    /**
+     * 根据工时code查询公司是否被引用
+     * @param maintainitemCode 工时code
+     * @return 工时是否被引用
+     * @author liuduo
+     * @date 2018-09-18 14:36:12
+     */
+    @Override
+    public Boolean getByProductCode(String maintainitemCode) {
+        return bizServiceOrderDao.getByProductCode(maintainitemCode);
+    }
+
 }

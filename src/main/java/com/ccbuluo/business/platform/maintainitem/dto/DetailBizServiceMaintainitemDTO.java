@@ -35,6 +35,11 @@ public class DetailBizServiceMaintainitemDTO extends IdEntity {
      */
     @ApiModelProperty(name = "multipleNum", value = "地区倍数数量")
     private Integer multipleNum;
+    /**
+     * 该工时是否被使用
+     */
+    @ApiModelProperty(name = "quote", value = "该工时是否被使用")
+    private Integer quote;
 
 
     public void setMaintainitemCode(String maintainitemCode) {
@@ -67,5 +72,13 @@ public class DetailBizServiceMaintainitemDTO extends IdEntity {
 
     public void setMultipleNum(Integer multipleNum) {
         this.multipleNum = multipleNum;
+    }
+
+    public Integer getQuote() {
+        return quote;
+    }
+
+    public void setQuote(Integer quote) {
+        this.quote = quote;
     }
 }

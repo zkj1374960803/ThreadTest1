@@ -289,4 +289,20 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
 
         return queryPageForBean(BizServiceOrder.class, sql.toString(), params, offset, pagesize);
     }
+
+    /**
+     * 根据工时code查询公司是否被引用
+     * @param maintainitemCode 工时code
+     * @return 工时是否被引用
+     * @author liuduo
+     * @date 2018-09-18 14:36:12
+     */
+    public Boolean getByProductCode(String maintainitemCode) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("maintainitemCode", maintainitemCode);
+
+        String sql = "SELECT COUNT(id) > 0 FROM biz_serviceorder_detail WHERE product_no = :maintainitemCode";
+
+        return findForObject(sql, params, Boolean.class);
+    }
 }
