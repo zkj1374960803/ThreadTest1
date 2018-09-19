@@ -386,7 +386,7 @@ public class PaymentServiceImpl implements PaymentService {
         bizServiceLog.setModel(mode);
         // BizServiceLog.actionEnum.UPDATE.name()
         bizServiceLog.setAction(action);
-        bizServiceLog.setSubjectType("PaymentServiceImpl");
+        bizServiceLog.setSubjectType("BizAllocateApply");
         bizServiceLog.setSubjectKeyvalue(applyNo);
         bizServiceLog.setLogContent(content);
         bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());

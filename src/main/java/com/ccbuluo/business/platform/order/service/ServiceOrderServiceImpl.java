@@ -1077,7 +1077,13 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     @Override
     public Map<String, Long> queryOrderStatusNum(String reportOrgno) {
         List<BizServiceOrder> statusList = bizServiceOrderDao.queryOrderStatusNum(reportOrgno);
-        return buildStatus(statusList, Maps.newHashMap());
+        Map<String, Long> map = buildMap();
+        if (!statusList.isEmpty()) {
+            Map<String, Long> collect = statusList.stream().collect(Collectors.groupingBy(BizServiceOrder::getOrderStatus, Collectors.counting()));
+            collect.forEach(map::put);
+            map.put("all", (long) statusList.size());
+        }
+        return map;
     }
 
 
@@ -1090,37 +1096,25 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     @Override
     public Map<String, Long> queryStoreOrderStatusNum(String reportOrgno) {
         List<BizServiceOrder> statusList = bizServiceOrderDao.queryStoreOrderStatusNum(reportOrgno);
-        return buildStatus(statusList, Maps.newHashMap());
+        Map<String, Long> map = buildMap();
+        if (!statusList.isEmpty()) {
+            Map<String, Long> collect = statusList.stream().collect(Collectors.groupingBy(BizServiceOrder::getOrderStatus, Collectors.counting()));
+            collect.forEach(map::put);
+            map.put("all", (long) statusList.size());
+        }
+        return map;
     }
 
-    /**
-     * 组装维修单状态数量
-     * @param statusList 维修单状态
-     * @param map 用来放数量
-     * @return 维修单状态数量
-     * @author liuduo
-     * @date 2018-09-19 18:55:37
-     */
-    private Map<String, Long> buildStatus(List<BizServiceOrder> statusList, Map<String, Long> map) {
-        if (!statusList.isEmpty()) {
-            map.put("all", Long.valueOf(statusList.size()));
-            long draftCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.DRAFT.name())).count();
-            map.put("DRAFT", draftCount);
-            long waitingReceiveCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.WAITING_RECEIVE.name())).count();
-            map.put("WAITING_RECEIVE", waitingReceiveCount);
-            long waitingPerfectionCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.WAITING_PERFECTION.name())).count();
-            map.put("WAITING_PERFECTION", waitingPerfectionCount);
-            long processingCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.PROCESSING.name())).count();
-            map.put("PROCESSING", processingCount);
-            long waitingCheckingCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.WAITING_CHECKING.name())).count();
-            map.put("WAITING_CHECKING", waitingCheckingCount);
-            long waitingPaymentCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.WAITING_PAYMENT.name())).count();
-            map.put("WAITING_PAYMENT", waitingPaymentCount);
-            long completedCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.COMPLETED.name())).count();
-            map.put("COMPLETED", completedCount);
-            long canceledCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.CANCELED.name())).count();
-            map.put("CANCELED", canceledCount);
-        }
+    private Map<String, Long> buildMap() {
+        Map<String, Long> map = Maps.newHashMap();
+        map.put(BizServiceOrder.OrderStatusEnum.DRAFT.name(), 0L);
+        map.put(BizServiceOrder.OrderStatusEnum.WAITING_RECEIVE.name(), 0L);
+        map.put(BizServiceOrder.OrderStatusEnum.WAITING_PERFECTION.name(), 0L);
+        map.put(BizServiceOrder.OrderStatusEnum.PROCESSING.name(), 0L);
+        map.put(BizServiceOrder.OrderStatusEnum.WAITING_CHECKING.name(), 0L);
+        map.put(BizServiceOrder.OrderStatusEnum.WAITING_PAYMENT.name(), 0L);
+        map.put(BizServiceOrder.OrderStatusEnum.COMPLETED.name(), 0L);
+        map.put(BizServiceOrder.OrderStatusEnum.CANCELED.name(), 0L);
         return map;
     }
 

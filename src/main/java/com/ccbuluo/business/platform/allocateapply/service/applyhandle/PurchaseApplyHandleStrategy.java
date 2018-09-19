@@ -192,7 +192,7 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
         bizServiceLog.setModel(BizServiceLog.modelEnum.ERP.name());
         // BizServiceLog.actionEnum.UPDATE.name()
         bizServiceLog.setAction(action);
-        bizServiceLog.setSubjectType("PurchaseApplyHandleStrategy");
+        bizServiceLog.setSubjectType("BizAllocateApply");
         bizServiceLog.setSubjectKeyvalue(applyNo);
         bizServiceLog.setLogContent(content);
         bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
