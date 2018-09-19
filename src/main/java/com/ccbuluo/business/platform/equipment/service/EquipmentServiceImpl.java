@@ -97,8 +97,13 @@ public class EquipmentServiceImpl implements EquipmentService{
     public DetailBizServiceEquipmentDTO getById(Long id) {
         // 查询最新生效价格
         DetailBizServiceEquipmentDTO equipmentDTO = bizServiceEquipmentDao.getById(id);
-        BigDecimal suggestedPrice = bizServiceEquipmentDao.findSuggestedPrice(equipmentDTO.getEquipCode());
-        equipmentDTO.setSuggestedPrice(suggestedPrice);
+        try {
+            BigDecimal suggestedPrice = bizServiceEquipmentDao.findSuggestedPrice(equipmentDTO.getEquipCode());
+            equipmentDTO.setSuggestedPrice(suggestedPrice);
+        }catch (Exception e){
+            e.printStackTrace();
+            equipmentDTO.setSuggestedPrice(new BigDecimal(0));
+        }
         return equipmentDTO;
     }
 

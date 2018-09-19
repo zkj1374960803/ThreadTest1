@@ -64,7 +64,7 @@ public class ClaimOrderController{
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query"),
     })
     public StatusDto<Page<QueryClaimorderListDTO>> queryClaimorderList(String claimOrdno, String docStatus, int offset, int pageSize){
-        return claimOrderServiceImpl.queryClaimorderList(claimOrdno, docStatus, offset, pageSize);
+        return claimOrderServiceImpl.queryClaimorderList(claimOrdno, null, docStatus, offset, pageSize);
     }
 
     /**

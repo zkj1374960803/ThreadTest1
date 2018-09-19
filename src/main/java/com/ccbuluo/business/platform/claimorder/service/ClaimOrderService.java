@@ -50,7 +50,7 @@ public interface ClaimOrderService {
      * @author zhangkangjian
      * @date 2018-09-08 16:55:56
      */
-    StatusDto<Page<QueryClaimorderListDTO>> queryClaimorderList(String claimOrdno, String docStatus, int offset, int pageSize);
+    StatusDto<Page<QueryClaimorderListDTO>> queryClaimorderList(String claimOrdno, String keyword, String docStatus, int offset, int pageSize);
     /**
      * 更新索赔单状态
      * @param claimOrdno 索赔单号

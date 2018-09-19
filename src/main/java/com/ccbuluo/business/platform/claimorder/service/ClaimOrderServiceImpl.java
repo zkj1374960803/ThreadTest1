@@ -31,6 +31,10 @@ import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
+import com.ccbuluo.usercoreintf.dto.QueryServiceCenterDTO;
+import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
+import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
+import com.ccbuluo.usercoreintf.service.BasicUserWorkplaceService;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +69,10 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
     private BasicCarmodelManageDao basicCarmodelManageDao;
     @ThriftRPCClient("BasicWalletpaymentSerService")
     private BizFinanceAccountService bizFinanceAccountService;
+    @ThriftRPCClient("UserCoreSerService")
+    private BasicUserOrganizationService basicUserOrganizationService;
+    @ThriftRPCClient("UserCoreSerService")
+    BasicUserWorkplaceService basicUserWorkplaceService;
     /**
      * 生成索赔单
      * @author zhangkangjian
@@ -256,7 +264,7 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
      * @date 2018-09-08 16:55:56
      */
     @Override
-    public StatusDto<Page<QueryClaimorderListDTO>> queryClaimorderList(String claimOrdno, String docStatus, int offset, int pageSize) {
+    public StatusDto<Page<QueryClaimorderListDTO>> queryClaimorderList(String claimOrdno, String keyword, String docStatus, int offset, int pageSize) {
         BusinessUser loggedUser = userHolder.getLoggedUser();
         Organization organization = loggedUser.getOrganization();
         String orgCode = organization.getOrgCode();
@@ -264,7 +272,21 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
         if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(orgCode)){
             orgCode = null;
         }
-        Page<QueryClaimorderListDTO> queryClaimorderListDTOPage = claimOrderDao.queryClaimorderList(claimOrdno, docStatus, orgCode, offset, pageSize);
+        Page<QueryClaimorderListDTO> queryClaimorderListDTOPage = claimOrderDao.queryClaimorderList(claimOrdno, keyword, docStatus, orgCode, offset, pageSize);
+        Optional.ofNullable(queryClaimorderListDTOPage.getRows()).ifPresent(a ->{
+            StatusDtoThriftPage<QueryServiceCenterDTO> serviceCenterList = basicUserOrganizationService.queryServiceCenterList(null, null ,null ,null,null,0,Integer.MAX_VALUE);
+            StatusDto<Page<QueryServiceCenterDTO>> queryServiceCenterDTOPage = StatusDtoThriftUtils.resolve(serviceCenterList, QueryServiceCenterDTO.class);
+            Optional.ofNullable(queryServiceCenterDTOPage.getData().getRows()).ifPresent(b ->{
+                Map<String, List<QueryServiceCenterDTO>> queryServiceCenterDTOMap = b.stream().collect(Collectors.groupingBy(QueryServiceCenterDTO::getServiceCenterCode));
+                a.forEach(item ->{
+                    List<QueryServiceCenterDTO> queryServiceCenterDTOS = queryServiceCenterDTOMap.get(item.getClaimOrgno());
+                    if(queryServiceCenterDTOS != null && queryServiceCenterDTOS.size() > 0){
+                        QueryServiceCenterDTO queryServiceCenterDTO = queryServiceCenterDTOS.get(0);
+                        item.setOrgPhone(queryServiceCenterDTO.getPrincipalPhone());
+                    }
+                });
+            });
+        });
         return StatusDto.buildDataSuccessStatusDto(queryClaimorderListDTOPage);
     }
 

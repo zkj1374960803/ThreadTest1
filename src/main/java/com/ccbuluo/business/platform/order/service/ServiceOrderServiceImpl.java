@@ -216,11 +216,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
                 bizServiceLog.setAction(BizServiceLog.actionEnum.UPDATE.name());
                 bizServiceLog.setSubjectType("ServiceOrderServiceImpl");
                 bizServiceLog.setSubjectKeyvalue(serviceOrderno);
-                if (userHolder.getLoggedUser().getOrganization().getOrgType().equals(BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name())) {
-                    bizServiceLog.setLogContent("客户经理接单");
-                } else {
-                    bizServiceLog.setLogContent("服务中心接单");
-                }
+                bizServiceLog.setLogContent("维修单接单");
                 bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
                 bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
                 bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
@@ -302,7 +298,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
                 return StatusDto.buildDataSuccessStatusDto(new Page<>());
             }
             // 查询客户经理
-            if (StringUtils.isNotBlank(orgType) && orgType.equals(BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name())) {
+            if (StringUtils.isNotBlank(orgType) && BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name().equals(orgType)) {
                 List<BizServiceCustmanager> bizServiceCustmanagers = custmanagerService.queryCustManagerListByOrgCode(orgCodes);
                 Map<String, BizServiceCustmanager> collect = bizServiceCustmanagers.stream().collect(Collectors.toMap(a -> a.getServicecenterCode(), Function.identity()));
                 rows.forEach(item -> {
@@ -415,7 +411,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             // 获取当前登录人的地址
             String province = "";
             String city = "";
-            if (userHolder.getLoggedUser().getOrganization().getOrgType().equals(BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name())) {
+            if (BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name().equals(userHolder.getLoggedUser().getOrganization().getOrgType())) {
                 BizServiceCustmanager bizServiceCustmanager = bizServiceCustmanagerDao.queryCustManagerByUuid(userHolder.getLoggedUserId());
                 StatusDtoThriftBean<ServiceCenterWorkplaceDTO> workplaceByCode = basicUserWorkplaceService.getWorkplaceByCode(bizServiceCustmanager.getServicecenterCode());
                 ServiceCenterWorkplaceDTO data1 = StatusDtoThriftUtils.resolve(workplaceByCode, ServiceCenterWorkplaceDTO.class).getData();

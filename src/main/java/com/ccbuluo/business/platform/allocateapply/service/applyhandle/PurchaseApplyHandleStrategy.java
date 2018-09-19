@@ -194,11 +194,7 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
         bizServiceLog.setAction(action);
         bizServiceLog.setSubjectType("PurchaseApplyHandleStrategy");
         bizServiceLog.setSubjectKeyvalue(applyNo);
-        if (userHolder.getLoggedUser().getOrganization().getOrgType().equals(BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name())) {
-            bizServiceLog.setLogContent("客户经理"+content);
-        } else {
-            bizServiceLog.setLogContent("服务中心"+content);
-        }
+        bizServiceLog.setLogContent(content);
         bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
         bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
         bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
