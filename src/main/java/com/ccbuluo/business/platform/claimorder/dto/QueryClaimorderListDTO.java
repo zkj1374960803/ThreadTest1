@@ -24,6 +24,36 @@ public class QueryClaimorderListDTO {
     private String carNo;
     @ApiModelProperty(name = "createTime", value = "创建时间")
     private  Long createTime;
+    @ApiModelProperty(name = "serviceOrgName", value = "服务中心名称")
+    private  String serviceOrgName;
+    @ApiModelProperty(name = "orgPhone", value = "服务中心电话")
+    private  String orgPhone;
+    @ApiModelProperty(name = "claimOrgno", value = "索赔机构的编号")
+    private  String claimOrgno;
+
+    public String getClaimOrgno() {
+        return claimOrgno;
+    }
+
+    public void setClaimOrgno(String claimOrgno) {
+        this.claimOrgno = claimOrgno;
+    }
+
+    public String getServiceOrgName() {
+        return serviceOrgName;
+    }
+
+    public void setServiceOrgName(String serviceOrgName) {
+        this.serviceOrgName = serviceOrgName;
+    }
+
+    public String getOrgPhone() {
+        return orgPhone;
+    }
+
+    public void setOrgPhone(String orgPhone) {
+        this.orgPhone = orgPhone;
+    }
 
     public String getClaimOrdno() {
         return claimOrdno;

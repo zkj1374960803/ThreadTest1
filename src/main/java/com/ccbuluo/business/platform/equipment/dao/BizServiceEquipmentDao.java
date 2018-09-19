@@ -224,7 +224,7 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
         StringBuffer sql = new StringBuffer();
         Map<String, Object> params = Maps.newHashMap();
         params.put("equipCode", equipCode);
-        sql.append(" SELECT a.suggested_price FROM rel_product_price a ")
+        sql.append(" SELECT ifnull(a.suggested_price,0) FROM rel_product_price a ")
             .append(" WHERE a.product_no = :equipCode ORDER BY a.create_time DESC LIMIT 1 ");
         return namedParameterJdbcTemplate.queryForObject(sql.toString(), params, BigDecimal.class);
     }

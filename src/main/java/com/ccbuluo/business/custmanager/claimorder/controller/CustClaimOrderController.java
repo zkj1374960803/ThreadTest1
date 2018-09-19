@@ -78,12 +78,11 @@ public class CustClaimOrderController {
     @GetMapping("/queryclaimorderlist")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "claimOrdno", value = "索赔单号", required = false, paramType = "query"),
-        @ApiImplicitParam(name = "docStatus", value = "索赔单状态", required = false, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query"),
     })
-    public StatusDto<Page<QueryClaimorderListDTO>> queryClaimorderList(String claimOrdno, String docStatus, int offset, int pageSize){
-        return claimOrderServiceImpl.queryClaimorderList(claimOrdno, docStatus, offset, pageSize);
+    public StatusDto<Page<QueryClaimorderListDTO>> queryClaimorderList(String claimOrdno, String keyword, String docStatus, int offset, int pageSize){
+        return claimOrderServiceImpl.queryClaimorderList(claimOrdno, keyword, docStatus, offset, pageSize);
     }
 
 

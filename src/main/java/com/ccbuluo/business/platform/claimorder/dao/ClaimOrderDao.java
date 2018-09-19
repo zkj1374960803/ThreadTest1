@@ -128,24 +128,28 @@ public class ClaimOrderDao extends BaseDao<ClaimOrderDao> {
      * @author zhangkangjian
      * @date 2018-09-08 16:16:03
      */
-    public Page<QueryClaimorderListDTO> queryClaimorderList(String claimOrdno, String docStatus, String userOrgCode, Integer offset, Integer pageSize){
+    public Page<QueryClaimorderListDTO> queryClaimorderList(String claimOrdno, String keyword, String docStatus, String userOrgCode, Integer offset, Integer pageSize){
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuffer sql = new StringBuffer();
-        sql.append("  SELECT a.claim_ordno,a.doc_status, a.service_ordno,b.car_no,UNIX_TIMESTAMP(a.create_time) as 'createTime'  ")
+        sql.append("  SELECT a.claim_ordno,a.doc_status, a.service_ordno,b.car_no,UNIX_TIMESTAMP(a.create_time) as 'createTime',a.claim_orgname as 'serviceOrgName',a.claim_orgno  ")
             .append(" FROM biz_service_claimorder a  ")
             .append(" LEFT JOIN biz_service_order b ON a.service_ordno = b.service_orderno ")
             .append("  WHERE 1 = 1  ");
         if(StringUtils.isNotBlank(userOrgCode)){
             map.put("userOrgCode", userOrgCode);
-            sql.append(" AND a.claim_orgno =:userOrgCode ");
+            sql.append(" AND a.claim_orgno = :userOrgCode ");
         }
         if(StringUtils.isNotBlank(claimOrdno)){
             map.put("claimOrdno", claimOrdno);
-            sql.append(" AND a.claim_ordno =:claimOrdno ");
+            sql.append(" AND a.claim_ordno = :claimOrdno ");
         }
         if(StringUtils.isNotBlank(docStatus)){
             map.put("docStatus", docStatus);
-            sql.append(" AND a.doc_status =:docStatus");
+            sql.append(" AND a.doc_status = :docStatus");
+        }
+        if(StringUtils.isNotBlank(keyword)){
+            map.put("keyword", keyword);
+            sql.append(" AND (a.claim_ordno = :keyword or b.car_no = :keyword or a.service_ordno = :keyword)");
         }
         sql.append("  ORDER BY b.operate_time DESC");
         return queryPageForBean(QueryClaimorderListDTO.class, sql.toString(), map, offset, pageSize);
