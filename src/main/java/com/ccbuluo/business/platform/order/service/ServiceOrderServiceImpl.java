@@ -216,11 +216,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
                 bizServiceLog.setAction(BizServiceLog.actionEnum.UPDATE.name());
                 bizServiceLog.setSubjectType("ServiceOrderServiceImpl");
                 bizServiceLog.setSubjectKeyvalue(serviceOrderno);
-                if (BizServiceOrder.ProcessorOrgtypeEnum.CUSTMANAGER.name().equals(userHolder.getLoggedUser().getOrganization().getOrgType())) {
-                    bizServiceLog.setLogContent("客户经理接单");
-                } else {
-                    bizServiceLog.setLogContent("服务中心接单");
-                }
+                bizServiceLog.setLogContent("维修单接单");
                 bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
                 bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
                 bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
