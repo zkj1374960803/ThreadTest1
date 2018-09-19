@@ -67,7 +67,6 @@ public class CustClaimOrderController {
     /**
      * 查询索赔单的列表
      * @param claimOrdno 索赔单号
-     * @param docStatus 索赔单状态
      * @param offset 索赔单状态
      * @param pageSize 每页显示的数量
      * @return 索赔单的列表
@@ -81,8 +80,8 @@ public class CustClaimOrderController {
         @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query"),
     })
-    public StatusDto<Page<QueryClaimorderListDTO>> queryClaimorderList(String claimOrdno, String keyword, String docStatus, int offset, int pageSize){
-        return claimOrderServiceImpl.queryClaimorderList(claimOrdno, keyword, docStatus, offset, pageSize);
+    public StatusDto<Page<QueryClaimorderListDTO>> queryClaimorderList(String claimOrdno,  int offset, int pageSize){
+        return claimOrderServiceImpl.queryClaimorderList(claimOrdno, null, null, offset, pageSize);
     }
 
 
