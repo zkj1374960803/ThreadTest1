@@ -1077,28 +1077,9 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     @Override
     public Map<String, Long> queryOrderStatusNum(String reportOrgno) {
         List<BizServiceOrder> statusList = bizServiceOrderDao.queryOrderStatusNum(reportOrgno);
-        Map<String, Long> map = Maps.newHashMap();
-        if (!statusList.isEmpty()) {
-            map.put("all", Long.valueOf(statusList.size()));
-            long draftCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.DRAFT.name())).count();
-            map.put("DRAFT", draftCount);
-            long waitingReceiveCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.WAITING_RECEIVE.name())).count();
-            map.put("WAITING_RECEIVE", waitingReceiveCount);
-            long waitingPerfectionCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.WAITING_PERFECTION.name())).count();
-            map.put("WAITING_PERFECTION", waitingPerfectionCount);
-            long processingCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.PROCESSING.name())).count();
-            map.put("PROCESSING", processingCount);
-            long waitingCheckingCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.WAITING_CHECKING.name())).count();
-            map.put("WAITING_CHECKING", waitingCheckingCount);
-            long waitingPaymentCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.WAITING_PAYMENT.name())).count();
-            map.put("WAITING_PAYMENT", waitingPaymentCount);
-            long completedCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.COMPLETED.name())).count();
-            map.put("COMPLETED", completedCount);
-            long canceledCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.CANCELED.name())).count();
-            map.put("CANCELED", canceledCount);
-        }
-        return map;
+        return buildStatus(statusList, Maps.newHashMap());
     }
+
 
     /**
      * 查询维修单状态数量(门店用)
@@ -1108,8 +1089,19 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      */
     @Override
     public Map<String, Long> queryStoreOrderStatusNum(String reportOrgno) {
-        List<BizServiceOrder> statusList = bizServiceOrderDao.queryOrderStatusNum(reportOrgno);
-        Map<String, Long> map = Maps.newHashMap();
+        List<BizServiceOrder> statusList = bizServiceOrderDao.queryStoreOrderStatusNum(reportOrgno);
+        return buildStatus(statusList, Maps.newHashMap());
+    }
+
+    /**
+     * 组装维修单状态数量
+     * @param statusList 维修单状态
+     * @param map 用来放数量
+     * @return 维修单状态数量
+     * @author liuduo
+     * @date 2018-09-19 18:55:37
+     */
+    private Map<String, Long> buildStatus(List<BizServiceOrder> statusList, Map<String, Long> map) {
         if (!statusList.isEmpty()) {
             map.put("all", Long.valueOf(statusList.size()));
             long draftCount = statusList.stream().filter(item -> item.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.DRAFT.name())).count();
