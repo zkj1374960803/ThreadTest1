@@ -57,6 +57,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -1065,6 +1066,40 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     @Override
     public Boolean getByProductCode(String maintainitemCode) {
         return bizServiceOrderDao.getByProductCode(maintainitemCode);
+    }
+
+    /**
+     * 查询维修单状态数量
+     * @return 维修单各种状态的数量
+     * @author liuduo
+     * @date 2018-09-19 17:21:44
+     */
+    @Override
+    public Map<String, Long> queryOrderStatusNum(String reportOrgno) {
+        List<BizServiceOrder> statusList = bizServiceOrderDao.queryOrderStatusNum(reportOrgno);
+        Map<String, Long> map = Maps.newHashMap();
+        if (!statusList.isEmpty()) {
+            map = statusList.stream().collect(Collectors.groupingBy(BizServiceOrder::getOrderStatus, Collectors.counting()));
+            map.put("all", Long.valueOf(statusList.size()));
+        }
+        return map;
+    }
+
+    /**
+     * 查询维修单状态数量(门店用)
+     * @return 维修单各种状态的数量
+     * @author liuduo
+     * @date 2018-09-19 17:21:44
+     */
+    @Override
+    public Map<String, Long> queryStoreOrderStatusNum(String reportOrgno) {
+        List<BizServiceOrder> statusList = bizServiceOrderDao.queryStoreOrderStatusNum(reportOrgno);
+        Map<String, Long> map = Maps.newHashMap();
+        if (!statusList.isEmpty()) {
+            map = statusList.stream().collect(Collectors.groupingBy(BizServiceOrder::getOrderStatus, Collectors.counting()));
+            map.put("all", Long.valueOf(statusList.size()));
+        }
+        return map;
     }
 
 }

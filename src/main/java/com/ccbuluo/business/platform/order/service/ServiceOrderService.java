@@ -182,4 +182,19 @@ public interface ServiceOrderService {
      */
     Boolean getByProductCode(String maintainitemCode);
 
+    /**
+     * 查询维修单状态数量
+     * @return 维修单各种状态的数量
+     * @author liuduo
+     * @date 2018-09-19 17:21:44
+     */
+    Map<String, Long> queryOrderStatusNum(String reportOrgno);
+
+    /**
+     * 查询维修单状态数量(门店用)
+     * @return 维修单各种状态的数量
+     * @author liuduo
+     * @date 2018-09-19 17:21:44
+     */
+    Map<String, Long> queryStoreOrderStatusNum(String reportOrgno);
 }
