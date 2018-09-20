@@ -8,7 +8,7 @@ package com.ccbuluo.business.constants;
 public enum OrganizationTypeEnum {
     SERVICECENTER("服务中心"),
     CUSTMANAGER("客户经理"),
-    SERVICEPLATFORM("售后平台"),
+    PLATFORM("售后平台"),
     RENTALSTORE("租赁门店");
 
 
