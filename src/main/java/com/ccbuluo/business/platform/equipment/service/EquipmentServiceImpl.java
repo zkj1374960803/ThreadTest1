@@ -103,7 +103,6 @@ public class EquipmentServiceImpl implements EquipmentService{
             equipmentDTO.setSuggestedPrice(suggestedPrice);
         }catch (Exception e){
             e.printStackTrace();
-            equipmentDTO.setSuggestedPrice(new BigDecimal(0));
         }
         return equipmentDTO;
     }
