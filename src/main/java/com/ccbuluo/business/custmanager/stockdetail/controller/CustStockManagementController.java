@@ -47,7 +47,7 @@ public class CustStockManagementController extends BaseController {
         @ApiImplicitParam(name = "equiptypeId", value = "物料类型的id", required = false, paramType = "query"),
         @ApiImplicitParam(name = "productNo", value = "商品的编号", required = false, paramType = "query"),
         @ApiImplicitParam(name = "orgNo", value = "服务中心的编号", required = false, paramType = "query"),
-        @ApiImplicitParam(name = "type", value = "(注：PLATFORM集团，SERVICECENTER服务中心，CUSTMANAGER客户经理)", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "type", value = "(注：SERVICEPLATFORM集团，SERVICECENTER服务中心，CUSTMANAGER客户经理)", required = false, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query")
     })
