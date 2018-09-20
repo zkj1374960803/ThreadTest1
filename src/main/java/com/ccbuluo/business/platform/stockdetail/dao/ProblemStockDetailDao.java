@@ -179,4 +179,25 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
         sql.append(" GROUP BY id ");
         return super.queryListBean(StockDetailDTO.class, sql.toString(), param);
     }
+
+    /**
+     * 查询本机构所有零配件的问题库存
+     * @param orgCode 组织机构code
+     * @author weijb
+     * @date 2018-08-14 21:59:51
+     */
+    public List<StockBizStockDetailDTO> getStockBizStockList(String orgCode,List<String> codes){
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        param.put("orgCode", orgCode);
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,product_no,product_name,product_type,product_unit,SUM(valid_stock) as valid_stock,SUM(problem_stock) as problem_stock,product_categoryname,trade_no,create_time,org_no,delete_flag ")
+                .append(" FROM biz_stock_detail WHERE delete_flag = 0  and org_no = :orgCode ");
+        if(codes != null && codes.size() > 0){
+            param.put("codes", codes);
+            sql.append(" AND product_no IN(:codes)  ");
+        }
+        sql.append(" GROUP BY product_no");
+        return super.queryListBean(StockBizStockDetailDTO.class, sql.toString(), param);
+    }
 }

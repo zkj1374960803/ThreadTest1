@@ -6,11 +6,16 @@ import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.entity.BizAllocateApply.AllocateApplyTypeEnum;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
+import com.ccbuluo.business.platform.allocateapply.dto.CheckStockQuantityDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.ProductStockInfoDTO;
+import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
+import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
+import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.core.common.UserHolder;
@@ -19,11 +24,13 @@ import com.ccbuluo.http.StatusDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 申请处理
@@ -51,6 +58,8 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     private BizAllocateapplyDetailDao bizAllocateapplyDetailDao;
     @Resource
     BizInstockplanDetailDao bizInstockplanDetailDao;
+    @Autowired
+    ProblemStockDetailDao problemStockDetailDao;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -558,6 +567,41 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             return BizStockDetail.StockTypeEnum.VALIDSTOCK.name();
         }else {
             return BizStockDetail.StockTypeEnum.PROBLEMSTOCK.name();
+        }
+    }
+
+    /**
+     *  校验问题件库存是否满足
+     * @param
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-09-20 16:26:50
+     */
+    public void checkStock(String orgNo, List<AllocateapplyDetailBO> details,String type){
+        List<String> codeList = getProductList(details);
+        List<StockBizStockDetailDTO> stockBizStockList = problemStockDetailDao.getStockBizStockList(orgNo,codeList);
+        Map<String, List<StockBizStockDetailDTO>> collect = stockBizStockList.stream().collect(Collectors.groupingBy(StockBizStockDetailDTO::getProductNo));
+
+        for(AllocateapplyDetailBO detail : details){
+            List<StockBizStockDetailDTO> stockList = collect.get(detail.getProductNo());
+            if(null != stockList && stockList.size() > 0){
+                Long applyNum = 0L;
+                // 问题件
+                if(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.name().equals(type)){
+                    applyNum = stockList.get(0).getProblemStock();
+                }
+                // 正常件
+                if(BizStockDetail.StockTypeEnum.VALIDSTOCK.name().equals(type)){
+                    applyNum = stockList.get(0).getValidStock();
+                }
+                // 如果申请数量大于库存数量
+                if(detail.getApplyNum().intValue() > applyNum.intValue()){
+                    throw new CommonException("0", "库存不足！");
+                }
+            }else{
+                throw new CommonException("0", "库存不足！");
+            }
         }
     }
 }

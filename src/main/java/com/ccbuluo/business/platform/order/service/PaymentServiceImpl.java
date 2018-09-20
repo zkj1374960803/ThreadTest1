@@ -25,10 +25,14 @@ import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftBean;
 import com.ccbuluo.http.StatusDtoThriftList;
+import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.supplier.dto.BizFinancePaymentbills;
 import com.ccbuluo.supplier.dto.BizFinanceReceipt;
 import com.ccbuluo.supplier.service.BizFinancePaymentbillsService;
+import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
+import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -74,6 +78,8 @@ public class PaymentServiceImpl implements PaymentService {
     private BizServiceSupplierDao bizServiceSupplierDao;
     @Autowired
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
+    @ThriftRPCClient("UserCoreSerService")
+    private BasicUserOrganizationService basicUserOrganizationService;
 
     /**
      *  支付完成调用接口
@@ -114,7 +120,8 @@ public class PaymentServiceImpl implements PaymentService {
                 if(BizAllocateApply.AllocateApplyTypeEnum.SAMELEVEL.toString().equals(ba.getApplyType())){
                     bizOutstockplanDetailDao.updatePlanStatus(applyNo);
                 }
-                addlog(applyNo,ba.getInstockOrgno()+"创建预付款单据到"+ba.getOutstockOrgno(),BizServiceLog.actionEnum.PAYMENT.name(),BizServiceLog.modelEnum.ERP.name());
+                Pair<String,String> pair = getOrgNameByCode(ba.getInstockOrgno(),ba.getOutstockOrgno());
+                addlog(applyNo,pair.getLeft()+"创建了预付款单据",BizServiceLog.actionEnum.PAYMENT.name(),BizServiceLog.modelEnum.ERP.name());
             }else{
                 return statusDto;
             }
@@ -175,7 +182,8 @@ public class PaymentServiceImpl implements PaymentService {
                 if(BizAllocateApply.AllocateApplyTypeEnum.SAMELEVEL.toString().equals(ba.getApplyType())){
                     bizOutstockplanDetailDao.updatePlanStatus(applyNo);
                 }
-                addlog(applyNo,ba.getInstockOrgno()+"支付给"+ba.getOutstockOrgno()+sellTotal+"人民币",BizServiceLog.actionEnum.PAYMENT.name(),BizServiceLog.modelEnum.ERP.name());
+                Pair<String,String> pair = getOrgNameByCode(ba.getInstockOrgno(),ba.getOutstockOrgno());
+                addlog(applyNo,pair.getLeft()+"支付给"+pair.getRight()+sellTotal+"人民币",BizServiceLog.actionEnum.PAYMENT.name(),BizServiceLog.modelEnum.ERP.name());
             }else{
                 return statusDto;
             }
@@ -234,7 +242,8 @@ public class PaymentServiceImpl implements PaymentService {
                 if(BizAllocateApply.AllocateApplyTypeEnum.SAMELEVEL.toString().equals(ba.getApplyType())){
                     bizOutstockplanDetailDao.updatePlanStatus(applyNo);
                 }
-                addlog(applyNo,ba.getInstockOrgno()+"支付给"+ba.getOutstockOrgno()+actualAmount+"人民币",BizServiceLog.actionEnum.PAYMENT.name(),BizServiceLog.modelEnum.ERP.name());
+                Pair<String,String> pair = getOrgNameByCode(ba.getInstockOrgno(),ba.getOutstockOrgno());
+                addlog(applyNo,pair.getLeft()+"支付给"+pair.getRight()+actualAmount+"人民币",BizServiceLog.actionEnum.PAYMENT.name(),BizServiceLog.modelEnum.ERP.name());
             }else{
                 return statusDto;
             }
@@ -335,7 +344,8 @@ public class PaymentServiceImpl implements PaymentService {
             String receiveOrgno = pair.getLeft();
             BigDecimal price = pair.getRight();
             // 记录日志
-            addlog(serviceOrderno,payerOrgno+"支付给"+receiveOrgno+price+"人民币",BizServiceLog.actionEnum.PAYMENT.name(),BizServiceLog.modelEnum.SERVICE.name());
+            Pair<String,String> pairOrgName = getOrgNameByCode(payerOrgno,receiveOrgno);
+            addlog(serviceOrderno,pairOrgName.getLeft()+"支付给"+pairOrgName.getRight()+price+"人民币",BizServiceLog.actionEnum.PAYMENT.name(),BizServiceLog.modelEnum.SERVICE.name());
         }
         // 付款完成，状态改为已完成
         bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.COMPLETED.name());
@@ -708,6 +718,34 @@ public class PaymentServiceImpl implements PaymentService {
             supplierName = supplier.getSupplierName();
         }
         return supplierName;
+    }
+
+    /**
+     *  获取出入库组织机构名称
+     * @param
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-09-20 11:50:24
+     */
+    private Pair<String,String> getOrgNameByCode(String instockOrgno,String outstockOrgno) {
+        List<String> codes = new ArrayList<String>();
+        if(StringUtils.isNotBlank(instockOrgno)){
+            codes.add(instockOrgno);
+        }
+        if(StringUtils.isNotBlank(outstockOrgno)){
+            codes.add(outstockOrgno);
+        }
+        Map<String, BasicUserOrganization> map = basicUserOrganizationService.queryOrganizationByOrgCodes(codes);
+        String inOrgName = "";
+        String outOrgName = "";
+        if(StringUtils.isNotBlank(instockOrgno) && null != map.get(instockOrgno)){
+            inOrgName = map.get(instockOrgno).getOrgName();
+        }
+        if(StringUtils.isNotBlank(outstockOrgno) && null != map.get(outstockOrgno)){
+            outOrgName = map.get(outstockOrgno).getOrgName();
+        }
+        return Pair.of(inOrgName, outOrgName);
     }
 
 }

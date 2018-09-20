@@ -436,7 +436,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }
             return orgCode;
         }
-        return StringUtils.EMPTY;
+        throw new CommonException(Constants.ERROR_CODE, "获取用户信息异常！");
     }
 
     /**
@@ -1092,9 +1092,17 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public Page<QueryOrgDTO> queryTransferStock(QueryOrgDTO orgDTO, String productNo, Integer offset, Integer pageSize) {
-        List<String> name = List.of(OrganizationTypeEnum.SERVICEPLATFORM.name(), OrganizationTypeEnum.SERVICECENTER.name(), OrganizationTypeEnum.CUSTMANAGER.name());
+        Organization organization = userHolder.getLoggedUser().getOrganization();
+        String orgType = organization.getOrgType();
+        List<String> orgTypeList = null;
+        if(OrganizationTypeEnum.CUSTMANAGER.name().equals(orgType)){
+            orgTypeList = List.of(OrganizationTypeEnum.SERVICEPLATFORM.name(), OrganizationTypeEnum.SERVICECENTER.name(), OrganizationTypeEnum.CUSTMANAGER.name());
+        }
+        if(OrganizationTypeEnum.SERVICECENTER.name().equals(orgType)){
+            orgTypeList = List.of(OrganizationTypeEnum.SERVICEPLATFORM.name(), OrganizationTypeEnum.SERVICECENTER.name());
+        }
         orgDTO.setStatus(Constants.FREEZE_STATUS_YES);
-        orgDTO.setOrgTypeList(name);
+        orgDTO.setOrgTypeList(orgTypeList);
         StatusDtoThriftList<QueryOrgDTO> queryOrgDTOList = basicUserOrganizationService.queryOrgAndWorkInfo(orgDTO);
         StatusDto<List<QueryOrgDTO>> resolve = StatusDtoThriftUtils.resolve(queryOrgDTOList, QueryOrgDTO.class);
         List<QueryOrgDTO> queryOrgList = resolve.getData();
