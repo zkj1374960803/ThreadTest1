@@ -9,6 +9,9 @@ import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
+import com.ccbuluo.business.platform.allocateapply.dto.CheckStockQuantityDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.ProductStockInfoDTO;
+import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
@@ -77,6 +80,8 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
             if(null == details || details.size() == 0){
                 throw new CommonException("0", "申请单为空！");
             }
+            // 判断库存是否满足
+            checkStock(ba.getOutstockOrgno(),details,BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
             // 构建占用库存和订单占用库存关系
             // 获取卖方机构code
             String productOrgNo = getProductOrgNo(ba);
@@ -357,4 +362,5 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
         bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
         serviceLogService.create(bizServiceLog);
     }
+
 }

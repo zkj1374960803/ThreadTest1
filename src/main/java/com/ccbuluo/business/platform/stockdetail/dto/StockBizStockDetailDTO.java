@@ -39,6 +39,11 @@ public class StockBizStockDetailDTO extends IdEntity {
     @ApiModelProperty(name = "problemStock", value = "问题件库存数量")
     private Long problemStock;
     /**
+     * 可用库存
+     */
+    @ApiModelProperty(name = "validStock", value = "可用库存")
+    private Long validStock;
+    /**
      * 计量单位
      */
     @ApiModelProperty(name = "productUnit", value = "计量单位")
@@ -164,5 +169,13 @@ public class StockBizStockDetailDTO extends IdEntity {
 
     public void setOutstockTime(Date outstockTime) {
         this.outstockTime = outstockTime;
+    }
+
+    public Long getValidStock() {
+        return validStock;
+    }
+
+    public void setValidStock(Long validStock) {
+        this.validStock = validStock;
     }
 }
