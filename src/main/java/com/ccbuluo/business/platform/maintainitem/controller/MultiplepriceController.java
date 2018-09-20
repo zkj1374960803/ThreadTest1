@@ -48,7 +48,7 @@ public class MultiplepriceController extends BaseController {
      * @param provinceCode 省code
      * @param cityCode 市code
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 地区倍数列表
      * @author liuduo
      * @date 2018-07-18 15:35:18
@@ -58,14 +58,14 @@ public class MultiplepriceController extends BaseController {
         @ApiImplicitParam(name = "provinceCode", value = "省code", paramType = "query", required = false),
         @ApiImplicitParam(name = "cityCode", value = "市code", paramType = "query", required = false),
         @ApiImplicitParam(name = "offset", value = "起始数", paramType = "query", required = true, dataType = "int"),
-        @ApiImplicitParam(name = "pagesize", value = "每页数", paramType = "query", required = true, dataType = "int"),})
+        @ApiImplicitParam(name = "pageSize", value = "每页数", paramType = "query", required = true, dataType = "int"),})
     @GetMapping("/queryList")
     public StatusDto<Page<BizServiceMultipleprice>> queryList(@RequestParam String maintainitemCode,
                                                               @RequestParam(required = false) String provinceCode,
                                                               @RequestParam(required = false) String cityCode,
                                                               @RequestParam(defaultValue = "0") Integer offset,
-                                                              @RequestParam(defaultValue = "10") Integer pagesize) {
-        return StatusDto.buildDataSuccessStatusDto(multiplepriceService.queryList(maintainitemCode, provinceCode, cityCode, offset, pagesize));
+                                                              @RequestParam(defaultValue = "10") Integer pageSize) {
+        return StatusDto.buildDataSuccessStatusDto(multiplepriceService.queryList(maintainitemCode, provinceCode, cityCode, offset, pageSize));
     }
 
 

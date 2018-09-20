@@ -186,14 +186,14 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      * @param serviceType 服务类型
      * @param keyword 关键字
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 服务单列表
      * @author liuduo
      * @date 2018-09-04 15:06:55
      */
     @Override
-    public StatusDto<Page<BizServiceOrder>> queryList(String orderStatus, String serviceType, String reportOrgno, String keyword, Integer offset, Integer pagesize) {
-        return StatusDto.buildDataSuccessStatusDto(bizServiceOrderDao.queryList(orderStatus, serviceType, reportOrgno, keyword, offset, pagesize));
+    public StatusDto<Page<BizServiceOrder>> queryList(String orderStatus, String serviceType, String reportOrgno, String keyword, Integer offset, Integer pageSize) {
+        return StatusDto.buildDataSuccessStatusDto(bizServiceOrderDao.queryList(orderStatus, serviceType, reportOrgno, keyword, offset, pageSize));
     }
 
 
@@ -282,14 +282,14 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      * @param orgType 机构类型
      * @param keyword 关键字
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 可以分配的客户经理和服务中心
      * @author liuduo
      * @date 2018-09-05 10:40:35
      */
     @Override
-    public StatusDto<Page<ServiceCenterDTO>> serviceCenterList(String province, String city, String area, String orgType, String keyword, Integer offset, Integer pagesize) {
-        StatusDtoThriftPage<ServiceCenterDTO> serviceCenterDTOStatusDtoThriftPage = basicUserOrganizationService.queryAfterSaleServiceCenter(province, city, area, orgType, keyword, offset, pagesize);
+    public StatusDto<Page<ServiceCenterDTO>> serviceCenterList(String province, String city, String area, String orgType, String keyword, Integer offset, Integer pageSize) {
+        StatusDtoThriftPage<ServiceCenterDTO> serviceCenterDTOStatusDtoThriftPage = basicUserOrganizationService.queryAfterSaleServiceCenter(province, city, area, orgType, keyword, offset, pageSize);
         Page<ServiceCenterDTO> data = StatusDtoThriftUtils.resolve(serviceCenterDTOStatusDtoThriftPage, ServiceCenterDTO.class).getData();
         if (null != data && null != data.getRows()) {
             List<ServiceCenterDTO> rows = data.getRows();
@@ -395,14 +395,14 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      * 查询工时列表
      * @param keyword 关键字
      * @param offset 起始数
-     *  @param pagesize 每页数
+     *  @param pageSize 每页数
      * @return 工时列表
      * @author liuduo
      * @date 2018-09-06 10:39:33
      */
     @Override
-    public StatusDto<Page<DetailBizServiceMaintainitemDTO>> queryMaintainitem(String keyword, Integer offset, Integer pagesize) {
-        Page<DetailBizServiceMaintainitemDTO> detailBizServiceMaintainitemDTOPage = maintainitemService.queryList(keyword, offset, pagesize);
+    public StatusDto<Page<DetailBizServiceMaintainitemDTO>> queryMaintainitem(String keyword, Integer offset, Integer pageSize) {
+        Page<DetailBizServiceMaintainitemDTO> detailBizServiceMaintainitemDTOPage = maintainitemService.queryList(keyword, offset, pageSize);
         if (null != detailBizServiceMaintainitemDTOPage && null != detailBizServiceMaintainitemDTOPage.getRows()) {
             List<DetailBizServiceMaintainitemDTO> rows = detailBizServiceMaintainitemDTOPage.getRows();
             List<String> codes = rows.stream().map(DetailBizServiceMaintainitemDTO::getMaintainitemCode).collect(Collectors.toList());
@@ -1046,14 +1046,14 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      * @param serviceType 服务类型
      * @param keyword 关键字
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 维修单列表
      * @author liuduo
      * @date 2018-09-04 15:06:55
      */
     @Override
-    public StatusDto<Page<BizServiceOrder>> queryStoreList(String orderStatus, String serviceType, String reportOrgno, String keyword, Integer offset, Integer pagesize) {
-        return StatusDto.buildDataSuccessStatusDto(bizServiceOrderDao.queryStoreList(orderStatus, serviceType, reportOrgno, keyword, offset, pagesize));
+    public StatusDto<Page<BizServiceOrder>> queryStoreList(String orderStatus, String serviceType, String reportOrgno, String keyword, Integer offset, Integer pageSize) {
+        return StatusDto.buildDataSuccessStatusDto(bizServiceOrderDao.queryStoreList(orderStatus, serviceType, reportOrgno, keyword, offset, pageSize));
     }
 
     /**

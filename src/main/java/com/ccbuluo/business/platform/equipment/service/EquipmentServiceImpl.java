@@ -103,6 +103,7 @@ public class EquipmentServiceImpl implements EquipmentService{
             equipmentDTO.setSuggestedPrice(suggestedPrice);
         }catch (Exception e){
             e.printStackTrace();
+            equipmentDTO.setSuggestedPrice(new BigDecimal(0));
         }
         return equipmentDTO;
     }
@@ -147,16 +148,16 @@ public class EquipmentServiceImpl implements EquipmentService{
      * @param keyword 关键字
      * @param carpartsPriceType
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 物料列表
      * @author liuduo
      * @date 2018-07-17 20:10:35
      */
     @Override
-    public Page<DetailBizServiceEquipmentDTO> queryList(Long equiptypeId, String keyword, String carpartsPriceType, Integer offset, Integer pagesize) {
+    public Page<DetailBizServiceEquipmentDTO> queryList(Long equiptypeId, String keyword, String carpartsPriceType, Integer offset, Integer pageSize) {
         // 查询有价格的物料code
         List<String> productNoList = bizServiceEquipmentDao.queryProductPrice(Constants.PRODUCT_TYPE_EQUIPMENT);
-        return bizServiceEquipmentDao.queryList(carpartsPriceType, productNoList, equiptypeId, keyword, offset, pagesize);
+        return bizServiceEquipmentDao.queryList(carpartsPriceType, productNoList, equiptypeId, keyword, offset, pageSize);
     }
 
     /**

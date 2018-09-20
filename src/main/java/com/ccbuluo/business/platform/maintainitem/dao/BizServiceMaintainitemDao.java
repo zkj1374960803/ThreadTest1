@@ -134,12 +134,12 @@ public class BizServiceMaintainitemDao extends BaseDao<BizServiceMaintainitem> {
      * 查询工时列表
      * @param keyword 关键字
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 工时列表
      * @author liuduo
      * @date 2018-07-17 20:10:35
      */
-    public Page<DetailBizServiceMaintainitemDTO> queryList(String keyword, Integer offset, Integer pagesize) {
+    public Page<DetailBizServiceMaintainitemDTO> queryList(String keyword, Integer offset, Integer pageSize) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
 
@@ -154,7 +154,7 @@ public class BizServiceMaintainitemDao extends BaseDao<BizServiceMaintainitem> {
         }
         sql.append("  AND bsmm.delete_flag = :deleteFlag ORDER BY bsmm.operate_time DESC");
 
-        return queryPageForBean(DetailBizServiceMaintainitemDTO.class, sql.toString(), params, offset, pagesize);
+        return queryPageForBean(DetailBizServiceMaintainitemDTO.class, sql.toString(), params, offset, pageSize);
     }
 
     /**
