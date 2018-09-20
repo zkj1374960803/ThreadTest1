@@ -124,7 +124,7 @@ public class AllocateapplyDetailBO {
     /**
      * 申请类型
      */
-    @ApiModelProperty(name = "applyType", value = "申请类型（SERVICEPLATFORM，SAMELEVEL）")
+    @ApiModelProperty(name = "applyType", value = "申请类型（PLATFORM，SAMELEVEL）")
     private String applyType;
     /**
      *  库存类型

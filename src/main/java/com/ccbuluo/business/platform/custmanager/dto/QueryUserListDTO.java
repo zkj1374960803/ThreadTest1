@@ -25,6 +25,16 @@ public class QueryUserListDTO {
     private Long materialsNumber;
     @ApiModelProperty(name = "vinId", value = "维修车id")
     private Long vinId;
+    @ApiModelProperty(name = "receivingAddress", value = "收货地址")
+    private String receivingAddress;
+
+    public String getReceivingAddress() {
+        return receivingAddress;
+    }
+
+    public void setReceivingAddress(String receivingAddress) {
+        this.receivingAddress = receivingAddress;
+    }
 
     public Long getVinId() {
         return vinId;

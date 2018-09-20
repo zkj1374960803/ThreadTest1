@@ -111,7 +111,7 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
             bizServiceClaimorder.setClaimOrgname(bizServiceorderDetail.getServiceOrgname());
             // 处理索赔单的机构
             bizServiceClaimorder.setProcessOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
-            bizServiceClaimorder.setProcessOrgname(OrganizationTypeEnum.SERVICEPLATFORM.getLabel());
+            bizServiceClaimorder.setProcessOrgname(OrganizationTypeEnum.PLATFORM.getLabel());
             // 设置索赔的金额
             bizServiceClaimorder.setClaimAmount(aDouble);
             bizServiceClaimorder.setOperator(loggedUserId);

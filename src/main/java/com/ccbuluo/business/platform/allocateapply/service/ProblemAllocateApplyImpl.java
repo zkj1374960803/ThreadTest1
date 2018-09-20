@@ -177,7 +177,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         if(StringUtils.isBlank(type)){
             return Collections.emptyList();
         }
-        if(OrganizationTypeEnum.SERVICEPLATFORM.name().equals(type)){
+        if(OrganizationTypeEnum.PLATFORM.name().equals(type)){
             return List.of(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
         }
         QueryOrgDTO orgDTO = new QueryOrgDTO();
