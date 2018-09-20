@@ -111,7 +111,7 @@ public class StoreHouseController extends BaseController {
      * @param storeHouseStatus 状态
      * @param keyword 关键字
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 仓库列表
      * @author liuduo
      * @date 2018-07-03 14:27:11
@@ -123,7 +123,7 @@ public class StoreHouseController extends BaseController {
         @ApiImplicitParam(name = "storeHouseStatus", value = "状态", required = false, paramType = "query"),
         @ApiImplicitParam(name = "keyword", value = "关键字", required = false, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "起始数", required = true, paramType = "query"),
-        @ApiImplicitParam(name = "pagesize", value = "每页数", required = true, paramType = "query")})
+        @ApiImplicitParam(name = "pageSize", value = "每页数", required = true, paramType = "query")})
     @PostMapping("/list")
     public StatusDto<Page<SearchStorehouseListDTO>> queryList(@RequestParam(required = false) String provinceName,
                                                               @RequestParam(required = false) String cityName,
@@ -131,8 +131,8 @@ public class StoreHouseController extends BaseController {
                                                               @RequestParam(required = false) Integer storeHouseStatus,
                                                               @RequestParam(required = false) String keyword,
                                                               @RequestParam(defaultValue = "0") Integer offset,
-                                                              @RequestParam(defaultValue = "10") Integer pagesize) throws TException  {
-        return StatusDto.buildDataSuccessStatusDto(storeHouseService.queryList(provinceName, cityName, areaName, storeHouseStatus, keyword, offset, pagesize));
+                                                              @RequestParam(defaultValue = "10") Integer pageSize) throws TException  {
+        return StatusDto.buildDataSuccessStatusDto(storeHouseService.queryList(provinceName, cityName, areaName, storeHouseStatus, keyword, offset, pageSize));
     }
 
     /**

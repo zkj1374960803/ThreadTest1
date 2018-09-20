@@ -157,7 +157,7 @@ public class StockAdjustController extends BaseController {
      * @param adjustSource 盘库单来源
      * @param keyWord 关键字（盘库单号/服务中心/客户经理）
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 盘库单列表
      * @author liuduo
      * @date 2018-08-15 11:03:46
@@ -168,15 +168,15 @@ public class StockAdjustController extends BaseController {
         @ApiImplicitParam(name = "productType", value = "商品类型（物料或者备件）",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "keyWord", value = "关键字（盘库单号/服务中心/客户经理）",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "起始数",  required = true, paramType = "query", dataType = "int"),
-        @ApiImplicitParam(name = "pagesize", value = "每页数",  required = true, paramType = "query", dataType = "int")})
+        @ApiImplicitParam(name = "pageSize", value = "每页数",  required = true, paramType = "query", dataType = "int")})
     @GetMapping("/queryadjuststocklist")
     public StatusDto<Page<SearchStockAdjustListDTO>> queryAdjustStockList(@RequestParam(required = false) Integer adjustResult,
                                                                           @RequestParam(required = false) String adjustSource,
                                                                           @RequestParam(required = false) String productType,
                                                                           @RequestParam(required = false) String keyWord,
                                                                           @RequestParam(defaultValue = "0") Integer offset,
-                                                                          @RequestParam(defaultValue = "10") Integer pagesize) {
-        return StatusDto.buildDataSuccessStatusDto(stockAdjustService.queryAdjustStockList(adjustResult, adjustSource, keyWord, productType, offset, pagesize));
+                                                                          @RequestParam(defaultValue = "10") Integer pageSize) {
+        return StatusDto.buildDataSuccessStatusDto(stockAdjustService.queryAdjustStockList(adjustResult, adjustSource, keyWord, productType, offset, pageSize));
     }
 
 

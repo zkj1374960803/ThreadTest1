@@ -22,8 +22,8 @@ public class SearchListDTO {
     private String status;//状态
     @ApiModelProperty(name = "offset", value = "起始数", example = "0", required = true)
     private int offset;//起始数
-    @ApiModelProperty(name = "pagesize", value = "每页数", example = "10", required = true)
-    private int pagesize;//每页数
+    @ApiModelProperty(name = "pageSize", value = "每页数", example = "10", required = true)
+    private int pageSize;//每页数
 
     public String getProvince() {
         return province;
@@ -74,10 +74,10 @@ public class SearchListDTO {
     }
 
     public int getPagesize() {
-        return pagesize;
+        return pageSize;
     }
 
-    public void setPagesize(int pagesize) {
-        this.pagesize = pagesize;
+    public void setPagesize(int pageSize) {
+        this.pageSize = pageSize;
     }
 }

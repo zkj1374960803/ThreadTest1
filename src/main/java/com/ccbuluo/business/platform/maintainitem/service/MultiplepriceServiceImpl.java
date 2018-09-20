@@ -127,14 +127,14 @@ public class MultiplepriceServiceImpl implements MultiplepriceService{
      * @param provinceCode 省code
      * @param cityCode 市code
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 地区倍数列表
      * @author liuduo
      * @date 2018-07-18 15:35:18
      */
     @Override
-    public Page<BizServiceMultipleprice> queryList(String maintainitemCode, String provinceCode, String cityCode, Integer offset, Integer pagesize) {
-        return bizServiceMultiplepriceDao.queryList(maintainitemCode,provinceCode,cityCode,offset,pagesize);
+    public Page<BizServiceMultipleprice> queryList(String maintainitemCode, String provinceCode, String cityCode, Integer offset, Integer pageSize) {
+        return bizServiceMultiplepriceDao.queryList(maintainitemCode,provinceCode,cityCode,offset,pageSize);
     }
 
     /**

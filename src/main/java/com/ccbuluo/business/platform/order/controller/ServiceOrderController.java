@@ -80,7 +80,7 @@ public class ServiceOrderController extends BaseController {
      * @param serviceType 服务类型
      * @param keyword 关键字
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 维修单列表
      * @author liuduo
      * @date 2018-09-04 15:06:55
@@ -91,15 +91,15 @@ public class ServiceOrderController extends BaseController {
         @ApiImplicitParam(name = "reportOrgno", value = "当前登录人的机构编号",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "keyword", value = "关键字",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "起始数",  required = true, paramType = "query", dataType = "int"),
-        @ApiImplicitParam(name = "pagesize", value = "每页数",  required = true, paramType = "query", dataType = "int")})
+        @ApiImplicitParam(name = "pageSize", value = "每页数",  required = true, paramType = "query", dataType = "int")})
     @GetMapping("/list")
     public StatusDto<Page<BizServiceOrder>> queryList(@RequestParam(required = false) String orderStatus,
                                                       @RequestParam(required = false) String serviceType,
                                                       @RequestParam(required = false) String reportOrgno,
                                                       @RequestParam(required = false) String keyword,
                                                       @RequestParam(defaultValue = "0") Integer offset,
-                                                      @RequestParam(defaultValue = "10") Integer pagesize) {
-        return serviceOrderService.queryList(orderStatus, serviceType, reportOrgno, keyword, offset, pagesize);
+                                                      @RequestParam(defaultValue = "10") Integer pageSize) {
+        return serviceOrderService.queryList(orderStatus, serviceType, reportOrgno, keyword, offset, pageSize);
     }
 
 
@@ -172,7 +172,7 @@ public class ServiceOrderController extends BaseController {
      * @param orgType 机构类型
      * @param keyword 关键字
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 可以分配的客户经理和服务中心
      * @author liuduo
      * @date 2018-09-05 10:40:35
@@ -184,7 +184,7 @@ public class ServiceOrderController extends BaseController {
         @ApiImplicitParam(name = "orgType", value = "机构类型",  required = true, paramType = "query"),
         @ApiImplicitParam(name = "keyword", value = "关键字",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "起始数",  required = true, paramType = "query", dataType = "int"),
-        @ApiImplicitParam(name = "pagesize", value = "每页数",  required = true, paramType = "query", dataType = "int")})
+        @ApiImplicitParam(name = "pageSize", value = "每页数",  required = true, paramType = "query", dataType = "int")})
     @GetMapping("/servicecenterlist")
     public StatusDto<Page<ServiceCenterDTO>> serviceCenterList(@RequestParam(required = false) String province,
                                                                @RequestParam(required = false) String city,
@@ -192,8 +192,8 @@ public class ServiceOrderController extends BaseController {
                                                                @RequestParam(required = false) String orgType,
                                                                @RequestParam(required = false) String keyword,
                                                                @RequestParam(defaultValue = "0") Integer offset,
-                                                               @RequestParam(defaultValue = "10") Integer pagesize) {
-        return serviceOrderService.serviceCenterList(province, city, area, orgType, keyword, offset, pagesize);
+                                                               @RequestParam(defaultValue = "10") Integer pageSize) {
+        return serviceOrderService.serviceCenterList(province, city, area, orgType, keyword, offset, pageSize);
     }
 
 
@@ -249,7 +249,7 @@ public class ServiceOrderController extends BaseController {
      * 查询工时列表
      * @param keyword 关键字
      * @param offset 起始数
-     *  @param pagesize 每页数
+     *  @param pageSize 每页数
      * @return 工时列表
      * @author liuduo
      * @date 2018-09-06 10:39:33
@@ -257,12 +257,12 @@ public class ServiceOrderController extends BaseController {
     @ApiOperation(value = "处理时添加工时的列表", notes = "【刘铎】")
     @ApiImplicitParams({@ApiImplicitParam(name = "keyword", value = "关键字", paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "起始数", paramType = "query", dataType = "int",required = true),
-        @ApiImplicitParam(name = "pagesize", value = "每页数", paramType = "query", dataType = "int",required = true)})
+        @ApiImplicitParam(name = "pageSize", value = "每页数", paramType = "query", dataType = "int",required = true)})
     @GetMapping("/querymaintainitem")
     public StatusDto<Page<DetailBizServiceMaintainitemDTO>> queryMaintainitem(@RequestParam(required = false) String keyword,
                                                                               @RequestParam(defaultValue = "0") Integer offset,
-                                                                              @RequestParam(defaultValue = "10") Integer pagesize) {
-        return serviceOrderService.queryMaintainitem(keyword, offset, pagesize);
+                                                                              @RequestParam(defaultValue = "10") Integer pageSize) {
+        return serviceOrderService.queryMaintainitem(keyword, offset, pageSize);
     }
 
 

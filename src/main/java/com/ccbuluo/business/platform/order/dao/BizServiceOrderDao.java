@@ -143,12 +143,12 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
      * @param serviceType 服务类型
      * @param keyword 关键字
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 订单列表
      * @author liuduo
      * @date 2018-09-04 15:06:55
      */
-    public Page<BizServiceOrder> queryList(String orderStatus, String serviceType, String reportOrgno, String keyword, Integer offset, Integer pagesize) {
+    public Page<BizServiceOrder> queryList(String orderStatus, String serviceType, String reportOrgno, String keyword, Integer offset, Integer pageSize) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
 
@@ -175,7 +175,7 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
         }
         sql.append(" AND bso.delete_flag = :deleteFlag ORDER BY bso.operate_time DESC");
 
-        return queryPageForBean(BizServiceOrder.class, sql.toString(), params, offset, pagesize);
+        return queryPageForBean(BizServiceOrder.class, sql.toString(), params, offset, pageSize);
     }
 
     /**
@@ -256,12 +256,12 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
      * @param serviceType 服务类型
      * @param keyword 关键字
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 订单列表
      * @author liuduo
      * @date 2018-09-04 15:06:55
      */
-    public Page<BizServiceOrder> queryStoreList(String orderStatus, String serviceType, String reportOrgno, String keyword, Integer offset, Integer pagesize) {
+    public Page<BizServiceOrder> queryStoreList(String orderStatus, String serviceType, String reportOrgno, String keyword, Integer offset, Integer pageSize) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
 
@@ -288,7 +288,7 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
         }
         sql.append(" AND bso.delete_flag = :deleteFlag ORDER BY bso.operate_time DESC");
 
-        return queryPageForBean(BizServiceOrder.class, sql.toString(), params, offset, pagesize);
+        return queryPageForBean(BizServiceOrder.class, sql.toString(), params, offset, pageSize);
     }
 
     /**

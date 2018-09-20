@@ -7,7 +7,6 @@ import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.ProblemAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
-import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dto.StockDetailDTO;
 import com.ccbuluo.core.common.UserHolder;
@@ -178,7 +177,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         if(StringUtils.isBlank(type)){
             return Collections.emptyList();
         }
-        if(OrganizationTypeEnum.PLATFORM.name().equals(type)){
+        if(OrganizationTypeEnum.SERVICEPLATFORM.name().equals(type)){
             return List.of(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
         }
         QueryOrgDTO orgDTO = new QueryOrgDTO();

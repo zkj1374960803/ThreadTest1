@@ -63,12 +63,12 @@ public interface StoreHouseService {
      * @param storeHouseStatus 状态
      * @param keyword 关键字
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 仓库列表
      * @author liuduo
      * @date 2018-07-03 14:27:11
      */
-    Page<SearchStorehouseListDTO> queryList(String provinceName, String cityName, String areaName, Integer storeHouseStatus, String keyword, Integer offset, Integer pagesize)throws TException ;
+    Page<SearchStorehouseListDTO> queryList(String provinceName, String cityName, String areaName, Integer storeHouseStatus, String keyword, Integer offset, Integer pageSize)throws TException ;
 
     /**
     * 根据服务中心code查询仓库

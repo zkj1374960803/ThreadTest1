@@ -119,12 +119,12 @@ public class BizServiceStorehouseDao extends BaseDao<BizServiceStorehouse> {
      * @param keyword 关键字
      * @param serviceCenterCode 服务中心的code
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 仓库列表
      * @author liuduo
      * @date 2018-07-03 14:27:11
      */
-    public Page<SearchStorehouseListDTO> queryList(String provinceName, String cityName, String areaName, Integer storeHouseStatus, String keyword, List<String> serviceCenterCode, Integer offset, Integer pagesize) {
+    public Page<SearchStorehouseListDTO> queryList(String provinceName, String cityName, String areaName, Integer storeHouseStatus, String keyword, List<String> serviceCenterCode, Integer offset, Integer pageSize) {
         Map<String, Object> params = Maps.newHashMap();
 
         StringBuilder sql = new StringBuilder();
@@ -157,7 +157,7 @@ public class BizServiceStorehouseDao extends BaseDao<BizServiceStorehouse> {
         }
         sql.append(" ORDER BY operate_time DESC");
 
-        return queryPageForBean(SearchStorehouseListDTO.class, sql.toString(), params, offset, pagesize);
+        return queryPageForBean(SearchStorehouseListDTO.class, sql.toString(), params, offset, pageSize);
     }
 
     /**

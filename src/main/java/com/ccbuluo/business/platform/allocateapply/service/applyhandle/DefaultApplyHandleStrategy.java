@@ -168,6 +168,9 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
     public List<BizStockDetail> getStockDetailList(String sellerOrgNo, List<AllocateapplyDetailBO> details){
         // 根据卖方code和商品code（list）查出库存列表
         List<String> codeList = getProductList(details);
+
+
+
         return bizStockDetailDao.getStockDetailListByOrgAndProduct(sellerOrgNo, codeList);
     }
 

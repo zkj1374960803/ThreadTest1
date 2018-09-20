@@ -77,12 +77,12 @@ public class BizInstockOrderDao extends BaseDao<BizInstockOrder> {
      * @param instockType 入库类型
      * @param instockNo 入库单号
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 入库单列表
      * @author liuduo
      * @date 2018-08-11 16:43:19
      */
-    public Page<BizInstockOrder> queryInstockList(String productType, String instockType, String instockNo, String orgCode, Integer offset, Integer pagesize) {
+    public Page<BizInstockOrder> queryInstockList(String productType, String instockType, String instockNo, String orgCode, Integer offset, Integer pageSize) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("productType", productType);
         params.put("orgCode", orgCode);
@@ -105,7 +105,7 @@ public class BizInstockOrderDao extends BaseDao<BizInstockOrder> {
         }
         sql.append(" ORDER BY bio.operate_time DESC");
 
-        return queryPageForBean(BizInstockOrder.class, sql.toString(), params, offset, pagesize);
+        return queryPageForBean(BizInstockOrder.class, sql.toString(), params, offset, pageSize);
     }
 
     /**

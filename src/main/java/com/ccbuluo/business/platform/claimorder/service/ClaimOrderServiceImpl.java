@@ -32,7 +32,6 @@ import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.ccbuluo.usercoreintf.dto.QueryServiceCenterDTO;
-import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.ccbuluo.usercoreintf.service.BasicUserWorkplaceService;
 import com.google.common.collect.Lists;
@@ -111,8 +110,8 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
             bizServiceClaimorder.setClaimOrgno(bizServiceorderDetail.getServiceOrgno());
             bizServiceClaimorder.setClaimOrgname(bizServiceorderDetail.getServiceOrgname());
             // 处理索赔单的机构
-            bizServiceClaimorder.setProcessOrgno(OrganizationTypeEnum.PLATFORM.name());
-            bizServiceClaimorder.setProcessOrgname(OrganizationTypeEnum.PLATFORM.getLabel());
+            bizServiceClaimorder.setProcessOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+            bizServiceClaimorder.setProcessOrgname(OrganizationTypeEnum.SERVICEPLATFORM.getLabel());
             // 设置索赔的金额
             bizServiceClaimorder.setClaimAmount(aDouble);
             bizServiceClaimorder.setOperator(loggedUserId);

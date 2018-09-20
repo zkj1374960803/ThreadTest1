@@ -201,13 +201,13 @@ public class StockAdjustServiceImpl implements StockAdjustService{
      * @param adjustSource 盘库单来源
      * @param keyWord 关键字（盘库单号/服务中心/客户经理）
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 盘库单列表
      * @author liuduo
      * @date 2018-08-15 11:03:46
      */
     @Override
-    public Page<SearchStockAdjustListDTO> queryAdjustStockList(Integer adjustResult, String adjustSource, String keyWord, String productType, Integer offset, Integer pagesize) {
+    public Page<SearchStockAdjustListDTO> queryAdjustStockList(Integer adjustResult, String adjustSource, String keyWord, String productType, Integer offset, Integer pageSize) {
         // 获取当前登录人的机构
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         // 先根据keyword查询服务中心或者客户经理是否存在
@@ -216,12 +216,12 @@ public class StockAdjustServiceImpl implements StockAdjustService{
             List<String> codes = StatusDtoThriftUtils.resolve(stringStatusDtoThriftList, String.class).getData();
             String join = StringUtils.join(codes, ",");
             if (!codes.isEmpty()) {
-                return editAdjustOrder(adjustResult, adjustSource, offset, pagesize, join, orgCode, productType);
+                return editAdjustOrder(adjustResult, adjustSource, offset, pageSize, join, orgCode, productType);
             } else {
-                return editAdjustOrder(adjustResult, adjustSource, offset, pagesize, keyWord, orgCode, productType);
+                return editAdjustOrder(adjustResult, adjustSource, offset, pageSize, keyWord, orgCode, productType);
             }
         }
-        return editAdjustOrder(adjustResult, adjustSource, offset, pagesize, keyWord, orgCode, productType);
+        return editAdjustOrder(adjustResult, adjustSource, offset, pageSize, keyWord, orgCode, productType);
     }
 
     /**
@@ -265,13 +265,13 @@ public class StockAdjustServiceImpl implements StockAdjustService{
      * @param adjustSource 盘库单来源
      * @param keyWord 关键字（盘库单号/服务中心/客户经理）
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 盘库单列表
      * @author liuduo
      * @date 2018-08-15 11:03:46
      */
-    private Page<SearchStockAdjustListDTO> editAdjustOrder(Integer adjustResult, String adjustSource, Integer offset, Integer pagesize, String keyWord, String orgCode, String productType) {
-        Page<SearchStockAdjustListDTO> adjustListDTOPage = bizStockAdjustDao.queryAdjustStockList(adjustResult, keyWord, offset, pagesize, orgCode, productType);
+    private Page<SearchStockAdjustListDTO> editAdjustOrder(Integer adjustResult, String adjustSource, Integer offset, Integer pageSize, String keyWord, String orgCode, String productType) {
+        Page<SearchStockAdjustListDTO> adjustListDTOPage = bizStockAdjustDao.queryAdjustStockList(adjustResult, keyWord, offset, pageSize, orgCode, productType);
         if (null != adjustListDTOPage && null != adjustListDTOPage.getRows()) {
             List<SearchStockAdjustListDTO> rows = adjustListDTOPage.getRows();
             List<String> orgCodes = rows.stream().map(SearchStockAdjustListDTO::getAdjustOrgno).distinct().collect(Collectors.toList());
@@ -300,8 +300,8 @@ public class StockAdjustServiceImpl implements StockAdjustService{
                 }
                 adjustListDTOPage.setRows(adjustList);
                 adjustListDTOPage.setTotal(total);
-                int totalPage = total / pagesize;
-                if (total % pagesize != 0) {
+                int totalPage = total / pageSize;
+                if (total % pageSize != 0) {
                     ++totalPage;
                 }
                 adjustListDTOPage.setTotalPage((long)totalPage);

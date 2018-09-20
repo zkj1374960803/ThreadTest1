@@ -271,16 +271,16 @@ public class InstockOrderServiceImpl implements InstockOrderService {
      * @param instockType 入库类型
      * @param instockNo   入库单号
      * @param offset      起始数
-     * @param pagesize    每页数
+     * @param pageSize    每页数
      * @return 入库单列表
      * @author liuduo
      * @date 2018-08-11 16:43:19
      */
     @Override
-    public Page<BizInstockOrder> queryInstockList(String productType, String instockType, String instockNo, Integer offset, Integer pagesize) {
+    public Page<BizInstockOrder> queryInstockList(String productType, String instockType, String instockNo, Integer offset, Integer pageSize) {
         // 查询当前登录人的机构下的入库单
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
-        Page<BizInstockOrder> bizInstockOrderPage = bizInstockOrderDao.queryInstockList(productType, instockType, instockNo, orgCode, offset, pagesize);
+        Page<BizInstockOrder> bizInstockOrderPage = bizInstockOrderDao.queryInstockList(productType, instockType, instockNo, orgCode, offset, pageSize);
         List<BizInstockOrder> rows = bizInstockOrderPage.getRows();
         List<String> instockOperator = rows.stream().map(BizInstockOrder::getInstockOperator).distinct().collect(Collectors.toList());
         if (instockOperator.size() == 0) {

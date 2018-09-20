@@ -65,12 +65,12 @@ public interface OutstockOrderService {
      * @param outstockType 入库类型
      * @param outstockNo 入库单号
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 入库单列表
      * @author liuduo
      * @date 2018-08-11 16:43:19
      */
-    Page<BizOutstockOrder> queryOutstockList(String productType, String outstockType, String outstockNo, Integer offset, Integer pagesize);
+    Page<BizOutstockOrder> queryOutstockList(String productType, String outstockType, String outstockNo, Integer offset, Integer pageSize);
 
     /**
      * 根据出库单号查询出库单详情

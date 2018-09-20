@@ -44,12 +44,12 @@ public interface ServiceOrderService {
      * @param serviceType 服务类型
      * @param keyword 关键字
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 服务单列表
      * @author liuduo
      * @date 2018-09-04 15:06:55
      */
-    StatusDto<Page<BizServiceOrder>> queryList(String orderStatus, String serviceType, String reportOrgno, String keyword, Integer offset, Integer pagesize);
+    StatusDto<Page<BizServiceOrder>> queryList(String orderStatus, String serviceType, String reportOrgno, String keyword, Integer offset, Integer pageSize);
 
     /**
      * 修改服务单状态
@@ -86,12 +86,12 @@ public interface ServiceOrderService {
      * @param orgType 机构类型
      * @param keyword 关键字
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 可以分配的客户经理和服务中心
      * @author liuduo
      * @date 2018-09-05 10:40:35
      */
-    StatusDto<Page<ServiceCenterDTO>> serviceCenterList(String province, String city, String area, String orgType, String keyword, Integer offset, Integer pagesize);
+    StatusDto<Page<ServiceCenterDTO>> serviceCenterList(String province, String city, String area, String orgType, String keyword, Integer offset, Integer pageSize);
 
     /**
      * 分配服务单
@@ -108,12 +108,12 @@ public interface ServiceOrderService {
      * 查询工时列表
      * @param keyword 关键字
      * @param offset 起始数
-     *  @param pagesize 每页数
+     *  @param pageSize 每页数
      * @return 工时列表
      * @author liuduo
      * @date 2018-09-06 10:39:33
      */
-    StatusDto<Page<DetailBizServiceMaintainitemDTO>> queryMaintainitem(String keyword, Integer offset, Integer pagesize);
+    StatusDto<Page<DetailBizServiceMaintainitemDTO>> queryMaintainitem(String keyword, Integer offset, Integer pageSize);
 
     /**
      * 保存维修单详单
@@ -166,12 +166,12 @@ public interface ServiceOrderService {
      * @param serviceType 服务类型
      * @param keyword 关键字
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 维修单列表
      * @author liuduo
      * @date 2018-09-04 15:06:55
      */
-    StatusDto<Page<BizServiceOrder>> queryStoreList(String orderStatus, String serviceType, String reportOrgno, String keyword, Integer offset, Integer pagesize);
+    StatusDto<Page<BizServiceOrder>> queryStoreList(String orderStatus, String serviceType, String reportOrgno, String keyword, Integer offset, Integer pageSize);
 
     /**
      * 根据工时code查询公司是否被引用

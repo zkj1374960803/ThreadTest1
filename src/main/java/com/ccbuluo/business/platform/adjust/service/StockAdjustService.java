@@ -70,12 +70,12 @@ public interface StockAdjustService {
      * @param adjustSource 盘库单来源
      * @param keyWord 关键字（盘库单号/服务中心/客户经理）
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 盘库单列表
      * @author liuduo
      * @date 2018-08-15 11:03:46
      */
-    Page<SearchStockAdjustListDTO> queryAdjustStockList(Integer adjustResult, String adjustSource, String keyWord, String productType, Integer offset, Integer pagesize);
+    Page<SearchStockAdjustListDTO> queryAdjustStockList(Integer adjustResult, String adjustSource, String keyWord, String productType, Integer offset, Integer pageSize);
 
     /**
      * 根据盘库单号查询盘库详情

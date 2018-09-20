@@ -44,12 +44,12 @@ public interface MaintainitemService {
      * 查询工时列表
      * @param keyword 关键字
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 物料列表
      * @author liuduo
      * @date 2018-07-17 20:10:35
      */
-    Page<DetailBizServiceMaintainitemDTO> queryList(String keyword, Integer offset, Integer pagesize);
+    Page<DetailBizServiceMaintainitemDTO> queryList(String keyword, Integer offset, Integer pageSize);
 
     /**
      * 根据code删除工时

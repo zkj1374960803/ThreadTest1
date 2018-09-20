@@ -87,7 +87,7 @@ public class OutstockOrderController extends BaseController {
      * @param outstockType 入库类型
      * @param outstockNo 入库单号
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 入库单列表
      * @author liuduo
      * @date 2018-08-11 16:43:19
@@ -97,14 +97,14 @@ public class OutstockOrderController extends BaseController {
         @ApiImplicitParam(name = "outstockType", value = "出库类型",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "outstockNo", value = "出库单单号",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "起始数",  required = true, paramType = "query", dataType = "int"),
-        @ApiImplicitParam(name = "pagesize", value = "每页数",  required = true, paramType = "query", dataType = "int")})
+        @ApiImplicitParam(name = "pageSize", value = "每页数",  required = true, paramType = "query", dataType = "int")})
     @GetMapping("/queryinstocklist")
     public StatusDto<Page<BizOutstockOrder>> queryInstockList(@RequestParam String productType,
                                                               @RequestParam(required = false) String outstockType,
                                                               @RequestParam(required = false) String outstockNo,
                                                               @RequestParam(defaultValue = "0") Integer offset,
-                                                              @RequestParam(defaultValue = "10") Integer pagesize) {
-        return StatusDto.buildDataSuccessStatusDto(outstockOrderService.queryOutstockList(productType, outstockType, outstockNo, offset, pagesize));
+                                                              @RequestParam(defaultValue = "10") Integer pageSize) {
+        return StatusDto.buildDataSuccessStatusDto(outstockOrderService.queryOutstockList(productType, outstockType, outstockNo, offset, pageSize));
     }
 
 

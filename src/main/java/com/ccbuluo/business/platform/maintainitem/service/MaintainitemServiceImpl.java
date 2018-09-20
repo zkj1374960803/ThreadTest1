@@ -134,14 +134,14 @@ public class MaintainitemServiceImpl implements MaintainitemService{
      * 查询工时列表
      * @param keyword 关键字
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 物料列表
      * @author liuduo
      * @date 2018-07-17 20:10:35
      */
     @Override
-    public Page<DetailBizServiceMaintainitemDTO> queryList(String keyword, Integer offset, Integer pagesize) {
-        return bizServiceMaintainitemDao.queryList(keyword, offset, pagesize);
+    public Page<DetailBizServiceMaintainitemDTO> queryList(String keyword, Integer offset, Integer pageSize) {
+        return bizServiceMaintainitemDao.queryList(keyword, offset, pageSize);
     }
 
     /**
