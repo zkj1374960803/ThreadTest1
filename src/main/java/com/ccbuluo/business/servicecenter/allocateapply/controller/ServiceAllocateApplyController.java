@@ -72,7 +72,7 @@ public class ServiceAllocateApplyController extends BaseController {
     @ApiOperation(value = "查询申请列表", notes = "【张康健】")
     @GetMapping("/list")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "orgType", value = "申请来源 SERVICECENTER(服务中心)CUSTMANAGER(客户经理)PLATFORM(售后平台);", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "orgType", value = "申请来源 SERVICECENTER(服务中心)CUSTMANAGER(客户经理)SERVICEPLATFORM(售后平台);", required = false, paramType = "query"),
         @ApiImplicitParam(name = "processType", value = "平台决定的处理类型(注：TRANSFER调拨、PURCHASE采购)", required = false, paramType = "query"),
         @ApiImplicitParam(name = "applyStatus", value = "申请状态", required = false, paramType = "query"),
         @ApiImplicitParam(name = "productType", value = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）", required = true, paramType = "query"),
@@ -96,7 +96,7 @@ public class ServiceAllocateApplyController extends BaseController {
     @ApiOperation(value = "查询处理申请列表", notes = "【张康健】")
     @GetMapping("/findprocesslist")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "orgType", value = "申请来源 SERVICECENTER(服务中心)CUSTMANAGER(客户经理)PLATFORM(售后平台);", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "orgType", value = "申请来源 SERVICECENTER(服务中心)CUSTMANAGER(客户经理)SERVICEPLATFORM(售后平台);", required = false, paramType = "query"),
         @ApiImplicitParam(name = "applyStatus", value = "申请状态", required = false, paramType = "query"),
         @ApiImplicitParam(name = "applyNo", value = "申请单号", required = false, paramType = "query"),
         @ApiImplicitParam(name = "productType", value = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）", required = true, paramType = "query"),
