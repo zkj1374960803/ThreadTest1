@@ -5,17 +5,22 @@ import com.ccbuluo.business.constants.*;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
+import com.ccbuluo.business.platform.allocateapply.dto.ProductStockInfoDTO;
+import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.outstock.service.OutstockOrderService;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
+import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
+import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.http.StatusDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,6 +74,8 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
             if(null == details || details.size() == 0){
                 throw new CommonException("0", "申请单为空！");
             }
+            // 判断库存是否满足
+            checkStock(ba.getOutstockOrgno(),details,BizStockDetail.StockTypeEnum.PROBLEMSTOCK.name());
             // 构建占用库存和订单占用库存关系
             //获取申请方机构code
             String applyorgNo = getProductOrgNo(ba);

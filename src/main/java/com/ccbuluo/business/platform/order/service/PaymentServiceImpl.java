@@ -737,7 +737,15 @@ public class PaymentServiceImpl implements PaymentService {
             codes.add(outstockOrgno);
         }
         Map<String, BasicUserOrganization> map = basicUserOrganizationService.queryOrganizationByOrgCodes(codes);
-        return Pair.of(map.get(instockOrgno).getOrgName(), map.get(outstockOrgno).getOrgName());
+        String inOrgName = "";
+        String outOrgName = "";
+        if(StringUtils.isNotBlank(instockOrgno) && null != map.get(instockOrgno)){
+            inOrgName = map.get(instockOrgno).getOrgName();
+        }
+        if(StringUtils.isNotBlank(outstockOrgno) && null != map.get(outstockOrgno)){
+            outOrgName = map.get(outstockOrgno).getOrgName();
+        }
+        return Pair.of(inOrgName, outOrgName);
     }
 
 }
