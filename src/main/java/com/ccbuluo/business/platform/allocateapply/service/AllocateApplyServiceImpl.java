@@ -119,6 +119,20 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createAllocateApply(AllocateApplyDTO allocateApplyDTO) {
+        String processType = allocateApplyDTO.getProcessType();
+        // 如果是退款类型，没有入库机构，不需要查询机构类型
+        if(!AllocateApplyTypeEnum.REFUND.name().equals(processType)){
+            // 入库仓库查询入库组织机构
+            String orgCode = bizServiceStorehouseDao.getOrgCodeByStoreHouseCode(allocateApplyDTO.getInRepositoryNo());
+            if(orgCode != null){
+                // 申请机构和出库机构不能相同
+                if(orgCode.equals(allocateApplyDTO.getOutstockOrgno())){
+                    throw new CommonException(Constants.ERROR_CODE, "出库机构和入库机构不能相同！");
+                }
+            }
+            allocateApplyDTO.setInstockOrgno(orgCode);
+        }
+
         String loggedUserId = userHolder.getLoggedUserId();
         allocateApplyDTO.setOperator(loggedUserId);
         allocateApplyDTO.setCreator(loggedUserId);
@@ -159,7 +173,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
 
 
         // 根据处理类型，设置申请的类型、各种相关机构、状态等属性
-        String processType = allocateApplyDTO.getProcessType();
+
         if(AllocateApplyTypeEnum.BARTER.name().equals(processType) || AllocateApplyTypeEnum.REFUND.name().equals(processType)){
             allocateApplyDTO.setApplyType(processType);
             StatusDto<String> thcode = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.TH);
