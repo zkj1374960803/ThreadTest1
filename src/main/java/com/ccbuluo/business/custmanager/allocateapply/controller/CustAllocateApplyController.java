@@ -42,7 +42,7 @@ public class CustAllocateApplyController extends BaseController {
      * @author zhangkangjian
      * @date 2018-08-07 20:54:24
      */
-    @ApiOperation(value = "创建物料申请（退换货）", notes = "【张康健】")
+    @ApiOperation(value = "创建物料申请", notes = "【张康健】")
     @PostMapping("/create")
     public StatusDto<String> createAllocateApply(@ApiParam(name = "bizAllocateApply", value = "创建申请json", required = true) @RequestBody AllocateApplyDTO allocateApplyDTO){
         allocateApplyServiceImpl.createAllocateApply(allocateApplyDTO);
@@ -74,7 +74,7 @@ public class CustAllocateApplyController extends BaseController {
     @ApiOperation(value = "查询申请列表", notes = "【张康健】")
     @GetMapping("/list")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "orgType", value = "申请来源 SERVICECENTER(服务中心)CUSTMANAGER(客户经理)PLATFORM(售后平台);", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "orgType", value = "申请来源 SERVICECENTER(服务中心)CUSTMANAGER(客户经理)SERVICEPLATFORM(售后平台);", required = false, paramType = "query"),
         @ApiImplicitParam(name = "processType", value = "平台决定的处理类型(注：TRANSFER调拨、PURCHASE采购)", required = false, paramType = "query"),
         @ApiImplicitParam(name = "applyStatus", value = "申请状态", required = false, paramType = "query"),
         @ApiImplicitParam(name = "productType", value = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）", required = true, paramType = "query"),
@@ -130,20 +130,6 @@ public class CustAllocateApplyController extends BaseController {
         return StatusDto.buildDataSuccessStatusDto(page);
     }
 
-
-//    /**
-//     * 保存处理申请单
-//     * @param processApplyDTO json数据格式
-//     * @return StatusDto<String> 状态DTO
-//     * @author zhangkangjian
-//     * @date 2018-09-12 16:02:08
-//     */
-//    @ApiOperation(value = "保存申请单", notes = "【张康健】")
-//    @PostMapping("/saveprocessapply")
-//    public StatusDto<String> saveProcessApply(@ApiParam(name = "processApplyDTO", value = "json数据格式", required = true) @RequestBody ProcessApplyDTO processApplyDTO){
-//        allocateApplyServiceImpl.saveProcessApply(processApplyDTO.getProcessApplyDetailDTO());
-//        return StatusDto.buildSuccessStatusDto();
-//    }
 
     /**
      * 查询可调拨库存列表

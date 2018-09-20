@@ -82,7 +82,7 @@ public class CustmanagerInstockOrderController extends BaseController {
      * @param instockType 入库类型
      * @param instockNo 入库单号
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 入库单列表
      * @author liuduo
      * @date 2018-08-11 16:43:19
@@ -92,14 +92,14 @@ public class CustmanagerInstockOrderController extends BaseController {
         @ApiImplicitParam(name = "instockType", value = "入库类型",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "instockNo", value = "入库单单号",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "起始数",  required = true, paramType = "query", dataType = "int"),
-        @ApiImplicitParam(name = "pagesize", value = "每页数",  required = true, paramType = "query", dataType = "int")})
+        @ApiImplicitParam(name = "pageSize", value = "每页数",  required = true, paramType = "query", dataType = "int")})
     @GetMapping("/queryinstocklist")
     public StatusDto<Page<BizInstockOrder>> queryInstockList(@RequestParam String productType,
                                                              @RequestParam(required = false) String instockType,
                                                              @RequestParam(required = false) String instockNo,
                                                              @RequestParam(defaultValue = "0") Integer offset,
-                                                             @RequestParam(defaultValue = "10") Integer pagesize) {
-        return StatusDto.buildDataSuccessStatusDto(instockOrderService.queryInstockList(productType, instockType, instockNo, offset, pagesize));
+                                                             @RequestParam(defaultValue = "10") Integer pageSize) {
+        return StatusDto.buildDataSuccessStatusDto(instockOrderService.queryInstockList(productType, instockType, instockNo, offset, pageSize));
     }
 
 

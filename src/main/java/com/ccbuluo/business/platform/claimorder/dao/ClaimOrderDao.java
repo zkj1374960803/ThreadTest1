@@ -128,7 +128,7 @@ public class ClaimOrderDao extends BaseDao<ClaimOrderDao> {
      * @author zhangkangjian
      * @date 2018-09-08 16:16:03
      */
-    public Page<QueryClaimorderListDTO> queryClaimorderList(String claimOrdno, String keyword, String docStatus, String userOrgCode, Integer offset, Integer pageSize){
+    public Page<QueryClaimorderListDTO>  queryClaimorderList(String claimOrdno, String keyword, String docStatus, String userOrgCode, Integer offset, Integer pageSize){
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuffer sql = new StringBuffer();
         sql.append("  SELECT a.claim_ordno,a.doc_status, a.service_ordno,b.car_no,UNIX_TIMESTAMP(a.create_time) as 'createTime',a.claim_orgname as 'serviceOrgName',a.claim_orgno  ")

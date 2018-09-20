@@ -173,13 +173,13 @@ public class StoreHouseServiceImpl implements StoreHouseService{
      * @param storeHouseStatus 状态
      * @param keyword 关键字
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 仓库列表
      * @author liuduo
      * @date 2018-07-03 14:27:11
      */
     @Override
-    public Page<SearchStorehouseListDTO> queryList(String provinceName, String cityName, String areaName, Integer storeHouseStatus, String keyword, Integer offset, Integer pagesize)throws TException  {
+    public Page<SearchStorehouseListDTO> queryList(String provinceName, String cityName, String areaName, Integer storeHouseStatus, String keyword, Integer offset, Integer pageSize)throws TException  {
         // 调用服务查询服务中心名称
         List<String> serviceCenterCode = new ArrayList<>();
         Map<String, String>  serviceCenterByCodes = Maps.newHashMap();
@@ -188,7 +188,7 @@ public class StoreHouseServiceImpl implements StoreHouseService{
             serviceCenterByCodes.forEach((key, value) ->serviceCenterCode.add(key));
         }
 
-        Page<SearchStorehouseListDTO> storehouseList =  bizServiceStorehouseDao.queryList(provinceName, cityName, areaName, storeHouseStatus, keyword, serviceCenterCode, offset, pagesize);
+        Page<SearchStorehouseListDTO> storehouseList =  bizServiceStorehouseDao.queryList(provinceName, cityName, areaName, storeHouseStatus, keyword, serviceCenterCode, offset, pageSize);
         List<SearchStorehouseListDTO> rows = storehouseList.getRows();
         if (!rows.isEmpty()) {
             // 查到所有的服务中心名称map，用来拼接服务中心的名字

@@ -55,12 +55,12 @@ public class BizServiceMultiplepriceDao extends BaseDao<BizServiceMultipleprice>
      * @param provinceCode 省code
      * @param cityCode 市code
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 地区倍数列表
      * @author liuduo
      * @date 2018-07-18 15:35:18
      */
-    public Page<BizServiceMultipleprice> queryList(String maintainitemCode, String provinceCode, String cityCode, Integer offset, Integer pagesize) {
+    public Page<BizServiceMultipleprice> queryList(String maintainitemCode, String provinceCode, String cityCode, Integer offset, Integer pageSize) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
 
@@ -81,7 +81,7 @@ public class BizServiceMultiplepriceDao extends BaseDao<BizServiceMultipleprice>
         }
         sql.append(" AND delete_flag = :deleteFlag ORDER BY operate_time DESC");
 
-        return queryPageForBean(BizServiceMultipleprice.class, sql.toString(), params, offset, pagesize);
+        return queryPageForBean(BizServiceMultipleprice.class, sql.toString(), params, offset, pageSize);
     }
 
     /**

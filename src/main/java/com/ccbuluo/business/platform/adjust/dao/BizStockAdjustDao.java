@@ -107,12 +107,12 @@ public class BizStockAdjustDao extends BaseDao<BizStockAdjust> {
      * @param adjustResult 盘库结果
      * @param keyWord 关键字（盘库单号/服务中心/客户经理）
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 盘库单列表
      * @author liuduo
      * @date 2018-08-15 11:03:46
      */
-    public Page<SearchStockAdjustListDTO> queryAdjustStockList(Integer adjustResult, String keyWord, Integer offset, Integer pagesize, String orgCode, String productType) {
+    public Page<SearchStockAdjustListDTO> queryAdjustStockList(Integer adjustResult, String keyWord, Integer offset, Integer pageSize, String orgCode, String productType) {
         Map<String, Object> params = Maps.newHashMap();
 
 
@@ -141,7 +141,7 @@ public class BizStockAdjustDao extends BaseDao<BizStockAdjust> {
         }
         sql.append("  ORDER BY bsa.operate_time DESC");
 
-        return queryPageForBean(SearchStockAdjustListDTO.class, sql.toString(), params, offset, pagesize);
+        return queryPageForBean(SearchStockAdjustListDTO.class, sql.toString(), params, offset, pageSize);
     }
 
     /**

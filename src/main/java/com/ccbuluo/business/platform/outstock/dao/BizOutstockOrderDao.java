@@ -62,12 +62,12 @@ public class BizOutstockOrderDao extends BaseDao<BizOutstockOrder> {
      * @param outstockType 入库类型
      * @param outstockNo 入库单号
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 入库单列表
      * @author liuduo
      * @date 2018-08-11 16:43:19
      */
-    public Page<BizOutstockOrder> queryOutstockList(String productType, String outstockType, String outstockNo, String orgCode, Integer offset, Integer pagesize) {
+    public Page<BizOutstockOrder> queryOutstockList(String productType, String outstockType, String outstockNo, String orgCode, Integer offset, Integer pageSize) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("productType", productType);
         params.put("orgCode", orgCode);
@@ -90,7 +90,7 @@ public class BizOutstockOrderDao extends BaseDao<BizOutstockOrder> {
         }
         sql.append(" ORDER BY boo.operate_time DESC");
 
-        return queryPageForBean(BizOutstockOrder.class, sql.toString(), params, offset, pagesize);
+        return queryPageForBean(BizOutstockOrder.class, sql.toString(), params, offset, pageSize);
 
     }
 

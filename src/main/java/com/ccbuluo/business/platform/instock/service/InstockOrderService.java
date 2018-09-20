@@ -60,12 +60,12 @@ public interface InstockOrderService {
      * @param instockType 入库类型
      * @param instockNo 入库单号
      * @param offset 起始数
-     * @param pagesize 每页数
+     * @param pageSize 每页数
      * @return 入库单列表
      * @author liuduo
      * @date 2018-08-11 16:43:19
      */
-    Page<BizInstockOrder> queryInstockList(String productType, String instockType, String instockNo, Integer offset, Integer pagesize);
+    Page<BizInstockOrder> queryInstockList(String productType, String instockType, String instockNo, Integer offset, Integer pageSize);
 
     /**
      * 根据入库单号查询入库单详情
