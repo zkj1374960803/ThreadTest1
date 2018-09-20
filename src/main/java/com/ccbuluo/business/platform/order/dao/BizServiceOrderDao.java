@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -304,5 +305,45 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
         String sql = "SELECT COUNT(id) > 0 FROM biz_serviceorder_detail WHERE product_no = :maintainitemCode";
 
         return findForObject(sql, params, Boolean.class);
+    }
+
+    /**
+     * 查询维修单状态数量
+     * @return 所有维修单状态
+     * @author liuduo
+     * @date 2018-09-19 17:27:00
+     */
+    public List<BizServiceOrder> queryOrderStatusNum(String reportOrgno) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("reportOrgno", reportOrgno);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT order_status FROM biz_service_order WHERE 1=1");
+        if (StringUtils.isNotBlank(reportOrgno) && !(reportOrgno.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM))) {
+            params.put("reportOrgno", reportOrgno);
+            sql.append(" AND (report_orgno = :reportOrgno OR processor_orgno = :reportOrgno)");
+        }
+
+        return queryListBean(BizServiceOrder.class, sql.toString(), params);
+    }
+
+    /**
+     * 查询维修单状态数量(门店用)
+     * @return 维修单各种状态的数量
+     * @author liuduo
+     * @date 2018-09-19 17:21:44
+     */
+    public List<BizServiceOrder> queryStoreOrderStatusNum(String reportOrgno) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("reportOrgno", reportOrgno);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT order_status FROM biz_service_order WHERE 1=1");
+        if (StringUtils.isNotBlank(reportOrgno)) {
+            params.put("reportOrgno", reportOrgno);
+            sql.append(" AND bso.customer_orgno = :reportOrgno");
+        }
+
+        return queryListBean(BizServiceOrder.class, sql.toString(), params);
     }
 }

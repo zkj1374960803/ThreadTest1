@@ -322,4 +322,17 @@ public class ServiceOrderController extends BaseController {
         return StatusDto.buildDataSuccessStatusDto(map);
     }
 
+    /**
+     * 查询维修单状态数量
+     * @return 维修单各种状态的数量
+     * @author liuduo
+     * @date 2018-09-19 17:21:44
+     */
+    @ApiOperation(value = "查询维修单状态数量", notes = "【刘铎】")
+    @ApiImplicitParam(name = "reportOrgno", value = "当前登录人的机构编号",  required = true, paramType = "query")
+    @GetMapping("/queryorderstatusnum")
+    public StatusDto<Map<String, Long>> queryOrderStatusNum(@RequestParam String reportOrgno) {
+        return StatusDto.buildDataSuccessStatusDto(serviceOrderService.queryOrderStatusNum(reportOrgno));
+    }
+
 }

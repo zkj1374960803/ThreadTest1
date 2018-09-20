@@ -6,6 +6,7 @@ import com.ccbuluo.business.platform.equipment.dto.DetailBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dto.ProblemStockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
+import com.ccbuluo.business.platform.stockdetail.dto.StockDetailDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
@@ -127,7 +128,19 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
         ProblemStockBizStockDetailDTO psd = problemStockDetailDao.getProblemStockDetail(id);
         // 查询本机构下面，本条记录所对应的商品的所有问题库存列表
         psd.setProblemDetailList(problemStockDetailDao.queryProblemStockBizStockList(orgCode, psd.getProductNo()));
+        // 对psd过滤计算下，问题件的个数，然后赋值
+        computerProblemProductCount(psd);
         return psd;
+    }
+    private void computerProblemProductCount(ProblemStockBizStockDetailDTO psd){
+        if(null == psd || null == psd.getProblemDetailList() || psd.getProblemDetailList().size() == 0){
+            return;
+        }
+        Long count = 0L;
+        for(StockDetailDTO stock : psd.getProblemDetailList()){
+            count += stock.getProblemStock();
+        }
+        psd.setProblemStock(count);
     }
 
     /**

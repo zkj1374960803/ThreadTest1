@@ -92,4 +92,11 @@ public interface ClaimOrderService {
      * @date 2018-09-12 14:02:21
      */
     Map<String, Double> findPaymentAmount(String serviceOrdno, String claimOrdno);
+    /**
+     *  查询维修单各种状态数据的数量
+     * @return Map<String, Long>
+     * @author zhangkangjian
+     * @date 2018-09-19 17:10:39
+     */
+    Map<String, Long> countClaimorderStatusNum();
 }

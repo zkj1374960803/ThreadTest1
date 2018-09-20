@@ -502,6 +502,13 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public void processOutStockOrg(String applyNo, String outstockOrgno) {
+        FindAllocateApplyDTO allocateApplyDTO = bizAllocateApplyDao.findDetail(applyNo);
+        String instockOrgno = allocateApplyDTO.getInstockOrgno();
+        if(instockOrgno != null && outstockOrgno != null){
+            if(instockOrgno.equals(outstockOrgno)){
+                throw new CommonException(Constants.ERROR_CODE, "出库机构和入库机构不能相同！");
+            }
+        }
         ProcessApplyDTO processApplyDTO = new ProcessApplyDTO();
         StatusDtoThriftBean<BasicUserOrganization> outstockOrg = basicUserOrganizationService.findOrgByCode(outstockOrgno);
         StatusDto<BasicUserOrganization> basicUserOrganizationResolve = StatusDtoThriftUtils.resolve(outstockOrg, BasicUserOrganization.class);

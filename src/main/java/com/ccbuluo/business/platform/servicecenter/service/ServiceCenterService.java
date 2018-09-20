@@ -7,9 +7,13 @@ import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftBean;
 import com.ccbuluo.http.StatusDtoThriftPage;
 import com.ccbuluo.usercoreintf.dto.QueryServiceCenterDTO;
+import com.ccbuluo.usercoreintf.dto.QueryServiceCenterListDTO;
 import com.ccbuluo.usercoreintf.dto.ServiceCenterWorkplaceDTO;
 import org.apache.thrift.TException;
+
+import javax.validation.constraints.Null;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -84,4 +88,17 @@ public interface ServiceCenterService {
      * @date 2018-07-06 10:11:00
      */
     StatusDto<String> editOrgStatus(String serviceCenterCode, Integer serviceCenterStatus);
+
+    /**
+     * 查询可用的服务中心和平台
+     * @param province 省
+     * @param city 市
+     * @param area 区
+     * @param orgType 机构类型
+     * @param name 服务中心名字
+     * @return 可用的服务中心
+     * @author liuduo
+     * @date 2018-07-06 10:00:52
+     */
+    List<QueryServiceCenterListDTO> findUsableServiceCenterAndPlatform(String province, String city, String area, String orgType, String name);
 }

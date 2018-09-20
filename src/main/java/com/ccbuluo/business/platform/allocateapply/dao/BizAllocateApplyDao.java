@@ -679,11 +679,12 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      */
     public Page<FindStockListDTO> findAllEquipmentStockList(FindStockListDTO findStockListDTO, String userOrgCode) {
         HashMap<String, Object> map = Maps.newHashMap();
+        map.put("userOrgCode", userOrgCode);
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.equip_code AS 'productNo', a.equip_name AS 'productName',a.equip_unit AS 'unit',c.type_name AS 'productCategoryname', ")
             .append(" SUM(IFNULL(b.valid_stock,0) + IFNULL(b.occupy_stock,0)) AS 'total' ")
             .append(" FROM biz_service_equipment a ")
-            .append(" LEFT JOIN biz_stock_detail b ON a.equip_code = b.product_no ")
+            .append(" LEFT JOIN biz_stock_detail b ON a.equip_code = b.product_no AND b.org_no = :userOrgCode ")
             .append(" LEFT JOIN biz_service_equiptype c ON c.id = a.equiptype_id ")
             .append(" WHERE 1 = 1 ");
         Integer equiptypeId = findStockListDTO.getEquiptypeId();
@@ -695,10 +696,6 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         if(StringUtils.isNotBlank(productNo)){
             map.put("productNo", productNo);
             sql.append(" AND a.equip_code = :productNo ");
-        }
-        if(StringUtils.isNotBlank(userOrgCode)){
-            map.put("userOrgCode", userOrgCode);
-            sql.append(" AND b.org_no = :userOrgCode ");
         }
         sql.append(" group by a.equip_code ");
         return queryPageForBean(FindStockListDTO.class, sql.toString(), map, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
