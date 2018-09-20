@@ -15,6 +15,7 @@ import com.ccbuluo.business.platform.allocateapply.service.applyhandle.PurchaseA
 import com.ccbuluo.business.platform.claimorder.dao.ClaimOrderDao;
 import com.ccbuluo.business.platform.claimorder.service.ClaimOrderService;
 import com.ccbuluo.business.platform.custmanager.dao.BizServiceCustmanagerDao;
+import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
@@ -42,6 +43,7 @@ import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.ccbuluo.usercoreintf.dto.QueryNameByUseruuidsDTO;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
+import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
 import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
@@ -58,6 +60,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 申请管理
@@ -108,6 +111,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     private BizInstockOrderDao bizInstockOrderDao;
     @Resource
     private BizOutstockOrderDao bizOutstockOrderDao;
+
 
 
     /**
@@ -1105,14 +1109,14 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         orgDTO.setOrgTypeList(orgTypeList);
         StatusDtoThriftList<QueryOrgDTO> queryOrgDTOList = basicUserOrganizationService.queryOrgAndWorkInfo(orgDTO);
         StatusDto<List<QueryOrgDTO>> resolve = StatusDtoThriftUtils.resolve(queryOrgDTOList, QueryOrgDTO.class);
-        List<QueryOrgDTO> queryOrgList = resolve.getData();
+        List<QueryOrgDTO> queryOrgList = Optional.ofNullable(resolve.getData()).orElse(new ArrayList<>());
         Map<String, QueryOrgDTO> queryOrgDTOMap = queryOrgList.stream().collect(Collectors.toMap(QueryOrgDTO::getOrgCode, a -> a,(k1,k2)->k1));
         List<String> orgCodes = queryOrgList.stream().map(QueryOrgDTO::getOrgCode).collect(Collectors.toList());
         orgCodes.add(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
         // 查询库存数量
         Page<QueryOrgDTO> findStockListDTO = bizAllocateApplyDao.findStockNum(productNo, orgCodes , offset, pageSize);
-        List<QueryOrgDTO> rows = findStockListDTO.getRows();
-        rows.stream().forEach(a -> {
+        List<QueryOrgDTO> rows = Optional.ofNullable(findStockListDTO.getRows()).orElse(new ArrayList<>());
+        rows.forEach(a -> {
             QueryOrgDTO org = queryOrgDTOMap.get(a.getOrgCode());
             if(org != null){
                 a.setAddress(org.getAddress());
@@ -1123,6 +1127,32 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }
 
         });
+
+        Map<String, QueryOrgDTO> collect = rows.stream().collect(Collectors.toMap(QueryOrgDTO::getOrgCode, b -> b, (k1, k2) -> k1));
+        rows.clear();
+        UserInfoDTO user = new UserInfoDTO();
+        List<String> custOrgCode = queryOrgList.stream().filter(a -> OrganizationTypeEnum.CUSTMANAGER.name().equals(a.getOrgType())).map(QueryOrgDTO::getOrgCode).collect(Collectors.toList());
+        user.setOrgCodes(custOrgCode);
+        StatusDtoThriftList<UserInfoDTO> userInfoDTOStatusDtoThriftList = innerUserInfoService.queryUserListByOrgCode(user);
+        StatusDto<List<UserInfoDTO>> userInfoDTOResolve = StatusDtoThriftUtils.resolve(userInfoDTOStatusDtoThriftList, UserInfoDTO.class);
+       Optional.ofNullable(userInfoDTOResolve.getData()).ifPresent(a -> {
+           List<String> useruuid = a.stream().map(UserInfoDTO::getUseruuid).collect(Collectors.toList());
+           Map<String, UserInfoDTO> userInfoDTOMap = a.stream().collect(Collectors.toMap(UserInfoDTO::getOrgCode, b -> b, (k1, k2) -> k1));
+           List<QueryUserListDTO> queryUserListDTOS = Optional.ofNullable(bizServiceCustmanagerDao.queryCustManager(useruuid)).orElse(new ArrayList<>());
+           Map<String, QueryUserListDTO> queryUserListDTOMap = queryUserListDTOS.stream().collect(Collectors.toMap(QueryUserListDTO::getUseruuid, b -> b, (k1, k2) -> k1));
+           // 查询客户经理的地址
+           collect.forEach((key, value) ->{
+               UserInfoDTO userInfoDTO = userInfoDTOMap.get(key);
+               if(userInfoDTO != null){
+                   QueryUserListDTO queryUserListDTO = queryUserListDTOMap.get(userInfoDTO.getUseruuid());
+                    if(queryUserListDTO != null){
+                        String receivingAddress = queryUserListDTO.getReceivingAddress();
+                        value.setAddress(receivingAddress);
+                    }
+               }
+               rows.add(value);
+           });
+       });
         return findStockListDTO;
     }
 
