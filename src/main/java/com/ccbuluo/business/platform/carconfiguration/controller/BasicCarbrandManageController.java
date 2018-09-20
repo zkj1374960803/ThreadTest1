@@ -140,7 +140,7 @@ public class BasicCarbrandManageController extends BaseController {
      * @author wuyibo
      * @date 2018-05-09 10:50:30
      */
-    @ApiOperation(value = "分页查询品牌列表", notes = "【wuyibo】")
+    @ApiOperation(value = "查询所有品牌列表（不分页）", notes = "【wuyibo】")
     @ApiImplicitParams({@ApiImplicitParam(name = "carbrandName", value = "品牌名称", paramType = "query"),
         @ApiImplicitParam(name = "initial", value = "品牌首字母", paramType = "query")})
     @GetMapping("/carbrandmanagelist")
