@@ -72,6 +72,7 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
     private BasicUserOrganizationService basicUserOrganizationService;
     @ThriftRPCClient("UserCoreSerService")
     BasicUserWorkplaceService basicUserWorkplaceService;
+
     /**
      * 生成索赔单
      * @author zhangkangjian
@@ -145,7 +146,6 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
     @Override
     public BizServiceClaimorder findClaimOrderDetail(BizServiceClaimorder bizServiceClaimorder) {
 
-
         ProductDetailDTO productDetailDTO = new ProductDetailDTO();
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         productDetailDTO.setServiceOrgno(orgCode);
@@ -215,7 +215,7 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
      }
 
     /**
-     * 查询维修单各种状态数据的数量
+     * 查询索赔单各种状态数据的数量
      * @return Map<String,Long>
      * @author zhangkangjian
      * @date 2018-09-19 17:10:39
@@ -227,11 +227,12 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
         statusMap.put(BizServiceClaimorder.DocStatusEnum.COMPLETED.name(), 0L);
         statusMap.put(BizServiceClaimorder.DocStatusEnum.PENDINGPAYMENT.name(), 0L);
         statusMap.put(BizServiceClaimorder.DocStatusEnum.PENDINGSUBMISSION.name(), 0L);
+        statusMap.put("ALL", 0L);
         Page<QueryClaimorderListDTO> queryClaimorderListDTOPage = queryClaimorderPage(null, null, null, 0, Integer.MAX_VALUE);
         List<QueryClaimorderListDTO> rows = queryClaimorderListDTOPage.getRows();
         if(rows != null && rows.size() > 0){
             Map<String,Long> map = rows.stream().collect(Collectors.groupingBy(QueryClaimorderListDTO::getDocStatus,Collectors.counting()));
-            map.put("ALL", (long) rows.size());
+            map.put("ALL", (long)rows.size());
             map.forEach(statusMap::put);
         }
         return statusMap;
