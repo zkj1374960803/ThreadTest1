@@ -15,6 +15,7 @@ import com.ccbuluo.business.platform.allocateapply.service.applyhandle.PurchaseA
 import com.ccbuluo.business.platform.claimorder.dao.ClaimOrderDao;
 import com.ccbuluo.business.platform.claimorder.service.ClaimOrderService;
 import com.ccbuluo.business.platform.custmanager.dao.BizServiceCustmanagerDao;
+import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
@@ -42,6 +43,7 @@ import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.ccbuluo.usercoreintf.dto.QueryNameByUseruuidsDTO;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
+import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
 import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
@@ -110,6 +112,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     private BizOutstockOrderDao bizOutstockOrderDao;
 
 
+
     /**
      * 创建物料或者零配件申请
      * @param allocateApplyDTO 申请单实体
@@ -152,13 +155,13 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         // 默认处理机构赋值
         if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(allocateApplyDTO.getApplyorgNo())) {
             allocateApplyDTO.setProcessOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
-            allocateApplyDTO.setProcessOrgtype(OrganizationTypeEnum.SERVICEPLATFORM.name());
+            allocateApplyDTO.setProcessOrgtype(OrganizationTypeEnum.PLATFORM.name());
         }else{
             // 遗漏的处理类型补充
             allocateApplyDTO.setProcessOrgno(allocateApplyDTO.getOutstockOrgno());
             String outstockOrgtype = allocateApplyDTO.getOutstockOrgtype();
             if(StringUtils.isBlank(outstockOrgtype)){
-                allocateApplyDTO.setProcessOrgtype(OrganizationTypeEnum.SERVICEPLATFORM.name());
+                allocateApplyDTO.setProcessOrgtype(OrganizationTypeEnum.PLATFORM.name());
             }else {
                 allocateApplyDTO.setProcessOrgtype(outstockOrgtype);
             }
@@ -178,8 +181,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             allocateApplyDTO.setApplyType(processType);
             StatusDto<String> thcode = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.TH);
             allocateApplyDTO.setApplyNo(thcode.getData());
-            allocateApplyDTO.setProcessOrgtype(OrganizationTypeEnum.SERVICEPLATFORM.name());
-            allocateApplyDTO.setOutstockOrgtype(OrganizationTypeEnum.SERVICEPLATFORM.name());
+            allocateApplyDTO.setProcessOrgtype(OrganizationTypeEnum.PLATFORM.name());
+            allocateApplyDTO.setOutstockOrgtype(OrganizationTypeEnum.PLATFORM.name());
             allocateApplyDTO.setOutstockOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
             allocateApplyDTO.setProcessOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
             allocateApplyDTO.setApplyStatus(BizAllocateApply.ReturnApplyStatusEnum.PRODRETURNED.name());
@@ -192,7 +195,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         // 默认出库机构类型orgType
         String outOrgType = getOrgTypeByCode(allocateApplyDTO.getOutstockOrgno());
         if(StringUtils.isBlank(outOrgType)){
-            allocateApplyDTO.setOutstockOrgtype(OrganizationTypeEnum.SERVICEPLATFORM.name());
+            allocateApplyDTO.setOutstockOrgtype(OrganizationTypeEnum.PLATFORM.name());
         }else {
             allocateApplyDTO.setOutstockOrgtype(outOrgType);
             allocateApplyDTO.setProcessOrgtype(outOrgType);
@@ -291,7 +294,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                 if(StringUtils.isNotBlank(orgType)){
                     allocateApplyDTO.setOrgType(orgType);
                 }else {
-                    allocateApplyDTO.setOrgType(OrganizationTypeEnum.SERVICEPLATFORM.name());
+                    allocateApplyDTO.setOrgType(OrganizationTypeEnum.PLATFORM.name());
                 }
                 allocateApplyDTO.setApplyorgName(orgName);
         });
@@ -572,9 +575,9 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         // 默认申请的状态为待处理
         allocateApplyDTO.setApplyStatus(ApplyStatusEnum.PENDING.name());
         allocateApplyDTO.setProcessOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
-        allocateApplyDTO.setProcessOrgtype(OrganizationTypeEnum.SERVICEPLATFORM.name());
+        allocateApplyDTO.setProcessOrgtype(OrganizationTypeEnum.PLATFORM.name());
         allocateApplyDTO.setOutstockOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
-        allocateApplyDTO.setOutstockOrgtype(OrganizationTypeEnum.SERVICEPLATFORM.name());
+        allocateApplyDTO.setOutstockOrgtype(OrganizationTypeEnum.PLATFORM.name());
         String inRepositoryNo = createPurchaseBillDTO.getInRepositoryNo();
         allocateApplyDTO.setInRepositoryNo(inRepositoryNo);
         String orgCode = bizServiceStorehouseDao.getOrgCodeByStoreHouseCode(allocateApplyDTO.getInRepositoryNo());
@@ -832,7 +835,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         if(StringUtils.isBlank(type)){
             return Collections.emptyList();
         }
-        if(OrganizationTypeEnum.SERVICEPLATFORM.name().equals(type)){
+        if(OrganizationTypeEnum.PLATFORM.name().equals(type)){
             return List.of(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
         }
         QueryOrgDTO orgDTO = new QueryOrgDTO();
@@ -1096,23 +1099,23 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         String orgType = organization.getOrgType();
         List<String> orgTypeList = null;
         if(OrganizationTypeEnum.CUSTMANAGER.name().equals(orgType)){
-            orgTypeList = List.of(OrganizationTypeEnum.SERVICEPLATFORM.name(), OrganizationTypeEnum.SERVICECENTER.name(), OrganizationTypeEnum.CUSTMANAGER.name());
+            orgTypeList = List.of(OrganizationTypeEnum.PLATFORM.name(), OrganizationTypeEnum.SERVICECENTER.name(), OrganizationTypeEnum.CUSTMANAGER.name());
         }
         if(OrganizationTypeEnum.SERVICECENTER.name().equals(orgType)){
-            orgTypeList = List.of(OrganizationTypeEnum.SERVICEPLATFORM.name(), OrganizationTypeEnum.SERVICECENTER.name());
+            orgTypeList = List.of(OrganizationTypeEnum.PLATFORM.name(), OrganizationTypeEnum.SERVICECENTER.name());
         }
         orgDTO.setStatus(Constants.FREEZE_STATUS_YES);
         orgDTO.setOrgTypeList(orgTypeList);
         StatusDtoThriftList<QueryOrgDTO> queryOrgDTOList = basicUserOrganizationService.queryOrgAndWorkInfo(orgDTO);
         StatusDto<List<QueryOrgDTO>> resolve = StatusDtoThriftUtils.resolve(queryOrgDTOList, QueryOrgDTO.class);
-        List<QueryOrgDTO> queryOrgList = resolve.getData();
+        List<QueryOrgDTO> queryOrgList = Optional.ofNullable(resolve.getData()).orElse(new ArrayList<>());
         Map<String, QueryOrgDTO> queryOrgDTOMap = queryOrgList.stream().collect(Collectors.toMap(QueryOrgDTO::getOrgCode, a -> a,(k1,k2)->k1));
         List<String> orgCodes = queryOrgList.stream().map(QueryOrgDTO::getOrgCode).collect(Collectors.toList());
         orgCodes.add(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
         // 查询库存数量
         Page<QueryOrgDTO> findStockListDTO = bizAllocateApplyDao.findStockNum(productNo, orgCodes , offset, pageSize);
-        List<QueryOrgDTO> rows = findStockListDTO.getRows();
-        rows.stream().forEach(a -> {
+        List<QueryOrgDTO> rows = Optional.ofNullable(findStockListDTO.getRows()).orElse(new ArrayList<>());
+        rows.forEach(a -> {
             QueryOrgDTO org = queryOrgDTOMap.get(a.getOrgCode());
             if(org != null){
                 a.setAddress(org.getAddress());
@@ -1123,6 +1126,32 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }
 
         });
+
+        Map<String, QueryOrgDTO> collect = rows.stream().collect(Collectors.toMap(QueryOrgDTO::getOrgCode, b -> b, (k1, k2) -> k1));
+        rows.clear();
+        UserInfoDTO user = new UserInfoDTO();
+        List<String> custOrgCode = queryOrgList.stream().filter(a -> OrganizationTypeEnum.CUSTMANAGER.name().equals(a.getOrgType())).map(QueryOrgDTO::getOrgCode).collect(Collectors.toList());
+        user.setOrgCodes(custOrgCode);
+        StatusDtoThriftList<UserInfoDTO> userInfoDTOStatusDtoThriftList = innerUserInfoService.queryUserListByOrgCode(user);
+        StatusDto<List<UserInfoDTO>> userInfoDTOResolve = StatusDtoThriftUtils.resolve(userInfoDTOStatusDtoThriftList, UserInfoDTO.class);
+       Optional.ofNullable(userInfoDTOResolve.getData()).ifPresent(a -> {
+           List<String> useruuid = a.stream().map(UserInfoDTO::getUseruuid).collect(Collectors.toList());
+           Map<String, UserInfoDTO> userInfoDTOMap = a.stream().collect(Collectors.toMap(UserInfoDTO::getOrgCode, b -> b, (k1, k2) -> k1));
+           List<QueryUserListDTO> queryUserListDTOS = Optional.ofNullable(bizServiceCustmanagerDao.queryCustManager(useruuid)).orElse(new ArrayList<>());
+           Map<String, QueryUserListDTO> queryUserListDTOMap = queryUserListDTOS.stream().collect(Collectors.toMap(QueryUserListDTO::getUseruuid, b -> b, (k1, k2) -> k1));
+           // 查询客户经理的地址
+           collect.forEach((key, value) ->{
+               UserInfoDTO userInfoDTO = userInfoDTOMap.get(key);
+               if(userInfoDTO != null){
+                   QueryUserListDTO queryUserListDTO = queryUserListDTOMap.get(userInfoDTO.getUseruuid());
+                    if(queryUserListDTO != null){
+                        String receivingAddress = queryUserListDTO.getReceivingAddress();
+                        value.setAddress(receivingAddress);
+                    }
+               }
+               rows.add(value);
+           });
+       });
         return findStockListDTO;
     }
 
