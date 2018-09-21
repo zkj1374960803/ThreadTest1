@@ -571,7 +571,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
             map.put("orgNo", findStockListDTO.getOrgNo());
             sql.append(" AND a.org_no = :orgNo ");
         }
-        sql.append(" GROUP BY a.trade_no having SUM(IFNULL(a.valid_stock,0) + IFNULL(a.occupy_stock,0) + IFNULL(a.problem_stock,0) + IFNULL(a.damaged_stock,0)) > 0");
+        sql.append(" GROUP BY a.trade_no having SUM(IFNULL(a.valid_stock,0) + IFNULL(a.occupy_stock,0) + IFNULL(a.problem_stock,0) + IFNULL(a.damaged_stock,0)) > 0 order by a.create_time desc");
         return queryPageForBean(FindBatchStockListDTO.class, sql.toString(), map, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
     }
 
