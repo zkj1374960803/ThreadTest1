@@ -80,7 +80,7 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
                 throw new CommonException("0", "申请单为空！");
             }
             // 判断库存是否满足
-            checkStock(ba.getApplyorgNo(),details,BizStockDetail.StockTypeEnum.PROBLEMSTOCK.name());
+            checkStock(ba.getApplyorgNo(),details);
             //获取申请方机构code
             String applyorgNo = getProductOrgNo(ba);
             // 构建生成订单(调拨)
