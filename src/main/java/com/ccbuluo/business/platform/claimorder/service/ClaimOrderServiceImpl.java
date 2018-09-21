@@ -232,7 +232,7 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
         List<QueryClaimorderListDTO> rows = queryClaimorderListDTOPage.getRows();
         if(rows != null && rows.size() > 0){
             Map<String,Long> map = rows.stream().collect(Collectors.groupingBy(QueryClaimorderListDTO::getDocStatus,Collectors.counting()));
-            map.put("ALL", (long)rows.size());
+            map.put("ALL", (long) rows.size());
             map.forEach(statusMap::put);
         }
         return statusMap;
