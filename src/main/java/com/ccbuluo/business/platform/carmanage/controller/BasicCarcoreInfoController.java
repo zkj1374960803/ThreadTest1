@@ -10,13 +10,10 @@ import com.ccbuluo.business.platform.carmanage.service.BasicCarcoreInfoService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
-import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import io.swagger.annotations.*;
 import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -32,8 +29,6 @@ public class BasicCarcoreInfoController extends BaseController {
 
     @Autowired
     private BasicCarcoreInfoService basicCarcoreInfoService;
-    @Resource
-    private InnerUserInfoService innerUserInfoService;
 
     /**
      * 车辆注册新增
