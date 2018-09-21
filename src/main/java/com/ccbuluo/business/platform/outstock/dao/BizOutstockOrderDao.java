@@ -73,8 +73,9 @@ public class BizOutstockOrderDao extends BaseDao<BizOutstockOrder> {
         params.put("orgCode", orgCode);
 
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT DISTINCT boo.id,boo.outstockorder_no,boo.outstock_type,boo.outstock_time,boo.trade_docno,boo.outstock_operator")
+        sql.append(" SELECT DISTINCT boo.id,boo.outstockorder_no,boo.outstock_type,boo.outstock_time,boo.trade_docno,boo.outstock_operator,baa.apply_type")
             .append("  FROM biz_outstock_order AS boo LEFT JOIN biz_outstockorder_detail AS bod ON bod.outstock_orderno = boo.outstockorder_no")
+            .append("  LEFT JOIN biz_allocate_apply AS baa ON baa.apply_no = boo.trade_docno")
             .append("   WHERE bod.product_type = :productType AND boo.outstock_orgno = :orgCode");
         if (StringUtils.isNotBlank(outstockType)) {
             params.put("outstockType", outstockType);
