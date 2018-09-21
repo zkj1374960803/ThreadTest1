@@ -316,7 +316,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         param.put("orgCode", orgCode);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,product_no,product_type,valid_stock,version_no FROM biz_stock_detail WHERE product_no = :productNo AND org_no = :orgCode ORDER BY create_time DESC");
+        sql.append("SELECT id,product_no,product_type,IFNULL(valid_stock,0) AS validStock,version_no FROM biz_stock_detail WHERE product_no = :productNo AND org_no = :orgCode ORDER BY create_time DESC");
 
         return queryListBean(BizStockDetail.class, sql.toString(), param);
     }
