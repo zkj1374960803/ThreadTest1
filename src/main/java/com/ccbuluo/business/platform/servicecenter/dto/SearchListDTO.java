@@ -73,11 +73,11 @@ public class SearchListDTO {
         this.offset = offset;
     }
 
-    public int getPagesize() {
+    public int getPageSize() {
         return pageSize;
     }
 
-    public void setPagesize(int pageSize) {
+    public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
     }
 }

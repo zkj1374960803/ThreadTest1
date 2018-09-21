@@ -280,7 +280,7 @@ public class ServiceCenterServiceImpl implements ServiceCenterService{
                                                                          searchListDTO.getStatus(),
                                                                          searchListDTO.getKeyword(),
                                                                          searchListDTO.getOffset(),
-                                                                         searchListDTO.getPagesize());
+                                                                         searchListDTO.getPageSize());
         StatusDto<Page<QueryServiceCenterDTO>> resolve = StatusDtoThriftUtils.resolve(serviceCenterList, QueryServiceCenterDTO.class);
         Page<QueryServiceCenterDTO> data = resolve.getData();
         List<QueryServiceCenterDTO> rows = data.getRows();

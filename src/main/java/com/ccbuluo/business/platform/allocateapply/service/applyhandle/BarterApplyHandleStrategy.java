@@ -75,7 +75,7 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
                 throw new CommonException("0", "申请单为空！");
             }
             // 判断库存是否满足
-            checkStock(ba.getOutstockOrgno(),details,BizStockDetail.StockTypeEnum.PROBLEMSTOCK.name());
+            checkStock(ba.getApplyorgNo(),details);
             // 构建占用库存和订单占用库存关系
             //获取申请方机构code
             String applyorgNo = getProductOrgNo(ba);
