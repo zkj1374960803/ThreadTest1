@@ -70,6 +70,11 @@ public class BizInstockOrder extends AftersaleCommonEntity{
     @ApiModelProperty(name = "instockOperatorName", value = "入库人")
     private String instockOperatorName;
     /**
+     * 申请单类型
+     */
+    @ApiModelProperty(name = "applyType", value = "申请单类型")
+    private String applyType;
+    /**
      * 备注
      */
     @ApiModelProperty(name = "remark", value = "备注")
@@ -169,5 +174,13 @@ public class BizInstockOrder extends AftersaleCommonEntity{
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getApplyType() {
+        return applyType;
+    }
+
+    public void setApplyType(String applyType) {
+        this.applyType = applyType;
     }
 }
