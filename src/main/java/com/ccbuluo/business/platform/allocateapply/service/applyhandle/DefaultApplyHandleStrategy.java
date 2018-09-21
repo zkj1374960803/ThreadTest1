@@ -578,21 +578,23 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
      * @author weijb
      * @date 2018-09-20 16:26:50
      */
-    public void checkStock(String orgNo, List<AllocateapplyDetailBO> details,String type){
+    public void checkStock(String orgNo, List<AllocateapplyDetailBO> details){
         List<String> codeList = getProductList(details);
         List<StockBizStockDetailDTO> stockBizStockList = problemStockDetailDao.getStockBizStockList(orgNo,codeList);
-        Map<String, List<StockBizStockDetailDTO>> collect = stockBizStockList.stream().collect(Collectors.groupingBy(StockBizStockDetailDTO::getProductNo));
 
-        for(AllocateapplyDetailBO detail : details){
+        Map<String, List<StockBizStockDetailDTO>> collect = stockBizStockList.stream().collect(Collectors.groupingBy(StockBizStockDetailDTO::getProductNo));
+        // 根据商品编号和库存类型合并
+        List<AllocateapplyDetailBO> detailBOS = mergeStock(details);
+        for(AllocateapplyDetailBO detail : detailBOS){
             List<StockBizStockDetailDTO> stockList = collect.get(detail.getProductNo());
             if(null != stockList && stockList.size() > 0){
                 Long applyNum = 0L;
                 // 问题件
-                if(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.name().equals(type)){
+                if(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.name().equals(detail.getStockType())){
                     applyNum = stockList.get(0).getProblemStock();
                 }
                 // 正常件
-                if(BizStockDetail.StockTypeEnum.VALIDSTOCK.name().equals(type)){
+                if(BizStockDetail.StockTypeEnum.VALIDSTOCK.name().equals(detail.getStockType())){
                     applyNum = stockList.get(0).getValidStock();
                 }
                 // 如果申请数量大于库存数量
@@ -604,4 +606,31 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
             }
         }
     }
+    /**
+     *  根据商品编号和库存类型合并（一个单子有可能既有问题件又有正常件）
+     * @param
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-09-20 19:57:09
+     */
+    private List<AllocateapplyDetailBO> mergeStock(List<AllocateapplyDetailBO> details){
+        List<AllocateapplyDetailBO> resultList =  new ArrayList<AllocateapplyDetailBO>();
+        Map<String,Map<String,List<AllocateapplyDetailBO>>> amp = details.stream().collect(Collectors.groupingBy(AllocateapplyDetailBO::getProductNo,Collectors.groupingBy(AllocateapplyDetailBO::getStockType)));
+        amp.forEach((key,value)->{
+            value.forEach((key2,value2)->{
+                AllocateapplyDetailBO detail = new AllocateapplyDetailBO();
+                Long applyNum = 0L;
+                for(AllocateapplyDetailBO adb : value2){
+                    applyNum += adb.getApplyNum();
+                }
+                detail.setProductNo(key);
+                detail.setStockType(key2);
+                detail.setApplyNum(applyNum);
+                resultList.add(detail);
+            });
+        });
+        return resultList;
+    }
+
 }

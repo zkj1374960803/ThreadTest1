@@ -81,7 +81,7 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
                 throw new CommonException("0", "申请单为空！");
             }
             // 判断库存是否满足
-            checkStock(ba.getOutstockOrgno(),details,BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
+            checkStock(ba.getOutstockOrgno(),details);
             // 构建占用库存和订单占用库存关系
             // 获取卖方机构code
             String productOrgNo = getProductOrgNo(ba);
