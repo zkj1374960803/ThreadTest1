@@ -96,4 +96,22 @@ public class ProblemAllocateApplyController extends BaseController {
         return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.getProblemdetailDetail(applyNo));
     }
 
+    /**
+     * 更改退换货类型
+     * @param applyNo 申请单号
+     * @param applyType 申请类型
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-09-21 19:02:58
+     */
+    @ApiOperation(value = "更改退换货类型（平台）", notes = "【魏俊标】")
+    @PostMapping("/changeapplytype")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "applyType", value = "申请类型", required = true, paramType = "query")
+    })
+    public StatusDto<String> changeApplyType(String applyNo, String applyType){
+        return problemAllocateApply.changeApplyType(applyNo,applyType);
+    }
+
 }

@@ -117,7 +117,7 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
     }
 
     /**
-     *  申请撤销
+     *  申请撤销（更改退换货类型用）
      * @param applyNo 申请单编号
      * @author weijb
      * @date 2018-08-11 13:35:41

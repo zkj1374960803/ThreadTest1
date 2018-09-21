@@ -3,9 +3,12 @@ package com.ccbuluo.business.platform.allocateapply.service;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.OrganizationTypeEnum;
+import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.ProblemAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
+import com.ccbuluo.business.platform.allocateapply.service.applyhandle.BarterApplyHandleStrategy;
+import com.ccbuluo.business.platform.allocateapply.service.applyhandle.RefundApplyHandleStrategy;
 import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
 import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dto.StockDetailDTO;
@@ -27,6 +30,8 @@ import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,6 +65,10 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
     private BasicUserOrganizationService basicUserOrganizationService;
     @Resource
     ProblemStockDetailDao problemStockDetailDao;
+    @Resource
+    private RefundApplyHandleStrategy refundApplyHandleStrategy;
+    @Resource
+    private BarterApplyHandleStrategy barterApplyHandleStrategy;
 
     /**
      * 问题件申请列表
@@ -280,6 +289,38 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             operatorName = resolve.getData().getName();
         }
         return operatorName;
+    }
+
+    /**
+     * 更改退换货类型
+     * @param applyNo 申请单号
+     * @param applyType 申请类型
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-09-21 19:02:58
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public StatusDto changeApplyType(String applyNo, String applyType){
+        // 根据申请单获取申请单详情 TODO 本期先不做
+        BizAllocateApply ba = bizAllocateApplyDao.getByNo(applyNo);
+        if(null == ba || StringUtils.isNotBlank(applyType)){
+            throw new CommonException(Constants.ERROR_CODE, "不存在的申请单！");
+        }
+        // 退款
+        if(BizAllocateApply.AllocateApplyTypeEnum.REFUND.name().equals(applyType)){
+            // 先清理换货的数据
+            barterApplyHandleStrategy.cancelApply(applyNo);
+            refundApplyHandleStrategy.applyHandle(ba);
+
+        }
+        // 换货
+        if(BizAllocateApply.AllocateApplyTypeEnum.BARTER.name().equals(applyType)){
+            // 先清理退款的数据
+            refundApplyHandleStrategy.cancelApply(applyNo);
+            barterApplyHandleStrategy.applyHandle(ba);
+        }
+        return StatusDto.buildSuccessStatusDto("更改成功！");
     }
 
 }
