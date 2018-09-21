@@ -361,10 +361,7 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         for(BizStockDetail bd : stockDetails){
             for(RelOrdstockOccupy roo : list){
                 if(bd.getId().intValue() == roo.getStockId().intValue()){
-                    if(bd.getValidStock() != null && roo.getOccupyNum() != null && bd.getOccupyStock() != null){
-                        bd.setValidStock(bd.getValidStock() + roo.getOccupyNum());//具体到某一条库存明细id，所被占用的数量（更新的时候要加上原来的数量）
-                        bd.setOccupyStock(bd.getOccupyStock() - roo.getOccupyNum());// 占用的库存也要减去当时的占用记录
-                    }
+                    bd.setOccupyStock(roo.getOccupyNum());// 占用的库存也要减去当时的占用记录
                 }
             }
         }

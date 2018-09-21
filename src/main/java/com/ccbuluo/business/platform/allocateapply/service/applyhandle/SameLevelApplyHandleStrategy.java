@@ -160,7 +160,7 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
                 //根据订单占用库存关系构建库存list
                 List<BizStockDetail> stockDetails = buildBizStockDetail(list);
                 // 还原被占用的库存
-                int flag = bizStockDetailDao.batchUpdateStockDetil(stockDetails);
+                int flag = bizStockDetailDao.batchReductionStockDetil(stockDetails);
                 if(flag == 0){// 更新失败
                     throw new CommonException("0", "还原占用库存失败！");
                 }

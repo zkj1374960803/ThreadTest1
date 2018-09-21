@@ -41,9 +41,9 @@ base:
   #本系统域名
   url: http://localhost:15201
   #本系统的appid
-  appid: c873890d60ad4e8c92705d4872ccac90
+  appid: 41f8d25f461e471cb8ffb756012a4f36
   #本系统的secret
-  secret: 883c12f76921465aa5bfb74e9d9ac9cc
+  secret: a71797ae9cd64a0eb622ba2f0735f3e4
   #售后系统顶级机构编号
   topplatform: "SC000001"
   #顶级服务中心code
@@ -78,9 +78,9 @@ verification:
 #dev开发环境中配置默认登录用户:
 dev-default:
   #是否开启自动登录 只要有值即可!
-#  needLogin: need
-  username: "FO00000135"
-  password: "FO00000135"
+  #needLogin: need
+  username: "SC00000118"
+  password: "SC00000118"
 
 
 
