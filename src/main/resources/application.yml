@@ -6,3 +6,7 @@ spring:
 #根据环境读取logback配置文件名
 logging:
   config: classpath:logback/logback-${spring.profiles.active}.xml
+
+#不需要拦截卡登录的http接口url
+auth:
+  exclution: /carmanage/basiccarcoreinfo/getcarinfobyvin,/carmanage/basiccarcoreinfo/batchupdatecarcoreinfobyvin
