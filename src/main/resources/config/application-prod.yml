@@ -1,1 +1,103 @@
 #生产环境 配置文件
+#开发环境 配置文件
+server:
+  port: 8093
+  maxPostSize: 20971520
+
+#tomcatJdbc 配置信息
+spring:
+  datasource:
+    url: jdbc:mysql://192.168.0.94:3306/aftersale_repairing_platform?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&allowMultiQueries=true&useSSL=false
+    driver-class-name: com.mysql.jdbc.Driver
+    username: test_app
+    password: test1234
+
+
+#jedis配置
+redis:
+  database: 0
+  host:  192.168.0.54
+  port: 6379
+  password: zhtqc$123456
+
+  #集群配置
+  cluster:
+    #多个节点以逗号分隔
+    clusterNodes: 192.168.0.54:6379,192.168.0.54:6380,192.168.0.54:6381,192.168.0.54:6382,192.168.0.54:6383,192.168.0.54:6384
+    password: zhtqc$123456
+
+  perfix:
+    projectcode: serviceprod:projectcode
+
+#单点登录相关配置
+oauth:
+  center:
+    #认证中心路径
+    url:  http://172.16.25.72:8081
+
+
+#本系统相关配置
+base:
+  #本系统域名
+  url: logintest.ccbuluo.cn
+  #本系统的appid
+  appid: 41f8d25f461e471cb8ffb756012a4f36
+  #本系统的secret
+  secret: a71797ae9cd64a0eb622ba2f0735f3e4
+  #售后系统顶级机构编号
+  topplatform: "SC000001"
+  #顶级服务中心code
+  topservicecenter: "SC000002"
+  #客户经理组织机构
+  custmanager: "SC000003"
+  #客户经理角色code
+  custmanagerrolecode: "JS024"
+
+  #小程序基础相关配置
+  mini:
+    #小程序appid [必须]
+    appid: wxc85f2eccf731433a
+    #小程序秘钥   [必须]
+    secret: e45950b1658681e996c95a509e9c455d
+    #小程序对应 商户id [可选]
+    mchId: mchId
+    #小程序对应 商户秘钥 [可选]
+    mchKey: mchKey
+
+
+cookie:
+  #cookie的domain,设置访问域
+  #domain: ccbuluo.cn
+
+#验证码配置
+verification:
+  #本系统是否开启验证码校验,有值且为true时,有效
+  check: false
+
+
+#dev开发环境中配置默认登录用户:
+dev-default:
+  #是否开启自动登录 只要有值即可!
+  #needLogin: need
+  username: "ZHT0007"
+  password: "123456"
+#文件上传目录
+oss:
+  bucket-name: zht-test-nosec
+
+
+#swagger相关配置
+swagger:
+  basePackage: com.ccbuluo
+  title: 售后服务平台PC端接口
+  version: 1.0.0
+  description: 售后服务平台PC端api
+
+#thrift微服务配置
+ccbuluo:
+  thrift:
+    service:
+      basePackages: com
+    zookeeper:
+      server: 192.168.0.54:2181
+
