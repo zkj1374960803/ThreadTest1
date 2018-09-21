@@ -314,7 +314,7 @@ public class RefundStockInOutCallBack implements StockInOutCallBack{
                     // 成本价
                     outstockplanSeller.setCostPrice(stockDetail.getCostPrice());
                     // 交易类型
-                    outstockplanSeller.setOutstockType(OutstockTypeEnum.TRANSFER.toString());
+                    outstockplanSeller.setOutstockType(OutstockTypeEnum.REFUND.toString());
                     // 未执行
                     outstockplanSeller.setPlanStatus(StockPlanStatusEnum.DOING.toString());
                     outList.add(outstockplanSeller);
