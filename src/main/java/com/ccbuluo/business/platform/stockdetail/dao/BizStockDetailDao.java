@@ -201,6 +201,18 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
     }
 
     /**
+     * 根据仓库明细id更新仓库的有效库存和占用库存
+     * @param stockDetailList 仓库详情list
+     * @exception
+     * @author weijb
+     * @date 2018-08-08 19:59:51
+     */
+    public int batchReductionStockDetil(List<BizStockDetail> stockDetailList){
+        String sql = "update biz_stock_detail set valid_stock= IFNULL(valid_stock, 0) + :occupyStock, occupy_stock= IFNULL(occupy_stock, 0) - :occupyStock, version_no=version_no+1 where version_no=:versionNo and id=:id";
+        return batchUpdateForListBean(sql, stockDetailList);
+    }
+
+    /**
      * 根据ids查询list
      * @param sList id list
      * @exception
@@ -316,7 +328,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         param.put("orgCode", orgCode);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,product_no,product_type,valid_stock,version_no FROM biz_stock_detail WHERE product_no = :productNo AND org_no = :orgCode ORDER BY create_time DESC");
+        sql.append("SELECT id,product_no,product_type,IFNULL(valid_stock,0) AS validStock,version_no FROM biz_stock_detail WHERE product_no = :productNo AND org_no = :orgCode ORDER BY create_time DESC");
 
         return queryListBean(BizStockDetail.class, sql.toString(), param);
     }

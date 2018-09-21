@@ -341,7 +341,7 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
         sql.append("SELECT order_status FROM biz_service_order WHERE 1=1");
         if (StringUtils.isNotBlank(reportOrgno)) {
             params.put("reportOrgno", reportOrgno);
-            sql.append(" AND bso.customer_orgno = :reportOrgno");
+            sql.append(" AND customer_orgno = :reportOrgno");
         }
 
         return queryListBean(BizServiceOrder.class, sql.toString(), params);

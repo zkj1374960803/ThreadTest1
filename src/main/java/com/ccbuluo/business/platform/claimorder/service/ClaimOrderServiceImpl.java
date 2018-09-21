@@ -232,7 +232,7 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
         List<QueryClaimorderListDTO> rows = queryClaimorderListDTOPage.getRows();
         if(rows != null && rows.size() > 0){
             Map<String,Long> map = rows.stream().collect(Collectors.groupingBy(QueryClaimorderListDTO::getDocStatus,Collectors.counting()));
-            map.put("ALL", (long)rows.size());
+            map.put("ALL", (long) rows.size());
             map.forEach(statusMap::put);
         }
         return statusMap;
@@ -321,7 +321,7 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
         BusinessUser loggedUser = userHolder.getLoggedUser();
         Organization organization = loggedUser.getOrganization();
         String orgCode = organization.getOrgCode();
-        // 如果时平台的话，查询所有的索赔单
+        // 如果是平台的话，查询所有待提交之后的状态的索赔单
         if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(orgCode)){
             orgCode = null;
         }
