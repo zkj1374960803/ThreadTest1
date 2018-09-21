@@ -1115,6 +1115,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         map.put(BizServiceOrder.OrderStatusEnum.WAITING_PAYMENT.name(), 0L);
         map.put(BizServiceOrder.OrderStatusEnum.COMPLETED.name(), 0L);
         map.put(BizServiceOrder.OrderStatusEnum.CANCELED.name(), 0L);
+        map.put("all", 0L);
         return map;
     }
 
