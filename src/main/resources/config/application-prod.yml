@@ -83,7 +83,7 @@ dev-default:
   password: "123456"
 #文件上传目录
 oss:
-  bucket-name: zht-test-nosec
+  bucket-name: zht-prod-nosec
 
 
 #swagger相关配置
