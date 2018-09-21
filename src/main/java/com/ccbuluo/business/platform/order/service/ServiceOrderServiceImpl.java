@@ -924,6 +924,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
                     // 库存编号id
                     outPlan.setStockId(stock.getId());
                     outPlan.setCostPrice(stock.getCostPrice());
+                    outPlan.setOutstockType(OutstockTypeEnum.SERVICEORDER.name());
                     outStockList.add(outPlan);
                     continue;
                 }

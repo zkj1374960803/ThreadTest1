@@ -13,6 +13,7 @@ import com.ccbuluo.business.platform.maintaincar.dto.ListServiceMaintaincarDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.constants.SystemPropertyHolder;
+import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
@@ -52,7 +53,7 @@ public class BasicCarcoreInfoServiceImpl  implements BasicCarcoreInfoService{
     private UserHolder userHolder;
     @Autowired
     BasicCarseriesManageDao basicCarseriesManageDao;
-    @Resource
+    @ThriftRPCClient("UserCoreSerService")
     private InnerUserInfoService innerUserInfoService;
     @Resource
     private GenerateProjectCodeService generateProjectCodeService;
