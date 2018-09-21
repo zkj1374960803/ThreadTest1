@@ -321,9 +321,10 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
         BusinessUser loggedUser = userHolder.getLoggedUser();
         Organization organization = loggedUser.getOrganization();
         String orgCode = organization.getOrgCode();
-        // 如果时平台的话，查询所有的索赔单
+        // 如果是平台的话，查询所有待提交之后的状态的索赔单
         if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(orgCode)){
             orgCode = null;
+
         }
         return claimOrderDao.queryClaimorderList(claimOrdno, keyword, docStatus, orgCode, offset, pageSize);
     }

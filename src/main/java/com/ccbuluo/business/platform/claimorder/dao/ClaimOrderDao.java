@@ -138,6 +138,8 @@ public class ClaimOrderDao extends BaseDao<ClaimOrderDao> {
         if(StringUtils.isNotBlank(userOrgCode)){
             map.put("userOrgCode", userOrgCode);
             sql.append(" AND a.claim_orgno = :userOrgCode ");
+            map.put("docStatusList", List.of(BizServiceClaimorder.DocStatusEnum.PENDINGSUBMISSION.name()));
+            sql.append(" AND a.doc_status not in (:docStatusList)");
         }
         if(StringUtils.isNotBlank(claimOrdno)){
             map.put("claimOrdno", claimOrdno);
