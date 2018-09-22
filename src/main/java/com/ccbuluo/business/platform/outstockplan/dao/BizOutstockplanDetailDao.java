@@ -125,7 +125,10 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
      * @date 2018-08-09 14:38:57
      */
     public List<BizOutstockplanDetail> getOutstockplansByApplyNo(String applyNo,String applyorgNo) {
+
         Map<String, Object> params = Maps.newHashMap();
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT a.id,a.outstock_type,a.stock_id,a.product_no,a.product_type,a.trade_no,")
             .append("a.supplier_no,a.apply_detail_id,a.cost_price,a.sales_price,a.out_repository_no,")
@@ -133,7 +136,7 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
             .append("a.creator,a.create_time,a.operator,a.operate_time,a.delete_flag,a.remark,a.version_no,")
             .append("a.product_categoryname,a.out_orgno,a.stock_type,b.supplier_name,a.product_name,a.product_unit FROM biz_outstockplan_detail a ")
             .append(" left join biz_service_supplier b on a.supplier_no = b.supplier_code ")
-            .append("WHERE 1 = 1 ");
+            .append("WHERE a.delete_flag = :deleteFlag ");
         if(StringUtils.isNotBlank(applyNo)){
             params.put("applyNo", applyNo);
             sql.append(" AND a.trade_no= :applyNo ");

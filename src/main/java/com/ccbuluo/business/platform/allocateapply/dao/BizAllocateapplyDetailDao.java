@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.dao;
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.constants.StockPlanStatusEnum;
 import com.ccbuluo.business.custmanager.allocateapply.dto.QueryPendingMaterialsDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
@@ -157,7 +158,8 @@ public class BizAllocateapplyDetailDao extends BaseDao<AllocateapplyDetailDTO> {
             .append(" FROM biz_instockplan_detail a LEFT JOIN biz_allocate_apply b ON a.trade_no = b.apply_no ")
             .append(" LEFT JOIN biz_service_supplier c ON a.supplier_no = c.supplier_code ")
             .append(" WHERE  a.product_type = :productType ");
-
+        map.put("completeStatusList", List.of(StockPlanStatusEnum.COMPLETE.name(),StockPlanStatusEnum.DOING.name()));
+        sql.append(" AND a.complete_status in (:completeStatusList) ");
         if(StringUtils.isNotBlank(loggedUserId)){
             map.put("applyer", loggedUserId);
             sql.append(" AND b.applyer = :applyer ");
