@@ -5,6 +5,7 @@ import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.ProblemAllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
 import com.ccbuluo.db.Page;
+import com.ccbuluo.http.StatusDto;
 
 /**
  * 功能描述（1）
@@ -68,4 +69,13 @@ public interface ProblemAllocateApply {
      * @date 2018-08-20 20:02:58
      */
     FindAllocateApplyDTO getProblemdetailDetail(String applyNo);
+    /**
+     * 更改退换货类型
+     * @param applyNo 申请单号
+     * @param applyType 申请类型
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-09-21 19:02:58
+     */
+    StatusDto changeApplyType(String applyNo, String applyType);
 }
