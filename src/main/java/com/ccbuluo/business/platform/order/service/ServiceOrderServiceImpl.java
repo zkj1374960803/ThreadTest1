@@ -1120,4 +1120,42 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         return map;
     }
 
+    /**
+     * 维修单取消
+     * @param serviceOrderno 维修单编号
+     * @return 修改是否成功
+     * @author weijb
+     * @date 2018-09-22 18:41:58
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public StatusDto cancelApply(String serviceOrderno){
+        // 恢复库存
+            // 删除关联关系
+            bizAllocateTradeorderDao.deleteRelation(serviceOrderno);
+        // 更改维修单状态
+        bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.CANCELED.name());
+        return StatusDto.buildSuccessStatusDto("取消成功！");
+    }
+
+    private void regainStock(String serviceOrderno){
+        // 查询关联关系
+        List<RelOrdstockOccupy> relOrdstockOccupyByApplyNo = bizAllocateTradeorderDao.getRelOrdstockOccupyByApplyNo(serviceOrderno);
+        List<BizStockDetail> bizStockDetailList = Lists.newArrayList();
+        if (!relOrdstockOccupyByApplyNo.isEmpty()) {
+            relOrdstockOccupyByApplyNo.forEach(item -> {
+                BizStockDetail bizStockDetail = new BizStockDetail();
+                bizStockDetail.setId(item.getStockId());
+                bizStockDetail.setValidStock(item.getOccupyNum());
+                bizStockDetail.setOccupyStock(item.getOccupyNum());
+                bizStockDetailList.add(bizStockDetail);
+            });
+            // 还库存
+            int i = bizStockDetailDao.updateValidAndOccupy(bizStockDetailList);
+            if (i != bizStockDetailList.size()) {
+                throw new CommonException("3004", "库存归还失败！");
+            }
+        }
+    }
+
 }
