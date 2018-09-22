@@ -1131,8 +1131,9 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     @Transactional(rollbackFor = Exception.class)
     public StatusDto cancelApply(String serviceOrderno){
         // 恢复库存
-            // 删除关联关系
-            bizAllocateTradeorderDao.deleteRelation(serviceOrderno);
+        regainStock(serviceOrderno);
+        // 删除关联关系
+        bizAllocateTradeorderDao.deleteRelation(serviceOrderno);
         // 更改维修单状态
         bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.CANCELED.name());
         return StatusDto.buildSuccessStatusDto("取消成功！");
