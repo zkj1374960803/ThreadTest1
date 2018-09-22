@@ -692,31 +692,25 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      * @date 2018-09-04 14:39:36
      */
     private void buildEditBizServiceOrder(EditServiceOrderDTO editServiceOrderDTO) {
-        BizServiceOrder bizServiceOrder = new BizServiceOrder();
-        bizServiceOrder.setServiceOrderno(editServiceOrderDTO.getServiceOrderno());
-        bizServiceOrder.setCarNo(editServiceOrderDTO.getCarNo());
-        bizServiceOrder.setCarVin(editServiceOrderDTO.getCarVin());
-        bizServiceOrder.setServiceType(editServiceOrderDTO.getServiceType());
-        bizServiceOrder.setCustomerName(editServiceOrderDTO.getCustomerName());
-        bizServiceOrder.setCustomerPhone(editServiceOrderDTO.getCustomerPhone());
-        bizServiceOrder.setCustomerOrgno(editServiceOrderDTO.getCustomerOrgno());
-        bizServiceOrder.setReserveContacter(editServiceOrderDTO.getReserveContacter());
-        bizServiceOrder.setReservePhone(editServiceOrderDTO.getReservePhone());
-        // 根据车牌号查询该车属于哪个机构
-        String uuid = basicCarcoreInfoService.getUuidByPlateNum(editServiceOrderDTO.getCarNo());
-        if (StringUtils.isBlank(uuid)) {
-            throw new CommonException("3001", "该车辆没有被分配到客户经理，请核对！");
+        // 根据单号查询维修单
+        BizServiceOrder bizServiceOrder = bizServiceOrderDao.getByOrderNo(editServiceOrderDTO.getServiceOrderno());
+        if (null == bizServiceOrder) {
+            throw new CommonException("3011", "未查询到该维修单，请核对！");
+        } else {
+            bizServiceOrder.setServiceOrderno(editServiceOrderDTO.getServiceOrderno());
+            bizServiceOrder.setCarNo(editServiceOrderDTO.getCarNo());
+            bizServiceOrder.setCarVin(editServiceOrderDTO.getCarVin());
+            bizServiceOrder.setServiceType(editServiceOrderDTO.getServiceType());
+            bizServiceOrder.setCustomerName(editServiceOrderDTO.getCustomerName());
+            bizServiceOrder.setCustomerPhone(editServiceOrderDTO.getCustomerPhone());
+            bizServiceOrder.setCustomerOrgno(editServiceOrderDTO.getCustomerOrgno());
+            bizServiceOrder.setReserveContacter(editServiceOrderDTO.getReserveContacter());
+            bizServiceOrder.setReservePhone(editServiceOrderDTO.getReservePhone());
+            bizServiceOrder.setServiceTime(editServiceOrderDTO.getServiceTime());
+            bizServiceOrder.setProblemContent(editServiceOrderDTO.getProblemContent());
+            bizServiceOrder.preUpdate(userHolder.getLoggedUserId());
+            bizServiceOrderDao.updateBizServiceOrder(bizServiceOrder);
         }
-        bizServiceOrder.setCurProcessor(uuid);
-        // 根据用户uuid查询用户机构类型
-        StatusDtoThriftBean<UserInfoDTO> userDetail = innerUserInfoService.findUserDetail(uuid);
-        UserInfoDTO data = StatusDtoThriftUtils.resolve(userDetail, UserInfoDTO.class).getData();
-        bizServiceOrder.setProcessorOrgtype(data.getOrgType());
-        bizServiceOrder.setProcessorOrgno(data.getOrgCode());
-        bizServiceOrder.setServiceTime(editServiceOrderDTO.getServiceTime());
-        bizServiceOrder.setProblemContent(editServiceOrderDTO.getProblemContent());
-        bizServiceOrder.preUpdate(userHolder.getLoggedUserId());
-        bizServiceOrderDao.updateBizServiceOrder(bizServiceOrder);
         BizServiceLog bizServiceLog = new BizServiceLog();
         bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
         bizServiceLog.setAction(BizServiceLog.actionEnum.UPDATE.name());
