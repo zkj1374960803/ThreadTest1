@@ -142,6 +142,9 @@ public class StockAdjustServiceImpl implements StockAdjustService{
      @Transactional(rollbackFor = Exception.class)
      public StatusDto save(SaveBizStockAdjustDTO saveBizStockAdjustDTO) {
           try {
+              if (null == saveBizStockAdjustDTO.getBizStockAdjustdetailList() || saveBizStockAdjustDTO.getBizStockAdjustdetailList().size() == 0) {
+                  return StatusDto.buildFailure("无需要盘库的数据，无法生存盘库单！");
+              }
                // 1、保存盘库单
                // 生成盘库单号
                String adjustNo = null;
