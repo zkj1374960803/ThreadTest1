@@ -343,8 +343,7 @@ public class ServiceOrderController extends BaseController {
      * @date 2018-09-22 18:41:58
      */
     @ApiOperation(value = "维修单取消", notes = "【魏俊标】")
-    @ApiImplicitParams({@ApiImplicitParam(name = "serviceOrderno", value = "维修单编号",  required = true, paramType = "query"),
-            @ApiImplicitParam(name = "orderStatus", value = "维修单类型",  required = true, paramType = "query")})
+    @ApiImplicitParam(name = "serviceOrderno", value = "维修单编号",  required = true, paramType = "query")
     @PostMapping("/cancelserviceorder")
     public StatusDto cancelApply(@RequestParam String serviceOrderno) {
         return serviceOrderService.cancelApply(serviceOrderno);
