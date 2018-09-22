@@ -1124,6 +1124,16 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public StatusDto cancelApply(String serviceOrderno){
+        BizServiceOrder serviceOrder = bizServiceOrderDao.getByOrderNo(serviceOrderno);
+        // 取消防护
+        boolean flag = false;
+        flag = serviceOrder.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.WAITING_RECEIVE.name())
+                || serviceOrder.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.WAITING_PERFECTION.name())
+                || serviceOrder.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.PROCESSING.name());
+        if (! flag) {
+            BizServiceOrder.OrderStatusEnum statusEnum = BizServiceOrder.OrderStatusEnum.valueOf(serviceOrder.getOrderStatus());
+            throw new CommonException("0", statusEnum.getLabel()+"状态不能取消！");
+        }
         // 恢复库存
         regainStock(serviceOrderno);
         // 删除关联关系
