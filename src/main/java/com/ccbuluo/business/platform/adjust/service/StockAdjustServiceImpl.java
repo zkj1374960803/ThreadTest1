@@ -263,6 +263,23 @@ public class StockAdjustServiceImpl implements StockAdjustService{
     }
 
     /**
+     * 根据零配件分类code查询零配件
+     * @param categoryCode 零配件分类code
+     * @return 零配件类型集合
+     * @author liuduo
+     * @date 2018-08-15 09:16:23
+     */
+    @Override
+    public List<StockAdjustListDTO> queryProductByCode(String categoryCode) {
+        List<BasicCarpartsProductDTO> basicCarpartsProductDTOS = carpartsProductService.queryCarpartsProductListByCategoryCode(categoryCode);
+        if (null == basicCarpartsProductDTOS || basicCarpartsProductDTOS.size() == 0) {
+            return Lists.newArrayList();
+        }
+        List<String> carparts = basicCarpartsProductDTOS.stream().map(BasicCarpartsProductDTO::getCarpartsCode).collect(Collectors.toList());
+        return stockDetailService.queryAdjustList(carparts, userHolder.getLoggedUser().getOrganization().getOrgCode(), Constants.PRODUCT_TYPE_FITTINGS);
+    }
+
+    /**
      * 盘库单列表数据组装
      * @param adjustResult 盘库结果
      * @param adjustSource 盘库单来源
