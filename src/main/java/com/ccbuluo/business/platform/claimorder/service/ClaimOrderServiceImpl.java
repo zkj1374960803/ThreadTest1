@@ -82,12 +82,12 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
     private BasicUserOrganizationService basicUserOrganizationService;
     @ThriftRPCClient("UserCoreSerService")
     BasicUserWorkplaceService basicUserWorkplaceService;
-    @Autowired
-    private ServiceLogService serviceLogService;
     @ThriftRPCClient("UserCoreSerService")
     private InnerUserInfoService innerUserInfoService;
     @Resource
     private BizServiceCustmanagerDao bizServiceCustmanagerDao;
+    @Autowired
+    private ServiceLogService serviceLogService;
 
     /**
      * 生成索赔单
