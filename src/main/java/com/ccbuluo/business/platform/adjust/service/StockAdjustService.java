@@ -85,4 +85,13 @@ public interface StockAdjustService {
      * @date 2018-08-15 14:37:37
      */
     StockAdjustDetailDTO getByAdjustNo(String adjustNo);
+
+    /**
+     * 根据零配件分类code查询零配件
+     * @param categoryCode 零配件分类code
+     * @return 零配件类型集合
+     * @author liuduo
+     * @date 2018-08-15 09:16:23
+     */
+    List<StockAdjustListDTO> queryProductByCode(String categoryCode);
 }

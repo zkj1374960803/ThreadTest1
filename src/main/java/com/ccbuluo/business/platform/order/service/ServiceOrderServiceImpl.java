@@ -692,31 +692,25 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      * @date 2018-09-04 14:39:36
      */
     private void buildEditBizServiceOrder(EditServiceOrderDTO editServiceOrderDTO) {
-        BizServiceOrder bizServiceOrder = new BizServiceOrder();
-        bizServiceOrder.setServiceOrderno(editServiceOrderDTO.getServiceOrderno());
-        bizServiceOrder.setCarNo(editServiceOrderDTO.getCarNo());
-        bizServiceOrder.setCarVin(editServiceOrderDTO.getCarVin());
-        bizServiceOrder.setServiceType(editServiceOrderDTO.getServiceType());
-        bizServiceOrder.setCustomerName(editServiceOrderDTO.getCustomerName());
-        bizServiceOrder.setCustomerPhone(editServiceOrderDTO.getCustomerPhone());
-        bizServiceOrder.setCustomerOrgno(editServiceOrderDTO.getCustomerOrgno());
-        bizServiceOrder.setReserveContacter(editServiceOrderDTO.getReserveContacter());
-        bizServiceOrder.setReservePhone(editServiceOrderDTO.getReservePhone());
-        // 根据车牌号查询该车属于哪个机构
-        String uuid = basicCarcoreInfoService.getUuidByPlateNum(editServiceOrderDTO.getCarNo());
-        if (StringUtils.isBlank(uuid)) {
-            throw new CommonException("3001", "该车辆没有被分配到客户经理，请核对！");
+        // 根据单号查询维修单
+        BizServiceOrder bizServiceOrder = bizServiceOrderDao.getByOrderNo(editServiceOrderDTO.getServiceOrderno());
+        if (null == bizServiceOrder) {
+            throw new CommonException("3011", "未查询到该维修单，请核对！");
+        } else {
+            bizServiceOrder.setServiceOrderno(editServiceOrderDTO.getServiceOrderno());
+            bizServiceOrder.setCarNo(editServiceOrderDTO.getCarNo());
+            bizServiceOrder.setCarVin(editServiceOrderDTO.getCarVin());
+            bizServiceOrder.setServiceType(editServiceOrderDTO.getServiceType());
+            bizServiceOrder.setCustomerName(editServiceOrderDTO.getCustomerName());
+            bizServiceOrder.setCustomerPhone(editServiceOrderDTO.getCustomerPhone());
+            bizServiceOrder.setCustomerOrgno(editServiceOrderDTO.getCustomerOrgno());
+            bizServiceOrder.setReserveContacter(editServiceOrderDTO.getReserveContacter());
+            bizServiceOrder.setReservePhone(editServiceOrderDTO.getReservePhone());
+            bizServiceOrder.setServiceTime(editServiceOrderDTO.getServiceTime());
+            bizServiceOrder.setProblemContent(editServiceOrderDTO.getProblemContent());
+            bizServiceOrder.preUpdate(userHolder.getLoggedUserId());
+            bizServiceOrderDao.updateBizServiceOrder(bizServiceOrder);
         }
-        bizServiceOrder.setCurProcessor(uuid);
-        // 根据用户uuid查询用户机构类型
-        StatusDtoThriftBean<UserInfoDTO> userDetail = innerUserInfoService.findUserDetail(uuid);
-        UserInfoDTO data = StatusDtoThriftUtils.resolve(userDetail, UserInfoDTO.class).getData();
-        bizServiceOrder.setProcessorOrgtype(data.getOrgType());
-        bizServiceOrder.setProcessorOrgno(data.getOrgCode());
-        bizServiceOrder.setServiceTime(editServiceOrderDTO.getServiceTime());
-        bizServiceOrder.setProblemContent(editServiceOrderDTO.getProblemContent());
-        bizServiceOrder.preUpdate(userHolder.getLoggedUserId());
-        bizServiceOrderDao.updateBizServiceOrder(bizServiceOrder);
         BizServiceLog bizServiceLog = new BizServiceLog();
         bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
         bizServiceLog.setAction(BizServiceLog.actionEnum.UPDATE.name());
@@ -1118,6 +1112,55 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         map.put(BizServiceOrder.OrderStatusEnum.CANCELED.name(), 0L);
         map.put("all", 0L);
         return map;
+    }
+
+    /**
+     * 维修单取消
+     * @param serviceOrderno 维修单编号
+     * @return 修改是否成功
+     * @author weijb
+     * @date 2018-09-22 18:41:58
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public StatusDto cancelApply(String serviceOrderno){
+        BizServiceOrder serviceOrder = bizServiceOrderDao.getByOrderNo(serviceOrderno);
+        // 取消防护
+        boolean flag = false;
+        flag = serviceOrder.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.WAITING_RECEIVE.name())
+                || serviceOrder.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.WAITING_PERFECTION.name())
+                || serviceOrder.getOrderStatus().equals(BizServiceOrder.OrderStatusEnum.PROCESSING.name());
+        if (! flag) {
+            BizServiceOrder.OrderStatusEnum statusEnum = BizServiceOrder.OrderStatusEnum.valueOf(serviceOrder.getOrderStatus());
+            throw new CommonException("0", statusEnum.getLabel()+"状态不能取消！");
+        }
+        // 恢复库存
+        regainStock(serviceOrderno);
+        // 删除关联关系
+        bizAllocateTradeorderDao.deleteRelation(serviceOrderno);
+        // 更改维修单状态
+        bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.CANCELED.name());
+        return StatusDto.buildSuccessStatusDto("取消成功！");
+    }
+
+    private void regainStock(String serviceOrderno){
+        // 查询关联关系
+        List<RelOrdstockOccupy> relOrdstockOccupyByApplyNo = bizAllocateTradeorderDao.getRelOrdstockOccupyByApplyNo(serviceOrderno);
+        List<BizStockDetail> bizStockDetailList = Lists.newArrayList();
+        if (!relOrdstockOccupyByApplyNo.isEmpty()) {
+            relOrdstockOccupyByApplyNo.forEach(item -> {
+                BizStockDetail bizStockDetail = new BizStockDetail();
+                bizStockDetail.setId(item.getStockId());
+                bizStockDetail.setValidStock(item.getOccupyNum());
+                bizStockDetail.setOccupyStock(item.getOccupyNum());
+                bizStockDetailList.add(bizStockDetail);
+            });
+            // 还库存
+            int i = bizStockDetailDao.updateValidAndOccupy(bizStockDetailList);
+            if (i != bizStockDetailList.size()) {
+                throw new CommonException("3004", "库存归还失败！");
+            }
+        }
     }
 
 }
