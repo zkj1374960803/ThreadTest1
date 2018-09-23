@@ -982,7 +982,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.WAITING_PAYMENT.name());
             // 修改维修单状态
             // 记录日志
-            addlog(serviceOrderno,"验收完成",BizServiceLog.actionEnum.UPDATE.name());
+            addlog(serviceOrderno,"验收通过",BizServiceLog.actionEnum.UPDATE.name());
             return StatusDto.buildSuccessStatusDto("验收成功");
         } catch (Exception e) {
             throw new CommonException("0", "验收失败！");
