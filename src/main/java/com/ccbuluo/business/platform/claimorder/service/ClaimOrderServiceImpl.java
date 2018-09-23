@@ -8,6 +8,7 @@ import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.DocCodePrefixEnum;
 import com.ccbuluo.business.constants.OrganizationTypeEnum;
+import com.ccbuluo.business.entity.BizServiceLog;
 import com.ccbuluo.business.entity.BizServiceOrder;
 import com.ccbuluo.business.entity.BizServiceorderDetail;
 import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarmodelManageDao;
@@ -21,6 +22,7 @@ import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceorderDetailDao;
 import com.ccbuluo.business.platform.order.dto.ProductDetailDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
+import com.ccbuluo.business.platform.servicelog.service.ServiceLogService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.BusinessUser;
 import com.ccbuluo.core.entity.Organization;
@@ -84,6 +86,8 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
     private InnerUserInfoService innerUserInfoService;
     @Resource
     private BizServiceCustmanagerDao bizServiceCustmanagerDao;
+    @Autowired
+    private ServiceLogService serviceLogService;
 
     /**
      * 生成索赔单
@@ -443,6 +447,8 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
         if(statusDto.isSuccess()){
             // 更新索赔单状态和支付时间
             claimOrderDao.updateDocStatusAndRepayTime(claimOrdno, docStatus,actualAmount);
+            // 记录日志
+            addlog(claimOrdno,"平台支付索赔单费用", BizServiceLog.actionEnum.PAYMENT.name());
         }else{
             return statusDto;
         }
@@ -491,5 +497,24 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
         transaction.setTransactionTypeEnumThrift(TransactionTypeEnumThrift.THREE_PACK_SUPPLIER_REFUND);
         transaction.setCreator(userHolder.getLoggedUserId());
         return transaction;
+    }
+
+    /**
+     * 记录日志
+     * @param applyNo 申请单号
+     * @param content 日志内容
+     * @param action 动作
+     */
+    private void addlog(String applyNo,String content,String action){
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
+        bizServiceLog.setAction(action);
+        bizServiceLog.setSubjectType("ClaimOrderServiceImpl");
+        bizServiceLog.setSubjectKeyvalue(applyNo);
+        bizServiceLog.setLogContent(content);
+        bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+        bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+        serviceLogService.create(bizServiceLog);
     }
 }
