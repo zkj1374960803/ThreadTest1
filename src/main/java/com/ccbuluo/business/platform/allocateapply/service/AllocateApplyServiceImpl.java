@@ -769,7 +769,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     /**
      * 保存采购单
      *
-     * @param confirmationQuoteDTO@exception
+     * @param confirmationQuoteDTO
+     * @exception
      * @return
      * @author zhangkangjian
      * @date 2018-09-15 18:35:07
@@ -808,20 +809,17 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         if(StringUtils.isBlank(orgNo)){
             String type = findStockListDTO.getType();
             if(StringUtils.isBlank(type)){
-                Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, null);
-                return page;
+                return bizAllocateApplyDao.findStockList(findStockListDTO, productCode, null);
             }else {
                 orgCode = getOrgCodesByOrgType(type);
                 if(orgCode == null || orgCode.size() == 0){
                     return new Page<>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
                 }else {
-                    Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
-                    return page;
+                    return bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
                 }
             }
         }else {
-            Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
-            return page;
+            return bizAllocateApplyDao.findStockList(findStockListDTO, productCode, null);
         }
 
     }
@@ -902,10 +900,9 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      * @date 2018-08-24 17:37:13
      */
     @Override
-    public Map<String, String> findCustManagerServiceCenter(String useruuid) throws IOException {
+    public Map<String, String> findCustManagerServiceCenter(String useruuid) {
         if(StringUtils.isBlank(useruuid)){
-            String loggedUserId = userHolder.getLoggedUserId();
-            useruuid = loggedUserId;
+            useruuid = userHolder.getLoggedUserId();
         }
         HashMap<String, String> map = Maps.newHashMap();
         // 查询客户经理的详情
@@ -992,8 +989,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             return new Page<FindStockListDTO>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
         }
         String userOrgCode = getUserOrgCode();
-        Page<FindStockListDTO> page = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, List.of(userOrgCode));
-        return page;
+        return bizAllocateApplyDao.findStockList(findStockListDTO, productCode, List.of(userOrgCode));
     }
 
     /**
@@ -1051,7 +1047,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         String userOrgCode = getUserOrgCode();
         Page<FindStockListDTO> page = bizAllocateApplyDao.findAllEquipmentStockList(findStockListDTO, userOrgCode);
         Optional.ofNullable(page.getRows()).ifPresent(a ->{
-            a.stream().forEach(b -> {
+            a.forEach(b -> {
                 String unit = b.getUnit();
                 if(StringUtils.isNotBlank(unit)){
                     b.setUnit(ProductUnitEnum.valueOf(unit).getLabel());
@@ -1091,7 +1087,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     /**
      * 查询可调拨库存列表
      * @param orgDTO 查询条件
-     * @param productNo
+     * @param productNo 商品的编号
      * @return StatusDtoThriftPage<QueryOrgDTO>
      * @author zhangkangjian
      * @date 2018-08-13 17:19:54
@@ -1160,17 +1156,15 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
 
     /**
      * 库存校验
-     * @param checkStockQuantityDTO
-     * @exception
-     * @return
+     * @param checkStockQuantityDTO 库存实体
+     * @return StatusDto<List<ProductStockInfoDTO>>
      * @author zhangkangjian
      * @date 2018-08-15 14:10:42
      */
     @Override
     public StatusDto<List<ProductStockInfoDTO>> checkStockQuantity(CheckStockQuantityDTO checkStockQuantityDTO) {
         Map<String, Object> map = bizAllocateApplyDao.queryStockQuantity(checkStockQuantityDTO.getOutstockOrgno(), checkStockQuantityDTO.getSellerOrgno());
-        StatusDto<List<ProductStockInfoDTO>> listStatusDto = getListStatusDto(map, checkStockQuantityDTO.getProductInfoList());
-        return listStatusDto;
+        return getListStatusDto(map, checkStockQuantityDTO.getProductInfoList());
     }
 
     /**
@@ -1240,8 +1234,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }
         });
         List<ProductStockInfoDTO> allocateapplyDetailList = checkStockQuantityDTO.getProductInfoList();
-        StatusDto<List<ProductStockInfoDTO>> listStatusDto = getListStatusDto(map, allocateapplyDetailList);
-        return listStatusDto;
+        return getListStatusDto(map, allocateapplyDetailList);
     }
 
     /**
