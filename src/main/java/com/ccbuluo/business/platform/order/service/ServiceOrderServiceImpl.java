@@ -1175,9 +1175,9 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      */
     private void addlog(String applyNo,String content,String action){
         BizServiceLog bizServiceLog = new BizServiceLog();
-        bizServiceLog.setModel(BizServiceLog.modelEnum.ERP.name());
+        bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
         bizServiceLog.setAction(action);
-        bizServiceLog.setSubjectType("BizServiceOrder");
+        bizServiceLog.setSubjectType("ServiceOrderServiceImpl");
         bizServiceLog.setSubjectKeyvalue(applyNo);
         bizServiceLog.setLogContent(content);
         bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
