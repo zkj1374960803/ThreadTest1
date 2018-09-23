@@ -459,7 +459,7 @@ public class BasicCarcoreInfoDao extends BaseDao<CarcoreInfo> {
         sql.append("SELECT plate_number FROM basic_carcore_info WHERE 1 = 1");
         // 是门店
         if (statusFlagZero == Constants.STATUS_FLAG_ZERO) {
-            sql.append(" AND store_code = orgCode AND store_assigned = :storeAssigned");
+            sql.append(" AND store_code = :orgCode AND store_assigned = :storeAssigned");
         } else {
             sql.append(" AND cusmanager_uuid = :orgCode AND store_assigned = :storeAssigned");
         }
