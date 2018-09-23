@@ -849,7 +849,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             for (String orgCode : orderOrgNo){
                 List<String> codeList = getProductList(orderDetails);
                 // 根据卖方code和商品code（list）查出库存列表
-                List<BizStockDetail> stockDetails = bizStockDetailDao.getStockDetailListByOrgAndProduct(orgCode, codeList);
+                List<BizStockDetail> stockDetails = bizStockDetailDao.getStockDetailList(orgCode, codeList);
                 // 查询占用关系
                 List<RelOrdstockOccupy> relOrdstockOccupies = bizAllocateTradeorderDao.getRelOrdstockOccupyBy(orderNo,orgCode);
                 // 生成出库计划
