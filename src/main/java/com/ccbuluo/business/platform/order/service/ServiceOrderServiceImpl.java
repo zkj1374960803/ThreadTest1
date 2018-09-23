@@ -797,7 +797,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         bizServiceLog.setSubjectType("ServiceOrderServiceImpl");
         bizServiceLog.setSubjectKeyvalue(orderCode);
         if (loggedUser.getOrganization().getOrgType().equals(BizServiceOrder.ProcessorOrgtypeEnum.STORE.name())) {
-            bizServiceLog.setLogContent("提交保修");
+            bizServiceLog.setLogContent("提交报修");
         } else {
             bizServiceLog.setLogContent("新增维修单");
         }
@@ -943,10 +943,11 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             return flag;
         }
         for(BizOutstockplanDetail outPlan : outStockList){
-            flag = ro.getProductNo().equals(outPlan.getProductNo()) && ro.getSupplierNo().equals(outPlan.getSupplierNo()) && ro.getCostPrice().compareTo(outPlan.getCostPrice()) == 0;
+            boolean status = ro.getProductNo().equals(outPlan.getProductNo()) && ro.getSupplierNo().equals(outPlan.getSupplierNo()) && ro.getCostPrice().compareTo(outPlan.getCostPrice()) == 0;
             // 如果同一个商品的供应商和价格都相同，那么就合并
-            if(flag){
+            if(status){
                 outPlan.setPlanOutstocknum(outPlan.getPlanOutstocknum() + ro.getOccupyNum());
+                flag = true;
             }
         }
         return flag;
