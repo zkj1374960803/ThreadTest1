@@ -822,6 +822,8 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             buildOutstockplanAndOut(serviceOrderno);
             // 修改维修单状态(待验收)
             bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.WAITING_CHECKING.name());
+            // 记录日志
+            addlog(serviceOrderno,"提交验收",BizServiceLog.actionEnum.UPDATE.name());
             return StatusDto.buildSuccessStatusDto("提交成功");
         } catch (Exception e) {
             throw new CommonException("0", "提交失败！");
@@ -847,7 +849,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             for (String orgCode : orderOrgNo){
                 List<String> codeList = getProductList(orderDetails);
                 // 根据卖方code和商品code（list）查出库存列表
-                List<BizStockDetail> stockDetails = bizStockDetailDao.getStockDetailListByOrgAndProduct(orgCode, codeList);
+                List<BizStockDetail> stockDetails = bizStockDetailDao.getStockDetailList(orgCode, codeList);
                 // 查询占用关系
                 List<RelOrdstockOccupy> relOrdstockOccupies = bizAllocateTradeorderDao.getRelOrdstockOccupyBy(orderNo,orgCode);
                 // 生成出库计划
@@ -979,6 +981,8 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             // 验收完成
             bizServiceOrderDao.editStatus(serviceOrderno, BizServiceOrder.OrderStatusEnum.WAITING_PAYMENT.name());
             // 修改维修单状态
+            // 记录日志
+            addlog(serviceOrderno,"验收通过",BizServiceLog.actionEnum.UPDATE.name());
             return StatusDto.buildSuccessStatusDto("验收成功");
         } catch (Exception e) {
             throw new CommonException("0", "验收失败！");
@@ -1161,6 +1165,25 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
                 throw new CommonException("3004", "库存归还失败！");
             }
         }
+    }
+
+    /**
+     * 记录日志
+     * @param applyNo 申请单号
+     * @param content 日志内容
+     * @param action 动作
+     */
+    private void addlog(String applyNo,String content,String action){
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
+        bizServiceLog.setAction(action);
+        bizServiceLog.setSubjectType("ServiceOrderServiceImpl");
+        bizServiceLog.setSubjectKeyvalue(applyNo);
+        bizServiceLog.setLogContent(content);
+        bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+        bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+        serviceLogService.create(bizServiceLog);
     }
 
 }
