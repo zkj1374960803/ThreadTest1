@@ -797,7 +797,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         bizServiceLog.setSubjectType("ServiceOrderServiceImpl");
         bizServiceLog.setSubjectKeyvalue(orderCode);
         if (loggedUser.getOrganization().getOrgType().equals(BizServiceOrder.ProcessorOrgtypeEnum.STORE.name())) {
-            bizServiceLog.setLogContent("提交保修");
+            bizServiceLog.setLogContent("提交报修");
         } else {
             bizServiceLog.setLogContent("新增维修单");
         }
