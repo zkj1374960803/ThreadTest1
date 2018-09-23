@@ -378,7 +378,7 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
             // 更新索赔单状态和支付时间
             claimOrderDao.updateDocStatusAndRepayTime(claimOrdno, docStatus,actualAmount);
             // 记录日志
-            addlog(claimOrdno,"平台支付索赔单费用", BizServiceLog.actionEnum.UPDATE.name());
+            addlog(claimOrdno,"平台支付索赔单费用", BizServiceLog.actionEnum.PAYMENT.name());
         }else{
             return statusDto;
         }
