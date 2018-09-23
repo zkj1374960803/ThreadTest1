@@ -197,4 +197,13 @@ public interface ServiceOrderService {
      * @date 2018-09-19 17:21:44
      */
     Map<String, Long> queryStoreOrderStatusNum(String reportOrgno);
+
+    /**
+     * 维修单取消
+     * @param serviceOrderno 维修单编号
+     * @return 修改是否成功
+     * @author weijb
+     * @date 2018-09-22 18:41:58
+     */
+    StatusDto cancelApply(String serviceOrderno);
 }

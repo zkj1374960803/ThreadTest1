@@ -113,8 +113,8 @@ public class StockAdjustController extends BaseController {
     @ApiOperation(value = "根据零配件分类code查询零配件", notes = "【刘铎】")
     @ApiImplicitParam(name = "categoryCode", value = "零配件分类code", required = false, paramType = "query")
     @GetMapping("/queryproductbycode")
-    public StatusDto<List<BasicCarpartsProductDTO>> queryProductByCode(@RequestParam(required = false) String categoryCode) {
-        return StatusDto.buildDataSuccessStatusDto(carpartsProductService.queryCarpartsProductListByCategoryCode(categoryCode));
+    public StatusDto<List<StockAdjustListDTO>> queryProductByCode(@RequestParam(required = false) String categoryCode) {
+        return StatusDto.buildDataSuccessStatusDto(stockAdjustService.queryProductByCode(categoryCode));
     }
 
 
