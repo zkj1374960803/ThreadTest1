@@ -135,14 +135,29 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
     }
 
     /**
-     *  申请撤销
+     *  申请撤销（更改退换货类型用）
      * @param applyNo 申请单编号
      * @author weijb
      * @date 2018-08-11 13:35:41
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public StatusDto cancelApply(String applyNo){
-        return StatusDto.buildSuccessStatusDto("退换货没有撤销！");
+        try {
+            //删除订单占用关系
+            bizAllocateTradeorderDao.deleteRelOrdstockOccupyByApplyNo(applyNo);
+            // 删除订单
+            bizAllocateTradeorderDao.deleteAllocateTradeorderByApplyNo(applyNo);
+            // 删除出库计划
+            bizOutstockplanDetailDao.deleteOutstockplanDetailByApplyNo(applyNo);
+            // 删除入库计划
+            bizInstockplanDetailDao.batchInsertInstockplanDetail(applyNo);
+            //恢复自动出库的数据 TODO
+        } catch (Exception e) {
+            logger.error("撤销失败！", e);
+            throw e;
+        }
+        return StatusDto.buildSuccessStatusDto("执行完成！");
     }
 
     /**

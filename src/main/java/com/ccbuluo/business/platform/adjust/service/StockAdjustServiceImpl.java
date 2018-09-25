@@ -142,6 +142,9 @@ public class StockAdjustServiceImpl implements StockAdjustService{
      @Transactional(rollbackFor = Exception.class)
      public StatusDto save(SaveBizStockAdjustDTO saveBizStockAdjustDTO) {
           try {
+              if (null == saveBizStockAdjustDTO.getBizStockAdjustdetailList() || saveBizStockAdjustDTO.getBizStockAdjustdetailList().size() == 0) {
+                  return StatusDto.buildFailure("无需要盘库的数据，无法生存盘库单！");
+              }
                // 1、保存盘库单
                // 生成盘库单号
                String adjustNo = null;
@@ -257,6 +260,23 @@ public class StockAdjustServiceImpl implements StockAdjustService{
         });
         stockAdjustDetailDTO.setStockAdjustListDTOList(stockAdjustListDTOList);
         return stockAdjustDetailDTO;
+    }
+
+    /**
+     * 根据零配件分类code查询零配件
+     * @param categoryCode 零配件分类code
+     * @return 零配件类型集合
+     * @author liuduo
+     * @date 2018-08-15 09:16:23
+     */
+    @Override
+    public List<StockAdjustListDTO> queryProductByCode(String categoryCode) {
+        List<BasicCarpartsProductDTO> basicCarpartsProductDTOS = carpartsProductService.queryCarpartsProductListByCategoryCode(categoryCode);
+        if (null == basicCarpartsProductDTOS || basicCarpartsProductDTOS.size() == 0) {
+            return Lists.newArrayList();
+        }
+        List<String> carparts = basicCarpartsProductDTOS.stream().map(BasicCarpartsProductDTO::getCarpartsCode).collect(Collectors.toList());
+        return stockDetailService.queryAdjustList(carparts, userHolder.getLoggedUser().getOrganization().getOrgCode(), Constants.PRODUCT_TYPE_FITTINGS);
     }
 
     /**

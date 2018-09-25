@@ -8,6 +8,7 @@ import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.DocCodePrefixEnum;
 import com.ccbuluo.business.constants.OrganizationTypeEnum;
+import com.ccbuluo.business.entity.BizServiceLog;
 import com.ccbuluo.business.entity.BizServiceOrder;
 import com.ccbuluo.business.entity.BizServiceorderDetail;
 import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarmodelManageDao;
@@ -15,10 +16,13 @@ import com.ccbuluo.business.platform.carconfiguration.service.BasicCarmodelManag
 import com.ccbuluo.business.platform.claimorder.dao.ClaimOrderDao;
 import com.ccbuluo.business.platform.claimorder.dto.BizServiceClaimorder;
 import com.ccbuluo.business.platform.claimorder.dto.QueryClaimorderListDTO;
+import com.ccbuluo.business.platform.custmanager.dao.BizServiceCustmanagerDao;
+import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
 import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceorderDetailDao;
 import com.ccbuluo.business.platform.order.dto.ProductDetailDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
+import com.ccbuluo.business.platform.servicelog.service.ServiceLogService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.BusinessUser;
 import com.ccbuluo.core.entity.Organization;
@@ -26,16 +30,21 @@ import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftList;
 import com.ccbuluo.http.StatusDtoThriftPage;
 import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
+import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 import com.ccbuluo.usercoreintf.dto.QueryServiceCenterDTO;
+import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.ccbuluo.usercoreintf.service.BasicUserWorkplaceService;
+import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +52,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author zhangkangjian
@@ -72,6 +82,12 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
     private BasicUserOrganizationService basicUserOrganizationService;
     @ThriftRPCClient("UserCoreSerService")
     BasicUserWorkplaceService basicUserWorkplaceService;
+    @ThriftRPCClient("UserCoreSerService")
+    private InnerUserInfoService innerUserInfoService;
+    @Resource
+    private BizServiceCustmanagerDao bizServiceCustmanagerDao;
+    @Autowired
+    private ServiceLogService serviceLogService;
 
     /**
      * 生成索赔单
@@ -125,15 +141,38 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
 
     /**
      * 提交索赔单
-     * @param bizServiceClaimorder
+     * @param bizServiceClaimorder 索赔单的实体
      * @author zhangkangjian
      * @date 2018-09-08 14:26:55
      */
     @Override
     public void updateClaimOrder(BizServiceClaimorder bizServiceClaimorder) {
+        // 检查索赔单的状态, 不符合状态的不可以更新
+        checkClaimOrderStatus(bizServiceClaimorder.getClaimOrdno(), BizServiceClaimorder.DocStatusEnum.PENDINGSUBMISSION.name());
         // 设置索赔单的状态
         bizServiceClaimorder.setDocStatus(BizServiceClaimorder.DocStatusEnum.WAITACCEPTANCE.name());
         claimOrderDao.updateClaimOrder(bizServiceClaimorder);
+    }
+
+    /**
+     *  检查索赔单的状态, 不符合状态的不可以更新
+     * @param claimOrdno 索赔单的code
+     * @param docStatus 比较索赔单的状态
+     * @author zhangkangjian
+     * @date 2018-09-23 16:47:20
+     */
+    private void checkClaimOrderStatus(String claimOrdno, String docStatus) {
+        if(StringUtils.isAnyBlank(claimOrdno, docStatus)){
+            throw new CommonException(Constants.ERROR_CODE, "必填参数为null");
+        }
+        // 查询索赔单的详情
+        BizServiceClaimorder claimOrderDetail = claimOrderDao.findClaimOrderDetail(claimOrdno);
+        if(claimOrderDetail != null){
+            String claimOrderStatus = claimOrderDetail.getDocStatus();
+            if(!docStatus.equals(claimOrderStatus)){
+                throw new CommonException(Constants.ERROR_CODE, "状态不符合！");
+            }
+        }
     }
 
     /**
@@ -289,6 +328,7 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
     @Override
     public StatusDto<Page<QueryClaimorderListDTO>> queryClaimorderList(String claimOrdno, String keyword, String docStatus, int offset, int pageSize) {
         Page<QueryClaimorderListDTO> queryClaimorderListDTOPage = queryClaimorderPage(claimOrdno, keyword, docStatus, offset, pageSize);
+        // 查询机构类型的联系人
         Optional.ofNullable(queryClaimorderListDTOPage.getRows()).ifPresent(a ->{
             StatusDtoThriftPage<QueryServiceCenterDTO> serviceCenterList = basicUserOrganizationService.queryServiceCenterList(null, null ,null ,null,null,0,Integer.MAX_VALUE);
             StatusDto<Page<QueryServiceCenterDTO>> queryServiceCenterDTOPage = StatusDtoThriftUtils.resolve(serviceCenterList, QueryServiceCenterDTO.class);
@@ -301,6 +341,36 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
                         item.setOrgPhone(queryServiceCenterDTO.getPrincipalPhone());
                     }
                 });
+            });
+        });
+        // 查询客户经理的手机号
+        QueryOrgDTO queryOrgDTO = new QueryOrgDTO();
+        queryOrgDTO.setStatus(Constants.FREEZE_STATUS_YES);
+        queryOrgDTO.setOrgTypeList(List.of(OrganizationTypeEnum.CUSTMANAGER.name()));
+        StatusDtoThriftList<QueryOrgDTO> queryOrgDTOList = basicUserOrganizationService.queryOrgAndWorkInfo(queryOrgDTO);
+        StatusDto<List<QueryOrgDTO>> queryOrgDTOResolve = StatusDtoThriftUtils.resolve(queryOrgDTOList, QueryOrgDTO.class);
+        Optional.ofNullable(queryOrgDTOResolve.getData()).ifPresent(a ->{
+            List<String> custManagerOrgCode = a.stream().map(QueryOrgDTO::getOrgCode).collect(Collectors.toList());
+            UserInfoDTO userInfoDTO = new UserInfoDTO();
+            userInfoDTO.setOrgCodes(custManagerOrgCode);
+            StatusDtoThriftList<UserInfoDTO> userInfoDTOStatusDtoThriftList = innerUserInfoService.queryUserListByOrgCode(userInfoDTO);
+            StatusDto<List<UserInfoDTO>> userInfoDTOResolve = StatusDtoThriftUtils.resolve(userInfoDTOStatusDtoThriftList, UserInfoDTO.class);
+            List<UserInfoDTO> userInfoDTOData = userInfoDTOResolve.getData();
+            Map<String, List<UserInfoDTO>> userInfoDTOMap = userInfoDTOData.stream().collect(Collectors.groupingBy(UserInfoDTO::getOrgCode));
+            List<String> useruuidCollect = userInfoDTOData.stream().map(UserInfoDTO::getUseruuid).collect(Collectors.toList());
+            List<QueryUserListDTO> queryUserListDTOS = Optional.ofNullable(bizServiceCustmanagerDao.queryCustManager(useruuidCollect)).orElse(new ArrayList<>());
+            Map<String, QueryUserListDTO> queryUserListDTOMap = queryUserListDTOS.stream().collect(Collectors.toMap(QueryUserListDTO::getUseruuid, b -> b, (k1, k2) -> k1));
+            queryClaimorderListDTOPage.getRows().forEach(item ->{
+                String claimOrgno = item.getClaimOrgno();
+                List<UserInfoDTO> userInfoDTOS = userInfoDTOMap.get(claimOrgno);
+                if(userInfoDTOS != null && userInfoDTOS.size() > 0){
+                    UserInfoDTO userInfoDTO1 = userInfoDTOS.get(0);
+                    if(userInfoDTO1 != null){
+                        String useruuid = userInfoDTO1.getUseruuid();
+                        QueryUserListDTO queryUserListDTO = queryUserListDTOMap.get(useruuid);
+                        item.setOrgPhone(queryUserListDTO.getOfficePhone());
+                    }
+                }
             });
         });
         return StatusDto.buildDataSuccessStatusDto(queryClaimorderListDTOPage);
@@ -349,6 +419,8 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
      */
     @Override
     public void updateDocStatusAndProcessTime(String claimOrdno, String docStatus) {
+        // 检查索赔单的状态, 不符合状态的不可以更新
+        checkClaimOrderStatus(claimOrdno, BizServiceClaimorder.DocStatusEnum.WAITACCEPTANCE.name());
         claimOrderDao.updateDocStatusAndProcessTime(claimOrdno, docStatus);
     }
 
@@ -364,6 +436,8 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
         if(null == actualAmount){
             throw new CommonException("0", "请填写付款金额！");
         }
+        // 检查索赔单的状态, 不符合状态的不可以更新
+        checkClaimOrderStatus(claimOrdno, BizServiceClaimorder.DocStatusEnum.PENDINGPAYMENT.name());
         BizServiceClaimorder claimorder = claimOrderDao.findClaimOrderDetail(claimOrdno);
         // 构建申请单
         List<AccountTransactionDTO> payments = buildClaimPayment(claimorder,actualAmount);
@@ -373,6 +447,8 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
         if(statusDto.isSuccess()){
             // 更新索赔单状态和支付时间
             claimOrderDao.updateDocStatusAndRepayTime(claimOrdno, docStatus,actualAmount);
+            // 记录日志
+            addlog(claimOrdno,"平台支付索赔单费用", BizServiceLog.actionEnum.PAYMENT.name());
         }else{
             return statusDto;
         }
@@ -421,5 +497,24 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
         transaction.setTransactionTypeEnumThrift(TransactionTypeEnumThrift.THREE_PACK_SUPPLIER_REFUND);
         transaction.setCreator(userHolder.getLoggedUserId());
         return transaction;
+    }
+
+    /**
+     * 记录日志
+     * @param applyNo 申请单号
+     * @param content 日志内容
+     * @param action 动作
+     */
+    private void addlog(String applyNo,String content,String action){
+        BizServiceLog bizServiceLog = new BizServiceLog();
+        bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
+        bizServiceLog.setAction(action);
+        bizServiceLog.setSubjectType("ClaimOrderServiceImpl");
+        bizServiceLog.setSubjectKeyvalue(applyNo);
+        bizServiceLog.setLogContent(content);
+        bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+        bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+        bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+        serviceLogService.create(bizServiceLog);
     }
 }

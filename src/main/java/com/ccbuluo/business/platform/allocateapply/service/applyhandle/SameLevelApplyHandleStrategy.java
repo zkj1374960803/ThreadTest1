@@ -151,6 +151,7 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
      * @author weijb
      * @date 2018-08-11 13:35:41
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public StatusDto cancelApply(String applyNo){
         try {

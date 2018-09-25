@@ -7,7 +7,7 @@ package com.ccbuluo.business.constants;
  */
 public enum OutstockTypeEnum {
 
-    TRANSFER("调拨出库"),BARTER("换货出库"),REFUND("退货出库");
+    TRANSFER("调拨出库"),BARTER("换货出库"),REFUND("退货出库"),SERVICEORDER("维修单出库");
 
     OutstockTypeEnum(String label) {
         this.label = label;
