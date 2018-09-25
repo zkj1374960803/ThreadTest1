@@ -209,20 +209,34 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     @Transactional(rollbackFor = Exception.class)
     public StatusDto editStatus(String serviceOrderno, String orderStatus) {
         try {
+            BizServiceLog bizServiceLog = new BizServiceLog();
+            bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
+            bizServiceLog.setAction(BizServiceLog.actionEnum.UPDATE.name());
+            bizServiceLog.setSubjectType("ServiceOrderServiceImpl");
+            bizServiceLog.setSubjectKeyvalue(serviceOrderno);
             // 如果是 待完善 状态，则还需要更新服务单派发表的数据
-            if (StringUtils.isNotBlank(orderStatus) && orderStatus.equals(BizServiceOrder.OrderStatusEnum.WAITING_PERFECTION.name())) {
-                bizServiceDispatchDao.updateConfirmed(serviceOrderno);
-                BizServiceLog bizServiceLog = new BizServiceLog();
-                bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
-                bizServiceLog.setAction(BizServiceLog.actionEnum.UPDATE.name());
-                bizServiceLog.setSubjectType("ServiceOrderServiceImpl");
-                bizServiceLog.setSubjectKeyvalue(serviceOrderno);
-                bizServiceLog.setLogContent("维修单接单");
-                bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
-                bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
-                bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
-                serviceLogService.create(bizServiceLog);
+            if (StringUtils.isNotBlank(orderStatus) ) {
+                if (orderStatus.equals(BizServiceOrder.OrderStatusEnum.WAITING_PERFECTION.name())) {
+                    bizServiceDispatchDao.updateConfirmed(serviceOrderno);
+                    bizServiceLog.setLogContent("维修单接单");
+                } else if (orderStatus.equals(BizServiceOrder.OrderStatusEnum.WAITING_RECEIVE.name())) {
+                    bizServiceLog.setLogContent("提交维修单");
+                } else if (orderStatus.equals(BizServiceOrder.OrderStatusEnum.PROCESSING.name())) {
+                    bizServiceLog.setLogContent("开始处理维修单");
+                } else if (orderStatus.equals(BizServiceOrder.OrderStatusEnum.WAITING_CHECKING.name())) {
+                    bizServiceLog.setLogContent("处理完成，待验收");
+                } else if (orderStatus.equals(BizServiceOrder.OrderStatusEnum.WAITING_PAYMENT.name())) {
+                    bizServiceLog.setLogContent("验收完成，待付款");
+                } else if (orderStatus.equals(BizServiceOrder.OrderStatusEnum.COMPLETED.name())) {
+                    bizServiceLog.setLogContent("已完成");
+                } else {
+                    bizServiceLog.setLogContent("已取消");
+                }
             }
+            bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+            bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+            bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+            serviceLogService.create(bizServiceLog);
             bizServiceOrderDao.editStatus(serviceOrderno, orderStatus);
             return StatusDto.buildSuccessStatusDto();
         } catch (Exception e) {
@@ -797,7 +811,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         bizServiceLog.setSubjectType("ServiceOrderServiceImpl");
         bizServiceLog.setSubjectKeyvalue(orderCode);
         if (loggedUser.getOrganization().getOrgType().equals(BizServiceOrder.ProcessorOrgtypeEnum.STORE.name())) {
-            bizServiceLog.setLogContent("提交保修");
+            bizServiceLog.setLogContent("提交报修");
         } else {
             bizServiceLog.setLogContent("新增维修单");
         }
@@ -849,7 +863,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             for (String orgCode : orderOrgNo){
                 List<String> codeList = getProductList(orderDetails);
                 // 根据卖方code和商品code（list）查出库存列表
-                List<BizStockDetail> stockDetails = bizStockDetailDao.getStockDetailListByOrgAndProduct(orgCode, codeList);
+                List<BizStockDetail> stockDetails = bizStockDetailDao.getStockDetailList(orgCode, codeList);
                 // 查询占用关系
                 List<RelOrdstockOccupy> relOrdstockOccupies = bizAllocateTradeorderDao.getRelOrdstockOccupyBy(orderNo,orgCode);
                 // 生成出库计划
@@ -943,10 +957,11 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
             return flag;
         }
         for(BizOutstockplanDetail outPlan : outStockList){
-            flag = ro.getProductNo().equals(outPlan.getProductNo()) && ro.getSupplierNo().equals(outPlan.getSupplierNo()) && ro.getCostPrice().compareTo(outPlan.getCostPrice()) == 0;
+            boolean status = ro.getProductNo().equals(outPlan.getProductNo()) && ro.getSupplierNo().equals(outPlan.getSupplierNo()) && ro.getCostPrice().compareTo(outPlan.getCostPrice()) == 0;
             // 如果同一个商品的供应商和价格都相同，那么就合并
-            if(flag){
+            if(status){
                 outPlan.setPlanOutstocknum(outPlan.getPlanOutstocknum() + ro.getOccupyNum());
+                flag = true;
             }
         }
         return flag;
