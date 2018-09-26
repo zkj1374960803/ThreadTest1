@@ -368,7 +368,7 @@ public class CustmanagerServiceImpl implements CustmanagerService{
                 b.forEach(item ->{
                     List<QueryPendingMaterialsDTO> queryPendingMaterialsDTOS1 = collect.get(item.getUseruuid());
                     if(queryPendingMaterialsDTOS1 != null && queryPendingMaterialsDTOS1.size() > 0){
-                        item.setMaterialsNumber(Long.valueOf(queryPendingMaterialsDTOS1.size()));
+                        item.setMaterialsNumber((long) queryPendingMaterialsDTOS1.size());
                     }
                 });
             });
