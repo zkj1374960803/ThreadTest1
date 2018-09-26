@@ -1110,7 +1110,9 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         List<QueryOrgDTO> queryOrgList = Optional.ofNullable(resolve.getData()).orElse(new ArrayList<>());
         Map<String, QueryOrgDTO> queryOrgDTOMap = queryOrgList.stream().collect(Collectors.toMap(QueryOrgDTO::getOrgCode, a -> a,(k1,k2)->k1));
         List<String> orgCodes = queryOrgList.stream().map(QueryOrgDTO::getOrgCode).collect(Collectors.toList());
-        orgCodes.add(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+        if(orgCodes == null || orgCodes.size() == 0){
+            return new Page<QueryOrgDTO>(offset, pageSize);
+        }
         // 查询库存数量
         Page<QueryOrgDTO> findStockListDTO = bizAllocateApplyDao.findStockNum(productNo, orgCodes , offset, pageSize);
         List<QueryOrgDTO> rows = Optional.ofNullable(findStockListDTO.getRows()).orElse(new ArrayList<>());
