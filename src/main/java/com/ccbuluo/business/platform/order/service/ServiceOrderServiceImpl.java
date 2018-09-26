@@ -209,20 +209,34 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     @Transactional(rollbackFor = Exception.class)
     public StatusDto editStatus(String serviceOrderno, String orderStatus) {
         try {
+            BizServiceLog bizServiceLog = new BizServiceLog();
+            bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
+            bizServiceLog.setAction(BizServiceLog.actionEnum.UPDATE.name());
+            bizServiceLog.setSubjectType("ServiceOrderServiceImpl");
+            bizServiceLog.setSubjectKeyvalue(serviceOrderno);
             // 如果是 待完善 状态，则还需要更新服务单派发表的数据
-            if (StringUtils.isNotBlank(orderStatus) && orderStatus.equals(BizServiceOrder.OrderStatusEnum.WAITING_PERFECTION.name())) {
-                bizServiceDispatchDao.updateConfirmed(serviceOrderno);
-                BizServiceLog bizServiceLog = new BizServiceLog();
-                bizServiceLog.setModel(BizServiceLog.modelEnum.SERVICE.name());
-                bizServiceLog.setAction(BizServiceLog.actionEnum.UPDATE.name());
-                bizServiceLog.setSubjectType("ServiceOrderServiceImpl");
-                bizServiceLog.setSubjectKeyvalue(serviceOrderno);
-                bizServiceLog.setLogContent("维修单接单");
-                bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
-                bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
-                bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
-                serviceLogService.create(bizServiceLog);
+            if (StringUtils.isNotBlank(orderStatus) ) {
+                if (orderStatus.equals(BizServiceOrder.OrderStatusEnum.WAITING_PERFECTION.name())) {
+                    bizServiceDispatchDao.updateConfirmed(serviceOrderno);
+                    bizServiceLog.setLogContent("维修单接单");
+                } else if (orderStatus.equals(BizServiceOrder.OrderStatusEnum.WAITING_RECEIVE.name())) {
+                    bizServiceLog.setLogContent("提交维修单");
+                } else if (orderStatus.equals(BizServiceOrder.OrderStatusEnum.PROCESSING.name())) {
+                    bizServiceLog.setLogContent("开始处理维修单");
+                } else if (orderStatus.equals(BizServiceOrder.OrderStatusEnum.WAITING_CHECKING.name())) {
+                    bizServiceLog.setLogContent("处理完成，待验收");
+                } else if (orderStatus.equals(BizServiceOrder.OrderStatusEnum.WAITING_PAYMENT.name())) {
+                    bizServiceLog.setLogContent("验收完成，待付款");
+                } else if (orderStatus.equals(BizServiceOrder.OrderStatusEnum.COMPLETED.name())) {
+                    bizServiceLog.setLogContent("已完成");
+                } else {
+                    bizServiceLog.setLogContent("已取消");
+                }
             }
+            bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
+            bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
+            bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
+            serviceLogService.create(bizServiceLog);
             bizServiceOrderDao.editStatus(serviceOrderno, orderStatus);
             return StatusDto.buildSuccessStatusDto();
         } catch (Exception e) {

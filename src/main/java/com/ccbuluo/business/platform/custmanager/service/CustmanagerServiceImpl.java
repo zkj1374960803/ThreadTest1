@@ -311,6 +311,9 @@ public class CustmanagerServiceImpl implements CustmanagerService{
         userInfoDTO.setAppId(SystemPropertyHolder.getBaseAppid());
         userInfoDTO.setSecretId(SystemPropertyHolder.getBaseSecret());
         List<String> orgCodeList = allocateApplyService.getOrgCodesByOrgType(OrganizationTypeEnum.CUSTMANAGER.name());
+        if(orgCodeList == null || orgCodeList.size() == 0){
+            return StatusDto.buildDataSuccessStatusDto(new Page<QueryUserListDTO>(userInfoDTO.getOffset(), userInfoDTO.getPageSize()));
+        }
         userInfoDTO.setOrgCodes(orgCodeList);
         // 排序字段
         userInfoDTO.setSortField(Constants.SORT_FIELD_OPERATE);

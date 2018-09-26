@@ -96,7 +96,7 @@ public class ClaimOrderController{
             @ApiImplicitParam(name = "claimOrdno", value = "索赔单号", required = true, paramType = "query"),
             @ApiImplicitParam(name = "actualAmount", value = "实际赔偿的金额", required = true, paramType = "query")
     })
-    public StatusDto<String> billOfPayment(String claimOrdno, BigDecimal actualAmount){
+    public StatusDto billOfPayment(String claimOrdno, BigDecimal actualAmount){
         return claimOrderServiceImpl.billOfPayment(claimOrdno, BizServiceClaimorder.DocStatusEnum.COMPLETED.name(),actualAmount);
     }
 
