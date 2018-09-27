@@ -65,8 +65,6 @@ public class CustAllocateApplyController extends BaseController {
 
     /**
      * 查询申请列表
-     * @param
-     * @exception
      * @return Page<QueryAllocateApplyListDTO> 分页的信息
      * @author zhangkangjian
      * @date 2018-08-09 10:36:34
@@ -83,7 +81,7 @@ public class CustAllocateApplyController extends BaseController {
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query"),
     })
     public StatusDto<Page<QueryAllocateApplyListDTO>> list(String productType,String orgType, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
-        Page<QueryAllocateApplyListDTO> page = allocateApplyServiceImpl.findApplyList(productType, orgType, processType, applyStatus, applyNo, offset, pageSize);
+        Page<QueryAllocateApplyListDTO> page = allocateApplyServiceImpl.findApplyList(null, productType, orgType, processType, applyStatus, applyNo, offset, pageSize);
         return StatusDto.buildDataSuccessStatusDto(page);
     }
 
