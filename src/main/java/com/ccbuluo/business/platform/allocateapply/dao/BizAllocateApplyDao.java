@@ -526,10 +526,11 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         params.put("productType", productType);
         params.put("orgCode", orgCode);
         params.put("status", status);
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
 
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT DISTINCT baa.apply_no FROM biz_allocate_apply AS baa LEFT JOIN biz_instockplan_detail AS bid ON bid.trade_no = baa.apply_no ")
-            .append("  WHERE bid.complete_status = :status AND bid.product_type = :productType AND bid.instock_orgno = :orgCode");
+            .append("  WHERE bid.complete_status = :status AND bid.product_type = :productType AND bid.instock_orgno = :orgCode AND bid.delete_flag = :deleteFlag");
 
         return querySingColum(String.class, sql.toString(), params);
     }
@@ -715,10 +716,11 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         params.put("productType", productType);
         params.put("orgCode", orgCode);
         params.put("status", status);
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
 
         StringBuilder sql = new StringBuilder();
         sql.append("select DISTINCT baa.apply_no from biz_allocate_apply as baa left join biz_outstockplan_detail as bod on bod.trade_no = baa.apply_no")
-            .append("  WHERE bod.out_orgno = :orgCode AND bod.plan_status = :status AND bod.product_type = :productType");
+            .append("  WHERE bod.out_orgno = :orgCode AND bod.plan_status = :status AND bod.product_type = :productType AND bod.delete_flag = :deleteFlag");
 
         return querySingColum(String.class, sql.toString(), params);
     }
