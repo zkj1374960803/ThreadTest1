@@ -190,6 +190,8 @@ public class BizAllocateapplyDetailDao extends BaseDao<AllocateapplyDetailDTO> {
             .append(" FROM biz_instockplan_detail a LEFT JOIN biz_allocate_apply b ON a.trade_no = b.apply_no  ")
             .append(" WHERE 1 = 1 ");
         Map<String, Object> map = Maps.newHashMap();
+        map.put("completeStatusList", List.of(StockPlanStatusEnum.COMPLETE.name(),StockPlanStatusEnum.DOING.name()));
+        sql.append(" AND a.complete_status in (:completeStatusList) ");
         if(useruuid != null && useruuid.size() > 0){
             map.put("useruuid", useruuid);
             sql.append(" AND b.applyer in (:useruuid) ");
