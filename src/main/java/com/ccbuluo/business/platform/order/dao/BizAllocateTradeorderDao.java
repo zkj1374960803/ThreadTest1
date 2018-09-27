@@ -269,9 +269,10 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
         sql.append("SELECT id,order_no,apply_no,purchaser_orgno,seller_orgno,")
                 .append("order_status,total_price,payer,pay_method,payed_time,creator,")
                 .append("create_time,operator,operate_time,delete_flag,remark,perpay_amount")
-                .append(" FROM biz_allocate_tradeorder WHERE apply_no= :applyNo");
+                .append(" FROM biz_allocate_tradeorder WHERE apply_no= :applyNo AND delete_flag = :deleteFlag");
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNo", applyNo);
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         return super.queryListBean(BizAllocateTradeorder.class, sql.toString(), params);
     }
 
