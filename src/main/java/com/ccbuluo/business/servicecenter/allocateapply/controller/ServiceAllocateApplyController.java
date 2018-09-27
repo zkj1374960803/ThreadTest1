@@ -81,7 +81,7 @@ public class ServiceAllocateApplyController extends BaseController {
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query"),
     })
     public StatusDto<Page<QueryAllocateApplyListDTO>> list(String productType,String orgType, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
-        Page<QueryAllocateApplyListDTO> page = allocateApplyServiceImpl.findApplyList(productType, orgType, processType, applyStatus, applyNo, offset, pageSize);
+        Page<QueryAllocateApplyListDTO> page = allocateApplyServiceImpl.findApplyList(null, productType, orgType, processType, applyStatus, applyNo, offset, pageSize);
         return StatusDto.buildDataSuccessStatusDto(page);
     }
 
