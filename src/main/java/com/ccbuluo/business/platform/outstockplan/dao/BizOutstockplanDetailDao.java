@@ -200,10 +200,10 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
      * @author liuduo
      * @date 2018-08-11 13:17:42
      */
-    public List<BizOutstockplanDetail> queryOutstockplanList(String applyNo, String outRepositoryNo, String productType) {
+    public List<BizOutstockplanDetail> queryOutstockplanList(String applyNo, String outOrgNo, String productType) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("applyNo", applyNo);
-        params.put("outRepositoryNo", outRepositoryNo);
+        params.put("outOrgno", outOrgNo);
         params.put("productType", productType);
 
         StringBuilder sql = new StringBuilder();
@@ -213,7 +213,7 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
             .append(" bsss.storehouse_name FROM biz_outstockplan_detail AS bod")
             .append("  LEFT JOIN biz_service_supplier AS bss ON bss.supplier_code = bod.supplier_no")
             .append("  LEFT JOIN biz_service_storehouse AS bsss ON bsss.storehouse_code = bod.out_repository_no")
-            .append(" WHERE bod.trade_no = :applyNo AND bod.product_type = :productType AND out_repository_no = :outRepositoryNo");
+            .append(" WHERE bod.trade_no = :applyNo AND bod.product_type = :productType AND bod.out_orgno = :outOrgno");
 
         return queryListBean(BizOutstockplanDetail.class, sql.toString(), params);
     }

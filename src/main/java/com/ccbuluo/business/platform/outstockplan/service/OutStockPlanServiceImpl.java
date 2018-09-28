@@ -90,8 +90,8 @@ public class OutStockPlanServiceImpl implements OutStockPlanService {
      * @date 2018-08-11 13:17:42
      */
     @Override
-    public List<BizOutstockplanDetail> queryOutstockplanList(String applyNo, String outRepositoryNo, String productType) {
-        List<BizOutstockplanDetail> bizOutstockplanDetails = bizOutstockplanDetailDao.queryOutstockplanList(applyNo, outRepositoryNo, productType);
+    public List<BizOutstockplanDetail> queryOutstockplanList(String applyNo, String outOrgNo, String productType) {
+        List<BizOutstockplanDetail> bizOutstockplanDetails = bizOutstockplanDetailDao.queryOutstockplanList(applyNo, outOrgNo, productType);
         bizOutstockplanDetails.forEach(item -> {
             item.setShouldOutstocknum(item.getPlanOutstocknum() - item.getActualOutstocknum());
         });
