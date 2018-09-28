@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.carparts.dao;
 
 import com.ccbuluo.business.entity.RelProductPrice;
 import com.ccbuluo.dao.BaseDao;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.weakref.jmx.internal.guava.collect.Maps;
@@ -28,19 +29,23 @@ public class CarpartsProductPriceDao extends BaseDao<CarpartsProductPriceDao> {
 
     /**
      * 查询零配件列表
-     * @param
-     * @exception
-     * @return
+     * @param productType 商品的类型
+     * @return List<RelProductPrice> 价格列表
      * @author zhangkangjian
      * @date 2018-09-06 16:55:13
      */
-    public List<RelProductPrice> queryCarpartsProductList() {
+    public List<RelProductPrice> queryCarpartsProductList(String productType) {
+        HashMap<String, Object> map = Maps.newHashMap();
         StringBuffer sql = new StringBuffer();
         sql.append("SELECT a.product_no,a.suggested_price FROM rel_product_price a  ")
             .append(" INNER JOIN ( ")
             .append(" SELECT a.product_no,MAX(a.id) AS 'id' FROM rel_product_price a  GROUP BY a.product_no ")
-            .append(" ) b ON a.id = b.id ");
-        return queryListBean(RelProductPrice.class, sql.toString(), Maps.newHashMap());
+            .append(" ) b ON a.id = b.id WHERE 1 = 1 ");
+        if(StringUtils.isNotBlank(productType)){
+            map.put("productType", productType);
+            sql.append(" AND a.product_type = :productType ");
+        }
+        return queryListBean(RelProductPrice.class, sql.toString(), map);
     }
 
     /**
