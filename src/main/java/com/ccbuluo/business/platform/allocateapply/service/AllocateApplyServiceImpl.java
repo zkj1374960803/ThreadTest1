@@ -344,6 +344,9 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         String userOrgCode = getUserOrgCode();
         List<String> orgCodes = getOrgCodesByOrgType(orgType);
         // 查询全部，不限制当前登陆人和机构类型（根据orgType查询orgCodes）
+        if(whetherQueryAll == null){
+            whetherQueryAll = false;
+        }
         if(whetherQueryAll){
             userOrgCode = null;
             orgCodes = null;
