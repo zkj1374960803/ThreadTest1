@@ -1,6 +1,7 @@
 package com.ccbuluo.business.entity;
 
 import com.ccbuluo.business.constants.StockPlanStatusEnum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.StringUtils;
@@ -142,6 +143,12 @@ public class BizOutstockplanDetail extends AftersaleCommonEntity{
      */
     @ApiModelProperty(name = "stockType", value = "库存类型（正常库存、问题库存、报损件库存，等等）")
     private String stockType;
+
+
+    @JsonIgnore
+    public String getProdNoAndSupplyNo(){
+        return StringUtils.defaultIfBlank(productNo, "") + "@" + StringUtils.defaultIfBlank(supplierNo, "");
+    }
 
     public String getOutOrgName() {
         return outOrgName;

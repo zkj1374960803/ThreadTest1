@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.allocateapply.service.applyhandle;
 
+import com.auth0.jwt.internal.org.apache.commons.lang3.StringUtils;
 import com.auth0.jwt.internal.org.apache.commons.lang3.tuple.Pair;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.InstockTypeEnum;
@@ -262,6 +263,7 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
         distinstSupplier(inList, outList,details);
     }
 
+
     /**
      *   过滤供应商(有可能一个商品有多个供应商（根据商品和供应商分组合并）)
      * @param
@@ -271,6 +273,41 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
      * @date 2018-08-21 18:05:46
      */
     private void distinstSupplier(List<BizInstockplanDetail> inList,List<BizOutstockplanDetail> outList,List<AllocateapplyDetailBO> details){
+        for (BizOutstockplanDetail bizOutstockplanDetail : outList) {
+            if(StringUtils.isEmpty(bizOutstockplanDetail.getSupplierNo())){
+                bizOutstockplanDetail.setSupplierNo("");
+            }
+        }
+        // 根据商品编号 和供应商的 组合分组，每个分组要生成一个入库计划
+        Map<String, List<BizOutstockplanDetail>> collect = outList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getProdNoAndSupplyNo));
+        for (Map.Entry<String, List<BizOutstockplanDetail>> entryP : collect.entrySet()) {
+            List<BizOutstockplanDetail> valueS = entryP.getValue();
+            BizInstockplanDetail inPlan = buildBizInstockplanDetail(valueS.get(0));
+            Optional<AllocateapplyDetailBO> applyFilter = details.stream() .filter(applyDetail -> inPlan.getProductNo().equals(applyDetail.getProductNo())) .findFirst();
+            if (applyFilter.isPresent()) {
+                AllocateapplyDetailBO ad = applyFilter.get();
+                // 入库仓库编号
+                inPlan.setInstockRepositoryNo(ad.getInRepositoryNo());
+                // 买入机构编号
+                inPlan.setInstockOrgno(ad.getInstockOrgno());
+                // 买方入库的成本价等于单子上的销售价
+                inPlan.setCostPrice(ad.getSellPrice());
+                // 卖方机构的编号
+                inPlan.setSellerOrgno(ad.getOutstockOrgno());
+            }
+            // 合并要入库的数量
+            Long planOutstocknum = 0L;
+            for(BizOutstockplanDetail bd : valueS){
+                // 计划出库数量
+                planOutstocknum += bd.getPlanOutstocknum();
+            }
+            // 完成状态（未生效）
+            inPlan.setCompleteStatus(StockPlanStatusEnum.NOTEFFECTIVE.toString());
+            inPlan.setPlanInstocknum(planOutstocknum);
+            inList.add(inPlan);
+        }
+    }
+    /*private void distinstSupplier(List<BizInstockplanDetail> inList,List<BizOutstockplanDetail> outList,List<AllocateapplyDetailBO> details){
         Optional<BizOutstockplanDetail> outFilter = outList.stream() .filter(outstockplan -> null == outstockplan.getSupplierNo()) .findFirst();
         if (outFilter.isPresent()) {
             outFilter.get().setSupplierNo("");
@@ -283,8 +320,8 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
             BizInstockplanDetail inPlan = null;
             // 根据供应商分组
             Map<String, List<BizOutstockplanDetail>> collect1 = valueP.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getSupplierNo));
-            int i = 0;
             for (Map.Entry<String, List<BizOutstockplanDetail>> entryS : collect1.entrySet()) {
+                int i = 0;
                 List<BizOutstockplanDetail> valueS = entryS.getValue();
                 if(null != valueS && valueS.size() > 0){
                     if(i == 0){
@@ -306,7 +343,7 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
                     }
                 }
                 Long planOutstocknum = 0L;
-                for(BizOutstockplanDetail bd : valueS){
+                for(BizOutstockplanDetail bd : valueS){ // TODO valueP
                     // 计划出库数量
                     planOutstocknum += bd.getPlanOutstocknum();
                 }
@@ -314,9 +351,10 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
                 inPlan.setCompleteStatus(StockPlanStatusEnum.NOTEFFECTIVE.toString());
                 inPlan.setPlanInstocknum(planOutstocknum);
                 inList.add(inPlan);
+                // TODO continue;
             }
         }
-    }
+    }*/
     /**
      *  构建平台调拨的入库计划
      * @param
