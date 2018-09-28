@@ -13,6 +13,7 @@ import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
 import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.business.platform.outstock.dto.OutstockorderDetailDTO;
 import com.ccbuluo.business.platform.outstock.dto.UpdatePlanStatusDTO;
+import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.outstockplan.service.OutStockPlanService;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.servicelog.service.ServiceLogService;
@@ -79,6 +80,8 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     private StockInOutCallBackContext stockInOutCallBackContext;
     @Autowired
     private ServiceLogService serviceLogService;
+    @Autowired
+    private BizOutstockplanDetailDao bizOutstockplanDetailDao;
 
     /**
      * 自动保存出库单
@@ -150,6 +153,8 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                 updateOccupyStock(bizOutstockorderDetailList1, bizOutstockplanDetailList);
                 // 4、更新出库计划中的实际出库数量
                 updateActualOutstocknum(bizOutstockorderDetailList1);
+                // 更新出库单的复核状态
+                bizOutstockOrderDao.updateChecked(outstockNo, Constants.FLAG_ONE, new Date());
                 // 5、更新出库计划中的状态和完成时间
                 List<BizOutstockplanDetail> bizOutstockplanDetailList2 = outStockPlanService.queryOutstockplan(applyNo, StockPlanStatusEnum.DOING.toString(), outRepositoryNo);
                 updatePlanStatus(bizOutstockplanDetailList2);
@@ -159,6 +164,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
 //                    updateApplyOrderStatus(applyNo, bizOutstockplanDetailList3);
                     stockInOutCallBackContext.outStockCallBack(applyNo,outRepositoryNo);
                 }
+
             }
             return StatusDto.buildSuccessStatusDto("保存成功！");
         } catch (Exception e) {
@@ -183,40 +189,42 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     @Transactional(rollbackFor = Exception.class)
     public StatusDto<String> saveOutstockOrder(String applyNo, String outRepositoryNo, String transportorderNo, List<BizOutstockorderDetail> bizOutstockorderDetailList) {
         try {
-            // 生成出库单号
-            String outstockNo = null;
-            StatusDto<String> outstockCode = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.C);
-            if (outstockCode.getCode().equals(Constants.SUCCESS_CODE)) {
-                outstockNo = outstockCode.getData();
-            } else {
-                return StatusDto.buildFailure("生成出库单编码失败！");
-            }
-            // 1、保存出库单
-            // 根据申请单号查询基本信息
-            FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
+//            // 生成出库单号
+//            String outstockNo = null;
+//            StatusDto<String> outstockCode = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.C);
+//            if (outstockCode.getCode().equals(Constants.SUCCESS_CODE)) {
+//                outstockNo = outstockCode.getData();
+//            } else {
+//                return StatusDto.buildFailure("生成出库单编码失败！");
+//            }
+//            // 1、保存出库单
+//            // 根据申请单号查询基本信息
+//            FindAllocateApplyDTO detail = allocateApplyService.findDetail(applyNo);
+//            // 查询出库计划
+//            List<BizOutstockplanDetail> bizOutstockplanDetailList = outStockPlanService.queryOutstockplan(applyNo, StockPlanStatusEnum.DOING.toString(), outRepositoryNo);
+//            int outstockorderStatus = saveOutstockOrder(outstockNo, applyNo, transportorderNo, bizOutstockplanDetailList.get(0).getOutstockType(), outRepositoryNo);
+//            if (outstockorderStatus == Constants.FAILURESTATUS) {
+//                throw new CommonException("2001", "生成出库单失败！");
+//            }
+//            // 2、保存出库单详单
+//            List<Long> longs = saveOutstockorderDetail(bizOutstockorderDetailList, outstockNo, bizOutstockplanDetailList);
+//            if (null != longs && longs.size() == 0) {
+//                throw new CommonException("2002", "保存出库单详单失败！");
+//            }
+//            // 复核库存和计划
+//            checkStockAndPlan(applyNo, outRepositoryNo, outstockNo, bizOutstockplanDetailList);
+
             // 查询出库计划
-            List<BizOutstockplanDetail> bizOutstockplanDetailList = outStockPlanService.queryOutstockplan(applyNo, StockPlanStatusEnum.DOING.toString(), outRepositoryNo);
-            int outstockorderStatus = saveOutstockOrder(outstockNo, applyNo, transportorderNo, bizOutstockplanDetailList.get(0).getOutstockType(), outRepositoryNo);
-            if (outstockorderStatus == Constants.FAILURESTATUS) {
+            List<BizOutstockplanDetail> outstockPlans = bizOutstockplanDetailDao.getOutstockplansByApplyNo(applyNo, userHolder.getLoggedUser().getOrganization().getOrgCode());
+            autoSaveOutstockOrder(applyNo, outstockPlans, ApplyTypeEnum.APPLYORDER.name());
+            // 保存出库单后回填物流单号
+            // 根据申请单查询出库单号
+            List<String> outstockNo = bizOutstockOrderDao.queryOutstockByApplyNo(applyNo);
+            if (outstockNo.isEmpty()) {
                 throw new CommonException("2001", "生成出库单失败！");
             }
-            // 2、保存出库单详单
-            List<Long> longs = saveOutstockorderDetail(bizOutstockorderDetailList, outstockNo, bizOutstockplanDetailList);
-            if (null != longs && longs.size() == 0) {
-                throw new CommonException("2002", "保存出库单详单失败！");
-            }
-            // 复核库存和计划
-            checkStockAndPlan(applyNo, outRepositoryNo, outstockNo, bizOutstockplanDetailList);
-            BizServiceLog bizServiceLog = new BizServiceLog();
-            bizServiceLog.setModel(BizServiceLog.modelEnum.ERP.name());
-            bizServiceLog.setAction(BizServiceLog.actionEnum.SAVE.name());
-            bizServiceLog.setSubjectType("OutstockOrderServiceImpl");
-            bizServiceLog.setSubjectKeyvalue(outstockNo);
-            bizServiceLog.setLogContent("保存出库单");
-            bizServiceLog.setOwnerOrgno(userHolder.getLoggedUser().getOrganization().getOrgCode());
-            bizServiceLog.setOwnerOrgname(userHolder.getLoggedUser().getOrganization().getOrgName());
-            bizServiceLog.preInsert(userHolder.getLoggedUser().getUserId());
-            serviceLogService.create(bizServiceLog);
+            // 回填物流单号
+            bizOutstockOrderDao.updateTransportorderNo(outstockNo, transportorderNo);
             return StatusDto.buildSuccessStatusDto("保存成功！");
         } catch (Exception e) {
             logger.error("生成出库单失败！", e.getMessage());
@@ -321,8 +329,8 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      * @date 2018-08-11 13:17:42
      */
     @Override
-    public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String outRepositoryNo, String productType) {
-        return outStockPlanService.queryOutstockplanList(applyNo, outRepositoryNo, productType);
+    public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String productType) {
+        return outStockPlanService.queryOutstockplanList(applyNo, userHolder.getLoggedUser().getOrganization().getOrgCode(), productType);
     }
 
     /**

@@ -707,7 +707,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         String userOrgCode = getUserOrgCode();
         HashMap<String, Object> map = Maps.newHashMap();
         // 根据申请单号查询出库单号
-        BizOutstockOrderDTO outstockOrderDTO = bizOutstockOrderDao.getByTradeDocno(applyNo);
+        BizOutstockOrderDTO outstockOrderDTO = bizOutstockOrderDao.getSigleOutStockByTradeDocno(applyNo);
         if(outstockOrderDTO != null){
             BizOutstockOrderDTO bizOutstockOrderDTO = bizOutstockOrderDao.getByOutstockNo(outstockOrderDTO.getOutstockorderNo());
             // 封装入库人
