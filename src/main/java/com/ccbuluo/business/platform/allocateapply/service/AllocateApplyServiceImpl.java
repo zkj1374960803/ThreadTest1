@@ -722,7 +722,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         if(outstockOrgno != null){
             if(outstockOrgno.equals(userOrgCode) || BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(userOrgCode)){
                 List<BizOutstockplanDetail> outstockplansByApplyNo = bizOutstockplanDetailDao.getOutstockplansByApplyNo(applyNo, null);
-                paddingOrgName(outstockplansByApplyNo);
+//                paddingOrgName(outstockplansByApplyNo);
                 map.put("stockPlanList", outstockplansByApplyNo);
             }
         }
@@ -744,7 +744,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                 Object stockPlanList = map.get("stockPlanList");
                 if(stockPlanList == null){
                     List<BizOutstockplanDetail> instockplansByApplyNo = bizInstockplanDetailDao.getInstockplansByApplyNo(applyNo);
-                    paddingOrgName(instockplansByApplyNo);
+//                    paddingOrgName(instockplansByApplyNo);
                     map.put("stockPlanList", instockplansByApplyNo);
                 }
             }
