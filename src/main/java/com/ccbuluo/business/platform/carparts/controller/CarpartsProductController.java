@@ -220,26 +220,7 @@ public class CarpartsProductController extends BaseController {
         return carpartsProductServiceImpl.queryCarpartsProductPriceList(queryCarpartsProductDTO);
     }
 
-    /**
-     * 查询维修单的零配件列表
-     * @param
-     * @exception
-     * @return
-     * @author zhangkangjian
-     * @date 2018-09-28 10:31:47
-     */
-    @ApiOperation(value = "查询维修单的零配件列表",notes = "【张康健】")
-    @GetMapping("/queryserviceproductlist")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "carpartsPriceType", value = "(注:无价格:NOPRICE，有价格:HAVEPRICE）", required = false, paramType = "query"),
-        @ApiImplicitParam(name = "categoryCode", value = "零部件分类code", required = false, paramType = "query"),
-        @ApiImplicitParam(name = "keyword", value = "零配件编号/名称", required = false, paramType = "query"),
-        @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
-        @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query")
-    })
-    public StatusDto<Page<BasicCarpartsProductDTO>> queryServiceProductList(@ApiIgnore QueryCarpartsProductDTO queryCarpartsProductDTO) {
-        return carpartsProductServiceImpl.queryServiceProductList(queryCarpartsProductDTO);
-    }
+
 
 
 }
