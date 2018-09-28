@@ -57,7 +57,7 @@ public interface OutstockOrderService {
      * @author liuduo
      * @date 2018-08-11 13:17:42
      */
-    List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String outRepositoryNo, String productType);
+    List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String productType);
 
     /**
      * 分页查询出库单列表

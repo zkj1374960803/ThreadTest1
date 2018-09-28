@@ -72,7 +72,7 @@ public class CustmanagerOutstockOrderController extends BaseController {
     public StatusDto<List<BizOutstockplanDetail>> queryOutstockplan(@RequestParam String applyNo,
                                                                     @RequestParam String outRepositoryNo,
                                                                     @RequestParam String productType) {
-        return StatusDto.buildDataSuccessStatusDto(outstockOrderService.queryOutstockplan(applyNo, outRepositoryNo, productType));
+        return StatusDto.buildDataSuccessStatusDto(outstockOrderService.queryOutstockplan(applyNo, productType));
     }
 
 
