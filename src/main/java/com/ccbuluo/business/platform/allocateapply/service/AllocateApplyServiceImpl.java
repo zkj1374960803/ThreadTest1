@@ -1253,7 +1253,16 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                 map.put(a.getProductNo(), ret.longValue() + amount);
             }
         });
-        List<ProductStockInfoDTO> allocateapplyDetailList = checkStockQuantityDTO.getProductInfoList();
+        List<ProductStockInfoDTO> allocateapplyDetailList = Lists.newArrayList();
+        List<ProductStockInfoDTO> productStockInfoDTOS = Optional.ofNullable(checkStockQuantityDTO.getProductInfoList()).orElse(Lists.newArrayList());
+        // 根据商品的编号分组统计申请的数量
+        Map<String, List<ProductStockInfoDTO>> productStockInfoDTOMap = productStockInfoDTOS.stream().collect(Collectors.groupingBy(ProductStockInfoDTO::getProductNo));
+        productStockInfoDTOMap.forEach((key, value)->{
+            Long sumApplyProductNum = value.stream().mapToLong(ProductStockInfoDTO::getApplyProductNum).sum();
+            ProductStockInfoDTO productStockInfoDTO = value.get(0);
+            productStockInfoDTO.setApplyProductNum(sumApplyProductNum);
+            allocateapplyDetailList.add(productStockInfoDTO);
+        });
         return getListStatusDto(map, allocateapplyDetailList);
     }
 
