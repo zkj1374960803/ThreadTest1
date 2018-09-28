@@ -217,6 +217,14 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
             // 查询出库计划
             List<BizOutstockplanDetail> outstockPlans = bizOutstockplanDetailDao.getOutstockplansByApplyNo(applyNo, userHolder.getLoggedUser().getOrganization().getOrgCode());
             autoSaveOutstockOrder(applyNo, outstockPlans, ApplyTypeEnum.APPLYORDER.name());
+            // 保存出库单后回填物流单号
+            // 根据申请单查询出库单号
+            List<String> outstockNo = bizOutstockOrderDao.queryOutstockByApplyNo(applyNo);
+            if (outstockNo.isEmpty()) {
+                throw new CommonException("2001", "生成出库单失败！");
+            }
+            // 回填物流单号
+            bizOutstockOrderDao.updateTransportorderNo(outstockNo, transportorderNo);
             return StatusDto.buildSuccessStatusDto("保存成功！");
         } catch (Exception e) {
             logger.error("生成出库单失败！", e.getMessage());

@@ -183,4 +183,37 @@ public class BizOutstockOrderDao extends BaseDao<BizOutstockOrder> {
 
         updateForMap(sql, params);
     }
+
+    /**
+     * 根据申请单号查询出库单号
+     * @param applyNo 申请单号
+     * @return 出库单号
+     * @author liuduo
+     * @date 2018-09-28 15:28:03
+     */
+    public List<String> queryOutstockByApplyNo(String applyNo) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+
+        String sql = "SELECT outstockorder_no FROM biz_outstock_order WHERE trade_docno = :applyNo";
+
+        return querySingColum(String.class, sql, params);
+    }
+
+    /**
+     * 回填物流单号
+     * @param outstockNo 出库单号
+     * @param transportorderNo 物流单号
+     * @author liuduo
+     * @date 2018-09-28 15:35:43
+     */
+    public void updateTransportorderNo(List<String> outstockNo, String transportorderNo) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("outstockNo", outstockNo);
+        params.put("transportorderNo", transportorderNo);
+
+        String sql = "UPDATE biz_outstock_order SET transportorder_no = :transportorderNo WHERE outstockorder_no IN(:outstockNo)";
+
+        updateForMap(sql, params);
+    }
 }
