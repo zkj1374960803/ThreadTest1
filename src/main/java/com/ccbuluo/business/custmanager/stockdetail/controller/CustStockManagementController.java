@@ -5,12 +5,15 @@ import com.ccbuluo.business.platform.allocateapply.dto.CheckStockQuantityDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.ProductStockInfoDTO;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
+import com.ccbuluo.business.platform.carparts.service.CarpartsProductPriceService;
 import com.ccbuluo.business.platform.stockdetail.dao.FindBatchStockListDTO;
 import com.ccbuluo.business.platform.stockdetail.dao.FindStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.service.StockManagementService;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
+import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +35,8 @@ public class CustStockManagementController extends BaseController {
     private StockManagementService stockManagementService;
     @Resource(name = "allocateApplyServiceImpl")
     private AllocateApplyService allocateApplyServiceImpl;
+    @Resource(name = "carpartsProductPriceServiceImpl")
+    private CarpartsProductPriceService carpartsProductServiceImpl;
 
 
     /**
@@ -254,6 +259,27 @@ public class CustStockManagementController extends BaseController {
     public StatusDto<Page<FindStockListDTO>> findAllEquipmentStockList(@ApiIgnore FindStockListDTO findStockListDTO){
         Page<FindStockListDTO> page = allocateApplyServiceImpl.findAllEquipmentStockList(findStockListDTO);
         return StatusDto.buildDataSuccessStatusDto(page);
+    }
+
+    /**
+     * 查询维修单的零配件列表
+     * @param
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-09-28 10:31:47
+     */
+    @ApiOperation(value = "查询维修单的零配件列表",notes = "【张康健】")
+    @GetMapping("/queryserviceproductlist")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "carpartsPriceType", value = "(注:无价格:NOPRICE，有价格:HAVEPRICE）", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "categoryCode", value = "零部件分类code", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "keyword", value = "零配件编号/名称", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query")
+    })
+    public StatusDto<Page<BasicCarpartsProductDTO>> queryServiceProductList(@ApiIgnore QueryCarpartsProductDTO queryCarpartsProductDTO) {
+        return carpartsProductServiceImpl.queryServiceProductList(queryCarpartsProductDTO);
     }
 
 }
