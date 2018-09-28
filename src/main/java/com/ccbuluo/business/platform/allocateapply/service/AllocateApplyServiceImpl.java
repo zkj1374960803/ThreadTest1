@@ -326,15 +326,31 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
 
     /**
      * 查询申请列表
+     * @param whetherQueryAll 是否查询全部
+     * @param productType 商品的类型
+     * @param orgType 机构的类型
+     * @param processType 处理的类型
+     * @param applyStatus 申请的状态
+     * @param applyNo 申请单的编号
+     * @param offset 偏移量
+     * @param pageSize 每页显示的数量
      * @return Page<QueryAllocateApplyListDTO> 分页的信息
      * @author zhangkangjian
      * @date 2018-08-09 10:36:34
      */
     @Override
-    public Page<QueryAllocateApplyListDTO> findApplyList(String productType, String orgType, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize) {
+    public Page<QueryAllocateApplyListDTO> findApplyList(Boolean whetherQueryAll, String productType, String orgType, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize) {
         // 获取用户的组织机构
         String userOrgCode = getUserOrgCode();
         List<String> orgCodes = getOrgCodesByOrgType(orgType);
+        // 查询全部，不限制当前登陆人和机构类型（根据orgType查询orgCodes）
+        if(whetherQueryAll == null){
+            whetherQueryAll = false;
+        }
+        if(whetherQueryAll){
+            userOrgCode = null;
+            orgCodes = null;
+        }
         // 查询分页的申请列表
         // 如果类型是空的话，全部类型，查询所有的申请数据
         Page<QueryAllocateApplyListDTO> page = new Page<>();
@@ -354,6 +370,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         findOrgName(page);
         return page;
     }
+
+
 
     private void findOrgName(Page<QueryAllocateApplyListDTO> page) {
         Optional.ofNullable(page.getRows()).ifPresent(a ->{
@@ -689,7 +707,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         String userOrgCode = getUserOrgCode();
         HashMap<String, Object> map = Maps.newHashMap();
         // 根据申请单号查询出库单号
-        BizOutstockOrderDTO outstockOrderDTO = bizOutstockOrderDao.getByTradeDocno(applyNo);
+        BizOutstockOrderDTO outstockOrderDTO = bizOutstockOrderDao.getSigleOutStockByTradeDocno(applyNo);
         if(outstockOrderDTO != null){
             BizOutstockOrderDTO bizOutstockOrderDTO = bizOutstockOrderDao.getByOutstockNo(outstockOrderDTO.getOutstockorderNo());
             // 封装入库人
@@ -1235,7 +1253,16 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                 map.put(a.getProductNo(), ret.longValue() + amount);
             }
         });
-        List<ProductStockInfoDTO> allocateapplyDetailList = checkStockQuantityDTO.getProductInfoList();
+        List<ProductStockInfoDTO> allocateapplyDetailList = Lists.newArrayList();
+        List<ProductStockInfoDTO> productStockInfoDTOS = Optional.ofNullable(checkStockQuantityDTO.getProductInfoList()).orElse(Lists.newArrayList());
+        // 根据商品的编号分组统计申请的数量
+        Map<String, List<ProductStockInfoDTO>> productStockInfoDTOMap = productStockInfoDTOS.stream().collect(Collectors.groupingBy(ProductStockInfoDTO::getProductNo));
+        productStockInfoDTOMap.forEach((key, value)->{
+            Long sumApplyProductNum = value.stream().mapToLong(ProductStockInfoDTO::getApplyProductNum).sum();
+            ProductStockInfoDTO productStockInfoDTO = value.get(0);
+            productStockInfoDTO.setApplyProductNum(sumApplyProductNum);
+            allocateapplyDetailList.add(productStockInfoDTO);
+        });
         return getListStatusDto(map, allocateapplyDetailList);
     }
 

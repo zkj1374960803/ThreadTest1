@@ -27,4 +27,12 @@ public interface CarpartsProductPriceService {
      * @date 2018-09-06 19:27:11
      */
     void saveProductPrice(RelProductPrice relProductPrice);
+    /**
+     * 查询维修单的零配件列表
+     * @param queryCarpartsProductDTO 查询条件
+     * @return StatusDto<Page<BasicCarpartsProductDTO>> 查询分页信息
+     * @author zhangkangjian
+     * @date 2018-09-28 10:31:47
+     */
+    StatusDto<Page<BasicCarpartsProductDTO>> queryServiceProductList(QueryCarpartsProductDTO queryCarpartsProductDTO);
 }

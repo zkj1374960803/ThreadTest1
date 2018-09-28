@@ -38,13 +38,19 @@ public interface AllocateApplyService {
     FindAllocateApplyDTO findDetail(String applyNo);
     /**
      * 查询申请列表
-     * @param
-     * @exception
+     * @param whetherQueryAll 是否查询全部
+     * @param productType 商品的类型
+     * @param orgType 机构的类型
+     * @param processType 处理的类型
+     * @param applyStatus 申请的状态
+     * @param applyNo 申请单的编号
+     * @param offset 偏移量
+     * @param pageSize 每页显示的数量
      * @return Page<QueryAllocateApplyListDTO> 分页的信息
      * @author zhangkangjian
      * @date 2018-08-09 10:36:34
      */
-    Page<QueryAllocateApplyListDTO> findApplyList(String productType, String orgType, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize);
+    Page<QueryAllocateApplyListDTO> findApplyList(Boolean whetherQueryAll, String productType, String orgType, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize);
     /**
      * 查询处理申请列表
      * @param

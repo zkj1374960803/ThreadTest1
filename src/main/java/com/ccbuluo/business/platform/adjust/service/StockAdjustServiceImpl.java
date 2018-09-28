@@ -156,12 +156,12 @@ public class StockAdjustServiceImpl implements StockAdjustService{
                }
               int saveAdjustStatus = saveStockAdjust(saveBizStockAdjustDTO, adjustNo);
                if (saveAdjustStatus == Constants.FAILURESTATUS) {
-                   throw new CommonException("10001", "生成盘库单失败！");
+                   throw new CommonException("4001", "生成盘库单失败！");
                }
               // 2、保存盘库单详单
               List<Long> ids = saveAdjustDetail(saveBizStockAdjustDTO, adjustNo);
-              if (null == ids && ids.size() == 0) {
-                  return StatusDto.buildFailure("保存失败！");
+              if (ids.isEmpty()) {
+                  throw new CommonException("4002", "生成盘库单详单失败！");
               }
               return StatusDto.buildSuccessStatusDto("保存成功！");
           } catch (Exception e) {
