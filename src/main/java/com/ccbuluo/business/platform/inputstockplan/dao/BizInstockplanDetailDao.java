@@ -296,9 +296,9 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT a.id,a.instock_type,a.product_no,a.product_unit,a.product_name,a.product_type,a.product_categoryname,a.seller_orgno AS 'outOrgno',")
-            .append("a.trade_no,a.supplier_no,a.instock_repository_no,a.cost_price,b.supplier_name,")
+            .append("a.trade_no,a.supplier_no,a.instock_repository_no,a.cost_price,b.supplier_name,c.storehouse_name as 'outOrgName',")
             .append("IFNULL(a.plan_instocknum,0) AS 'planOutstocknum',IFNULL(a.actual_instocknum,0) AS actualInstocknum,a.complete_status,a.complete_time")
-            .append(" FROM biz_instockplan_detail a left join biz_service_supplier b on a.supplier_no = b.supplier_code")
+            .append(" FROM biz_instockplan_detail a left join biz_service_supplier b on a.supplier_no = b.supplier_code left join biz_service_storehouse c on c.storehouse_code = a.instock_repository_no")
             .append(" WHERE a.delete_flag = :deleteFlag ");
         if(StringUtils.isNotBlank(applyNo)){
             sql.append(" AND a.trade_no= :applyNo ");
