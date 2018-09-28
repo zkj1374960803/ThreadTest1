@@ -49,7 +49,7 @@ public class BizInstockOrderDao extends BaseDao<BizInstockOrder> {
 
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,instock_orderno,instock_orgno,trade_docno,instock_type,instock_time,instock_operator,transportorder_no")
-            .append("  FROM biz_instock_order WHERE trade_docno = :tradeDocno");
+            .append("  FROM biz_instock_order WHERE trade_docno = :tradeDocno limit 0,1");
         return findForBean(BizInstockOrderDTO.class, sql.toString(), params);
     }
     /**
