@@ -1,7 +1,10 @@
 package com.ccbuluo.business.platform.custmanager.dto;
 
+import com.ccbuluo.business.custmanager.allocateapply.dto.QueryPendingMaterialsDTO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.util.List;
 
 /**
  * @author zhangkangjian
@@ -27,6 +30,16 @@ public class QueryUserListDTO {
     private Long vinId;
     @ApiModelProperty(name = "receivingAddress", value = "收货地址")
     private String receivingAddress;
+    @ApiModelProperty(name = "queryPendingMaterialsDTO", value = "物料领取的列表")
+    private List<QueryPendingMaterialsDTO> queryPendingMaterialsDTO;
+
+    public List<QueryPendingMaterialsDTO> getQueryPendingMaterialsDTO() {
+        return queryPendingMaterialsDTO;
+    }
+
+    public void setQueryPendingMaterialsDTO(List<QueryPendingMaterialsDTO> queryPendingMaterialsDTO) {
+        this.queryPendingMaterialsDTO = queryPendingMaterialsDTO;
+    }
 
     public String getReceivingAddress() {
         return receivingAddress;
