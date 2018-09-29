@@ -98,11 +98,7 @@ public class BizInstockOrderDao extends BaseDao<BizInstockOrder> {
         }
         if (StringUtils.isNotBlank(instockNo)) {
             params.put("instockNo", instockNo);
-            if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-                sql.append(" AND  (bio.instock_orderno like CONCAT('%',:instockNo,'%') OR bio.trade_docno like CONCAT('%',:instockNo,'%'))");
-            } else {
-                sql.append(" AND  bio.instock_orderno like CONCAT('%',:instockNo,'%')");
-            }
+            sql.append(" AND  (bio.instock_orderno like CONCAT('%',:instockNo,'%') OR bio.trade_docno like CONCAT('%',:instockNo,'%'))");
         }
         sql.append(" ORDER BY bio.operate_time DESC");
 
