@@ -366,9 +366,9 @@ public class CustmanagerServiceImpl implements CustmanagerService{
             Map<String, List<QueryPendingMaterialsDTO>> collect = a.stream().collect(Collectors.groupingBy(QueryPendingMaterialsDTO::getApplyeruuid));
             Optional.ofNullable(page.getRows()).ifPresent(b ->{
                 b.forEach(item ->{
-                    List<QueryPendingMaterialsDTO> queryPendingMaterialsDTOS1 = collect.get(item.getUseruuid());
-                    if(queryPendingMaterialsDTOS1 != null && queryPendingMaterialsDTOS1.size() > 0){
-                        item.setMaterialsNumber((long) queryPendingMaterialsDTOS1.size());
+                    List<QueryPendingMaterialsDTO> pendingMaterials = collect.get(item.getUseruuid());
+                    if(pendingMaterials != null && pendingMaterials.size() > 0){
+                        item.setQueryPendingMaterialsDTO(pendingMaterials);
                     }
                 });
             });

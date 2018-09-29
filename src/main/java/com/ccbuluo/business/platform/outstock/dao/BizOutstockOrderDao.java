@@ -83,11 +83,7 @@ public class BizOutstockOrderDao extends BaseDao<BizOutstockOrder> {
         }
         if (StringUtils.isNotBlank(outstockNo)) {
             params.put("outstockNo", outstockNo);
-            if (userHolder.getLoggedUser().getOrganization().getOrgCode().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
-                sql.append(" AND  (boo.outstockorder_no like CONCAT('%',:outstockNo,'%') OR boo.trade_docno like CONCAT('%',:outstockNo,'%'))");
-            } else {
-                sql.append(" AND  boo.outstockorder_no like CONCAT('%',:outstockNo,'%')");
-            }
+            sql.append(" AND  (boo.outstockorder_no like CONCAT('%',:outstockNo,'%') OR boo.trade_docno like CONCAT('%',:outstockNo,'%'))");
         }
         sql.append(" ORDER BY boo.operate_time DESC");
 
