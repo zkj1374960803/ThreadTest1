@@ -40,9 +40,9 @@ base:
   #本系统域名
   url: logintest.ccbuluo.cn
   #本系统的appid
-  appid: 681fe3bf2bcf4a0f8fc4bc1497d9a4f6
+  appid: 41f8d25f461e471cb8ffb756012a4f36
   #本系统的secret
-  secret: 6c28edbc36214242858fbea49fe58098
+  secret: a71797ae9cd64a0eb622ba2f0735f3e4
   #售后系统顶级机构编号
   topplatform: "SC000001"
   #顶级服务中心code
