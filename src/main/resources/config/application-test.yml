@@ -71,7 +71,7 @@ cookie:
 #验证码配置
 verification:
   #本系统是否开启验证码校验,有值且为true时,有效
-  check: true
+  check: false
 
 
 #dev开发环境中配置默认登录用户:
