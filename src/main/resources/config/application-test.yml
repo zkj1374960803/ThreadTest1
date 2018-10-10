@@ -50,7 +50,7 @@ base:
   #客户经理组织机构
   custmanager: "SC000003"
   #客户经理角色code
-  custmanagerrolecode: "JS024"
+  custmanagerrolecode: "SH000007"
 
   #小程序基础相关配置
   mini:
