@@ -2,7 +2,9 @@ package com.ccbuluo.business.platform.carconfiguration.controller;
 
 import com.ccbuluo.business.platform.carconfiguration.entity.CarbrandManage;
 import com.ccbuluo.business.platform.carconfiguration.service.BasicCarbrandManageService;
+import com.ccbuluo.core.annotation.validate.ValidateGroup;
 import com.ccbuluo.core.controller.BaseController;
+import com.ccbuluo.core.validate.Group;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -41,7 +43,7 @@ public class BasicCarbrandManageController extends BaseController {
         @ApiImplicitParam(name = "sortNumber", value = "排序号", required = true, paramType = "query"),
         @ApiImplicitParam(name = "carbrandLogo", value = "品牌logo", paramType = "query")})
     @PostMapping("/create")
-    public StatusDto create(@ApiIgnore CarbrandManage carbrandManage) {
+    public StatusDto create(@ValidateGroup(value = Group.Add.class)@ApiIgnore CarbrandManage carbrandManage) {
         return basicCarbrandManageService.saveCarbrandManage(carbrandManage);
     }
 
