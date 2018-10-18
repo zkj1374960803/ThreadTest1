@@ -7,7 +7,11 @@ import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHand
 import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.business.platform.outstock.dto.SaveOutstockorderDetailDTO;
 import com.ccbuluo.business.platform.outstock.service.OutstockOrderService;
+import com.ccbuluo.core.annotation.validate.ValidateGroup;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.controller.BaseController;
+import com.ccbuluo.core.validate.ValidateUtils;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.*;
@@ -43,7 +47,8 @@ public class OutstockOrderController extends BaseController {
      */
     @ApiOperation(value = "出库单新增", notes = "【刘铎】")
     @PostMapping("/save")
-    public StatusDto<String> saveOutstockOrder( @ApiParam(name = "出库单详单集合", value = "传入json格式", required = true)@RequestBody SaveOutstockorderDetailDTO saveOutstockorderDetailDTO) {
+    public StatusDto<String> saveOutstockOrder( @ApiParam(name = "出库单详单集合", value = "传入json格式", required = true)@RequestBody @ValidateGroup SaveOutstockorderDetailDTO saveOutstockorderDetailDTO) {
+        ValidateUtils.validate(saveOutstockorderDetailDTO.getBizOutstockorderDetailList(), null);
         return outstockOrderService.saveOutstockOrder(saveOutstockorderDetailDTO.getApplyNo(), saveOutstockorderDetailDTO.getOutRepositoryNo(),
             saveOutstockorderDetailDTO.getTransportorderNo(), saveOutstockorderDetailDTO.getBizOutstockorderDetailList());
     }
@@ -57,7 +62,7 @@ public class OutstockOrderController extends BaseController {
     @ApiOperation(value = "查询申请单", notes = "【刘铎】")
     @ApiImplicitParam(name = "productType", value = "商品类型(物料或者备件)",  required = true, paramType = "query")
     @GetMapping("/queryapplyno")
-    public StatusDto<List<String>> queryApplyNo(@RequestParam String productType) {
+    public StatusDto<List<String>> queryApplyNo(@RequestParam @ValidateNotBlank(message = "productType(商品类型(物料或者备件))不能为空") String productType) {
         return StatusDto.buildDataSuccessStatusDto(outstockOrderService.queryApplyNo(productType));
     }
 
@@ -74,9 +79,9 @@ public class OutstockOrderController extends BaseController {
         @ApiImplicitParam(name = "outRepositoryNo", value = "仓库编号",  required = true, paramType = "query"),
         @ApiImplicitParam(name = "productType", value = "商品类型（物料或者备件）",  required = true, paramType = "query")})
     @GetMapping("/queryoutstockplan")
-    public StatusDto<List<BizOutstockplanDetail>> queryOutstockplan(@RequestParam String applyNo,
+    public StatusDto<List<BizOutstockplanDetail>> queryOutstockplan(@RequestParam @ValidateNotBlank(message = "applyNo(申请单号)不能为空") String applyNo,
                                                                     @RequestParam String outRepositoryNo,
-                                                                    @RequestParam String productType) {
+                                                                    @RequestParam @ValidateNotBlank(message = "productType(商品类型(物料或者备件))不能为空") String productType) {
         return StatusDto.buildDataSuccessStatusDto(outstockOrderService.queryOutstockplan(applyNo, productType));
     }
 
@@ -99,7 +104,7 @@ public class OutstockOrderController extends BaseController {
         @ApiImplicitParam(name = "offset", value = "起始数",  required = true, paramType = "query", dataType = "int"),
         @ApiImplicitParam(name = "pageSize", value = "每页数",  required = true, paramType = "query", dataType = "int")})
     @GetMapping("/queryinstocklist")
-    public StatusDto<Page<BizOutstockOrder>> queryInstockList(@RequestParam String productType,
+    public StatusDto<Page<BizOutstockOrder>> queryInstockList(@RequestParam @ValidateNotBlank(message = "productType(商品类型(物料或者备件))不能为空") String productType,
                                                               @RequestParam(required = false) String outstockType,
                                                               @RequestParam(required = false) String outstockNo,
                                                               @RequestParam(defaultValue = "0") Integer offset,
@@ -118,7 +123,7 @@ public class OutstockOrderController extends BaseController {
     @ApiOperation(value = "出库单详情", notes = "【刘铎】")
     @ApiImplicitParam(name = "outstockNo", value = "出库单单号",  required = true, paramType = "query")
     @GetMapping("/getbyoutstockno")
-    public StatusDto<BizOutstockOrderDTO> getByOutstockNo(@RequestParam String outstockNo) {
+    public StatusDto<BizOutstockOrderDTO> getByOutstockNo(@RequestParam @ValidateNotBlank(message = "outstockNo(出库单单号)不能为空") String outstockNo) {
         return StatusDto.buildDataSuccessStatusDto(outstockOrderService.getByOutstockNo(outstockNo));
     }
 
@@ -132,7 +137,7 @@ public class OutstockOrderController extends BaseController {
     @ApiOperation(value = "出库仓库", notes = "【刘铎】")
     @ApiImplicitParam(name = "applyNo", value = "申请单号",  required = true, paramType = "query")
     @GetMapping("/getbyapplyno")
-    public StatusDto<List<String>> getByApplyNo(@RequestParam String applyNo) {
+    public StatusDto<List<String>> getByApplyNo(@RequestParam @ValidateNotBlank(message = "applyNo(申请单号)不能为空") String applyNo) {
         return StatusDto.buildDataSuccessStatusDto(outstockOrderService.getByApplyNo(applyNo));
     }
 
@@ -149,8 +154,8 @@ public class OutstockOrderController extends BaseController {
     @ApiImplicitParams({@ApiImplicitParam(name = "applyNo", value = "申请单号",  required = true, paramType = "query"),
         @ApiImplicitParam(name = "refundPrice", value = "退款金额",  required = true, paramType = "query", dataType = "int")})
     @PostMapping("/updaterefundprice")
-    public StatusDto updateRefundPrice(@RequestParam String applyNo,
-                                       @RequestParam BigDecimal refundPrice) {
+    public StatusDto updateRefundPrice(@RequestParam @ValidateNotBlank(message = "applyNo(申请单号)不能为空") String applyNo,
+                                       @RequestParam @ValidateNotNull(message = "refundPrice(退款金额)不能为空") BigDecimal refundPrice) {
         return applyHandleContext.updateTradeorderInfo(applyNo, refundPrice);
     }
 

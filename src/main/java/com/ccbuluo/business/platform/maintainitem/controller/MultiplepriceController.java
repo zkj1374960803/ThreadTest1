@@ -4,6 +4,9 @@ import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceMultipleprice;
 import com.ccbuluo.business.platform.maintainitem.dto.SaveBizServiceMultiplepriceDTO;
 import com.ccbuluo.business.platform.maintainitem.service.MultiplepriceService;
+import com.ccbuluo.core.annotation.validate.ValidateGroup;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -34,7 +37,7 @@ public class MultiplepriceController extends BaseController {
      */
     @ApiOperation(value = "地区倍数保存", notes = "【刘铎】")
     @PostMapping("/save")
-    public StatusDto saveMultipleprice(@ApiParam(name = "工时对象", value = "传入json格式", required = true)@RequestBody SaveBizServiceMultiplepriceDTO saveBizServiceMultiplepriceDTO) {
+    public StatusDto saveMultipleprice(@ApiParam(name = "工时对象", value = "传入json格式", required = true)@RequestBody @ValidateGroup SaveBizServiceMultiplepriceDTO saveBizServiceMultiplepriceDTO) {
         int status = multiplepriceService.save(saveBizServiceMultiplepriceDTO);
         if (status == Constants.FAILURESTATUS) {
             return StatusDto.buildFailure("保存失败！");
@@ -60,7 +63,7 @@ public class MultiplepriceController extends BaseController {
         @ApiImplicitParam(name = "offset", value = "起始数", paramType = "query", required = true, dataType = "int"),
         @ApiImplicitParam(name = "pageSize", value = "每页数", paramType = "query", required = true, dataType = "int"),})
     @GetMapping("/queryList")
-    public StatusDto<Page<BizServiceMultipleprice>> queryList(@RequestParam String maintainitemCode,
+    public StatusDto<Page<BizServiceMultipleprice>> queryList(@RequestParam @ValidateNotBlank(message = "maintainitemCode(服务项code)不能为空") String maintainitemCode,
                                                               @RequestParam(required = false) String provinceCode,
                                                               @RequestParam(required = false) String cityCode,
                                                               @RequestParam(defaultValue = "0") Integer offset,
@@ -79,7 +82,7 @@ public class MultiplepriceController extends BaseController {
     @ApiOperation(value = "地区倍数删除", notes = "【刘铎】")
     @ApiImplicitParam(name = "id", value = "地区倍数id", paramType = "query", required = true, dataType = "int")
     @DeleteMapping("/deletebyid")
-    public StatusDto deleteById(@RequestParam Long id) {
+    public StatusDto deleteById(@RequestParam @ValidateNotNull(message = "id不能为空") Long id) {
         int status = multiplepriceService.deleteById(id);
         if (status == Constants.FAILURESTATUS) {
             return StatusDto.buildFailure("删除失败！");

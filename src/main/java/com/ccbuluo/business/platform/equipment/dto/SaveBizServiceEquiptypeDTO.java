@@ -2,6 +2,8 @@ package com.ccbuluo.business.platform.equipment.dto;
 
 import com.ccbuluo.business.entity.AftersaleCommonEntity;
 import com.ccbuluo.business.entity.IdEntity;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateRange;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -16,6 +18,8 @@ public class SaveBizServiceEquiptypeDTO extends IdEntity {
     /**
      * 类型的名称
      */
+    @ValidateRange(min = 0, max = 6)
+    @ValidateNotBlank(message = "名称不能为空")
     @ApiModelProperty(name = "typeName", value = "类型的名称", required = true)
     private String typeName;
     /**
