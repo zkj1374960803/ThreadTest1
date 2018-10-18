@@ -1,5 +1,7 @@
 package com.ccbuluo.business.platform.supplier.dto;
 
+import com.ccbuluo.core.annotation.validate.*;
+import com.ccbuluo.core.validate.Group;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -17,6 +19,7 @@ public class EditSupplierDTO {
     /**
      * 供应商id
      */
+    @ValidateNotBlank(groups = Group.Update.class)
     @ApiModelProperty(name = "id", value = "供应商id", required = true)
     private Long id;
     /**
@@ -27,21 +30,25 @@ public class EditSupplierDTO {
     /**
      * 供应商名称
      */
+    @ValidateLength(min = 1, max = 50, groups = Group.Update.class, message = "供应商名称长度必须在1~50之间")
     @ApiModelProperty(name = "supplierName", value = "供应商名称", required = true)
     private String supplierName;
     /**
      * 联系人
      */
+    @ValidateLength(min = 1, max = 10, groups = Group.Update.class, message = "联系人名称长度必须在1~10之间")
     @ApiModelProperty(name = "linkman", value = "联系人", required = true)
     private String linkman;
     /**
      * 联系电话
      */
+    @ValidatePhone(groups = Group.Update.class, message = "供应商联系电话格式不对")
     @ApiModelProperty(name = "supplierPhone", value = "联系电话", required = true)
     private String supplierPhone;
     /**
      * 详细地址
      */
+    @ValidateLength(min = 1, max = 50, groups = Group.Update.class, message = "详细地址长度必须在1~50之间")
     @ApiModelProperty(name = "supplierAddress", value = "详细地址", required = true)
     private String supplierAddress;
     /**
@@ -52,46 +59,55 @@ public class EditSupplierDTO {
     /**
      * 供应商性质
      */
+    @ValidatePattern(regexp = {"STATERUN","PRIVATE", "JOINTVENTURE"}, excludeNull = true, groups = Group.Update.class, message = "供应商性质不合法")
     @ApiModelProperty(name = "supplierNature", value = "供应商性质 国营(STATERUN) 民营（PRIVATE）合资（JOINTVENTURE）")
     private String supplierNature;
     /**
      * 成立时间
      */
+    @ValidateDateRange(pattern = "yyyy-MM-dd", excludeNull = true, groups = Group.Update.class, message = "成立时间格式不正确")
     @ApiModelProperty(name = "establishTime", value = "成立时间 Sting类型 例：2018-07-02")
     private Date establishTime;
     /**
      * 省
      */
+    @ValidateNotBlank(groups = Group.Update.class, message = "省名称不能为空")
     @ApiModelProperty(name = "provinceName", value = "省", required = true)
     private String provinceName;
     /**
      *
      */
+    @ValidateNotBlank(groups = Group.Update.class, message = "省code不能为空")
     @ApiModelProperty(name = "provinceCode", value = "省code", required = true)
     private String provinceCode;
     /**
      * 市
      */
+    @ValidateNotBlank(groups = Group.Update.class, message = "市名称不能为空")
     @ApiModelProperty(name = "cityName", value = "市", required = true)
     private String cityName;
     /**
      *
      */
+    @ValidateNotBlank(groups = Group.Update.class, message = "市code不能为空")
     @ApiModelProperty(name = "cityCode", value = "市code", required = true)
     private String cityCode;
     /**
      * 区
      */
+    @ValidateNotBlank(groups = Group.Update.class, message = "区名称不能为空")
     @ApiModelProperty(name = "areaName", value = "区", required = true)
     private String areaName;
     /**
      *
      */
+    @ValidateNotBlank(groups = Group.Update.class, message = "区code不能为空")
     @ApiModelProperty(name = "areaCode", value = "区code", required = true)
     private String areaCode;
     /**
      * 主营产品
      */
+    @ValidateLength(max = 100, groups = Group.Update.class, message = "主营产品名称长度必须在1~100之间")
     @ApiModelProperty(name = "majorProduct", value = "主营产品", required = true)
     private String majorProduct;
     /**

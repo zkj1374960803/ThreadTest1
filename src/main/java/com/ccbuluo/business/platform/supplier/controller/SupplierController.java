@@ -3,7 +3,12 @@ package com.ccbuluo.business.platform.supplier.controller;
 import com.ccbuluo.business.entity.BizServiceSupplier;
 import com.ccbuluo.business.platform.supplier.dto.*;
 import com.ccbuluo.business.platform.supplier.service.SupplierService;
+import com.ccbuluo.core.annotation.validate.ValidateGroup;
+import com.ccbuluo.core.annotation.validate.ValidateMax;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
 import com.ccbuluo.core.controller.BaseController;
+import com.ccbuluo.core.validate.Group;
+import com.ccbuluo.core.validate.ValidateUtils;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.*;
@@ -40,7 +45,7 @@ public class SupplierController extends BaseController {
      */
     @PostMapping("/createsupplier")
     @ApiOperation(value = "添加供应商",notes = "【张康健】")
-    public StatusDto createSupplier(BizServiceSupplier bizServiceSupplier) throws IOException {
+    public StatusDto createSupplier(@ValidateGroup(value = Group.Add.class) BizServiceSupplier bizServiceSupplier) throws IOException {
         return supplierServiceImpl.createSupplier(bizServiceSupplier);
     }
     
@@ -53,7 +58,7 @@ public class SupplierController extends BaseController {
      */
     @PostMapping("/editsupplier")
     @ApiOperation(value = "编辑供应商",notes = "【张康健】")
-    public StatusDto editsupplier(EditSupplierDTO editSupplierDTO) throws IOException {
+    public StatusDto editsupplier(@ValidateGroup(value = Group.Update.class)EditSupplierDTO editSupplierDTO) throws IOException {
         supplierServiceImpl.editsupplier(editSupplierDTO);
         return StatusDto.buildSuccessStatusDto();
     }
@@ -72,7 +77,7 @@ public class SupplierController extends BaseController {
         @ApiImplicitParam(name = "supplierStatus", value = "停用启用状态 1：启用 0：停用", required = true, paramType = "query")
     })
     @PostMapping("/disableandactivation")
-    public StatusDto disableAndActivation(Long id, Integer supplierStatus){
+    public StatusDto disableAndActivation(@ValidateMax(value = Long.MAX_VALUE) Long id, @ValidateMax(value = Integer.MAX_VALUE)Integer supplierStatus){
         supplierServiceImpl.updateSupplierStatus(id, supplierStatus);
         return StatusDto.buildSuccessStatusDto();
     }
@@ -86,7 +91,7 @@ public class SupplierController extends BaseController {
      */
     @ApiOperation(value = "分页查询供应商列表接口",notes = "【张康健】")
     @GetMapping("/querysupplierlist")
-    public StatusDto<Page<ResultSupplierListDTO>> querySupplierList(QuerySupplierListDTO querySupplierListDTO){
+    public StatusDto<Page<ResultSupplierListDTO>> querySupplierList(@ValidateGroup QuerySupplierListDTO querySupplierListDTO){
         return StatusDto.buildDataSuccessStatusDto(supplierServiceImpl.querySupplierList(querySupplierListDTO));
     }
 
@@ -113,7 +118,8 @@ public class SupplierController extends BaseController {
      */
     @ApiOperation(value = "添加关联商品",notes = "【张康健】")
     @PostMapping("/createrelsupplierproduct")
-    public StatusDto<String> createRelSupplierProduct(@ApiParam(name = "saveRelSupplierProductDTO", value = "保存供应商关联商品关系json", required = true)@RequestBody SaveRelSupplierProductDTO saveRelSupplierProductDTO){
+    public StatusDto<String> createRelSupplierProduct(@ApiParam(name = "saveRelSupplierProductDTO", value = "保存供应商关联商品关系json", required = true)@RequestBody @ValidateNotBlank SaveRelSupplierProductDTO saveRelSupplierProductDTO){
+        ValidateUtils.validate(saveRelSupplierProductDTO.getSupplierProductList(),null);
         return supplierServiceImpl.createRelSupplierProduct(saveRelSupplierProductDTO);
     }
 
@@ -132,7 +138,7 @@ public class SupplierController extends BaseController {
         @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query",dataType = "int"),
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query", dataType = "int")
     })
-    public StatusDto<Page<QueryRelSupplierProductDTO>> findSupplierProduct(@ApiIgnore QueryRelSupplierProductDTO queryRelSupplierProductDTO){
+    public StatusDto<Page<QueryRelSupplierProductDTO>> findSupplierProduct(@ApiIgnore @ValidateGroup QueryRelSupplierProductDTO queryRelSupplierProductDTO){
         Page<QueryRelSupplierProductDTO> page = supplierServiceImpl.findSupplierProduct(queryRelSupplierProductDTO);
         return StatusDto.buildDataSuccessStatusDto(page);
     }
@@ -165,7 +171,7 @@ public class SupplierController extends BaseController {
         @ApiImplicitParam(name = "type", value = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）", required = true, paramType = "query",dataType = "String")
     })
     @GetMapping("/querysupplierinfo")
-    public StatusDto<List<QuerySupplierInfoDTO>> querySupplierInfo(String code, String type){
+    public StatusDto<List<QuerySupplierInfoDTO>> querySupplierInfo(@ValidateNotBlank String code, @ValidateNotBlank String type){
         List<QuerySupplierInfoDTO> list = supplierServiceImpl.querySupplierInfo(code, type);
         return StatusDto.buildDataSuccessStatusDto(list);
     }
