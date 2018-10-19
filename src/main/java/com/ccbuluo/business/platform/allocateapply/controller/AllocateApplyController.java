@@ -9,10 +9,7 @@ import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
-import com.ccbuluo.core.annotation.validate.ValidateGroup;
-import com.ccbuluo.core.annotation.validate.ValidateMax;
-import com.ccbuluo.core.annotation.validate.ValidateMin;
-import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.*;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.core.validate.Group;
@@ -290,7 +287,7 @@ public class AllocateApplyController extends BaseController {
      */
     @PostMapping("/saveQuote")
     @ApiOperation(value = "保存价格(采购单)", notes = "【张康健】")
-    public StatusDto<String> saveQuote(@ApiParam(name = "ConfirmationQuoteDTO", value = "采购单填报价格（确认报价）", required = true) @RequestBody @ValidateNotBlank ConfirmationQuoteDTO confirmationQuoteDTO){
+    public StatusDto<String> saveQuote(@ApiParam(name = "ConfirmationQuoteDTO", value = "采购单填报价格（确认报价）", required = true) @RequestBody @ValidateNotNull ConfirmationQuoteDTO confirmationQuoteDTO){
         ValidateUtils.validate(confirmationQuoteDTO.getPerpayAmountDTO(), null);
         ValidateUtils.validate(confirmationQuoteDTO.getPurchaseProductInfo(), null);
         allocateApplyServiceImpl.saveQuote(confirmationQuoteDTO);
@@ -307,7 +304,7 @@ public class AllocateApplyController extends BaseController {
      */
     @PostMapping("/confirmationquote")
     @ApiOperation(value = "采购单填报价格（确认报价）", notes = "【张康健】")
-    public StatusDto<String> confirmationQuote(@ApiParam(name = "ConfirmationQuoteDTO", value = "采购单填报价格（确认报价）", required = true) @RequestBody @ValidateNotBlank ConfirmationQuoteDTO confirmationQuoteDTO){
+    public StatusDto<String> confirmationQuote(@ApiParam(name = "ConfirmationQuoteDTO", value = "采购单填报价格（确认报价）", required = true) @RequestBody @ValidateNotNull ConfirmationQuoteDTO confirmationQuoteDTO){
         ValidateUtils.validate(confirmationQuoteDTO.getPerpayAmountDTO(), null);
         ValidateUtils.validate(confirmationQuoteDTO.getPurchaseProductInfo(), null);
         allocateApplyServiceImpl.confirmationQuote(confirmationQuoteDTO);

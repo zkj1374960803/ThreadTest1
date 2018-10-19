@@ -17,7 +17,6 @@ public class PerpayAmountDTO {
     @ValidateNotBlank
     private String supplierCode;
     @ApiModelProperty(name = "supplierName", value = "供应商名称", hidden = true)
-    @ValidateNotBlank
     private String supplierName;
     @ValidateNotNull
     @ApiModelProperty(name = "perpayAmount", value = "预付款金额")
