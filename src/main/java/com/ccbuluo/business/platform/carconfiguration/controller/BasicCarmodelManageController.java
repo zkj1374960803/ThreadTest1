@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.carconfiguration.controller;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.carconfiguration.dao.CarmodelManageDTO;
 import com.ccbuluo.business.platform.carconfiguration.service.BasicCarmodelManageService;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.Api;
@@ -79,7 +80,7 @@ public class BasicCarmodelManageController extends BaseController {
     @ApiOperation(value = "根据车系id查询车型", notes = "【chaoshuai】")
     @ApiImplicitParam(name = "id", value = "车系id", required = true, paramType = "path")
     @GetMapping("/getbycarseriesid/{id}")
-    public StatusDto getByCarSeriesId(@PathVariable("id") Long id){
+    public StatusDto getByCarSeriesId(@PathVariable("id") @ValidateNotNull(message = "id(车型id)不能为空") Long id){
         return StatusDto.buildDataSuccessStatusDto(basicCarmodelManageService.getByCarSeriesId(id));
     }
     /**
@@ -122,7 +123,7 @@ public class BasicCarmodelManageController extends BaseController {
         @ApiImplicitParam(name = "status", value = "车型id", required = true, paramType = "query")
     })
     @PostMapping("/updatestatus")
-    public StatusDto updateStatus(Long id, int status){
+    public StatusDto updateStatus(@ValidateNotNull(message = "id(车型id)不能为空") Long id, int status){
         StatusDto statusDto = this.basicCarmodelManageService.stopOperationCarModel(id, status);
         return StatusDto.buildSuccessStatusDto(statusDto.getMessage());
     }
@@ -140,7 +141,7 @@ public class BasicCarmodelManageController extends BaseController {
             @ApiImplicitParam(name = "carmodelId", value = "车型id", dataType = "Long", required = true, paramType = "query"),
     })
     @GetMapping("/getcarmodelandlogo")
-    public StatusDto getCarmodelAndLogo(@RequestParam(name = "carmodelId") Long carmodelId){
+    public StatusDto getCarmodelAndLogo(@RequestParam(name = "carmodelId") @ValidateNotNull(message = "carmodelId(车型carmodelId)不能为空") Long carmodelId){
         return StatusDto.buildDataSuccessStatusDto(basicCarmodelManageService.getCarmodelAndLogo(carmodelId));
     }
 
@@ -167,7 +168,7 @@ public class BasicCarmodelManageController extends BaseController {
     @ApiOperation(value = "删除车型",notes = "【魏俊标】")
     @GetMapping("/delete")
     @ApiImplicitParam(name = "id", value = "车型id", required = true, paramType = "query")
-    public StatusDto delete(@RequestParam Long id) {
+    public StatusDto delete(@RequestParam @ValidateNotNull(message = "id(车型id)不能为空") Long id) {
         return basicCarmodelManageService.deleteCarmodelManageById(id);
     }
 

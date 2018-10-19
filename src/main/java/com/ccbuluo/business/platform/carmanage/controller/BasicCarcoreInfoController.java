@@ -7,6 +7,7 @@ import com.ccbuluo.business.platform.carmanage.dto.SearchCarcoreInfoDTO;
 import com.ccbuluo.business.platform.carmanage.dto.UpdateCarcoreInfoByVinDTO;
 import com.ccbuluo.business.platform.carmanage.dto.UpdateCarcoreInfoDTO;
 import com.ccbuluo.business.platform.carmanage.service.BasicCarcoreInfoService;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -70,7 +71,7 @@ public class BasicCarcoreInfoController extends BaseController {
     @ApiOperation(value = "根据车辆id查询车辆信息", notes = "【巢帅】carNumber:车辆编号,plateNumber:车牌号,vinNumber:车架号,storeName:门店名称,parkName:停车场")
     @ApiImplicitParam(name = "carId", value = "车辆id", required = true, paramType = "query")
     @GetMapping("/querycardetailbycarid")
-    public StatusDto queryCarDetailByCarId(Long carId) throws TException {
+    public StatusDto queryCarDetailByCarId(@ValidateNotNull(message = "id(车辆id)不能为空") Long carId) throws TException {
         return StatusDto.buildDataSuccessStatusDto(basicCarcoreInfoService.queryCarDetailByCarId(carId));
     }
 
@@ -85,7 +86,7 @@ public class BasicCarcoreInfoController extends BaseController {
     @ApiOperation(value = "删除车辆",notes = "【魏俊标】")
     @GetMapping("/delete/{carId}")
     @ApiImplicitParam(name = "carId", value = "车辆id", required = true, paramType = "path")
-    public StatusDto delete(@PathVariable Long carId) {
+    public StatusDto delete(@PathVariable @ValidateNotNull(message = "id(车辆id)不能为空") Long carId) {
         return basicCarcoreInfoService.deleteCarcoreInfoByCarId(carId);
     }
 
@@ -158,7 +159,7 @@ public class BasicCarcoreInfoController extends BaseController {
                         @ApiImplicitParam(name = "appId", value = "appId", required = true, paramType = "query"),
                         @ApiImplicitParam(name = "secretId", value = "secretId", required = true, paramType = "query")})
     @GetMapping("/getcarinfobyvin")
-    public StatusDto getCarInfoByVin(@RequestParam String vinNumber,@RequestParam String appId,@RequestParam String secretId) throws TException {
+    public StatusDto getCarInfoByVin(@RequestParam @ValidateNotNull(message = "vinNumber(车辆vinNumber)不能为空") String vinNumber,@RequestParam String appId,@RequestParam String secretId) throws TException {
         return basicCarcoreInfoService.getCarInfoByVin(vinNumber, appId, secretId);
     }
     /**
@@ -188,7 +189,7 @@ public class BasicCarcoreInfoController extends BaseController {
     @ApiOperation(value = "移除车辆与客户经理的关联关系", notes = "【刘铎】")
     @ApiImplicitParam(name = "carNumber", value = "车辆编码", required = true, paramType = "query")
     @GetMapping("/release")
-    public StatusDto release(@RequestParam String carNumber) {
+    public StatusDto release(@RequestParam @ValidateNotNull(message = "carNumber(车辆carNumber)不能为空") String carNumber) {
         int status = basicCarcoreInfoService.release(carNumber);
         if (status == Constants.FAILURESTATUS) {
             return StatusDto.buildFailure("操作失败！");
