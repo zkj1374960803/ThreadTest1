@@ -1,5 +1,9 @@
 package com.ccbuluo.business.platform.allocateapply.dto;
 
+import com.ccbuluo.business.constants.MyGroup;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidatePattern;
+import com.ccbuluo.core.validate.Group;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -55,6 +59,7 @@ public class AllocateApplyDTO {
     /**
      * 入库仓库编号
      */
+    @ValidateNotBlank(groups = Group.Add.class)
     @ApiModelProperty(name = "inRepositoryNo", value = "入库仓库编号")
     private String inRepositoryNo;
     /**
@@ -65,6 +70,7 @@ public class AllocateApplyDTO {
     /**
      * 出库的组织架构
      */
+    @ValidateNotBlank(groups = Group.Add.class)
     @ApiModelProperty(name = "outstockOrgno", value = "出库的组织架构(采购类型时，不必填)")
     private String outstockOrgno;
     /**
@@ -80,6 +86,7 @@ public class AllocateApplyDTO {
     /**
      * 平台决定的处理类型：调拨、采购
      */
+    @ValidatePattern(regexp = {"TRANSFER", "PURCHASE", "BARTER", "REFUND"}, groups = MyGroup.Add.class)
     @ApiModelProperty(name = "processType", value = "平台决定的处理类型(注：TRANSFER调拨、PURCHASE采购、BARTER调换、REFUND退款)")
     private String processType;
     /**

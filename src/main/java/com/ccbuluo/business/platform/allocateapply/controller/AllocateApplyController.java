@@ -8,8 +8,10 @@ import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
+import com.ccbuluo.core.annotation.validate.ValidateGroup;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
+import com.ccbuluo.core.validate.Group;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftBean;
@@ -55,7 +57,7 @@ public class AllocateApplyController extends BaseController {
      */
     @ApiOperation(value = "创建物料或者零配件申请", notes = "【张康健】")
     @PostMapping("/create")
-    public StatusDto<String> createAllocateApply(@ApiParam(name = "bizAllocateApply", value = "创建申请json", required = true) @RequestBody AllocateApplyDTO allocateApplyDTO){
+    public StatusDto<String> createAllocateApply(@ApiParam(name = "bizAllocateApply", value = "创建申请json", required = true) @RequestBody @ValidateGroup(Group.Add.class) AllocateApplyDTO allocateApplyDTO){
         allocateApplyServiceImpl.createAllocateApply(allocateApplyDTO);
         return StatusDto.buildSuccessStatusDto();
     }

@@ -1,5 +1,8 @@
 package com.ccbuluo.business.platform.allocateapply.dto;
 
+import com.ccbuluo.business.constants.MyGroup;
+import com.ccbuluo.core.annotation.validate.ValidateMax;
+import com.ccbuluo.core.annotation.validate.ValidateMin;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -48,6 +51,7 @@ public class AllocateapplyDetailDTO {
      * 申请的商品数量
      */
     @ApiModelProperty(name = "applyNum", value = "申请的商品数量")
+    @ValidateMin(value = 1, groups = MyGroup.Add.class)
     private Long applyNum;
     /**
      * 计量单位，用作展示冗余

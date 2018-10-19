@@ -2,6 +2,9 @@ package com.ccbuluo.business.platform.maintainitem.dto;
 
 import com.ccbuluo.business.entity.AftersaleCommonEntity;
 import com.ccbuluo.business.entity.IdEntity;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
+import com.ccbuluo.core.annotation.validate.ValidateRange;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -19,11 +22,14 @@ public class SaveBizServiceMaintainitemDTO extends IdEntity {
     /**
      * 服务项目名称
      */
+    @ValidateRange(min = 0, max = 10)
+    @ValidateNotBlank(message = "名称不能为空")
     @ApiModelProperty(name = "maintainitemName", value = "服务项目名称")
     private String maintainitemName;
     /**
      * 单价
      */
+    @ValidateNotNull(message = "单价不能为空")
     @ApiModelProperty(name = "unitPrice", value = "单价")
     private BigDecimal unitPrice;
 

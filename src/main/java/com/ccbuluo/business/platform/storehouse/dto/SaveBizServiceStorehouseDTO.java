@@ -2,6 +2,9 @@ package com.ccbuluo.business.platform.storehouse.dto;
 
 import com.ccbuluo.business.entity.AftersaleCommonEntity;
 import com.ccbuluo.business.entity.IdEntity;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
+import com.ccbuluo.core.annotation.validate.ValidateRange;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -16,21 +19,26 @@ public class SaveBizServiceStorehouseDTO extends IdEntity {
     /**
      * 名称
      */
+    @ValidateRange(min = 0, max = 10)
+    @ValidateNotBlank(message = "名称不能为空")
     @ApiModelProperty(name = "storehouseName", value = "名称", required = true)
     private String storehouseName;
     /**
      * 仓库面积单位平米
      */
+    @ValidateNotNull(message = "面积不能为空")
     @ApiModelProperty(name = "storehouseAcreage", value = "仓库面积单位平米", required = true)
     private Double storehouseAcreage;
     /**
      * 所属服务中心code（组织结构code）
      */
+    @ValidateNotBlank(message = "所属服务中心不能为空")
     @ApiModelProperty(name = "servicecenterCode", value = "所属服务中心code（组织结构code）", required = true)
     private String servicecenterCode;
     /**
      * 启用、停用
      */
+    @ValidateNotNull(message = "状态不能为空")
     @ApiModelProperty(name = "storehouseStatus", value = "启用、停用", required = true)
     private Long storehouseStatus;
     /**
@@ -62,6 +70,8 @@ public class SaveBizServiceStorehouseDTO extends IdEntity {
     /**
      * 详细地址
      */
+    @ValidateRange(min = 0, max = 100)
+    @ValidateNotBlank(message = "详细地址不能为空")
     @ApiModelProperty(name = "storehouseAddress", value = "详细地址", required = true)
     private String storehouseAddress;
 

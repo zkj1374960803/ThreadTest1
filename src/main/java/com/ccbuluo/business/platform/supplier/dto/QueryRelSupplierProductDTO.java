@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.supplier.dto;
 
+import com.ccbuluo.core.annotation.validate.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -42,16 +43,19 @@ public class QueryRelSupplierProductDTO {
     /**
      * 商品类型（注：PRODUCT零配件，EQUIPMENT物料）
      */
+    @ValidatePattern(regexp = {"FITTINGS", "EQUIPMENT"}, excludeNull = true)
     @ApiModelProperty(name = "productType", value = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）")
     private String productType;
     /**
      * 偏移量
      */
+    @ValidateNotBlank
     @ApiModelProperty(name = "offset", value = "偏移量", hidden = true)
     private Integer offset;
     /**
      * 每页显示的条数
      */
+    @ValidateNotBlank
     @ApiModelProperty(name = "pageSize", value = "每页显示的条数", hidden = true)
     private Integer pageSize;
 

@@ -1,5 +1,8 @@
 package com.ccbuluo.business.entity;
 
+import com.ccbuluo.core.annotation.validate.ValidateMin;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -27,21 +30,25 @@ public class BizInstockorderDetail extends AftersaleCommonEntity{
     /**
      * 商品编号
      */
+    @ValidateNotBlank(message = "商品编号不能为空")
     @ApiModelProperty(name = "productNo", value = "商品编号")
     private String productNo;
     /**
      * 商品名称
      */
+    @ValidateNotBlank(message = "商品名称不能为空")
     @ApiModelProperty(name = "productName", value = "商品名称")
     private String productName;
     /**
      * 商品类型
      */
+    @ValidateNotBlank(message = "申请单号不能为空")
     @ApiModelProperty(name = "productType", value = "商品类型")
     private String productType;
     /**
      * 商品分类名称,分类全路径，多个逗号隔开
      */
+    @ValidateNotBlank(message = "商品分类名称不能为空")
     @ApiModelProperty(name = "productCategoryname", value = "商品分类名称,分类全路径，多个逗号隔开")
     private String productCategoryname;
     /**
@@ -52,11 +59,15 @@ public class BizInstockorderDetail extends AftersaleCommonEntity{
     /**
      * 入库数量
      */
+    @ValidateMin(value = 0)
+    @ValidateNotNull(message = "入库数量不能为空")
     @ApiModelProperty(name = "instockNum", value = "入库数量")
     private Long instockNum;
     /**
      * 问题件数量
      */
+    @ValidateMin(value = 0)
+    @ValidateNotNull(message = "问题件数量不能为空")
     @ApiModelProperty(name = "problemNum", value = "问题件数量")
     private Long problemNum;
     /**

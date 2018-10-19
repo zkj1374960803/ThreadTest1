@@ -1,5 +1,8 @@
 package com.ccbuluo.business.entity;
 
+import com.ccbuluo.core.annotation.validate.ValidateMin;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -27,21 +30,25 @@ public class BizOutstockorderDetail extends AftersaleCommonEntity{
     /**
      * 商品编号
      */
+    @ValidateNotBlank(message = "出库仓库编号不能为空")
     @ApiModelProperty(name = "productNo", value = "商品编号")
     private String productNo;
     /**
      * 商品名称
      */
+    @ValidateNotBlank(message = "出库仓库编号不能为空")
     @ApiModelProperty(name = "productName", value = "商品名称")
     private String productName;
     /**
      * 商品类型(物料、零配件)
      */
+    @ValidateNotBlank(message = "出库仓库编号不能为空")
     @ApiModelProperty(name = "productType", value = "商品类型(物料、零配件)")
     private String productType;
     /**
      * 商品分类名称,多级逗号隔开
      */
+    @ValidateNotBlank(message = "出库仓库编号不能为空")
     @ApiModelProperty(name = "productCategoryname", value = "商品分类名称,多级逗号隔开")
     private String productCategoryname;
     /**
@@ -52,11 +59,14 @@ public class BizOutstockorderDetail extends AftersaleCommonEntity{
     /**
      * 出库数量
      */
+    @ValidateMin(0)
+    @ValidateNotNull(message = "出库仓库编号不能为空")
     @ApiModelProperty(name = "outstockNum", value = "出库数量")
     private Long outstockNum;
     /**
      * 库存类型
      */
+    @ValidateNotBlank(message = "出库仓库编号不能为空")
     @ApiModelProperty(name = "stockType", value = "库存类型")
     private String stockType;
     /**

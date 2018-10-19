@@ -12,6 +12,7 @@ import com.ccbuluo.business.platform.order.dto.*;
 import com.ccbuluo.business.platform.order.service.ServiceOrderService;
 import com.ccbuluo.business.vehiclelease.resdto.CarLesseeResDTO;
 import com.ccbuluo.business.vehiclelease.service.CarcoreInfoService;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCServer;
@@ -115,7 +116,8 @@ public class ServiceOrderController extends BaseController {
     @ApiImplicitParams({@ApiImplicitParam(name = "serviceOrderno", value = "维修单编号",  required = true, paramType = "query"),
         @ApiImplicitParam(name = "orderStatus", value = "维修单类型",  required = true, paramType = "query")})
     @PostMapping("/editstatus")
-    public StatusDto editStatus(@RequestParam String serviceOrderno,@RequestParam String orderStatus) {
+    public StatusDto editStatus(@RequestParam @ValidateNotNull(message = "serviceOrderno(维修单编号)不能为空") String serviceOrderno,
+                                @RequestParam @ValidateNotNull(message = "orderStatus(维修单类型)不能为空") String orderStatus) {
         return serviceOrderService.editStatus(serviceOrderno, orderStatus);
     }
 
@@ -140,9 +142,9 @@ public class ServiceOrderController extends BaseController {
      * @date 2018-09-04 16:18:43
      */
     @ApiOperation(value = "根据车牌号查询车辆信息", notes = "【刘铎】")
-    @ApiImplicitParam(name = "carNo", value = "车牌号",  required = false, paramType = "query")
+    @ApiImplicitParam(name = "carNo", value = "车牌号",  required = true, paramType = "query")
     @GetMapping("/getcarbycarno")
-    public StatusDto<CarcoreInfoDTO> getCarByCarNo(@RequestParam String carNo) {
+    public StatusDto<CarcoreInfoDTO> getCarByCarNo(@RequestParam @ValidateNotNull(message = "carNo(车牌号)不能为空") String carNo) {
         return basicCarcoreInfoService.getCarByCarNo(carNo);
     }
 
@@ -155,9 +157,9 @@ public class ServiceOrderController extends BaseController {
      * @date 2018-09-10 10:09:50
      */
     @ApiOperation(value = "根据车辆vin码查询车辆承租人的信息", notes = "【刘铎】")
-    @ApiImplicitParam(name = "vinNumber", value = "车辆vin码",  required = false, paramType = "query")
+    @ApiImplicitParam(name = "vinNumber", value = "车辆vin码",  required = true, paramType = "query")
     @GetMapping("/getuserbycarno")
-    public StatusDto<CarLesseeResDTO> getUserByCarno(@RequestParam String vinNumber) {
+    public StatusDto<CarLesseeResDTO> getUserByCarno(@RequestParam @ValidateNotNull(message = "vinNumber(车辆vin码)不能为空") String vinNumber) {
         StatusDtoThriftBean<CarLesseeResDTO> carLessee = carcoreInfoService.findCarLessee(vinNumber);
         return StatusDto.buildDataSuccessStatusDto(StatusDtoThriftUtils.resolve(carLessee, CarLesseeResDTO.class).getData());
     }
@@ -207,7 +209,7 @@ public class ServiceOrderController extends BaseController {
     @ApiOperation(value = "维修单详情", notes = "【刘铎】")
     @ApiImplicitParam(name = "serviceOrderno", value = "维修单编号",  required = true, paramType = "query")
     @GetMapping("/getdetailbyorderno")
-    public StatusDto<DetailServiceOrderDTO> getDetailByOrderNo(@RequestParam String serviceOrderno) {
+    public StatusDto<DetailServiceOrderDTO> getDetailByOrderNo(@RequestParam @ValidateNotNull(message = "serviceOrderno(维修单编号)不能为空") String serviceOrderno) {
         return serviceOrderService.getDetailByOrderNo(serviceOrderno);
     }
 
@@ -222,7 +224,7 @@ public class ServiceOrderController extends BaseController {
     @ApiOperation(value = "维修单日志", notes = "【刘铎】")
     @ApiImplicitParam(name = "serviceOrderno", value = "维修单编号",  required = true, paramType = "query")
     @GetMapping("/orderlog")
-    public StatusDto<List<BizServiceLog>> orderLog(@RequestParam String serviceOrderno) {
+    public StatusDto<List<BizServiceLog>> orderLog(@RequestParam @ValidateNotNull(message = "serviceOrderno(维修单编号)不能为空") String serviceOrderno) {
         return serviceOrderService.orderLog(serviceOrderno);
     }
 
@@ -240,7 +242,9 @@ public class ServiceOrderController extends BaseController {
         @ApiImplicitParam(name = "orgType", value = "分配的目标类型（服务中心）",  required = true, paramType = "query"),
         @ApiImplicitParam(name = "orgCodeOrUuid", value = "机构编号",  required = true, paramType = "query")})
     @PostMapping("/orderallocation")
-    public StatusDto orderAllocation(@RequestParam String serviceOrderno, @RequestParam String orgType, @RequestParam String orgCodeOrUuid) {
+    public StatusDto orderAllocation(@RequestParam @ValidateNotNull(message = "serviceOrderno(维修单编号)不能为空") String serviceOrderno,
+                                     @RequestParam @ValidateNotNull(message = "orgType(分配的目标类型（服务中心）)不能为空") String orgType,
+                                     @RequestParam @ValidateNotNull(message = "orgCodeOrUuid(机构编号)不能为空") String orgCodeOrUuid) {
         return serviceOrderService.orderAllocation(serviceOrderno, orgType, orgCodeOrUuid);
     }
 
@@ -331,7 +335,7 @@ public class ServiceOrderController extends BaseController {
     @ApiOperation(value = "查询维修单状态数量", notes = "【刘铎】")
     @ApiImplicitParam(name = "reportOrgno", value = "当前登录人的机构编号",  required = true, paramType = "query")
     @GetMapping("/queryorderstatusnum")
-    public StatusDto<Map<String, Long>> queryOrderStatusNum(@RequestParam String reportOrgno) {
+    public StatusDto<Map<String, Long>> queryOrderStatusNum(@RequestParam @ValidateNotNull(message = "reportOrgno(当前登录人的机构编号)不能为空") String reportOrgno) {
         return StatusDto.buildDataSuccessStatusDto(serviceOrderService.queryOrderStatusNum(reportOrgno));
     }
 
@@ -345,7 +349,7 @@ public class ServiceOrderController extends BaseController {
     @ApiOperation(value = "维修单取消", notes = "【魏俊标】")
     @ApiImplicitParam(name = "serviceOrderno", value = "维修单编号",  required = true, paramType = "query")
     @PostMapping("/cancelserviceorder")
-    public StatusDto cancelApply(@RequestParam String serviceOrderno) {
+    public StatusDto cancelApply(@RequestParam @ValidateNotNull(message = "serviceOrderno(维修单编号)不能为空") String serviceOrderno) {
         return serviceOrderService.cancelApply(serviceOrderno);
     }
 

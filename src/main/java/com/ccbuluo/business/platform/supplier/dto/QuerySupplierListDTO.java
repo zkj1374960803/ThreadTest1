@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.supplier.dto;
 
+import com.ccbuluo.core.annotation.validate.ValidateMax;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -21,7 +22,9 @@ public class QuerySupplierListDTO {
     @ApiModelProperty(name = "keyword", value = "供应商名称/联系人/联系方式")
    private String  keyword;
     @ApiModelProperty(name = "offset", value = "起始数", required = true)
+    @ValidateMax(value = Integer.MAX_VALUE)
    private Integer  offset;
+    @ValidateMax(value = Integer.MAX_VALUE)
     @ApiModelProperty(name = "pageSize", value = "每页的数量", required = true)
    private Integer  pageSize;
 

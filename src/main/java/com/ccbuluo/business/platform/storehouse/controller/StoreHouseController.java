@@ -5,6 +5,8 @@ import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.dto.SaveBizServiceStorehouseDTO;
 import com.ccbuluo.business.platform.storehouse.dto.SearchStorehouseListDTO;
 import com.ccbuluo.business.platform.storehouse.service.StoreHouseService;
+import com.ccbuluo.core.annotation.validate.ValidateGroup;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -39,7 +41,7 @@ public class StoreHouseController extends BaseController {
      */
     @ApiOperation(value = "仓库保存", notes = "【刘铎】")
     @PostMapping("/save")
-    public StatusDto saveStoreHouse(@ApiParam(name = "仓库对象", value = "传入json格式", required = true) SaveBizServiceStorehouseDTO saveBizServiceStorehouseDTO) throws TException {
+    public StatusDto saveStoreHouse(@ApiParam(name = "仓库对象", value = "传入json格式", required = true) @ValidateGroup SaveBizServiceStorehouseDTO saveBizServiceStorehouseDTO) throws TException {
         int status = storeHouseService.saveStoreHouse(saveBizServiceStorehouseDTO);
         if (status == Constants.SUCCESSSTATUS) {
             return StatusDto.buildSuccessStatusDto("保存成功！");
@@ -61,8 +63,8 @@ public class StoreHouseController extends BaseController {
     @ApiImplicitParams({@ApiImplicitParam(name = "id", value = "仓库id", required = true, paramType = "query"),
         @ApiImplicitParam(name = "storeHouseStatus", value = "仓库状态", required = true, paramType = "query")})
     @GetMapping("/editstorehousestatus")
-    public StatusDto editStoreHouseStatus(@RequestParam Long id,
-                                          @RequestParam Integer storeHouseStatus) {
+    public StatusDto editStoreHouseStatus(@RequestParam @ValidateNotBlank(message = "id不能为空") Long id,
+                                          @RequestParam @ValidateNotBlank(message = "storeHouseStatus(仓库状态)不能为空") Integer storeHouseStatus) {
         int status = storeHouseService.editStoreHouseStatus(id, storeHouseStatus);
         if (status == Constants.SUCCESSSTATUS) {
             return StatusDto.buildSuccessStatusDto("操作成功！");
@@ -79,7 +81,7 @@ public class StoreHouseController extends BaseController {
      */
     @ApiOperation(value = "编辑仓库", notes = "【刘铎】")
     @PostMapping("/edit")
-    public StatusDto edit(@ApiParam(name = "仓库对象", value = "传入json格式", required = true) SaveBizServiceStorehouseDTO saveBizServiceStorehouseDTO) {
+    public StatusDto edit(@ApiParam(name = "仓库对象", value = "传入json格式", required = true) @ValidateGroup SaveBizServiceStorehouseDTO saveBizServiceStorehouseDTO) {
         int status = storeHouseService.editStoreHouse(saveBizServiceStorehouseDTO);
         if (status == Constants.SUCCESSSTATUS) {
             return StatusDto.buildSuccessStatusDto("编辑成功！");
@@ -99,7 +101,7 @@ public class StoreHouseController extends BaseController {
     @ApiOperation(value = "仓库详情", notes = "【刘铎】")
     @ApiImplicitParam(name = "id", value = "仓库id",  required = true, paramType = "query")
     @GetMapping("/getbyid")
-    public StatusDto getById(@RequestParam Long id) throws TException {
+    public StatusDto getById(@RequestParam @ValidateNotBlank(message = "id不能为空") Long id) throws TException {
         return StatusDto.buildDataSuccessStatusDto(storeHouseService.getById(id));
     }
 
@@ -145,7 +147,7 @@ public class StoreHouseController extends BaseController {
     @ApiOperation(value = "根据服务中心查询启用的仓库列表（下拉框）", notes = "【张康健】")
     @ApiImplicitParam(name = "serviceCenterCode", value = "服务中心code",  required = true, paramType = "query",dataType = "string")
     @GetMapping("/querystorehousebyservicecentercode")
-    public StatusDto<List<QueryStorehouseDTO>> queryStorehouseByServiceCenterCode(@RequestParam String serviceCenterCode) {
+    public StatusDto<List<QueryStorehouseDTO>> queryStorehouseByServiceCenterCode(@RequestParam @ValidateNotBlank(message = "serviceCenterCode(服务中心code)不能为空") String serviceCenterCode) {
         return storeHouseService.queryStorehouseByServiceCenterCode(serviceCenterCode);
     }
 
