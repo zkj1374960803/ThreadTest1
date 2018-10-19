@@ -4,7 +4,7 @@ import com.ccbuluo.business.entity.AftersaleCommonEntity;
 import com.ccbuluo.business.entity.IdEntity;
 import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
 import com.ccbuluo.core.annotation.validate.ValidateNotNull;
-import com.ccbuluo.core.annotation.validate.ValidateRange;
+import com.ccbuluo.core.annotation.validate.ValidateLength;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -22,7 +22,7 @@ public class SaveBizServiceMaintainitemDTO extends IdEntity {
     /**
      * 服务项目名称
      */
-    @ValidateRange(min = 0, max = 10)
+    @ValidateLength(min = 0, max = 10, message = "名称不能超过10个字")
     @ValidateNotBlank(message = "名称不能为空")
     @ApiModelProperty(name = "maintainitemName", value = "服务项目名称")
     private String maintainitemName;

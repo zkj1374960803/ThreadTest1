@@ -4,7 +4,7 @@ import com.ccbuluo.business.entity.AftersaleCommonEntity;
 import com.ccbuluo.business.entity.IdEntity;
 import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
 import com.ccbuluo.core.annotation.validate.ValidateNotNull;
-import com.ccbuluo.core.annotation.validate.ValidateRange;
+import com.ccbuluo.core.annotation.validate.ValidateLength;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -19,7 +19,7 @@ public class SaveBizServiceStorehouseDTO extends IdEntity {
     /**
      * 名称
      */
-    @ValidateRange(min = 0, max = 10)
+    @ValidateLength(min = 0, max = 10, message = "仓库名称长度不能超过10个字")
     @ValidateNotBlank(message = "名称不能为空")
     @ApiModelProperty(name = "storehouseName", value = "名称", required = true)
     private String storehouseName;
@@ -70,7 +70,7 @@ public class SaveBizServiceStorehouseDTO extends IdEntity {
     /**
      * 详细地址
      */
-    @ValidateRange(min = 0, max = 100)
+    @ValidateLength(min = 0, max = 100, message = "地址不能超过100个字")
     @ValidateNotBlank(message = "详细地址不能为空")
     @ApiModelProperty(name = "storehouseAddress", value = "详细地址", required = true)
     private String storehouseAddress;
