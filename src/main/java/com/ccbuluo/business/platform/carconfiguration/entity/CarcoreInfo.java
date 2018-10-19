@@ -1,5 +1,9 @@
 package com.ccbuluo.business.platform.carconfiguration.entity;
 
+import com.ccbuluo.core.annotation.validate.ValidateDateRange;
+import com.ccbuluo.core.annotation.validate.ValidateLength;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
+import com.ccbuluo.core.annotation.validate.ValidateRange;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.Date;
@@ -20,31 +24,37 @@ public class CarcoreInfo extends CarCommonEntity {
     /**
      * 车架号
      */
+    @ValidateLength(min = 0, max = 17,message = "车架号长度不合法")
     @ApiModelProperty(name = "vinNumber", value = "车架号",required = true)
     private String vinNumber;
     /**
      * 发动机号
      */
+    @ValidateLength(min = 0, max = 10,message = "发动机号长度不合法")
     @ApiModelProperty(name = "engineNumber", value = "发动机号",required = true)
     private String engineNumber;
     /**
      * 车辆北斗ID
      */
+    @ValidateLength(min = 0, max = 8,message = "车辆北斗ID长度不合法")
     @ApiModelProperty(name = "beidouNumber", value = "车辆北斗ID")
     private String beidouNumber;
     /**
      * 所属品牌id
      */
+    @ValidateNotNull(message = "所属品牌不能为空")
     @ApiModelProperty(name = "carbrandId", value = "所属品牌id",required = true)
     private Long carbrandId;
     /**
      * 所属车系id
      */
+    @ValidateNotNull(message = "所属车系不能为空")
     @ApiModelProperty(name = "carseriesId", value = "所属车系id",required = true)
     private Long carseriesId;
     /**
      * 所属车型id
      */
+    @ValidateNotNull(message = "所属车型不能为空")
     @ApiModelProperty(name = "carmodelId", value = "所属车型id",required = true)
     private Long carmodelId;
     /**

@@ -43,7 +43,7 @@ public class BasicCarbrandManageController extends BaseController {
         @ApiImplicitParam(name = "sortNumber", value = "排序号", required = true, paramType = "query"),
         @ApiImplicitParam(name = "carbrandLogo", value = "品牌logo", paramType = "query")})
     @PostMapping("/create")
-    public StatusDto create(@ValidateGroup(value = Group.Add.class)@ApiIgnore CarbrandManage carbrandManage) {
+    public StatusDto create(@ApiIgnore CarbrandManage carbrandManage) {
         return basicCarbrandManageService.saveCarbrandManage(carbrandManage);
     }
 

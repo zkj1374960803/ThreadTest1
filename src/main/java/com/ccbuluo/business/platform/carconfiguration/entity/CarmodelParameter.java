@@ -56,12 +56,12 @@ public class CarmodelParameter extends CarCommonEntity {
     /**
      * 标签id
      */
+    @ValidateNotNull(message = "标签id不能为空")
     @ApiModelProperty(name = "carmodelLabelId", value = "标签id")
     private Integer carmodelLabelId;
     /**
      * 标签name
      */
-    @ValidateNotNull(message = "标签名称不能为空")
     @ApiModelProperty(name = "labelName", value = "标签name")
     private String labelName;
 
