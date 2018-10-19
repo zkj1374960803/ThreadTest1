@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.order.dto;
 
 import com.ccbuluo.business.entity.AftersaleCommonEntity;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -17,6 +18,7 @@ public class SaveOrderDetailDTO extends AftersaleCommonEntity {
     /**
      * 订单编号
      */
+    @ValidateNotBlank(message = "订单编号不能为空")
     @ApiModelProperty(name = "serviceOrderno", value = "订单编号")
     private String serviceOrderno;
     /**

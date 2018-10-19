@@ -12,9 +12,12 @@ import com.ccbuluo.business.platform.order.dto.SaveServiceOrderDTO;
 import com.ccbuluo.business.platform.order.service.ServiceOrderService;
 import com.ccbuluo.business.vehiclelease.resdto.CarLesseeResDTO;
 import com.ccbuluo.business.vehiclelease.service.CarcoreInfoService;
+import com.ccbuluo.core.annotation.validate.ValidateGroup;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
 import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
+import com.ccbuluo.core.validate.ValidateUtils;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftBean;
@@ -54,7 +57,7 @@ public class StoreServiceOrderController extends BaseController {
      */
     @ApiOperation(value = "维修单新增", notes = "【刘铎】")
     @PostMapping("/save")
-    public StatusDto saveOrder(@ApiParam(name = "维修单信息", value = "传入json格式", required = true)@RequestBody SaveServiceOrderDTO saveServiceOrderDTO) {
+    public StatusDto saveOrder(@ApiParam(name = "维修单信息", value = "传入json格式", required = true)@RequestBody @ValidateGroup SaveServiceOrderDTO saveServiceOrderDTO) {
         return serviceOrderService.saveOrder(saveServiceOrderDTO);
     }
 
@@ -69,7 +72,7 @@ public class StoreServiceOrderController extends BaseController {
      */
     @ApiOperation(value = "维修单编辑", notes = "【刘铎】")
     @PostMapping("/edit")
-    public StatusDto editOrder(@ApiParam(name = "维修单信息", value = "传入json格式", required = true)@RequestBody EditServiceOrderDTO editServiceOrderDTO) {
+    public StatusDto editOrder(@ApiParam(name = "维修单信息", value = "传入json格式", required = true)@RequestBody @ValidateGroup EditServiceOrderDTO editServiceOrderDTO) {
         return serviceOrderService.editOrder(editServiceOrderDTO);
     }
 
@@ -115,8 +118,8 @@ public class StoreServiceOrderController extends BaseController {
     @ApiImplicitParams({@ApiImplicitParam(name = "serviceOrderno", value = "维修单编号",  required = true, paramType = "query"),
         @ApiImplicitParam(name = "orderStatus", value = "维修单类型",  required = true, paramType = "query")})
     @PostMapping("/editstatus")
-    public StatusDto editStatus(@RequestParam @ValidateNotNull(message = "serviceOrderno(维修单编号)不能为空") String serviceOrderno,
-                                @RequestParam @ValidateNotNull(message = "orderStatus(维修单类型)不能为空") String orderStatus) {
+    public StatusDto editStatus(@RequestParam @ValidateNotBlank(message = "serviceOrderno(维修单编号)不能为空") String serviceOrderno,
+                                @RequestParam @ValidateNotBlank(message = "orderStatus(维修单类型)不能为空") String orderStatus) {
         return serviceOrderService.editStatus(serviceOrderno, orderStatus);
     }
 
@@ -143,7 +146,7 @@ public class StoreServiceOrderController extends BaseController {
     @ApiOperation(value = "根据车牌号查询车辆信息", notes = "【刘铎】")
     @ApiImplicitParam(name = "carNo", value = "车牌号",  required = true, paramType = "query")
     @GetMapping("/getcarbycarno")
-    public StatusDto<CarcoreInfoDTO> getCarByCarNo(@RequestParam @ValidateNotNull(message = "carNo(车牌号)不能为空") String carNo) {
+    public StatusDto<CarcoreInfoDTO> getCarByCarNo(@RequestParam @ValidateNotBlank(message = "carNo(车牌号)不能为空") String carNo) {
         return basicCarcoreInfoService.getCarByCarNo(carNo);
     }
 
@@ -158,7 +161,7 @@ public class StoreServiceOrderController extends BaseController {
     @ApiOperation(value = "根据车辆vin码查询车辆承租人的信息", notes = "【刘铎】")
     @ApiImplicitParam(name = "vinNumber", value = "车辆vin码",  required = true, paramType = "query")
     @GetMapping("/getuserbycarno")
-    public StatusDto<CarLesseeResDTO> getUserByCarno(@RequestParam @ValidateNotNull(message = "vinNumber(车辆vin码)不能为空") String vinNumber) {
+    public StatusDto<CarLesseeResDTO> getUserByCarno(@RequestParam @ValidateNotBlank(message = "vinNumber(车辆vin码)不能为空") String vinNumber) {
         StatusDtoThriftBean<CarLesseeResDTO> carLessee = carcoreInfoService.findCarLessee(vinNumber);
         return StatusDto.buildDataSuccessStatusDto(StatusDtoThriftUtils.resolve(carLessee, CarLesseeResDTO.class).getData());
     }
@@ -208,7 +211,7 @@ public class StoreServiceOrderController extends BaseController {
     @ApiOperation(value = "维修单详情", notes = "【刘铎】")
     @ApiImplicitParam(name = "serviceOrderno", value = "维修单编号",  required = true, paramType = "query")
     @GetMapping("/getdetailbyorderno")
-    public StatusDto<DetailServiceOrderDTO> getDetailByOrderNo(@RequestParam @ValidateNotNull(message = "serviceOrderno(维修单编号)不能为空") String serviceOrderno) {
+    public StatusDto<DetailServiceOrderDTO> getDetailByOrderNo(@RequestParam @ValidateNotBlank(message = "serviceOrderno(维修单编号)不能为空") String serviceOrderno) {
         return serviceOrderService.getDetailByOrderNo(serviceOrderno);
     }
 
@@ -223,7 +226,7 @@ public class StoreServiceOrderController extends BaseController {
     @ApiOperation(value = "维修单日志", notes = "【刘铎】")
     @ApiImplicitParam(name = "serviceOrderno", value = "维修单编号",  required = true, paramType = "query")
     @GetMapping("/orderlog")
-    public StatusDto<List<BizServiceLog>> orderLog(@RequestParam @ValidateNotNull(message = "serviceOrderno(维修单编号)不能为空") String serviceOrderno) {
+    public StatusDto<List<BizServiceLog>> orderLog(@RequestParam @ValidateNotBlank(message = "serviceOrderno(维修单编号)不能为空") String serviceOrderno) {
         return serviceOrderService.orderLog(serviceOrderno);
     }
 
@@ -241,9 +244,9 @@ public class StoreServiceOrderController extends BaseController {
         @ApiImplicitParam(name = "orgType", value = "分配的目标类型（服务中心）",  required = true, paramType = "query"),
         @ApiImplicitParam(name = "orgCodeOrUuid", value = "机构编号",  required = true, paramType = "query")})
     @PostMapping("/orderallocation")
-    public StatusDto orderAllocation(@RequestParam @ValidateNotNull(message = "serviceOrderno(维修单编号)不能为空") String serviceOrderno,
-                                     @RequestParam @ValidateNotNull(message = "orgType(分配的目标类型（服务中心）)不能为空") String orgType,
-                                     @RequestParam @ValidateNotNull(message = "orgCodeOrUuid(机构编号)不能为空") String orgCodeOrUuid) {
+    public StatusDto orderAllocation(@RequestParam @ValidateNotBlank(message = "serviceOrderno(维修单编号)不能为空") String serviceOrderno,
+                                     @RequestParam @ValidateNotBlank(message = "orgType(分配的目标类型（服务中心）)不能为空") String orgType,
+                                     @RequestParam @ValidateNotBlank(message = "orgCodeOrUuid(机构编号)不能为空") String orgCodeOrUuid) {
         return serviceOrderService.orderAllocation(serviceOrderno, orgType, orgCodeOrUuid);
     }
 
@@ -278,7 +281,9 @@ public class StoreServiceOrderController extends BaseController {
      */
     @ApiOperation(value = "保存工时和零配件", notes = "【刘铎】")
     @PostMapping("/saveorderdetail")
-    public StatusDto saveOrderDetail(@ApiParam(name = "维修单信息", value = "传入json格式", required = true)@RequestBody SaveOrderDetailDTO saveOrderDetailDTO) {
+    public StatusDto saveOrderDetail(@ApiParam(name = "维修单信息", value = "传入json格式", required = true)@RequestBody @ValidateGroup SaveOrderDetailDTO saveOrderDetailDTO) {
+        ValidateUtils.validate(saveOrderDetailDTO.getSaveMerchandiseDTOS(), null);
+        ValidateUtils.validate(saveOrderDetailDTO.getSaveMaintaintemDTOS(), null);
         return serviceOrderService.saveOrderDetail(saveOrderDetailDTO);
     }
 
@@ -319,7 +324,7 @@ public class StoreServiceOrderController extends BaseController {
     @ApiOperation(value = "查询维修单状态数量", notes = "【刘铎】")
     @ApiImplicitParam(name = "reportOrgno", value = "当前登录人的机构编号",  required = true, paramType = "query")
     @GetMapping("/queryorderstatusnum")
-    public StatusDto<Map<String, Long>> queryOrderStatusNum(@RequestParam @ValidateNotNull(message = "reportOrgno(当前登录人的机构编号)不能为空") String reportOrgno) {
+    public StatusDto<Map<String, Long>> queryOrderStatusNum(@RequestParam @ValidateNotBlank(message = "reportOrgno(当前登录人的机构编号)不能为空") String reportOrgno) {
         return StatusDto.buildDataSuccessStatusDto(serviceOrderService.queryStoreOrderStatusNum(reportOrgno));
     }
 
