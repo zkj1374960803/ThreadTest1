@@ -11,6 +11,7 @@ import com.ccbuluo.business.platform.stockdetail.dao.FindStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.service.StockManagementService;
 import com.ccbuluo.core.annotation.validate.ValidateGroup;
 import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.annotation.validate.ValidatePattern;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.validate.ValidateUtils;
@@ -180,7 +181,7 @@ public class ServiceStockManagementController extends BaseController {
      */
     @ApiOperation(value = "检查库存", notes = "【张康健】")
     @PostMapping("/checkstockquantity")
-    public StatusDto<List<ProductStockInfoDTO>> checkStockQuantity(@ApiParam(name = "CheckStockQuantityDTO", value = "Json数据", required = true) @RequestBody @ValidateNotBlank CheckStockQuantityDTO checkStockQuantityDTO){
+    public StatusDto<List<ProductStockInfoDTO>> checkStockQuantity(@ApiParam(name = "CheckStockQuantityDTO", value = "Json数据", required = true) @RequestBody @ValidateNotNull CheckStockQuantityDTO checkStockQuantityDTO){
         ValidateUtils.validate(checkStockQuantityDTO.getProductInfoList(), null);
         return allocateApplyServiceImpl.checkStockQuantity(checkStockQuantityDTO);
     }

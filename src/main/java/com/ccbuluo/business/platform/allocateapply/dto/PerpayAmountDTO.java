@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.dto;
 
 import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -18,7 +19,7 @@ public class PerpayAmountDTO {
     @ApiModelProperty(name = "supplierName", value = "供应商名称", hidden = true)
     @ValidateNotBlank
     private String supplierName;
-    @ValidateNotBlank
+    @ValidateNotNull
     @ApiModelProperty(name = "perpayAmount", value = "预付款金额")
     private BigDecimal perpayAmount;
     @ApiModelProperty(name = "totalPrice", value = "订单中所有商品的总价")

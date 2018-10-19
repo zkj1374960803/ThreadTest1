@@ -7,6 +7,7 @@ import com.ccbuluo.business.platform.storehouse.dto.SearchStorehouseListDTO;
 import com.ccbuluo.business.platform.storehouse.service.StoreHouseService;
 import com.ccbuluo.core.annotation.validate.ValidateGroup;
 import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -63,8 +64,8 @@ public class StoreHouseController extends BaseController {
     @ApiImplicitParams({@ApiImplicitParam(name = "id", value = "仓库id", required = true, paramType = "query"),
         @ApiImplicitParam(name = "storeHouseStatus", value = "仓库状态", required = true, paramType = "query")})
     @GetMapping("/editstorehousestatus")
-    public StatusDto editStoreHouseStatus(@RequestParam @ValidateNotBlank(message = "id不能为空") Long id,
-                                          @RequestParam @ValidateNotBlank(message = "storeHouseStatus(仓库状态)不能为空") Integer storeHouseStatus) {
+    public StatusDto editStoreHouseStatus(@RequestParam @ValidateNotNull(message = "id不能为空") Long id,
+                                          @RequestParam @ValidateNotNull(message = "storeHouseStatus(仓库状态)不能为空") Integer storeHouseStatus) {
         int status = storeHouseService.editStoreHouseStatus(id, storeHouseStatus);
         if (status == Constants.SUCCESSSTATUS) {
             return StatusDto.buildSuccessStatusDto("操作成功！");
@@ -101,7 +102,7 @@ public class StoreHouseController extends BaseController {
     @ApiOperation(value = "仓库详情", notes = "【刘铎】")
     @ApiImplicitParam(name = "id", value = "仓库id",  required = true, paramType = "query")
     @GetMapping("/getbyid")
-    public StatusDto getById(@RequestParam @ValidateNotBlank(message = "id不能为空") Long id) throws TException {
+    public StatusDto getById(@RequestParam @ValidateNotNull(message = "id不能为空") Long id) throws TException {
         return StatusDto.buildDataSuccessStatusDto(storeHouseService.getById(id));
     }
 

@@ -6,6 +6,7 @@ import com.ccbuluo.business.platform.supplier.service.SupplierService;
 import com.ccbuluo.core.annotation.validate.ValidateGroup;
 import com.ccbuluo.core.annotation.validate.ValidateMax;
 import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.validate.Group;
 import com.ccbuluo.core.validate.ValidateUtils;
@@ -16,6 +17,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -118,7 +120,7 @@ public class SupplierController extends BaseController {
      */
     @ApiOperation(value = "添加关联商品",notes = "【张康健】")
     @PostMapping("/createrelsupplierproduct")
-    public StatusDto<String> createRelSupplierProduct(@ApiParam(name = "saveRelSupplierProductDTO", value = "保存供应商关联商品关系json", required = true)@RequestBody @ValidateNotBlank SaveRelSupplierProductDTO saveRelSupplierProductDTO){
+    public StatusDto<String> createRelSupplierProduct(@ApiParam(name = "saveRelSupplierProductDTO", value = "保存供应商关联商品关系json", required = true)@RequestBody @ValidateNotNull SaveRelSupplierProductDTO saveRelSupplierProductDTO){
         ValidateUtils.validate(saveRelSupplierProductDTO.getSupplierProductList(),null);
         return supplierServiceImpl.createRelSupplierProduct(saveRelSupplierProductDTO);
     }
