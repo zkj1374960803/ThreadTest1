@@ -19,7 +19,7 @@ public class EditSupplierDTO {
     /**
      * 供应商id
      */
-    @ValidateNotBlank(groups = Group.Update.class)
+    @ValidateNotNull(groups = Group.Update.class)
     @ApiModelProperty(name = "id", value = "供应商id", required = true)
     private Long id;
     /**

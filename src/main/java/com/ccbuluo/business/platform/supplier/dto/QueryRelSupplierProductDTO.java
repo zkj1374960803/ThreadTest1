@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.supplier.dto;
 import com.ccbuluo.core.annotation.validate.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
@@ -49,15 +50,13 @@ public class QueryRelSupplierProductDTO {
     /**
      * 偏移量
      */
-    @ValidateNotBlank
     @ApiModelProperty(name = "offset", value = "偏移量", hidden = true)
-    private Integer offset;
+    private Integer offset = 0;
     /**
      * 每页显示的条数
      */
-    @ValidateNotBlank
     @ApiModelProperty(name = "pageSize", value = "每页显示的条数", hidden = true)
-    private Integer pageSize;
+    private Integer pageSize = 10;
 
     public Integer getOffset() {
         return offset;

@@ -1,6 +1,9 @@
 package com.ccbuluo.business.platform.order.dto;
 
 import com.ccbuluo.business.entity.AftersaleCommonEntity;
+import com.ccbuluo.core.annotation.validate.ValidateMin;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -22,26 +25,32 @@ public class SaveMerchandiseDTO extends AftersaleCommonEntity {
     /**
      * 服务、零配件的编号
      */
+    @ValidateNotBlank(message = "零配件编号不能为空")
     @ApiModelProperty(name = "productNo", value = "服务、零配件的编号")
     private String productNo;
     /**
      * 商品的类型：工时、零配件
      */
+    @ValidateNotBlank(message = "商品类型(工时)不能为空")
     @ApiModelProperty(name = "productType", value = "商品的类型：工时、零配件")
     private String productType;
     /**
      * 商品的单价
      */
+    @ValidateNotNull(message = "商品的单价不能为空")
     @ApiModelProperty(name = "unitPrice", value = "商品的单价")
     private BigDecimal unitPrice;
     /**
      * 使用的数量
      */
+    @ValidateMin(value = 0, message = "数量不能小于0")
+    @ValidateNotNull(message = "使用的数量不能为空")
     @ApiModelProperty(name = "amount", value = "使用的数量")
     private Long amount;
     /**
      * 保修类型：在保、过保
      */
+    @ValidateNotBlank(message = "保修类型不能为空")
     @ApiModelProperty(name = "warrantyType", value = "保修类型：在保、过保")
     private String warrantyType;
     /**

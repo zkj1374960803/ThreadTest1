@@ -1,5 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.dto;
 
+import com.ccbuluo.core.annotation.validate.ValidateLength;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -12,6 +14,7 @@ import java.util.List;
 @ApiModel(value = "CheckRepairOrderStockDTO", description = "商品信息DTO")
 public class CheckRepairOrderStockDTO {
     @ApiModelProperty(name = "outstockOrgno", value = "出库的机构")
+    @ValidateNotBlank
     private String outstockOrgno;
     @ApiModelProperty(name = "productInfoList", value = "商品的信息")
     List<ProductStockInfoDTO> productInfoList;

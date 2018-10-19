@@ -3,6 +3,8 @@ package com.ccbuluo.business.platform.claimorder.controller;
 import com.ccbuluo.business.platform.claimorder.dto.BizServiceClaimorder;
 import com.ccbuluo.business.platform.claimorder.dto.QueryClaimorderListDTO;
 import com.ccbuluo.business.platform.claimorder.service.ClaimOrderService;
+import com.ccbuluo.core.annotation.validate.ValidateGroup;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.Api;
@@ -78,7 +80,7 @@ public class ClaimOrderController{
     @ApiOperation(value = "验收索赔单", notes = "【张康健】")
     @GetMapping("/acceptanceclaimsheet")
     @ApiImplicitParam(name = "claimOrdno", value = "索赔单号", required = true, paramType = "query")
-    public StatusDto<String> acceptanceClaimSheet(String claimOrdno){
+    public StatusDto<String> acceptanceClaimSheet(@ValidateNotBlank String claimOrdno){
         claimOrderServiceImpl.updateDocStatusAndProcessTime(claimOrdno, BizServiceClaimorder.DocStatusEnum.PENDINGPAYMENT.name());
         return StatusDto.buildSuccessStatusDto();
     }
@@ -96,7 +98,7 @@ public class ClaimOrderController{
             @ApiImplicitParam(name = "claimOrdno", value = "索赔单号", required = true, paramType = "query"),
             @ApiImplicitParam(name = "actualAmount", value = "实际赔偿的金额", required = true, paramType = "query")
     })
-    public StatusDto billOfPayment(String claimOrdno, BigDecimal actualAmount){
+    public StatusDto billOfPayment(@ValidateNotBlank String claimOrdno, @ValidateNotBlank BigDecimal actualAmount){
         return claimOrderServiceImpl.billOfPayment(claimOrdno, BizServiceClaimorder.DocStatusEnum.COMPLETED.name(),actualAmount);
     }
 
@@ -114,7 +116,7 @@ public class ClaimOrderController{
         @ApiImplicitParam(name = "serviceOrdno", value = "维修单号", required = true, paramType = "query"),
         @ApiImplicitParam(name = "claimOrdno", value = "索赔单号", required = true, paramType = "query"),
     })
-    public StatusDto<Map<String, Double>> findPaymentAmount(String serviceOrdno, String claimOrdno){
+    public StatusDto<Map<String, Double>> findPaymentAmount(@ValidateNotBlank String serviceOrdno,@ValidateNotBlank String claimOrdno){
         Map<String, Double> paymentAmount = claimOrderServiceImpl.findPaymentAmount(serviceOrdno, claimOrdno);
         return StatusDto.buildDataSuccessStatusDto(paymentAmount);
     }
