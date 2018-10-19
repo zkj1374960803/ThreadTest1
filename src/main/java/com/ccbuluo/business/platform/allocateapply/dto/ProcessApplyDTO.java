@@ -1,5 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.dto;
 
+import com.ccbuluo.business.constants.MyGroup;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -24,6 +26,7 @@ public class ProcessApplyDTO {
     /**
      * 调拨申请单编号
      */
+    @ValidateNotBlank(groups = MyGroup.Add.class)
     @ApiModelProperty(name = "applyNo", value = "调拨申请单编号")
     private String applyNo;
     /**
@@ -40,6 +43,7 @@ public class ProcessApplyDTO {
     /**
      * 出库的组织架构
      */
+    @ValidateNotBlank(groups = MyGroup.Add.class)
     @ApiModelProperty(name = "outstockOrgno", value = "出库的组织架构(采购类型时，不必填)", hidden = true)
     private String outstockOrgno;
 

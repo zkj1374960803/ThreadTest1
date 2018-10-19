@@ -1,7 +1,9 @@
 
 package com.ccbuluo.business.platform.claimorder.dto;
 
+import com.ccbuluo.business.constants.MyGroup;
 import com.ccbuluo.business.platform.order.dto.ProductDetailDTO;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -19,6 +21,7 @@ public class BizServiceClaimorder {
     private Long id;
 
     // 索赔单的编号
+    @ValidateNotBlank(groups = {MyGroup.Add.class, MyGroup.Select.class})
     @ApiModelProperty(name = "claimOrdno", value = "索赔单的编号")
     private String claimOrdno;
 
@@ -27,10 +30,12 @@ public class BizServiceClaimorder {
     private String serviceOrdno;
 
     // 将三包件发给平台时的物流单号
+    @ValidateNotBlank(groups = MyGroup.Add.class)
     @ApiModelProperty(name = "trackingNo", value = "将三包件发给平台时的物流单号")
     private String trackingNo;
 
     // 将三包件推给平台的地址
+    @ValidateNotBlank(groups = MyGroup.Add.class)
     @ApiModelProperty(name = "refundAdress", value = "将三包件推给平台的地址")
     private String refundAdress;
 

@@ -8,6 +8,8 @@ import com.ccbuluo.core.validate.Group;
  */
 public class MyGroup extends Group {
 
-    public static class Edit extends Group{
+    public static class Edit extends MyGroup{
+    }
+    public static class Select extends MyGroup{
     }
 }

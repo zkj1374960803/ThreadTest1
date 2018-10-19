@@ -6,7 +6,12 @@ import com.ccbuluo.business.entity.BizOutstockplanDetail;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
+import com.ccbuluo.core.annotation.validate.ValidateGroup;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidatePattern;
+import com.ccbuluo.core.annotation.validate.ValidateRange;
 import com.ccbuluo.core.controller.BaseController;
+import com.ccbuluo.core.validate.ValidateUtils;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
@@ -42,7 +47,7 @@ public class ServiceAllocateApplyController extends BaseController {
      */
     @ApiOperation(value = "创建物料或者零配件申请", notes = "【张康健】")
     @PostMapping("/create")
-    public StatusDto<String> createAllocateApply(@ApiParam(name = "bizAllocateApply", value = "创建申请json", required = true) @RequestBody AllocateApplyDTO allocateApplyDTO){
+    public StatusDto<String> createAllocateApply(@ApiParam(name = "bizAllocateApply", value = "创建申请json", required = true) @RequestBody @ValidateGroup AllocateApplyDTO allocateApplyDTO){
         allocateApplyServiceImpl.createAllocateApply(allocateApplyDTO);
         return StatusDto.buildSuccessStatusDto();
     }
@@ -80,7 +85,13 @@ public class ServiceAllocateApplyController extends BaseController {
         @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query"),
     })
-    public StatusDto<Page<QueryAllocateApplyListDTO>> list(String productType,String orgType, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
+    public StatusDto<Page<QueryAllocateApplyListDTO>> list(@ValidatePattern(regexp = {"FITTINGS", "EQUIPMENT"}, excludeNull = true) String productType,
+                                                           String orgType,
+                                                           String processType,
+                                                           String applyStatus,
+                                                           String applyNo,
+                                                           @RequestParam(defaultValue = "0") Integer offset,
+                                                           @RequestParam(defaultValue = "10") Integer pageSize){
         Page<QueryAllocateApplyListDTO> page = allocateApplyServiceImpl.findApplyList(null, productType, orgType, processType, applyStatus, applyNo, offset, pageSize);
         return StatusDto.buildDataSuccessStatusDto(page);
     }
@@ -103,7 +114,12 @@ public class ServiceAllocateApplyController extends BaseController {
         @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query"),
     })
-    public StatusDto<Page<QueryAllocateApplyListDTO>> processList(String productType,String orgType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
+    public StatusDto<Page<QueryAllocateApplyListDTO>> processList(@ValidatePattern(regexp = {"FITTINGS", "EQUIPMENT"}, excludeNull = true) String productType,
+                                                                  String orgType,
+                                                                  String applyStatus,
+                                                                  String applyNo,
+                                                                  @RequestParam(defaultValue = "0") Integer offset,
+                                                                  @RequestParam(defaultValue = "10") Integer pageSize){
         Page<QueryAllocateApplyListDTO> page = allocateApplyServiceImpl.findProcessApplyList(productType,orgType, applyStatus, applyNo, offset, pageSize);
         return StatusDto.buildDataSuccessStatusDto(page);
     }
@@ -127,21 +143,6 @@ public class ServiceAllocateApplyController extends BaseController {
         Page<QueryCustManagerListDTO> page = custmanagerService.queryCustManagerList(queryCustManagerListDTO);
         return StatusDto.buildDataSuccessStatusDto(page);
     }
-
-
-//    /**
-//     * 保存处理申请单
-//     * @param processApplyDTO json数据格式
-//     * @return StatusDto<String> 状态DTO
-//     * @author zhangkangjian
-//     * @date 2018-09-12 16:02:08
-//     */
-//    @ApiOperation(value = "保存申请单", notes = "【张康健】")
-//    @PostMapping("/saveprocessapply")
-//    public StatusDto<String> saveProcessApply(@ApiParam(name = "processApplyDTO", value = "json数据格式", required = true) @RequestBody ProcessApplyDTO processApplyDTO){
-//        allocateApplyServiceImpl.saveProcessApply(processApplyDTO.getProcessApplyDetailDTO());
-//        return StatusDto.buildSuccessStatusDto();
-//    }
 
     /**
      * 查询可调拨库存列表
@@ -174,7 +175,10 @@ public class ServiceAllocateApplyController extends BaseController {
      */
     @ApiOperation(value = "查询可调拨库存列表", notes = "【张康健】")
     @GetMapping("/querytransferstock")
-    public StatusDto<Page<QueryOrgDTO>> queryTransferStock(@ApiIgnore QueryOrgDTO queryOrgDTO,String productNo ,Integer offset, Integer pageSize){
+    public StatusDto<Page<QueryOrgDTO>> queryTransferStock(@ApiIgnore QueryOrgDTO queryOrgDTO,
+                                                           String productNo ,
+                                                           @RequestParam(defaultValue = "0") Integer offset,
+                                                           @RequestParam(defaultValue = "10") Integer pageSize){
         Page<QueryOrgDTO> queryOrgDTOPage = allocateApplyServiceImpl.queryTransferStock(queryOrgDTO, productNo, offset, pageSize);
         return StatusDto.buildDataSuccessStatusDto(queryOrgDTOPage);
     }
@@ -219,7 +223,8 @@ public class ServiceAllocateApplyController extends BaseController {
         @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query"),
         @ApiImplicitParam(name = "processMemo", value = "驳回理由", required = true, paramType = "query")
     })
-    public StatusDto<String> rejectApply(String applyNo, String processMemo){
+    public StatusDto<String> rejectApply(@ValidateNotBlank String applyNo,
+                                         @ValidateNotBlank String processMemo){
         allocateApplyServiceImpl.rejectApply(applyNo, processMemo);
         return StatusDto.buildSuccessStatusDto();
     }
@@ -233,7 +238,7 @@ public class ServiceAllocateApplyController extends BaseController {
      */
     @ApiOperation(value = "提交申请", notes = "【张康健】")
     @PostMapping("/processapply")
-    public StatusDto<String> processApply(@ApiParam(name = "processApplyDTO", value = "json数据格式", required = true) @RequestBody ProcessApplyDTO processApplyDTO){
+    public StatusDto<String> processApply(@ApiParam(name = "processApplyDTO", value = "json数据格式", required = true) @RequestBody @ValidateGroup ProcessApplyDTO processApplyDTO){
         allocateApplyServiceImpl.processApply(processApplyDTO);
         return StatusDto.buildSuccessStatusDto();
     }
@@ -248,6 +253,7 @@ public class ServiceAllocateApplyController extends BaseController {
     @ApiOperation(value = "保存申请单（填报价格）", notes = "【张康健】")
     @PostMapping("/saveprocessapply")
     public StatusDto<String> saveProcessApply(@ApiParam(name = "processApplyDetailDTO", value = "json数组数据格式", required = true) @RequestBody List<ProcessApplyDetailDTO> processApplyDetailDTO){
+        ValidateUtils.validate(processApplyDetailDTO, null);
         allocateApplyServiceImpl.saveProcessApply(processApplyDetailDTO);
         return StatusDto.buildSuccessStatusDto();
     }
