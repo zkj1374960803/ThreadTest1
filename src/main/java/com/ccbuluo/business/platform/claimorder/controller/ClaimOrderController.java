@@ -5,6 +5,7 @@ import com.ccbuluo.business.platform.claimorder.dto.QueryClaimorderListDTO;
 import com.ccbuluo.business.platform.claimorder.service.ClaimOrderService;
 import com.ccbuluo.core.annotation.validate.ValidateGroup;
 import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.Api;
@@ -98,7 +99,7 @@ public class ClaimOrderController{
             @ApiImplicitParam(name = "claimOrdno", value = "索赔单号", required = true, paramType = "query"),
             @ApiImplicitParam(name = "actualAmount", value = "实际赔偿的金额", required = true, paramType = "query")
     })
-    public StatusDto billOfPayment(@ValidateNotBlank String claimOrdno, @ValidateNotBlank BigDecimal actualAmount){
+    public StatusDto billOfPayment(@ValidateNotBlank String claimOrdno, @ValidateNotNull BigDecimal actualAmount){
         return claimOrderServiceImpl.billOfPayment(claimOrdno, BizServiceClaimorder.DocStatusEnum.COMPLETED.name(),actualAmount);
     }
 
