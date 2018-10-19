@@ -6,6 +6,7 @@ import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.order.service.PaymentService;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -40,7 +41,7 @@ public class PaymentController {
     @ApiOperation(value = "申请单支付功能（采购）", notes = "【魏俊标】")
     @GetMapping("/purchasepayment/{applyNo}")
     @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
-    public StatusDto<FindAllocateApplyDTO> purchasePayment(@PathVariable String applyNo){
+    public StatusDto<FindAllocateApplyDTO> purchasePayment(@PathVariable @ValidateNotNull(message = "applyNo(申请applyNo)不能为空") String applyNo){
         return paymentService.purchasePayment(applyNo);
     }
 
@@ -54,7 +55,7 @@ public class PaymentController {
     @ApiOperation(value = "申请单支付功能（调拨）", notes = "【魏俊标】")
     @GetMapping("/samelevelpayment/{applyNo}")
     @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
-    public StatusDto<FindAllocateApplyDTO> samelevelPayment(@PathVariable String applyNo){
+    public StatusDto<FindAllocateApplyDTO> samelevelPayment(@PathVariable @ValidateNotNull(message = "applyNo(申请applyNo)不能为空") String applyNo){
         return paymentService.samelevelPayment(applyNo);
     }
 
@@ -71,7 +72,7 @@ public class PaymentController {
             @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query"),
             @ApiImplicitParam(name = "actualAmount", value = "实际退货的金额", required = true, paramType = "query")
     })
-    public StatusDto<FindAllocateApplyDTO> refundPayment(String applyNo, BigDecimal actualAmount){
+    public StatusDto<FindAllocateApplyDTO> refundPayment(@ValidateNotNull(message = "applyNo(申请applyNo)不能为空") String applyNo, BigDecimal actualAmount){
         return paymentService.refundPayment(applyNo,actualAmount);
     }
 
@@ -85,7 +86,7 @@ public class PaymentController {
     @ApiOperation(value = "根据申请单获取总价格", notes = "【魏俊标】")
     @GetMapping("/gettotalprice/{applyNo}")
     @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
-    public StatusDto<FindAllocateApplyDTO> getTotalPrice(@PathVariable String applyNo){
+    public StatusDto<FindAllocateApplyDTO> getTotalPrice(@PathVariable @ValidateNotNull(message = "applyNo(申请applyNo)不能为空") String applyNo){
         FindAllocateApplyDTO allocate = paymentService.getTotalPrice(applyNo);
         return StatusDto.buildDataSuccessStatusDto(allocate);
     }
@@ -100,7 +101,7 @@ public class PaymentController {
     @ApiOperation(value = "服务单（维修单）支付功能", notes = "【魏俊标】")
     @GetMapping("/servicepaymentcompletion/{serviceOrderno}")
     @ApiImplicitParam(name = "serviceOrderno", value = "申请单号", required = true, paramType = "path")
-    public StatusDto<String> servicepaymentcompletion(@PathVariable String serviceOrderno){
+    public StatusDto<String> servicepaymentcompletion(@PathVariable @ValidateNotNull(message = "claimOrdno(服务单claimOrdno)不能为空") String serviceOrderno){
         return paymentService.servicepaymentcompletion(serviceOrderno);
     }
     /**
@@ -113,7 +114,7 @@ public class PaymentController {
     @ApiOperation(value = "根据服务单（维修单）获取总价格", notes = "【魏俊标】")
     @GetMapping("/getserviceordernoprice/{serviceOrderno}")
     @ApiImplicitParam(name = "serviceOrderno", value = "申请单号", required = true, paramType = "path")
-    public StatusDto<BizServiceOrder> getServiceOrdernoPrice(@PathVariable String serviceOrderno){
+    public StatusDto<BizServiceOrder> getServiceOrdernoPrice(@PathVariable @ValidateNotNull(message = "claimOrdno(服务单claimOrdno)不能为空") String serviceOrderno){
         BizServiceOrder serviceOrder = paymentService.getServiceOrdernoPrice(serviceOrderno);
         return StatusDto.buildDataSuccessStatusDto(serviceOrder);
     }
@@ -128,7 +129,7 @@ public class PaymentController {
     @ApiOperation(value = "创建预付款单据（平台采购）", notes = "【魏俊标】")
     @GetMapping("/savecustomerserviceadvancecounter/{applyNo}")
     @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
-    public StatusDto<String> saveCustomerServiceAdvanceCounter(@PathVariable String applyNo){
+    public StatusDto<String> saveCustomerServiceAdvanceCounter(@PathVariable @ValidateNotNull(message = "applyNo(申请applyNo)不能为空") String applyNo){
         return paymentService.saveCustomerServiceAdvanceCounter(applyNo);
     }
 
@@ -142,7 +143,7 @@ public class PaymentController {
     @ApiOperation(value = "创建退货款单据（问题件退货）", notes = "【魏俊标】")
     @GetMapping("/savecustomerservicerefundcounter/{applyNo}")
     @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
-    public StatusDto<String> saveCustomerServiceRefundCounter(@PathVariable String applyNo){
+    public StatusDto<String> saveCustomerServiceRefundCounter(@PathVariable @ValidateNotNull(message = "applyNo(申请applyNo)不能为空") String applyNo){
         return paymentService.saveCustomerServiceRefundCounter(applyNo);
     }
 
@@ -156,7 +157,7 @@ public class PaymentController {
     @ApiOperation(value = "创建索赔单付款单据", notes = "【魏俊标】")
     @GetMapping("/savecustomerservicemarketcounter/{serviceOrderno}")
     @ApiImplicitParam(name = "claimOrdno", value = "申请单号", required = true, paramType = "path")
-    public StatusDto<String> saveCustomerServiceMarketCounter(@PathVariable String claimOrdno){
+    public StatusDto<String> saveCustomerServiceMarketCounter(@PathVariable @ValidateNotNull(message = "claimOrdno(索赔单claimOrdno)不能为空") String claimOrdno){
         return paymentService.saveCustomerServiceMarketCounter(claimOrdno);
     }
 }

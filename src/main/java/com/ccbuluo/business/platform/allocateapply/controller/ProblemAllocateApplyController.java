@@ -5,6 +5,8 @@ import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.ProblemAllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
 import com.ccbuluo.business.platform.allocateapply.service.ProblemAllocateApply;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
+import com.ccbuluo.core.annotation.validate.ValidatePattern;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -92,7 +94,7 @@ public class ProblemAllocateApplyController extends BaseController {
     @ApiOperation(value = "查询退换货处理申请单详情（处理）", notes = "【魏俊标】")
     @GetMapping("/problemdetail/{applyNo}")
     @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
-    public StatusDto<FindAllocateApplyDTO> getProblemdetailDetail(@PathVariable String applyNo){
+    public StatusDto<FindAllocateApplyDTO> getProblemdetailDetail(@PathVariable @ValidateNotNull(message = "applyNo(申请applyNo)不能为空") String applyNo){
         return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.getProblemdetailDetail(applyNo));
     }
 
@@ -110,7 +112,7 @@ public class ProblemAllocateApplyController extends BaseController {
             @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query"),
             @ApiImplicitParam(name = "applyType", value = "申请类型", required = true, paramType = "query")
     })
-    public StatusDto<String> changeApplyType(String applyNo, String applyType){
+    public StatusDto<String> changeApplyType(@ValidateNotNull(message = "applyNo(申请applyNo)不能为空") String applyNo, @ValidatePattern(regexp = {"BARTER", "REFUND"},message = "类型不合法") String applyType){
         return problemAllocateApply.changeApplyType(applyNo,applyType);
     }
 
