@@ -26,7 +26,7 @@ public class ProcessApplyDTO {
     /**
      * 调拨申请单编号
      */
-    @ValidateNotBlank(groups = MyGroup.Add.class)
+    @ValidateNotBlank(groups = {MyGroup.Add.class, MyGroup.Edit.class})
     @ApiModelProperty(name = "applyNo", value = "调拨申请单编号")
     private String applyNo;
     /**

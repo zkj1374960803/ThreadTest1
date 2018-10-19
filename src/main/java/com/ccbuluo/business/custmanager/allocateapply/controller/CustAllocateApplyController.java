@@ -304,7 +304,7 @@ public class CustAllocateApplyController extends BaseController {
      */
     @ApiOperation(value = "提交申请", notes = "【张康健】")
     @PostMapping("/processapply")
-    public StatusDto<String> processApply(@ApiParam(name = "processApplyDTO", value = "json数据格式", required = true) @RequestBody @ValidateGroup(MyGroup.Add.class) ProcessApplyDTO processApplyDTO){
+    public StatusDto<String> processApply(@ApiParam(name = "processApplyDTO", value = "json数据格式", required = true) @RequestBody @ValidateGroup(MyGroup.Edit.class) ProcessApplyDTO processApplyDTO){
         allocateApplyServiceImpl.processApply(processApplyDTO);
         return StatusDto.buildSuccessStatusDto();
     }

@@ -1,6 +1,7 @@
 package com.ccbuluo.business.servicecenter.allocateapply.controller;
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.constants.MyGroup;
 import com.ccbuluo.business.entity.BizInstockplanDetail;
 import com.ccbuluo.business.entity.BizOutstockplanDetail;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
@@ -238,7 +239,7 @@ public class ServiceAllocateApplyController extends BaseController {
      */
     @ApiOperation(value = "提交申请", notes = "【张康健】")
     @PostMapping("/processapply")
-    public StatusDto<String> processApply(@ApiParam(name = "processApplyDTO", value = "json数据格式", required = true) @RequestBody @ValidateGroup ProcessApplyDTO processApplyDTO){
+    public StatusDto<String> processApply(@ApiParam(name = "processApplyDTO", value = "json数据格式", required = true) @RequestBody @ValidateGroup(MyGroup.Edit.class) ProcessApplyDTO processApplyDTO){
         allocateApplyServiceImpl.processApply(processApplyDTO);
         return StatusDto.buildSuccessStatusDto();
     }
