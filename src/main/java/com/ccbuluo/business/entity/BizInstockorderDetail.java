@@ -66,8 +66,6 @@ public class BizInstockorderDetail extends AftersaleCommonEntity{
     /**
      * 问题件数量
      */
-    @ValidateMin(value = 0, message = "问题件数量不能小于0")
-    @ValidateNotNull(message = "问题件数量不能为空")
     @ApiModelProperty(name = "problemNum", value = "问题件数量")
     private Long problemNum;
     /**
