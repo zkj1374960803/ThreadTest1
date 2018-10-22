@@ -59,7 +59,6 @@ public class AllocateApplyDTO {
     /**
      * 入库仓库编号
      */
-    @ValidateNotBlank(groups = Group.Add.class)
     @ApiModelProperty(name = "inRepositoryNo", value = "入库仓库编号")
     private String inRepositoryNo;
     /**
