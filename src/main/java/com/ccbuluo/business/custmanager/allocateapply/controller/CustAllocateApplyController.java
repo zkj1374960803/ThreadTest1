@@ -11,6 +11,7 @@ import com.ccbuluo.business.platform.instock.service.InstockOrderService;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.core.annotation.validate.ValidateGroup;
 import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.annotation.validate.ValidatePattern;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.validate.ValidateUtils;
@@ -255,7 +256,7 @@ public class CustAllocateApplyController extends BaseController {
         @ApiImplicitParam(name = "id", value = "id", required = true, paramType = "query"),
         @ApiImplicitParam(name = "productNo", value = "商品的编号", required = true, paramType = "query")
     })
-    public StatusDto<String> receivingmaterials(@RequestParam @ValidateNotBlank Long id,
+    public StatusDto<String> receivingmaterials(@RequestParam @ValidateNotNull Long id,
                                                 @ValidateNotBlank String productNo){
         allocateApplyServiceImpl.receivingmaterials(id, productNo);
         return StatusDto.buildSuccessStatusDto();
