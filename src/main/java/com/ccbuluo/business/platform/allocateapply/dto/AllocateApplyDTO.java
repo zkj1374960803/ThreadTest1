@@ -70,7 +70,6 @@ public class AllocateApplyDTO {
     /**
      * 出库的组织架构
      */
-    @ValidateNotBlank(groups = Group.Add.class)
     @ApiModelProperty(name = "outstockOrgno", value = "出库的组织架构(采购类型时，不必填)")
     private String outstockOrgno;
     /**
