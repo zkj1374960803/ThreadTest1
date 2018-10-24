@@ -591,7 +591,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         sql.append(" GROUP BY a.product_no ");
         List<Map<String, Object>> maps = queryListMap(sql.toString(), map);
         map.clear();
-        maps.stream().forEach(a ->{
+        maps.forEach(a ->{
             String productNo = (String) a.get("productNo");
             Object validStock =  a.get("validStock");
             map.put(productNo,validStock);
