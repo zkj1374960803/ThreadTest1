@@ -2,14 +2,18 @@ package com.ccbuluo.business.platform.custmanager.controller;
 
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.constants.MyGroup;
 import com.ccbuluo.business.custmanager.allocateapply.dto.QueryPendingMaterialsDTO;
 import com.ccbuluo.business.platform.custmanager.dto.CustManagerDetailDTO;
 import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerServiceImpl;
+import com.ccbuluo.core.annotation.validate.ValidateGroup;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
+import com.ccbuluo.core.validate.Group;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftBean;
@@ -73,7 +77,7 @@ public class CustmanagerController extends BaseController {
         @ApiImplicitParam(name = "servicecenterCode", value = "服务中心code", required = true, paramType = "query")
     })
     @PostMapping("/createuser")
-    public StatusDto<String> createUser(@ApiIgnore UserInfoDTO userInfoDTO, @ApiIgnore BizServiceCustmanager bizServiceCustmanager) {
+    public StatusDto<String> createUser(@ApiIgnore UserInfoDTO userInfoDTO, @ApiIgnore @ValidateGroup(value = Group.Add.class) BizServiceCustmanager bizServiceCustmanager) {
         return custmanagerServiceImpl.createCustManager(userInfoDTO, bizServiceCustmanager);
     }
     /**
@@ -106,7 +110,7 @@ public class CustmanagerController extends BaseController {
     @GetMapping("/querycustmaterials")
     @ApiOperation(value = "查询客户经理物料的信息", notes = "【张康健】")
     @ApiImplicitParam(name = "useruuid", value = "用户uuid", required = true, paramType = "query")
-    public StatusDto<List<QueryPendingMaterialsDTO>> queryCustMaterials(String useruuid){
+    public StatusDto<List<QueryPendingMaterialsDTO>> queryCustMaterials(@ValidateNotBlank String useruuid){
         return StatusDto.buildDataSuccessStatusDto(custmanagerServiceImpl.queryCustMaterials(useruuid));
     }
 
@@ -138,7 +142,7 @@ public class CustmanagerController extends BaseController {
         @ApiImplicitParam(name = "vinNumber", value = "vin", required = true, paramType = "query"),
         @ApiImplicitParam(name = "servicecenterCode", value = "服务中心code", required = true, paramType = "query")
     })
-    public StatusDto editUser(@ApiIgnore UserInfoDTO userInfoDTO, @ApiIgnore BizServiceCustmanager bizServiceCustmanager) {
+    public StatusDto editUser(@ApiIgnore UserInfoDTO userInfoDTO, @ApiIgnore @ValidateGroup(Group.Update.class) BizServiceCustmanager bizServiceCustmanager) {
         return custmanagerServiceImpl.editUser(userInfoDTO, bizServiceCustmanager);
     }
 
@@ -173,7 +177,7 @@ public class CustmanagerController extends BaseController {
         @ApiImplicitParam(name = "name", value = "客户经理姓名", required = true, paramType = "query")
     })
     @PostMapping("/updatecustmanager")
-    public StatusDto<String> updateCustManager(@ApiIgnore BizServiceCustmanager bizServiceCustmanager) {
+    public StatusDto<String> updateCustManager(@ApiIgnore @ValidateGroup(MyGroup.Edit.class) BizServiceCustmanager bizServiceCustmanager) {
         return custmanagerServiceImpl.updateCustManager(bizServiceCustmanager);
     }
 

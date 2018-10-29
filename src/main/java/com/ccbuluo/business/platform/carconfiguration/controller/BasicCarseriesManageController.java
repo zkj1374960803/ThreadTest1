@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.carconfiguration.controller;
 
 import com.ccbuluo.business.platform.carconfiguration.entity.CarseriesManage;
 import com.ccbuluo.business.platform.carconfiguration.service.BasicCarseriesManageService;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -74,7 +75,7 @@ public class BasicCarseriesManageController extends BaseController {
     @ApiOperation(value = "车系删除", notes = "【wuyibo】")
     @ApiImplicitParam(name = "id", value = "车系id", required = true, paramType = "path")
     @GetMapping("/delete/{id}")
-    public StatusDto delete(@PathVariable("id") Long id) {
+    public StatusDto delete(@PathVariable("id") @ValidateNotNull(message = "id(车系id)不能为空") Long id) {
         return basicCarseriesManageService.deleteCarseriesManage(id);
     }
 
@@ -89,7 +90,7 @@ public class BasicCarseriesManageController extends BaseController {
     @ApiOperation(value = "车系详情", notes = "【wuyibo】")
     @ApiImplicitParam(name = "id", value = "车系id", required = true, paramType = "path")
     @GetMapping("/detail/{id}")
-    public StatusDto detail(@PathVariable("id") Long id) {
+    public StatusDto detail(@PathVariable("id") @ValidateNotNull(message = "id(车系id)不能为空") Long id) {
         return StatusDto.buildDataSuccessStatusDto(basicCarseriesManageService.findCarseriesManageDetail(id));
     }
 

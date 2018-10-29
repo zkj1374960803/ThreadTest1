@@ -1,6 +1,9 @@
 package com.ccbuluo.business.platform.allocateapply.dto;
 
+import com.ccbuluo.business.constants.MyGroup;
 import com.ccbuluo.business.entity.AftersaleCommonEntity;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidatePattern;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -27,11 +30,13 @@ public class FindStockListDTO{
     @ApiModelProperty(name = "orgNo", value = "机构的编号", hidden = true)
     private String orgNo;
 
+    @ValidatePattern(regexp = {"PLATFORM", "SERVICECENTER", "CUSTMANAGER"}, groups = MyGroup.Select.class)
     @ApiModelProperty(name = "type", value = "机构的类型", hidden = true)
     private String type;
     /**
      * 商品编号
      */
+    @ValidateNotBlank(groups = MyGroup.Select.class)
     @ApiModelProperty(name = "productNo", value = "商品编号")
     private String productNo;
     /**
@@ -52,6 +57,7 @@ public class FindStockListDTO{
     /**
      * 商品类型(物料、零配件)
      */
+    @ValidatePattern(regexp = {"FITTINGS", "EQUIPMENT"}, groups = MyGroup.Select.class)
     @ApiModelProperty(name = "productType", value = "商品类型(物料、零配件)", hidden = true)
     private String productType;
     /**
@@ -69,12 +75,12 @@ public class FindStockListDTO{
      * 偏移量
      */
     @ApiModelProperty(name = "offset", value = "偏移量", hidden = true)
-    private Integer offset;
+    private Integer offset = 0;
     /**
      * 每页显示的数量
      */
     @ApiModelProperty(name = "pageSize", value = "每页显示的数量", hidden = true)
-    private Integer pageSize;
+    private Integer pageSize = 10;
 
     public String getType() {
         return type;

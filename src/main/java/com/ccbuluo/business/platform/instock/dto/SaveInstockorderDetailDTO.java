@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.instock.dto;
 
 import com.ccbuluo.business.entity.AftersaleCommonEntity;
 import com.ccbuluo.business.entity.BizInstockorderDetail;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -19,11 +20,13 @@ public class SaveInstockorderDetailDTO{
     /**
      * 申请单号
      */
+    @ValidateNotBlank(message = "申请单号不能为空")
     @ApiModelProperty(name = "applyNo", value = "申请单号")
     private String applyNo;
     /**
      * 入库仓库编号
      */
+    @ValidateNotBlank(message = "入库仓库编号不能为空")
     @ApiModelProperty(name = "inRepositoryNo", value = "入库仓库编号")
     private String inRepositoryNo;
     /**

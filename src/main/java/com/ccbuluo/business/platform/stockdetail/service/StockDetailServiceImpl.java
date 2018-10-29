@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.stockdetail.service;
 
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.adjust.dto.StockAdjustListDTO;
 import com.ccbuluo.business.platform.outstock.dto.ProductStockDTO;
@@ -63,6 +64,7 @@ public class StockDetailServiceImpl implements StockDetailService{
      */
     @Override
     public Long saveStockDetail(BizStockDetail bizStockDetail) {
+        bizStockDetail.setDeleteFlag(Constants.DELETE_FLAG_NORMAL);
         return bizStockDetailDao.saveEntity(bizStockDetail);
     }
 

@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.outstock.dto;
 
 import com.ccbuluo.business.entity.BizInstockorderDetail;
 import com.ccbuluo.business.entity.BizOutstockorderDetail;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -23,6 +24,7 @@ public class SaveOutstockorderDetailDTO {
     /**
      * 出库仓库编号
      */
+    @ValidateNotBlank(message = "出库仓库编号不能为空")
     @ApiModelProperty(name = "outRepositoryNo", value = "出库仓库编号")
     private String outRepositoryNo;
     /**

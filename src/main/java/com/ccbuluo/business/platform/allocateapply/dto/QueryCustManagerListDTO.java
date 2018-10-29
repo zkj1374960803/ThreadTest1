@@ -23,9 +23,9 @@ public class QueryCustManagerListDTO {
     @ApiModelProperty(name = "inRepositoryNo", value = "仓库编号")
     private String inRepositoryNo;
     @ApiModelProperty(name = "offset", value = "偏移量")
-    private Integer offset;
+    private Integer offset = 0;
     @ApiModelProperty(name = "pageSize", value = "每页显示的条数")
-    private Integer pageSize;
+    private Integer pageSize = 10;
     @ApiModelProperty(name = "useruuid", value = "uuid")
     private String useruuid;
     @ApiModelProperty(name = "orgCode", value = "机构code")

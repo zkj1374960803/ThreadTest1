@@ -2,7 +2,10 @@ package com.ccbuluo.business.platform.carconfiguration.controller;
 
 import com.ccbuluo.business.platform.carconfiguration.entity.CarbrandManage;
 import com.ccbuluo.business.platform.carconfiguration.service.BasicCarbrandManageService;
+import com.ccbuluo.core.annotation.validate.ValidateGroup;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.controller.BaseController;
+import com.ccbuluo.core.validate.Group;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -74,7 +77,7 @@ public class BasicCarbrandManageController extends BaseController {
     @ApiOperation(value = "品牌删除", notes = "【wuyibo】")
     @ApiImplicitParam(name = "id", value = "品牌id", required = true, paramType = "path")
     @GetMapping("/delete/{id}")
-    public StatusDto delete(@PathVariable("id") Long id) {
+    public StatusDto delete(@PathVariable("id") @ValidateNotNull(message = "id(品牌id)不能为空") Long id) {
         return basicCarbrandManageService.deleteCarbrandManage(id);
     }
 
@@ -89,7 +92,7 @@ public class BasicCarbrandManageController extends BaseController {
     @ApiOperation(value = "品牌详情", notes = "【wuyibo】")
     @ApiImplicitParam(name = "id", value = "品牌id", required = true, paramType = "path")
     @GetMapping("/detail/{id}")
-    public StatusDto<CarbrandManage> detail(@PathVariable("id") Long id) {
+    public StatusDto<CarbrandManage> detail(@PathVariable("id") @ValidateNotNull(message = "id(品牌id)不能为空") Long id) {
         return StatusDto.buildDataSuccessStatusDto(basicCarbrandManageService.findCarbrandManageDetail(id));
     }
 

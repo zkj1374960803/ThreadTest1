@@ -4,6 +4,9 @@ import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.platform.maintainitem.dto.DetailBizServiceMaintainitemDTO;
 import com.ccbuluo.business.platform.maintainitem.dto.SaveBizServiceMaintainitemDTO;
 import com.ccbuluo.business.platform.maintainitem.service.MaintainitemService;
+import com.ccbuluo.core.annotation.validate.ValidateGroup;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -34,7 +37,7 @@ public class MaintainitemController extends BaseController {
      */
     @ApiOperation(value = "工时保存", notes = "【刘铎】")
     @PostMapping("/save")
-    public StatusDto saveMaintainitem(@ApiParam(name = "工时对象", value = "传入json格式", required = true)@RequestBody SaveBizServiceMaintainitemDTO saveBizServiceMaintainitemDTO) {
+    public StatusDto saveMaintainitem(@ApiParam(name = "工时对象", value = "传入json格式", required = true)@RequestBody @ValidateGroup SaveBizServiceMaintainitemDTO saveBizServiceMaintainitemDTO) {
         int status = maintainitemService.save(saveBizServiceMaintainitemDTO);
         if (status == Constants.FAILURE_ONE) {
             return StatusDto.buildFailure("该服务已存在，请核对！");
@@ -56,7 +59,7 @@ public class MaintainitemController extends BaseController {
     @ApiOperation(value = "工时详情", notes = "【刘铎】")
     @ApiImplicitParam(name = "id", value = "工时id",  required = true, paramType = "query")
     @GetMapping("/getbyid")
-    public StatusDto<DetailBizServiceMaintainitemDTO> getById(@RequestParam Long id) {
+    public StatusDto<DetailBizServiceMaintainitemDTO> getById(@RequestParam @ValidateNotNull(message = "id不能为空") Long id) {
         return StatusDto.buildDataSuccessStatusDto(maintainitemService.getById(id));
     }
 
@@ -69,7 +72,7 @@ public class MaintainitemController extends BaseController {
      */
     @ApiOperation(value = "工时编辑", notes = "【刘铎】")
     @PostMapping("/edit")
-    public StatusDto editMaintainitem(@ApiParam(name = "工时对象", value = "传入json格式", required = true)@RequestBody SaveBizServiceMaintainitemDTO saveBizServiceMaintainitemDTO) {
+    public StatusDto editMaintainitem(@ApiParam(name = "工时对象", value = "传入json格式", required = true)@RequestBody @ValidateGroup SaveBizServiceMaintainitemDTO saveBizServiceMaintainitemDTO) {
         int status = maintainitemService.edit(saveBizServiceMaintainitemDTO);
         if (status == Constants.FAILURE_ONE) {
             return StatusDto.buildFailure("该服务已存在，请核对！");
@@ -110,7 +113,7 @@ public class MaintainitemController extends BaseController {
     @ApiOperation(value = "工时删除", notes = "【刘铎】")
     @ApiImplicitParam(name = "equipCode", value = "工时编号", paramType = "query",required = true)
     @DeleteMapping("/delete")
-    public StatusDto delete(@RequestParam String equipCode) {
+    public StatusDto delete(@RequestParam @ValidateNotBlank(message = "equipCode(工时编号)不能为空") String equipCode) {
         int status = maintainitemService.delete(equipCode);
         if (status == Constants.FAILURE_ONE) {
             return StatusDto.buildFailure("该服务项已被引用，无法删除！");

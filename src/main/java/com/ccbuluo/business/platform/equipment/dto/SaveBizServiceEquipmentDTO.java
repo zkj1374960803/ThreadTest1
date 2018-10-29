@@ -2,6 +2,9 @@ package com.ccbuluo.business.platform.equipment.dto;
 
 import com.ccbuluo.business.entity.AftersaleCommonEntity;
 import com.ccbuluo.business.entity.IdEntity;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
+import com.ccbuluo.core.annotation.validate.ValidateLength;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -16,16 +19,21 @@ public class SaveBizServiceEquipmentDTO extends IdEntity {
     /**
      * 物料名称
      */
+    @ValidateLength(min = 0, max = 10, message = "名称不能超过10个字")
+    @ValidateNotBlank(message = "物料名称不能为空")
     @ApiModelProperty(name = "equipName", value = "物料名称", required = true)
     private String equipName;
     /**
      * 计量单位
      */
+    @ValidateLength(min = 0, max = 10, message = "计量单位不能超过10个字")
+    @ValidateNotBlank(message = "计量单位不能为空")
     @ApiModelProperty(name = "equipUnit", value = "计量单位")
     private String equipUnit;
     /**
      * 物料类型的id
      */
+    @ValidateNotNull(message = "物料类型不能为空")
     @ApiModelProperty(name = "equiptypeId", value = "物料类型的id", required = true)
     private Long equiptypeId;
     /**

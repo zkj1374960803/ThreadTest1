@@ -1,5 +1,8 @@
 package com.ccbuluo.business.entity;
 
+import com.ccbuluo.core.annotation.validate.ValidateMin;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.junit.After;
@@ -22,31 +25,39 @@ public class BizStockAdjustdetail extends AftersaleCommonEntity {
     /**
      * 商品的编号
      */
+    @ValidateNotBlank(message = "商品编号不能为空")
     @ApiModelProperty(name = "productNo", value = "商品的编号")
     private String productNo;
     /**
      * 商品类型：零配件、物料
      */
+    @ValidateNotBlank(message = "商品类型不能为空")
     @ApiModelProperty(name = "productType", value = "商品类型：零配件、物料")
     private String productType;
     /**
      * 商品的名称
      */
+    @ValidateNotBlank(message = "商品名称不能为空")
     @ApiModelProperty(name = "productName", value = "商品的名称")
     private String productName;
     /**
      * 商品分类的全路径名称
      */
+    @ValidateNotBlank(message = "商品分类的全路径名称不能为空")
     @ApiModelProperty(name = "productCategoryname", value = "商品分类的全路径名称")
     private String productCategoryname;
     /**
      * 完美情况下该商品的总库存量
      */
+    @ValidateMin(value = 0)
+    @ValidateNotNull(message = "商品应有库存不能为空")
     @ApiModelProperty(name = "perfectNum", value = "完美情况下该商品的总库存量")
     private Long perfectNum;
     /**
      * 该商品实际情况下的总库存量
      */
+    @ValidateMin(value = 0)
+    @ValidateNotNull(message = "商品实际库存不能为空")
     @ApiModelProperty(name = "actualNum", value = "该商品实际情况下的总库存量")
     private Long actualNum;
     /**

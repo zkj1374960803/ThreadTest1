@@ -5,6 +5,9 @@ import com.ccbuluo.business.constants.ProductUnitEnum;
 import com.ccbuluo.business.platform.equipment.dto.DetailBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.equipment.dto.SaveBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.equipment.service.EquipmentService;
+import com.ccbuluo.core.annotation.validate.ValidateGroup;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -37,7 +40,7 @@ public class EquipmentController extends BaseController {
      */
     @ApiOperation(value = "物料保存", notes = "【刘铎】")
     @PostMapping("/save")
-    public StatusDto saveEquiptype(@ApiParam(name = "物料对象", value = "传入json格式", required = true)@RequestBody SaveBizServiceEquipmentDTO saveBizServiceEquipmentDTO) {
+    public StatusDto saveEquiptype(@ApiParam(name = "物料对象", value = "传入json格式", required = true)@RequestBody @ValidateGroup SaveBizServiceEquipmentDTO saveBizServiceEquipmentDTO) {
         int status = equipmentService.save(saveBizServiceEquipmentDTO);
         if (status == Constants.FAILURE_ONE) {
             return StatusDto.buildFailure("该物料已存在，请核对！");
@@ -60,7 +63,7 @@ public class EquipmentController extends BaseController {
     @ApiOperation(value = "物料详情", notes = "【刘铎】")
     @ApiImplicitParam(name = "id", value = "物料id",  required = true, paramType = "query")
     @GetMapping("/getbyid")
-    public StatusDto<DetailBizServiceEquipmentDTO> getById(@RequestParam Long id) {
+    public StatusDto<DetailBizServiceEquipmentDTO> getById(@RequestParam @ValidateNotNull(message = "id不能为空") Long id) {
         return StatusDto.buildDataSuccessStatusDto(equipmentService.getById(id));
     }
 
@@ -73,7 +76,7 @@ public class EquipmentController extends BaseController {
      */
     @ApiOperation(value = "物料保存", notes = "【刘铎】")
     @PostMapping("/edit")
-    public StatusDto editEquiptype(@ApiParam(name = "物料对象", value = "传入json格式", required = true)@RequestBody SaveBizServiceEquipmentDTO saveBizServiceEquipmentDTO) {
+    public StatusDto editEquiptype(@ApiParam(name = "物料对象", value = "传入json格式", required = true)@RequestBody @ValidateGroup SaveBizServiceEquipmentDTO saveBizServiceEquipmentDTO) {
         int status = equipmentService.editEquiptype(saveBizServiceEquipmentDTO);
         if (status == Constants.FAILURE_ONE) {
             return StatusDto.buildFailure("该物料已存在，请核对！");
@@ -133,7 +136,7 @@ public class EquipmentController extends BaseController {
     @ApiOperation(value = "根据物料类型查物料", notes = "【刘铎】")
     @ApiImplicitParam(name = "equiptypeId", value = "物料类型id", paramType = "query", dataType = "int")
     @GetMapping("/queryequpmentbyequiptype")
-    public StatusDto<List<DetailBizServiceEquipmentDTO>> queryEqupmentByEquiptype(Long equiptypeId) {
+    public StatusDto<List<DetailBizServiceEquipmentDTO>> queryEqupmentByEquiptype(@ValidateNotNull(message = "equiptypeId(物料类型id)不能为空") Long equiptypeId) {
         return StatusDto.buildDataSuccessStatusDto(equipmentService.queryEqupmentByEquiptype(equiptypeId));
     }
 
@@ -147,7 +150,7 @@ public class EquipmentController extends BaseController {
     @ApiOperation(value = "删除物料", notes = "【刘铎】")
     @ApiImplicitParam(name = "equipCode", value = "物料code", paramType = "query", required = true)
     @DeleteMapping("/delete")
-    public StatusDto delete(@RequestParam String equipCode) {
+    public StatusDto delete(@RequestParam @ValidateNotBlank(message = "equipCode(物料code)不能为空") String equipCode) {
         int delete = equipmentService.delete(equipCode);
         if (delete == Constants.FAILURE_ONE) {
             return StatusDto.buildFailure("该物料已被关联，无法删除！");

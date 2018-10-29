@@ -7,6 +7,7 @@ import com.ccbuluo.business.platform.maintaincar.dto.ListServiceMaintaincarDTO;
 import com.ccbuluo.business.platform.maintaincar.dto.SearchBizServiceMaintaincarDTO;
 import com.ccbuluo.business.platform.maintaincar.service.BizServiceMaintaincarService;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -80,7 +81,7 @@ public class BizServiceMaintaincarController extends BaseController {
     @ApiOperation(value = "根据维修车辆id查询维修车辆信息", notes = "根据维修车辆id查询维修车辆信息")
     @ApiImplicitParam(name = "carId", value = "车辆id", required = true, paramType = "query")
     @GetMapping("/queryservicemaintaincarbycarid")
-    public StatusDto queryServiceMaintaincarByCarId(Long carId) throws TException {
+    public StatusDto queryServiceMaintaincarByCarId(@ValidateNotNull(message = "id(维修车id)不能为空") Long carId) throws TException {
         return StatusDto.buildDataSuccessStatusDto(bizServiceMaintaincarService.queryServiceMaintaincarByCarId(carId));
     }
 
@@ -95,7 +96,7 @@ public class BizServiceMaintaincarController extends BaseController {
     @ApiOperation(value = "删除维修车辆",notes = "【魏俊标】")
     @GetMapping("/delete/{carId}")
     @ApiImplicitParam(name = "carId", value = "维修车辆id", required = true, paramType = "path")
-    public StatusDto delete(@PathVariable Long carId) {
+    public StatusDto delete(@PathVariable @ValidateNotNull(message = "id(维修车id)不能为空") Long carId) {
         bizServiceMaintaincarService.deleteServiceMaintaincarByCarId(carId);
         return StatusDto.buildSuccessStatusDto();
     }
@@ -150,7 +151,7 @@ public class BizServiceMaintaincarController extends BaseController {
     @ApiImplicitParams({@ApiImplicitParam(name = "mendCode", value = "维修车code", required = false, paramType = "query"),
             @ApiImplicitParam(name = "carStatus", value = "状态", required = false, paramType = "query")})
     @GetMapping("/updatestatusbycode")
-    public StatusDto updatestatusbycode(@RequestParam String mendCode,@RequestParam Integer carStatus) {
+    public StatusDto updatestatusbycode(@RequestParam @ValidateNotNull(message = "mendCode(维修车mendCode)不能为空") String mendCode,@RequestParam Integer carStatus) {
         int flag = bizServiceMaintaincarService.updatestatusbycode(mendCode, carStatus);
         if (flag == Constants.SUCCESSSTATUS) {
             return StatusDto.buildSuccessStatusDto("操作成功！");

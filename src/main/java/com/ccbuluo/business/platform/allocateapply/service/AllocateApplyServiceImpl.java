@@ -300,7 +300,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         });
         // 查询申请单的详单
         List<QueryAllocateapplyDetailDTO> queryAllocateapplyDetailDTOS = bizAllocateApplyDao.queryAllocateapplyDetail(applyNo);
-        if (queryAllocateapplyDetailDTOS != null) {
+        if (null != queryAllocateapplyDetailDTOS && queryAllocateapplyDetailDTOS.size() > 0) {
             String productType = queryAllocateapplyDetailDTOS.get(0).getProductType();
             if (!Constants.PRODUCT_TYPE_EQUIPMENT.equals(productType)) {
                 // 查询零配件的名称

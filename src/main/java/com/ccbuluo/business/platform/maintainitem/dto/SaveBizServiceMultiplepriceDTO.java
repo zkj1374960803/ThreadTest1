@@ -1,6 +1,8 @@
 package com.ccbuluo.business.platform.maintainitem.dto;
 
 import com.ccbuluo.business.entity.IdEntity;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -18,11 +20,13 @@ public class SaveBizServiceMultiplepriceDTO {
     /**
      * 服务项目的编码
      */
+    @ValidateNotBlank(message = "服务项目的编码不能为空")
     @ApiModelProperty(name = "maintainitemCode", value = "服务项目的编码")
     private String maintainitemCode;
     /**
      * 倍数
      */
+    @ValidateNotNull(message = "倍数不能为空")
     @ApiModelProperty(name = "multiple", value = "倍数")
     private Double multiple;
     /**

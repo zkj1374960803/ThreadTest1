@@ -1,5 +1,7 @@
 package com.ccbuluo.business.entity;
 
+import com.ccbuluo.core.annotation.validate.ValidateLength;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -21,6 +23,7 @@ public class BizServiceMaintaincar extends AftersaleCommonEntity{
     /**
      * 车架号
      */
+    @ValidateLength(min = 0, max = 17,message = "车架号长度不合法")
     @ApiModelProperty(name = "vinNumber", value = "车架号",required = true)
     private String vinNumber;
     /**
@@ -31,16 +34,19 @@ public class BizServiceMaintaincar extends AftersaleCommonEntity{
     /**
      * 车辆品牌的id
      */
+    @ValidateNotNull(message = "所属品牌不能为空")
     @ApiModelProperty(name = "carbrandId", value = "车辆品牌的id",required = true)
     private Long carbrandId;
     /**
      * 车系的id
      */
+    @ValidateNotNull(message = "所属车系不能为空")
     @ApiModelProperty(name = "carseriesId", value = "车系的id",required = true)
     private Long carseriesId;
     /**
      * 车型的id
      */
+    @ValidateNotNull(message = "所属车型不能为空")
     @ApiModelProperty(name = "carmodelId", value = "车型的id",required = true)
     private Long carmodelId;
     /**
@@ -56,6 +62,7 @@ public class BizServiceMaintaincar extends AftersaleCommonEntity{
     /**
      * 北斗设备编号
      */
+    @ValidateLength(min = 0, max = 8,message = "车辆北斗ID长度不合法")
     @ApiModelProperty(name = "beidouNumber", value = "北斗设备编号",required = true)
     private String beidouNumber;
     /**

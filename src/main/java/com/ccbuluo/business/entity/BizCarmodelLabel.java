@@ -1,5 +1,8 @@
 package com.ccbuluo.business.entity;
 
+import com.ccbuluo.core.annotation.validate.ValidateLength;
+import com.ccbuluo.core.annotation.validate.ValidateMax;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -19,11 +22,14 @@ public class BizCarmodelLabel extends AftersaleCommonEntity{
     /**
      * 标签名称
      */
+    @ValidateLength(min = 0, max = 10,message = "标签名称长度不合法")
     @ApiModelProperty(name = "labelName", value = "标签名称",required = true)
     private String labelName;
     /**
      * 排序号
      */
+    @ValidateNotNull(message = "排序号不能为空")
+    @ValidateMax(value = 100,message = "排序号不能大于100")
     @ApiModelProperty(name = "sort", value = "排序号")
     private Integer sort;
 

@@ -1,10 +1,13 @@
 package com.ccbuluo.business.platform.order.dto;
 
 import com.ccbuluo.business.entity.AftersaleCommonEntity;
+import com.ccbuluo.business.entity.BizServiceOrder;
 import com.ccbuluo.business.entity.IdEntity;
+import com.ccbuluo.core.annotation.validate.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+import java.time.chrono.MinguoChronology;
 import java.util.Date;
 
 /**
@@ -18,21 +21,29 @@ public class SaveServiceOrderDTO extends AftersaleCommonEntity {
     /**
      * 车牌号
      */
+    @ValidateLength(min = 0, max = 10, message = "车牌号不正确")
+    @ValidateNotBlank(message = "车牌号不能为空")
     @ApiModelProperty(name = "carNo", value = "车牌号")
     private String carNo;
     /**
      * 车辆的VIN码
      */
+    @ValidateLength(min = 0, max = 20, message = "车辆的VIN码不正确")
+    @ValidateNotBlank(message = "车辆的VIN码不能为空")
     @ApiModelProperty(name = "carVin", value = "车辆的VIN码")
     private String carVin;
     /**
      * 服务类型：维修(REPAIR)、保养(MAINTAIN)、维修加保养(BOTH)
      */
+    @ValidateStringIn(value = {"REPAIR", "MAINTAIN", "BOTH"}, message = "服务类型不在指定的范围内")
+    @ValidateNotBlank(message = "服务类型不能为空")
     @ApiModelProperty(name = "serviceType", value = "服务类型：维修(REPAIR)、保养(MAINTAIN)、维修加保养(BOTH)")
     private String serviceType;
     /**
      * 报修机构的类型：租赁门店(RENTALSTORE)、客户经理(CUSTMANAGER)
      */
+    @ValidateStringIn(value = {"RENTALSTORE", "CUSTMANAGER"}, message = "报修机构的类型不在指定的范围内")
+    @ValidateNotBlank(message = "报修机构的类型不能为空")
     @ApiModelProperty(name = "reportOrgtype", value = "报修机构的类型：租赁门店(RENTALSTORE)、客户经理(CUSTMANAGER)")
     private String reportOrgtype;
     /**
@@ -43,11 +54,15 @@ public class SaveServiceOrderDTO extends AftersaleCommonEntity {
     /**
      * 车辆此时的客户的姓名
      */
+    @ValidateLength(min = 0, max = 30, message = "客户姓名不能超过30个字")
+    @ValidateNotBlank(message = "客户的姓名不能为空")
     @ApiModelProperty(name = "customerName", value = "车辆此时的客户的姓名")
     private String customerName;
     /**
      * 客户的联系方式
      */
+    @ValidateLength(min = 0, max = 20, message = "客户联系方式不能超过20个字")
+    @ValidateNotBlank(message = "客户的联系方式不能为空")
     @ApiModelProperty(name = "customerPhone", value = "客户的联系方式")
     private String customerPhone;
     /**
@@ -68,11 +83,15 @@ public class SaveServiceOrderDTO extends AftersaleCommonEntity {
     /**
      * 服务单的负责人和客户约好的上门维修时间
      */
+    @ValidateDateRange
+    @ValidateNotNull(message = "上门维修时间不能为空")
     @ApiModelProperty(name = "serviceTime", value = "服务单的负责人和客户约好的上门维修时间")
     private Date serviceTime;
     /**
      * 维修或保养的具体内容描述
      */
+    @ValidateLength(min = 0, max = 2000, message = "问题描述不能超过2000字")
+    @ValidateNotBlank(message = "问题描述不能为空")
     @ApiModelProperty(name = "problemContent", value = "维修或保养的具体内容描述")
     private String problemContent;
     /**
@@ -83,6 +102,7 @@ public class SaveServiceOrderDTO extends AftersaleCommonEntity {
     /**
      * 省
      */
+    @ValidateNotBlank(message = "省不能为空")
     @ApiModelProperty(name = "provinceName", value = "省")
     private String provinceName;
     /**
@@ -93,6 +113,7 @@ public class SaveServiceOrderDTO extends AftersaleCommonEntity {
     /**
      * 市
      */
+    @ValidateNotBlank(message = "市不能为空")
     @ApiModelProperty(name = "cityName", value = "市")
     private String cityName;
     /**
@@ -103,6 +124,7 @@ public class SaveServiceOrderDTO extends AftersaleCommonEntity {
     /**
      * 区
      */
+    @ValidateNotBlank(message = "区不能为空")
     @ApiModelProperty(name = "areaName", value = "区")
     private String areaName;
     /**

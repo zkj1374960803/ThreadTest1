@@ -4,6 +4,9 @@ import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizServiceEquiptype;
 import com.ccbuluo.business.platform.equipment.dto.SaveBizServiceEquiptypeDTO;
 import com.ccbuluo.business.platform.equipment.service.EquiptypeService;
+import com.ccbuluo.core.annotation.validate.ValidateGroup;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.Api;
@@ -38,7 +41,7 @@ public class EquiptypeController extends BaseController {
      */
     @ApiOperation(value = "物料类型保存", notes = "【刘铎】")
     @PostMapping("/save")
-    public StatusDto saveEquiptype(@ApiParam(name = "物料类型对象", value = "传入json格式", required = true)@RequestBody SaveBizServiceEquiptypeDTO saveBizServiceEquiptypeDTO) {
+    public StatusDto saveEquiptype(@ApiParam(name = "物料类型对象", value = "传入json格式", required = true)@RequestBody @ValidateGroup SaveBizServiceEquiptypeDTO saveBizServiceEquiptypeDTO) {
         return equiptypeService.save(saveBizServiceEquiptypeDTO);
     }
 
@@ -63,7 +66,7 @@ public class EquiptypeController extends BaseController {
      */
     @ApiOperation(value = "物料类型编辑", notes = "【刘铎】")
     @PostMapping("/edit")
-    public StatusDto editEquiptype(@ApiParam(name = "物料类型对象", value = "传入json格式", required = true)@RequestBody SaveBizServiceEquiptypeDTO saveBizServiceEquiptypeDTO) {
+    public StatusDto editEquiptype(@ApiParam(name = "物料类型对象", value = "传入json格式", required = true)@RequestBody @ValidateGroup SaveBizServiceEquiptypeDTO saveBizServiceEquiptypeDTO) {
         int status = equiptypeService.edit(saveBizServiceEquiptypeDTO);
         if (status == Constants.FAILURE_ONE) {
             return StatusDto.buildFailure("该物料类型已存在，请核对！");
@@ -83,7 +86,7 @@ public class EquiptypeController extends BaseController {
     @ApiOperation(value = "物料类型删除", notes = "【刘铎】")
     @ApiImplicitParam(name = "id", value = "物料类型id",  required = true, paramType = "query")
     @DeleteMapping("/delete")
-    public StatusDto deleteById(@RequestParam Long id) {
+    public StatusDto deleteById(@RequestParam @ValidateNotNull(message = "id不能为空") Long id) {
         int status = equiptypeService.deleteById(id);
         if (status == Constants.FAILURESTATUS) {
             return StatusDto.buildFailure("删除失败！");
