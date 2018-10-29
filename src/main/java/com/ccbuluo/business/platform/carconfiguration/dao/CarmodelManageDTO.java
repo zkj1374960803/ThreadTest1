@@ -1,6 +1,8 @@
 package com.ccbuluo.business.platform.carconfiguration.dao;
 
 import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelConfiguration;
+import com.ccbuluo.core.annotation.validate.ValidateLength;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.List;
@@ -12,9 +14,12 @@ import java.util.List;
  */
 public class CarmodelManageDTO {
     private Long id;
+    @ValidateNotNull(message = "品牌id不能为空")
     private Long carbrandId; // 品牌id
+    @ValidateNotNull(message = "车系id不能为空")
     private Long carseriesId; // 车系id
     private String carbrandLogo; // 品牌logo
+    @ValidateNotNull(message = "车辆类型不能为空")
     private Integer carType; // 车辆类型
     private String modelTitle; // 车型标题
     private String modelMasterImage; // 主图
@@ -22,6 +27,7 @@ public class CarmodelManageDTO {
     private Integer carmodelStatus; // 车型状态
     private Integer carCount; // 注册车辆数量
     private List<CarmodelConfiguration> configurations; // 车型配置参数
+    @ValidateLength(min = 0, max = 20,message = "车型名称长度不合法")
     private String carmodelName; // 车型名称
     private String carmodelNumber; // 车型编号,  C+6位自增编号，例如：C000001
     private String displacementGearbox; // 排量+变速箱

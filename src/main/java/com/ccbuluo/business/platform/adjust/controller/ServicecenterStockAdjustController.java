@@ -7,8 +7,13 @@ import com.ccbuluo.business.platform.adjust.dto.StockAdjustDetailDTO;
 import com.ccbuluo.business.platform.adjust.dto.StockAdjustListDTO;
 import com.ccbuluo.business.platform.adjust.service.StockAdjustService;
 import com.ccbuluo.business.platform.equipment.dto.DetailBizServiceEquipmentDTO;
+import com.ccbuluo.core.annotation.validate.ValidateGroup;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
+import com.ccbuluo.core.validate.ValidateUtils;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftList;
@@ -64,7 +69,7 @@ public class ServicecenterStockAdjustController extends BaseController {
     @ApiOperation(value = "根据物料类型查询物料", notes = "【刘铎】")
     @ApiImplicitParam(name = "equipTypeId", value = "物料类型id",  required = true, paramType = "query", dataType = "int")
     @GetMapping("/queryequipmentbytype")
-    public StatusDto<List<DetailBizServiceEquipmentDTO>> queryEquipmentByType(@RequestParam Long equipTypeId) {
+    public StatusDto<List<DetailBizServiceEquipmentDTO>> queryEquipmentByType(@RequestParam @ValidateNotNull(message = "equipTypeId(物料类型id)不能为空") Long equipTypeId) {
         return StatusDto.buildDataSuccessStatusDto(stockAdjustService.queryEquipmentByType(equipTypeId));
     }
 
@@ -84,7 +89,7 @@ public class ServicecenterStockAdjustController extends BaseController {
     @GetMapping("/queryadjustlist")
     public StatusDto<List<StockAdjustListDTO>> queryAdjustList(@RequestParam(required = false) Long equipTypeId,
                                                                @RequestParam(required = false) String equipmentcode,
-                                                               @RequestParam String productType) {
+                                                               @RequestParam @ValidateNotBlank(message = "productType(商品类型（物料）)不能为空") String productType) {
         return StatusDto.buildDataSuccessStatusDto(stockAdjustService.queryAdjustList(equipTypeId, equipmentcode, productType));
     }
 
@@ -98,7 +103,8 @@ public class ServicecenterStockAdjustController extends BaseController {
      */
     @ApiOperation(value = "保存盘库", notes = "【刘铎】")
     @PostMapping("/save")
-    public StatusDto save(@ApiParam(name = "盘库详情", value = "传入json格式", required = true)@RequestBody SaveBizStockAdjustDTO saveBizStockAdjustDTO) {
+    public StatusDto save(@ApiParam(name = "盘库详情", value = "传入json格式", required = true)@RequestBody @ValidateGroup SaveBizStockAdjustDTO saveBizStockAdjustDTO) {
+        ValidateUtils.validate(saveBizStockAdjustDTO.getBizStockAdjustdetailList(), null);
         return stockAdjustService.save(saveBizStockAdjustDTO);
     }
 
@@ -133,7 +139,7 @@ public class ServicecenterStockAdjustController extends BaseController {
     @GetMapping("/queryadjustlistbycategorycode")
     public StatusDto<List<StockAdjustListDTO>> queryAdjustListByCategoryCode(@RequestParam(required = false) String categoryCode,
                                                                              @RequestParam(required = false) String productCode,
-                                                                             @RequestParam String productType) {
+                                                                             @RequestParam @ValidateNotBlank(message = "productType(商品类型（备件）)不能为空") String productType) {
         return StatusDto.buildDataSuccessStatusDto(stockAdjustService.queryAdjustListByCategoryCode(categoryCode, productCode, productType));
     }
 
@@ -190,7 +196,7 @@ public class ServicecenterStockAdjustController extends BaseController {
     @ApiOperation(value = "根据盘库单号查询盘库详情", notes = "【刘铎】")
     @ApiImplicitParam(name = "adjustNo", value = "盘库单code", required = true, paramType = "query")
     @GetMapping("/getbyadjustno")
-    public StatusDto<StockAdjustDetailDTO> getByAdjustNo(@RequestParam String adjustNo) {
+    public StatusDto<StockAdjustDetailDTO> getByAdjustNo(@RequestParam @ValidateNotBlank(message = "adjustNo(盘库单code)不能为空") String adjustNo) {
         return StatusDto.buildDataSuccessStatusDto(stockAdjustService.getByAdjustNo(adjustNo));
     }
 }

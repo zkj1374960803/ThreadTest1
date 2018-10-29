@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.allocateapply.dto;
 
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -18,6 +19,7 @@ public class CreatePurchaseBillDTO {
      * 入库仓库编号
      */
     @ApiModelProperty(name = "inRepositoryNo", value = "入库仓库编号")
+    @ValidateNotBlank
     private String inRepositoryNo;
     /**
      * 申请商品详情列表

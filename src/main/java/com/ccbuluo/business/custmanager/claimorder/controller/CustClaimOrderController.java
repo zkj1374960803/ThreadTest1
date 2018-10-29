@@ -1,18 +1,17 @@
 package com.ccbuluo.business.custmanager.claimorder.controller;
 
+import com.ccbuluo.business.constants.MyGroup;
 import com.ccbuluo.business.platform.claimorder.dto.BizServiceClaimorder;
 import com.ccbuluo.business.platform.claimorder.dto.QueryClaimorderListDTO;
 import com.ccbuluo.business.platform.claimorder.service.ClaimOrderService;
+import com.ccbuluo.core.annotation.validate.ValidateGroup;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
@@ -45,7 +44,7 @@ public class CustClaimOrderController {
         @ApiImplicitParam(name = "trackingNo", value = "物流单号", required = true, paramType = "query"),
         @ApiImplicitParam(name = "refundAdress", value = "物流地址", required = true, paramType = "query"),
     })
-    public StatusDto<String> conmmitClaimOrder(@ApiIgnore BizServiceClaimorder bizServiceClaimorder){
+    public StatusDto<String> conmmitClaimOrder(@ApiIgnore @ValidateGroup(MyGroup.Add.class) BizServiceClaimorder bizServiceClaimorder){
         claimOrderServiceImpl.updateClaimOrder(bizServiceClaimorder);
         return StatusDto.buildSuccessStatusDto();
     }
@@ -59,9 +58,8 @@ public class CustClaimOrderController {
     @ApiOperation(value = "查询索赔单的详情", notes = "【张康健】")
     @GetMapping("/findclaimorderdetail")
     @ApiImplicitParam(name = "claimOrdno", value = "索赔单号", required = true, paramType = "query")
-    public StatusDto<BizServiceClaimorder> findClaimOrderDetail(@ApiIgnore BizServiceClaimorder bizServiceClaimorder){
-        BizServiceClaimorder claimOrderDetail = claimOrderServiceImpl.findClaimOrderDetail(bizServiceClaimorder);
-        return StatusDto.buildDataSuccessStatusDto(claimOrderDetail);
+    public StatusDto<BizServiceClaimorder> findClaimOrderDetail(@ApiIgnore @ValidateGroup(MyGroup.Select.class) BizServiceClaimorder bizServiceClaimorder){
+        return StatusDto.buildDataSuccessStatusDto(claimOrderServiceImpl.findClaimOrderDetail(bizServiceClaimorder));
     }
 
     /**
@@ -81,7 +79,10 @@ public class CustClaimOrderController {
         @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query"),
     })
-    public StatusDto<Page<QueryClaimorderListDTO>> queryClaimorderList(String docStatus, String claimOrdno, int offset, int pageSize){
+    public StatusDto<Page<QueryClaimorderListDTO>> queryClaimorderList(String docStatus,
+                                                                       String claimOrdno,
+                                                                       @RequestParam(defaultValue = "0") int offset,
+                                                                       @RequestParam(defaultValue = "10") int pageSize){
         return claimOrderServiceImpl.queryClaimorderList(claimOrdno, null, docStatus, offset, pageSize);
     }
 

@@ -6,6 +6,7 @@ import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHand
 import com.ccbuluo.business.platform.stockdetail.dto.ProblemStockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.service.ProblemStockDetailService;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
@@ -105,7 +106,7 @@ public class ProblemStockDetailController extends BaseController {
     @ApiOperation(value = "物料查询问题库存详情", notes = "【魏俊标】")
     @GetMapping("/problemdetail/{id}")
     @ApiImplicitParam(name = "id", value = "库存批次id", required = true, paramType = "path")
-    public StatusDto<ProblemStockBizStockDetailDTO> getProblemStockDetail(@PathVariable Long id){
+    public StatusDto<ProblemStockBizStockDetailDTO> getProblemStockDetail(@PathVariable @ValidateNotNull(message = "id(库存批次id)不能为空") Long id){
         return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.getProblemStockDetailById(id));
     }
 

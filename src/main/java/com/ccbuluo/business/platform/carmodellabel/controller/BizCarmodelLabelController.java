@@ -5,6 +5,7 @@ import com.ccbuluo.business.platform.carmodellabel.dto.BizCarmodelLabelDTO;
 import com.ccbuluo.business.platform.carmodellabel.dto.SearchBizCarmodelLabelDTO;
 import com.ccbuluo.business.platform.carmodellabel.dto.ViewCarmodelLabelDTO;
 import com.ccbuluo.business.platform.carmodellabel.service.BizCarmodelLabelService;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -68,7 +69,7 @@ public class BizCarmodelLabelController extends BaseController {
     @ApiOperation(value = "根据标签id查询车型标签详情", notes = "根据标签id查询车型标签详情")
     @ApiImplicitParam(name = "labelCode", value = "车型标签labelCode", required = true, paramType = "query")
     @GetMapping("/querycarmodellabelbylabelcode")
-    public StatusDto queryCarmodelLabelBylabelId(String labelCode) throws TException {
+    public StatusDto queryCarmodelLabelBylabelId(@ValidateNotNull(message = "labelCode(车型标签labelCode)不能为空") String labelCode) throws TException {
         return StatusDto.buildDataSuccessStatusDto(bizCarmodelLabelService.queryCarmodelLabelBylabelCode(labelCode));
     }
 
@@ -83,7 +84,7 @@ public class BizCarmodelLabelController extends BaseController {
     @ApiOperation(value = "删除车型标签",notes = "【魏俊标】")
     @GetMapping("/delete/{id}")
     @ApiImplicitParam(name = "id", value = "车型标签id", required = true, paramType = "path")
-    public StatusDto delete(@PathVariable Long id) {
+    public StatusDto delete(@PathVariable @ValidateNotNull(message = "id(车型标签id)不能为空") Long id) {
         return bizCarmodelLabelService.deleteCarcoreInfoBylabelCode(id);
     }
 

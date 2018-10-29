@@ -1,6 +1,9 @@
 package com.ccbuluo.business.platform.carconfiguration.entity;
 
 
+import com.ccbuluo.core.annotation.validate.ValidateLength;
+import com.ccbuluo.core.annotation.validate.ValidateMax;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -16,16 +19,19 @@ public class CarmodelParameter extends CarCommonEntity {
     /**
      * 参数名称
      */
+    @ValidateLength(min = 0, max = 10,message = "参数名称长度不合法")
     @ApiModelProperty(name = "parameterName", value = "参数名称", required = true)
     private String parameterName;
     /**
      * 参数值类型，目前支持 文本、单选属性、多选属性
      */
+    @ValidateNotNull(message = "参数类型不能为空")
     @ApiModelProperty(name = "valueType", value = "参数值类型，目前支持 文本(INPUT)、单选属性(SINGLE)、多选属性(MULTI)", required = true)
     private String valueType;
     /**
      * 可选值列表，json
      */
+    @ValidateNotNull(message = "可选值不能为空")
     @ApiModelProperty(name = "optionalList", value = "可选值列表，json", required = true)
     private String optionalList;
     /**
@@ -36,17 +42,21 @@ public class CarmodelParameter extends CarCommonEntity {
     /**
      * 是否支持必填,1为必填，0为非必填，默认值为非必填
      */
+    @ValidateNotNull(message = "是否支持必填不能为空")
     @ApiModelProperty(name = "requiredFlag", value = "是否支持必填,1为必填，0为非必填，默认值为非必填", required = true)
     private Integer requiredFlag;
     /**
      * 排序编号
      */
+    @ValidateNotNull(message = "优先级不能为空")
+    @ValidateMax(value = 100,message = "优先级不能大于100")
     @ApiModelProperty(name = "sortNumber", value = "排序编号")
     private Integer sortNumber;
 
     /**
      * 标签id
      */
+    @ValidateNotNull(message = "标签id不能为空")
     @ApiModelProperty(name = "carmodelLabelId", value = "标签id")
     private Integer carmodelLabelId;
     /**

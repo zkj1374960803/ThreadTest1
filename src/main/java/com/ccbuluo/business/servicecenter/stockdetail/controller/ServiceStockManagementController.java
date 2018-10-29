@@ -1,6 +1,7 @@
 package com.ccbuluo.business.servicecenter.stockdetail.controller;
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.constants.MyGroup;
 import com.ccbuluo.business.platform.allocateapply.dto.CheckStockQuantityDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.ProductStockInfoDTO;
@@ -8,7 +9,12 @@ import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.stockdetail.dao.FindBatchStockListDTO;
 import com.ccbuluo.business.platform.stockdetail.dao.FindStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.service.StockManagementService;
+import com.ccbuluo.core.annotation.validate.ValidateGroup;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
+import com.ccbuluo.core.annotation.validate.ValidatePattern;
 import com.ccbuluo.core.controller.BaseController;
+import com.ccbuluo.core.validate.ValidateUtils;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
@@ -96,7 +102,10 @@ public class ServiceStockManagementController extends BaseController {
         @ApiImplicitParam(name = "type", value = "(注：PLATFORM集团，SERVICECENTER服务中心，CUSTMANAGER客户经理)", required = true, paramType = "query"),
         @ApiImplicitParam(name = "code", value = "服务中心的code或者客户经理的orgcode", required = false, paramType = "query")
     })
-    public StatusDto<FindStockDetailDTO> findStockProductDetail(String productNo, String productType, String type, String code){
+    public StatusDto<FindStockDetailDTO> findStockProductDetail(@ValidateNotBlank String productNo,
+                                                                @ValidateNotBlank String productType,
+                                                                @ValidatePattern(regexp = {"PLATFORM", "SERVICECENTER", "CUSTMANAGER"}) String type,
+                                                                String code){
         FindStockDetailDTO findStockDetailDTO = stockManagementService.findStockProductDetail(productNo, productType, type, code);
         return StatusDto.buildDataSuccessStatusDto(findStockDetailDTO);
     }
@@ -118,7 +127,7 @@ public class ServiceStockManagementController extends BaseController {
         @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query")
     })
-    public StatusDto<Page<FindBatchStockListDTO>> findBatchStockList(@ApiIgnore FindStockListDTO findStockListDTO){
+    public StatusDto<Page<FindBatchStockListDTO>> findBatchStockList(@ApiIgnore @ValidateGroup(MyGroup.Select.class) FindStockListDTO findStockListDTO){
         Page<FindBatchStockListDTO> page = stockManagementService.findBatchStockList(findStockListDTO);
         return StatusDto.buildDataSuccessStatusDto(page);
     }
@@ -155,22 +164,25 @@ public class ServiceStockManagementController extends BaseController {
      */
     @ApiOperation(value = "可调拨库存", notes = "【张康健】")
     @GetMapping("/querytransferstock")
-    public StatusDto<Page<QueryOrgDTO>> queryTransferStock(QueryOrgDTO queryOrgDTO,String productNo, Integer offset, Integer pageSize){
+    public StatusDto<Page<QueryOrgDTO>> queryTransferStock(QueryOrgDTO queryOrgDTO,
+                                                           String productNo,
+                                                           @RequestParam(defaultValue = "0") Integer offset,
+                                                           @RequestParam(defaultValue = "10") Integer pageSize){
         Page<QueryOrgDTO> queryOrgDTOPage = allocateApplyServiceImpl.queryTransferStock(queryOrgDTO, productNo, offset, pageSize);
         return StatusDto.buildDataSuccessStatusDto(queryOrgDTOPage);
     }
 
     /**
      * 检查库存
-     * @param
-     * @exception
-     * @return
+     * @param checkStockQuantityDTO 库存信息
+     * @return StatusDto<List<ProductStockInfoDTO>>
      * @author zhangkangjian
      * @date 2018-08-15 13:51:06
      */
     @ApiOperation(value = "检查库存", notes = "【张康健】")
     @PostMapping("/checkstockquantity")
-    public StatusDto<List<ProductStockInfoDTO>> checkStockQuantity(@ApiParam(name = "CheckStockQuantityDTO", value = "Json数据", required = true) @RequestBody CheckStockQuantityDTO checkStockQuantityDTO){
+    public StatusDto<List<ProductStockInfoDTO>> checkStockQuantity(@ApiParam(name = "CheckStockQuantityDTO", value = "Json数据", required = true) @RequestBody @ValidateNotNull CheckStockQuantityDTO checkStockQuantityDTO){
+        ValidateUtils.validate(checkStockQuantityDTO.getProductInfoList(), null);
         return allocateApplyServiceImpl.checkStockQuantity(checkStockQuantityDTO);
     }
 

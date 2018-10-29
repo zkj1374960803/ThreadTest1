@@ -9,7 +9,9 @@ import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.stockdetail.dao.FindBatchStockListDTO;
 import com.ccbuluo.business.platform.stockdetail.dao.FindStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.service.StockManagementService;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
 import com.ccbuluo.core.controller.BaseController;
+import com.ccbuluo.core.validate.ValidateUtils;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
@@ -97,7 +99,7 @@ public class StockManagementController extends BaseController {
         @ApiImplicitParam(name = "type", value = "(注：PLATFORM集团，SERVICECENTER服务中心，CUSTMANAGER客户经理)", required = true, paramType = "query"),
         @ApiImplicitParam(name = "code", value = "服务中心的code或者客户经理的orgcode", required = false, paramType = "query")
     })
-    public StatusDto<FindStockDetailDTO> findStockProductDetail(String productNo, String productType, String type, String code){
+    public StatusDto<FindStockDetailDTO> findStockProductDetail(String productNo, @ValidateNotBlank String productType,@ValidateNotBlank String type, String code){
         FindStockDetailDTO findStockDetailDTO = stockManagementService.findStockProductDetail(productNo, productType, type, code);
         return StatusDto.buildDataSuccessStatusDto(findStockDetailDTO);
     }
@@ -163,28 +165,29 @@ public class StockManagementController extends BaseController {
 
     /**
      * 检查库存
-     * @param
-     * @exception
-     * @return
+     * @param checkStockQuantityDTO 申请商品信息
+     * @return StatusDto<List<ProductStockInfoDTO>>
      * @author zhangkangjian
      * @date 2018-08-15 13:51:06
      */
     @ApiOperation(value = "检查库存", notes = "【张康健】")
     @PostMapping("/checkstockquantity")
-    public StatusDto<List<ProductStockInfoDTO>> checkStockQuantity(@ApiParam(name = "CheckStockQuantityDTO", value = "Json数据", required = true) @RequestBody CheckStockQuantityDTO checkStockQuantityDTO){
+    public StatusDto<List<ProductStockInfoDTO>> checkStockQuantity(@ApiParam(name = "CheckStockQuantityDTO", value = "Json数据", required = true) @RequestBody @ValidateNotBlank CheckStockQuantityDTO checkStockQuantityDTO){
+        ValidateUtils.validate(checkStockQuantityDTO.getProductInfoList(), null);
         return allocateApplyServiceImpl.checkStockQuantity(checkStockQuantityDTO);
     }
 
     /**
      *  维修单检查库存
-     * @param checkRepairOrderStockDTO
+     * @param checkRepairOrderStockDTO 申请商品信息
      * @return StatusDto<List<ProductStockInfoDTO>>
      * @author zhangkangjian
      * @date 2018-09-11 16:21:56
      */
     @ApiOperation(value = "维修单校验库存", notes = "【张康健】")
     @PostMapping("/checkrepairorderstock")
-    public StatusDto<List<ProductStockInfoDTO>> checkRepairOrderStock(@ApiParam(name = "CheckRepairOrderStockDTO", value = "Json数据", required = true) @RequestBody CheckRepairOrderStockDTO checkRepairOrderStockDTO){
+    public StatusDto<List<ProductStockInfoDTO>> checkRepairOrderStock(@ApiParam(name = "CheckRepairOrderStockDTO", value = "Json数据", required = true) @RequestBody @ValidateNotBlank CheckRepairOrderStockDTO checkRepairOrderStockDTO){
+        ValidateUtils.validate(checkRepairOrderStockDTO.getProductInfoList(), null);
         return allocateApplyServiceImpl.checkRepairOrderStock(checkRepairOrderStockDTO);
     }
 

@@ -1,5 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.dto;
 
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -12,6 +14,7 @@ import java.math.BigDecimal;
 @ApiModel(value = "PerpayAmountDTO", description = "预付款DTO")
 public class PerpayAmountDTO {
     @ApiModelProperty(name = "supplierCode", value = "供应商code")
+    @ValidateNotBlank
     private String supplierCode;
     @ApiModelProperty(name = "supplierName", value = "供应商名称", hidden = true)
     private String supplierName;

@@ -1,5 +1,8 @@
 package com.ccbuluo.business.platform.carconfiguration.entity;
 
+import com.ccbuluo.core.annotation.validate.ValidateLength;
+import com.ccbuluo.core.annotation.validate.ValidateMax;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -14,6 +17,7 @@ public class CarseriesManage extends CarCommonEntity {
     /**
      * 车系名称
      */
+    @ValidateLength(min = 0, max = 20,message = "车系名称长度不合法")
     @ApiModelProperty(name = "carseriesName", value = "车系名称")
     private String carseriesName;
     /**
@@ -24,6 +28,8 @@ public class CarseriesManage extends CarCommonEntity {
     /**
      * 排序号
      */
+    @ValidateNotNull(message = "排序号不能为空")
+    @ValidateMax(value = 100,message = "排序号不能大于100")
     @ApiModelProperty(name = "sortNumber", value = "排序号")
     private Integer sortNumber;
     /**

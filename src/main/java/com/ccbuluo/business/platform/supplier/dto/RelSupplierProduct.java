@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.supplier.dto;
 
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -21,16 +22,19 @@ public class RelSupplierProduct {
      * 供应商code
      */
     @ApiModelProperty(name = "supplierCode", value = "供应商code")
+    @ValidateNotBlank
     private String supplierCode;
     /**
      * 商品的code
      */
     @ApiModelProperty(name = "productCode", value = "商品的code")
+    @ValidateNotBlank
     private String productCode;
     /**
      * 商品类型（注：PRODUCT零配件，EQUIPMENT物料）
      */
     @ApiModelProperty(name = "productType", value = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）")
+    @ValidateNotBlank
     private String productType;
     @ApiModelProperty(name = "creator", value = "创建人", hidden = true)
     private String creator;

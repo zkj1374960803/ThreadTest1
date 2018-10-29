@@ -1,5 +1,11 @@
 package com.ccbuluo.business.platform.custmanager.entity;
 
+import com.ccbuluo.business.constants.MyGroup;
+import com.ccbuluo.core.annotation.validate.ValidateLength;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidatePhone;
+import com.ccbuluo.core.validate.Group;
+
 import java.util.Date;
 
 /**
@@ -11,14 +17,18 @@ public class BizServiceCustmanager {
     private  Long id;
 
     //办公手机号
+    @ValidatePhone(groups = {Group.Add.class, Group.Update.class, MyGroup.Edit.class})
     private  String officePhone;
 
     //收货地址
+    @ValidateLength(min = 1, max = 500, groups = {Group.Add.class, Group.Update.class, MyGroup.Edit.class})
     private  String receivingAddress;
 
     //用户的uuid
+    @ValidateNotBlank(groups = MyGroup.Edit.class)
     private  String userUuid;
     //用户名称
+    @ValidateNotBlank(groups = {Group.Add.class, Group.Update.class, MyGroup.Edit.class})
     private  String name;
 
     //备注
@@ -39,6 +49,7 @@ public class BizServiceCustmanager {
     //删除标识
     private  Integer deleteFlag = 0;
     // 服务中心
+    @ValidateNotBlank(groups = {Group.Add.class, Group.Update.class, MyGroup.Edit.class})
     private String servicecenterCode;
     // 维修车编号
     private String mendCode;

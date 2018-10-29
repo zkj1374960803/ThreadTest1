@@ -1,5 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.dto;
 
+import com.ccbuluo.business.constants.MyGroup;
+import com.ccbuluo.core.annotation.validate.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -27,41 +29,49 @@ public class AllocateapplyDetailDTO {
     /**
      * 商品的编号
      */
+    @ValidateNotBlank(groups = MyGroup.Add.class)
     @ApiModelProperty(name = "productNo", value = "商品的编号")
     private String productNo;
     /**
      * 商品的名称
      */
+    @ValidateNotBlank(groups = MyGroup.Add.class)
     @ApiModelProperty(name = "productName", value = "商品的名称")
     private String productName;
     /**
      * 商品类型（注：FITTINGS零配件，EQUIPMENT物料）
      */
+    @ValidatePattern(regexp = {"FITTINGS", "EQUIPMENT"}, groups = MyGroup.Add.class)
     @ApiModelProperty(name = "productType", value = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）")
     private String productType;
     /**
      * 做冗余，分类整个路径的名字，多级用逗号隔开
      */
+    @ValidateNotBlank(groups = MyGroup.Add.class)
     @ApiModelProperty(name = "productCategoryname", value = "做冗余，分类整个路径的名字，多级用逗号隔开")
     private String productCategoryname;
     /**
      * 申请的商品数量
      */
     @ApiModelProperty(name = "applyNum", value = "申请的商品数量")
+    @ValidateMin(value = 1, groups = MyGroup.Add.class)
     private Long applyNum;
     /**
      * 计量单位，用作展示冗余
      */
+    @ValidateNotBlank(groups = MyGroup.Add.class)
     @ApiModelProperty(name = "unit", value = "计量单位")
     private String unit;
     /**
      * 销售单价
      */
+    // todo
     @ApiModelProperty(name = "sellPrice", value = "销售单价")
     private BigDecimal sellPrice;
     /**
      * 成本单价
      */
+    // todo
     @ApiModelProperty(name = "costPrice", value = "成本单价")
     private BigDecimal costPrice;
     /**

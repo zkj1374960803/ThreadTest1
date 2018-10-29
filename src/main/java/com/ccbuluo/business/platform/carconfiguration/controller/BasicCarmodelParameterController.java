@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.carconfiguration.controller;
 
 import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelParameter;
 import com.ccbuluo.business.platform.carconfiguration.service.BasicCarmodelParameterService;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.Api;
@@ -71,7 +72,7 @@ public class BasicCarmodelParameterController extends BaseController {
     @ApiOperation(value = "根据id查询配置参数详情", notes = "【chaoshuai】")
     @ApiImplicitParam(name = "id", value = "配置参数id", required = true, paramType = "path")
     @GetMapping("/queryforparameterbyid/{id}")
-    public StatusDto queryForParameterById(@PathVariable("id") Long id){
+    public StatusDto queryForParameterById(@PathVariable("id") @ValidateNotNull(message = "id(车型参数id)不能为空") Long id){
         return StatusDto.buildDataSuccessStatusDto(basicCarmodelParameterService.queryForParameterById(id));
     }
 
@@ -126,7 +127,7 @@ public class BasicCarmodelParameterController extends BaseController {
     @ApiOperation(value = "根据id删除车型参数配置", notes = "【chaoshuai】")
     @ApiImplicitParam(name = "id", value = "车型参数配置id", required = true, paramType = "path")
     @GetMapping("/delete/{id}")
-    public StatusDto delete(@PathVariable("id") Long id){
+    public StatusDto delete(@PathVariable("id") @ValidateNotNull(message = "id(车型参数id)不能为空") Long id){
         return  this.basicCarmodelParameterService.deleteParameter(id);
     }
 }
