@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.stockdetail.service;
 
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.adjust.dto.StockAdjustListDTO;
+import com.ccbuluo.business.platform.outstock.dto.ProductStockDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.UpdateStockBizStockDetailDTO;
 import com.ccbuluo.db.Page;
@@ -117,5 +118,12 @@ public interface StockDetailService {
      */
     void updateAdjustValidStock(List<BizStockDetail> bizStockDetailList1);
 
-
+    /**
+     * 根据商品编号查询库存
+     * @param products 商品编号
+     * @return 商品与数量对应关系
+     * @author liuduo
+     * @date 2018-10-29 10:00:15
+     */
+    List<ProductStockDTO> queryStockByProducts(List<String> products);
 }

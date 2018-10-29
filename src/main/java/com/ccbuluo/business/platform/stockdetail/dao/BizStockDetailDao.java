@@ -4,6 +4,7 @@ import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.adjust.dto.StockAdjustListDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
+import com.ccbuluo.business.platform.outstock.dto.ProductStockDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.UpdateStockBizStockDetailDTO;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.dao.BaseDao;
@@ -643,5 +644,22 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         params.put("sellerOrgNo", sellerOrgNo);
         params.put("codes", codes);
         return super.queryListBean(BizStockDetail.class, sql.toString(), params);
+    }
+
+    /**
+     * 根据商品编号查询库存
+     * @param products 商品编号
+     * @return 商品与数量对应关系
+     * @author liuduo
+     * @date 2018-10-29 10:00:15
+     */
+    public List<ProductStockDTO> queryStockByProducts(List<String> products) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("products", products);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT product_no,SUM(valid_stock) AS productNum FROM biz_stock_detail WHERE product_no IN( 'FP0000257','FA0015') GROUP BY product_no");
+
+        return queryListBean(ProductStockDTO.class, sql.toString(), params);
     }
 }

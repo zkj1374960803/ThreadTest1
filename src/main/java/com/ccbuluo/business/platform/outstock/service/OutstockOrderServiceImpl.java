@@ -12,6 +12,7 @@ import com.ccbuluo.business.platform.order.service.fifohandle.StockInOutCallBack
 import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
 import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.business.platform.outstock.dto.OutstockorderDetailDTO;
+import com.ccbuluo.business.platform.outstock.dto.ProductStockDTO;
 import com.ccbuluo.business.platform.outstock.dto.UpdatePlanStatusDTO;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.outstockplan.service.OutStockPlanService;
@@ -216,6 +217,18 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
 
             // 查询出库计划
             List<BizOutstockplanDetail> outstockPlans = bizOutstockplanDetailDao.getOutstockplansByApplyNo(applyNo, userHolder.getLoggedUser().getOrganization().getOrgCode());
+            // 获取到要出库的所有商品
+            List<String> products = outstockPlans.stream().map(item -> item.getProductNo()).collect(Collectors.toList());
+            // 查询所有商品的库存
+            List<ProductStockDTO> productStockDTOS = stockDetailService.queryStockByProducts(products);
+            Map<String, BizOutstockplanDetail> collect = outstockPlans.stream().collect(Collectors.toMap(BizOutstockplanDetail::getProductNo, Function.identity()));
+            // 若库存比要出的少，则抛出异常
+            for (ProductStockDTO productStockDTO : productStockDTOS) {
+                BizOutstockplanDetail bizOutstockplanDetail = collect.get(productStockDTO.getProductNo());
+                if (productStockDTO.getProductNum() < bizOutstockplanDetail.getActualOutstocknum()) {
+                    throw new CommonException("2003", bizOutstockplanDetail.getProductName() + "  库存不足，请核对！");
+                }
+            }
             autoSaveOutstockOrder(applyNo, outstockPlans, ApplyTypeEnum.APPLYORDER.name());
             // 保存出库单后回填物流单号
             // 根据申请单查询出库单号
