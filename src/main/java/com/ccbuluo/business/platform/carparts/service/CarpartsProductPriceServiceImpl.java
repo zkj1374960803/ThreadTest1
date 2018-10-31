@@ -186,7 +186,7 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
                     basicCarpartsProductDTO.setCustCarpartsPrice(suggestedPrice);
                 }
                 if(priceLevel == 4){
-//                    basicCarpartsProductDTO.setCarpartsPrice(suggestedPrice + "");
+                    basicCarpartsProductDTO.setCarpartsPrice(suggestedPrice);
                 }
             }
         }
