@@ -137,9 +137,6 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
 
     /**
      * 查询物料列表
-     *
-     * @param carpartsPriceType
-     * @param productNoList
      * @param equiptypeId 物料类型id
      * @param keyword 关键字
      * @param offset 起始数
@@ -148,7 +145,7 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
      * @author liuduo
      * @date 2018-07-17 20:10:35
      */
-    public Page<DetailBizServiceEquipmentDTO> queryList(String carpartsPriceType, List<String> productNoList, Long equiptypeId, String keyword, Integer offset, Integer pageSize) {
+    public Page<DetailBizServiceEquipmentDTO> queryList(Long equiptypeId, String keyword, Integer offset, Integer pageSize) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
 
@@ -162,17 +159,6 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
         if (StringUtils.isNotBlank(keyword)) {
             params.put("keywork", keyword);
             sql.append(" AND (bse.equip_name LIKE CONCAT('%',:keywork,'%') OR bse.equip_code LIKE CONCAT('%',:keywork,'%'))");
-        }
-        if(productNoList == null || productNoList.size() == 0){
-            productNoList = List.of("null");
-        }
-        if("HAVEPRICE".equals(carpartsPriceType)){
-            params.put("productNoList", productNoList);
-            sql.append(" AND bse.equip_code in (:productNoList)");
-        }
-        if("NOPRICE".equals(carpartsPriceType)){
-            params.put("productNoList", productNoList);
-            sql.append(" AND bse.equip_code not in (:productNoList)");
         }
         sql.append(" AND bse.delete_flag = :deleteFlag ORDER BY bse.operate_time DESC");
 
@@ -230,18 +216,29 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
 
     /**
      * 查询物料的客户经理价格
-     * @param  equipCode 物料的编号
-     * @return BigDecimal 物料的价格
+     * @param  productNo 物料的编号
+     * @return level 价格的阶梯等级
      * @author zhangkangjian
      * @date 2018-09-13 20:11:18
      */
-    public BigDecimal findSuggestedPrice(String equipCode) {
+    public Map<String, Object> findSuggestedPrice(List<String> productNo, Long priceLevel) {
         StringBuffer sql = new StringBuffer();
         Map<String, Object> params = Maps.newHashMap();
-        params.put("equipCode", equipCode);
-        sql.append(" SELECT ifnull(a.suggested_price,0) FROM rel_product_price a ")
-            .append(" WHERE a.product_no = :equipCode ORDER BY a.create_time DESC LIMIT 1 ");
-        return namedParameterJdbcTemplate.queryForObject(sql.toString(), params, BigDecimal.class);
+        params.put("productNo", productNo);
+        params.put("priceLevel", priceLevel);
+       sql.append(" SELECT b.`product_no`,b.`suggested_price`  ")
+           .append(" FROM (SELECT MAX(a.id) AS 'id' FROM rel_product_price a WHERE a.product_no IN (:productNo) AND a.`price_level` = :priceLevel ")
+           .append(" GROUP BY a.price_level,a.product_no) a LEFT JOIN rel_product_price b ON a.id = b.id ");
+        List<Map<String, Object>> maps = queryListMap(sql.toString(), params);
+       if(maps != null){
+            params.clear();
+            maps.forEach(map ->{
+                String productNoStr = (String) map.get("product_no");
+                BigDecimal suggestedPrice = (BigDecimal)map.get("suggested_price");
+                params.put(productNoStr, suggestedPrice.doubleValue());
+            });
+       }
+       return params;
     }
 
     /**

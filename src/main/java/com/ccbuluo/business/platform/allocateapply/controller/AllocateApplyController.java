@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.controller;
 
 import com.ccbuluo.business.constants.MyGroup;
+import com.ccbuluo.business.constants.PriceTypeEnum;
 import com.ccbuluo.business.entity.BizInstockplanDetail;
 import com.ccbuluo.business.entity.BizOutstockplanDetail;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
@@ -31,6 +32,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import java.lang.annotation.Annotation;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -352,7 +354,6 @@ public class AllocateApplyController extends BaseController {
      * @author liuduo
      * @date 2018-07-06 10:00:52
      */
-    // todo
     @ApiOperation(value = "查询可用的服务中心", notes = "【刘铎】")
     @ApiImplicitParams({@ApiImplicitParam(name = "province", value = "省",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "city", value = "市",  required = false, paramType = "query"),
@@ -365,6 +366,22 @@ public class AllocateApplyController extends BaseController {
                                                                               @RequestParam(required = false) String name) {
         StatusDtoThriftList<QueryServiceCenterListDTO> queryServiceCenterListDTOStatusDtoThriftList = orgService.findUsableServiceCenter(province, city, area, name);
         return StatusDtoThriftUtils.resolve(queryServiceCenterListDTOStatusDtoThriftList, QueryServiceCenterListDTO.class);
+    }
+
+
+    /**
+     * 校验销售单价
+     * @param checkedSellPriceDTO
+     * @return StatusDto<String>
+     * @author zhangkangjian
+     * @date 2018-10-29 17:26:10
+     */
+    @ApiOperation(value = "校验销售单价", notes = "【张康健】")
+    @PostMapping("/checksellprice")
+    public StatusDto<HashMap<String, Double>> checkSellPrice(@ApiParam(name = "checkedSellPriceDTO", required = true) @RequestBody @ValidateNotNull CheckedSellPriceDTO checkedSellPriceDTO){
+        ValidateUtils.validate(checkedSellPriceDTO.getProductNo(),null);
+        ValidateUtils.validate(checkedSellPriceDTO.getSellPrice(), null);
+        return allocateApplyServiceImpl.checkSellPrice(checkedSellPriceDTO);
     }
 
 

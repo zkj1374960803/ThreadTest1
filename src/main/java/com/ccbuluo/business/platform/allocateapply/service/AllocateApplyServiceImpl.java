@@ -18,6 +18,7 @@ import com.ccbuluo.business.platform.custmanager.dao.BizServiceCustmanagerDao;
 import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
+import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.instock.dao.BizInstockOrderDao;
 import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
@@ -110,6 +111,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     private BizInstockOrderDao bizInstockOrderDao;
     @Resource
     private BizOutstockOrderDao bizOutstockOrderDao;
+    @Resource
+    private BizServiceEquipmentDao bizServiceEquipmentDao;
 
 
 
@@ -796,6 +799,43 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     @Override
     public void saveQuote(ConfirmationQuoteDTO confirmationQuoteDTO) {
         updateAllocateTradeorder(confirmationQuoteDTO, new ProcessApplyDTO());
+    }
+
+    /**
+     * 校验销售单价
+     * @param checkedSellPriceDTO 销售价格
+     * @return StatusDto<String>
+     * @author zhangkangjian
+     * @date 2018-10-29 17:26:10
+     */
+    @Override
+    public StatusDto<HashMap<String, Double>> checkSellPrice(CheckedSellPriceDTO checkedSellPriceDTO) {
+        String flag = Constants.SUCCESS_CODE;
+        HashMap<String, Double> map = Maps.newHashMap();
+        List<String> productNo = checkedSellPriceDTO.getProductNo();
+        Map<String, Object> suggestedPriceMap = bizServiceEquipmentDao.findSuggestedPrice(productNo, checkedSellPriceDTO.getPriceTypeEnum().getLabel());
+        if(suggestedPriceMap == null || suggestedPriceMap.size() == 0){
+            return StatusDto.buildDataSuccessStatusDto(map);
+        }
+        List<Double> sellPrice = checkedSellPriceDTO.getSellPrice();
+        for (int i = 0; i < productNo.size(); i++) {
+            Double aDouble = sellPrice.get(i);
+            String product = productNo.get(i);
+            Double suggestedPrice = (Double) suggestedPriceMap.get(product);
+            if(aDouble > suggestedPrice){
+                flag = Constants.ERROR_CODE;
+                map.put(product, suggestedPrice);
+            }
+        }
+        if(flag.equals(Constants.SUCCESS_CODE)){
+            return StatusDto.buildDataSuccessStatusDto(map);
+        }else {
+            StatusDto<HashMap<String, Double>> hashMapStatusDto = StatusDto.buildDataSuccessStatusDto(map);
+            hashMapStatusDto.setCode(flag);
+            hashMapStatusDto.setMessage("失败！");
+            return hashMapStatusDto;
+
+        }
     }
 
 

@@ -6,6 +6,8 @@ import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
 
+import java.util.List;
+
 /**
  * 零配件价格service
  * @author zhangkangjian
@@ -26,7 +28,7 @@ public interface CarpartsProductPriceService {
      * @author zhangkangjian
      * @date 2018-09-06 19:27:11
      */
-    void saveProductPrice(RelProductPrice relProductPrice);
+    void saveProductPrice(List<RelProductPrice> relProductPrice);
     /**
      * 查询维修单的零配件列表
      * @param queryCarpartsProductDTO 查询条件

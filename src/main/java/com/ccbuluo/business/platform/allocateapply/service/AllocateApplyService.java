@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.allocateapply.service;
 
+import com.ccbuluo.business.constants.PriceTypeEnum;
 import com.ccbuluo.business.custmanager.allocateapply.dto.QueryPendingMaterialsDTO;
 import com.ccbuluo.business.entity.BizInstockplanDetail;
 import com.ccbuluo.business.entity.BizOutstockplanDetail;
@@ -13,6 +14,7 @@ import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -314,4 +316,12 @@ public interface AllocateApplyService {
      * @date 2018-09-15 18:35:07
      */
     void saveQuote(ConfirmationQuoteDTO confirmationQuoteDTO);
+    /**
+     * 校验销售单价
+     * @param checkedSellPriceDTO
+     * @return StatusDto<String>
+     * @author zhangkangjian
+     * @date 2018-10-29 17:26:10
+     */
+    StatusDto<HashMap<String, Double>> checkSellPrice(CheckedSellPriceDTO checkedSellPriceDTO);
 }

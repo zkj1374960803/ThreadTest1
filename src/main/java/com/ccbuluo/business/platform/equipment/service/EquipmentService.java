@@ -45,14 +45,13 @@ public interface EquipmentService {
      * 查询物料列表
      * @param equiptypeId 物料类型id
      * @param keyword 关键字
-     * @param carpartsPriceType
      * @param offset 起始数
      * @param pageSize 每页数
      * @return 物料列表
      * @author liuduo
      * @date 2018-07-17 20:10:35
      */
-    Page<DetailBizServiceEquipmentDTO> queryList(Long equiptypeId, String keyword, String carpartsPriceType, Integer offset, Integer pageSize);
+    Page<DetailBizServiceEquipmentDTO> queryList(Long equiptypeId, String keyword, Integer offset, Integer pageSize);
 
     /**
      * 查询计量单位
