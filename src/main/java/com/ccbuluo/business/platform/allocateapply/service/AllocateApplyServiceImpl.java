@@ -835,7 +835,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         }else {
             StatusDto<HashMap<String, Double>> hashMapStatusDto = StatusDto.buildDataSuccessStatusDto(map);
             hashMapStatusDto.setCode(flag);
-            hashMapStatusDto.setMessage("失败！");
+            hashMapStatusDto.setMessage("销售单价超出阶梯价格！");
             return hashMapStatusDto;
         }
     }
