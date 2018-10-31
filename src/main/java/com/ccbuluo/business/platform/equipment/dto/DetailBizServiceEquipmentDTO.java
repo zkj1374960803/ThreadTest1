@@ -47,17 +47,27 @@ public class DetailBizServiceEquipmentDTO extends IdEntity {
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
 
-    @ApiModelProperty(name = "suggestedPrice", value = "销售给客户经理的价格")
-    private BigDecimal suggestedPrice;
+    @ApiModelProperty(name = "custCarpartsPrice", value = "客户经理的价格")
+    private Double custCarpartsPrice;
 
-    public BigDecimal getSuggestedPrice() {
-        return suggestedPrice;
+    @ApiModelProperty(name = "serverCarpartsPrice", value = "服务中心价格")
+    private Double serverCarpartsPrice;
+
+    public Double getCustCarpartsPrice() {
+        return custCarpartsPrice;
     }
 
-    public void setSuggestedPrice(BigDecimal suggestedPrice) {
-        this.suggestedPrice = suggestedPrice;
+    public void setCustCarpartsPrice(Double custCarpartsPrice) {
+        this.custCarpartsPrice = custCarpartsPrice;
     }
 
+    public Double getServerCarpartsPrice() {
+        return serverCarpartsPrice;
+    }
+
+    public void setServerCarpartsPrice(Double serverCarpartsPrice) {
+        this.serverCarpartsPrice = serverCarpartsPrice;
+    }
     public void setEquipCode(String equipCode) {
         this.equipCode = equipCode;
     }

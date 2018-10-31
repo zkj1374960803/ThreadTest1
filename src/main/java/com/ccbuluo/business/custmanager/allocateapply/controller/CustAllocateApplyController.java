@@ -197,10 +197,11 @@ public class CustAllocateApplyController extends BaseController {
     @GetMapping("/queryproblemstocklist")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "orgCode", value = "所属机构的编号", required = true, paramType = "query"),
-        @ApiImplicitParam(name = "productType", value = "商品类型(注：FITTINGS零配件，EQUIPMENT物料)", required = false, paramType = "query")
+        @ApiImplicitParam(name = "productType", value = "商品类型(注：FITTINGS零配件，EQUIPMENT物料)", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "supplierNo", value = "供应商编号", required = true, paramType = "query"),
     })
-    public StatusDto<List<StockBizStockDetailDTO>> queryProblemStockList(String orgCode, String productType) {
-        return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.queryProblemStockList(orgCode, productType));
+    public StatusDto<List<StockBizStockDetailDTO>> queryProblemStockList(String orgCode, String productType, String supplierNo) {
+        return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.queryProblemStockList(orgCode, productType, supplierNo));
     }
 
     /**

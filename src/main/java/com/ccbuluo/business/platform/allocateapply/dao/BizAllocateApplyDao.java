@@ -624,7 +624,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @author zhangkangjian
      * @date 2018-08-22 14:37:40
      */
-    public List<StockBizStockDetailDTO> queryProblemStockList(String orgCode, String productType) {
+    public List<StockBizStockDetailDTO> queryProblemStockList(String orgCode, String productType, String supplierNo) {
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
@@ -639,6 +639,10 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         if (StringUtils.isNotBlank(productType)) {
             param.put("productType", productType);
             sql.append(" AND a.product_type = :productType ");
+        }
+        if(StringUtils.isNotBlank(supplierNo)){
+            param.put("supplierNo", supplierNo);
+            sql.append(" AND a.supplier_no = :supplierNo ");
         }
         sql.append(" GROUP BY a.product_no having SUM(a.problem_stock) > 0 ORDER BY a.create_time DESC");
         return queryListBean(StockBizStockDetailDTO.class, sql.toString(), param);

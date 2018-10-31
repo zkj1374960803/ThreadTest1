@@ -60,7 +60,7 @@ public class BizServiceSupplier {
     /**
      * 供应商性质
      */
-    @ValidatePattern(regexp = {"STATERUN","PRIVATE", "JOINTVENTURE"}, excludeNull = true, groups = Group.Add.class, message = "供应商性质不合法")
+    @ValidatePattern(regexp = {"STATERUN","PRIVATE", "JOINTVENTURE", ""}, excludeNull = true, groups = Group.Add.class, message = "供应商性质不合法")
     @ApiModelProperty(name = "supplierNature", value = "供应商性质 国营(STATERUN) 民营（PRIVATE）合资（JOINTVENTURE）")
     private String supplierNature;
     /**

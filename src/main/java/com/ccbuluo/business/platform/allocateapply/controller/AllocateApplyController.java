@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.controller;
 
 import com.ccbuluo.business.constants.MyGroup;
+import com.ccbuluo.business.constants.PriceTypeEnum;
 import com.ccbuluo.business.entity.BizInstockplanDetail;
 import com.ccbuluo.business.entity.BizOutstockplanDetail;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
@@ -9,6 +10,7 @@ import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
+import com.ccbuluo.business.platform.supplier.dto.QuerySupplierInfoDTO;
 import com.ccbuluo.core.annotation.validate.*;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
@@ -31,6 +33,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import java.lang.annotation.Annotation;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -167,10 +170,7 @@ public class AllocateApplyController extends BaseController {
      */
     @ApiOperation(value = "保存申请单（填报价格）", notes = "【张康健】")
     @PostMapping("/saveprocessapply")
-    public StatusDto<String> saveProcessApply(@ApiParam(name = "processApplyDetailDTO", value = "json数组数据格式", required = true) @RequestBody List<ProcessApplyDetailDTO> processApplyDetailDTO){
-//        Class<MyGroup.Add>[] groups;
-//        Class<MyGroup.Edit> editClass = MyGroup.Edit.class;
-//        groups[0] = MyGroup.Add.class;
+    public StatusDto<String> saveProcessApply(@ApiParam(name = "processApplyDetailDTO", value = "json数组数据格式", required = true) @RequestBody List<ProcessApplyDetailDTO> processApplyDetailDTO){ ;
         ValidateUtils.validate(processApplyDetailDTO, null);
         allocateApplyServiceImpl.saveProcessApply(processApplyDetailDTO);
         return StatusDto.buildSuccessStatusDto();
@@ -352,7 +352,6 @@ public class AllocateApplyController extends BaseController {
      * @author liuduo
      * @date 2018-07-06 10:00:52
      */
-    // todo
     @ApiOperation(value = "查询可用的服务中心", notes = "【刘铎】")
     @ApiImplicitParams({@ApiImplicitParam(name = "province", value = "省",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "city", value = "市",  required = false, paramType = "query"),
@@ -367,6 +366,37 @@ public class AllocateApplyController extends BaseController {
         return StatusDtoThriftUtils.resolve(queryServiceCenterListDTOStatusDtoThriftList, QueryServiceCenterListDTO.class);
     }
 
+
+    /**
+     * 校验销售单价
+     * @param checkedSellPriceDTO
+     * @return StatusDto<String>
+     * @author zhangkangjian
+     * @date 2018-10-29 17:26:10
+     */
+    @ApiOperation(value = "校验销售单价", notes = "【张康健】")
+    @PostMapping("/checksellprice")
+    public StatusDto<HashMap<String, Double>> checkSellPrice(@ApiParam(name = "checkedSellPriceDTO", required = true) @RequestBody @ValidateNotNull CheckedSellPriceDTO checkedSellPriceDTO){
+        ValidateUtils.validate(checkedSellPriceDTO.getProductNo(),null);
+        ValidateUtils.validate(checkedSellPriceDTO.getSellPrice(), null);
+        return allocateApplyServiceImpl.checkSellPrice(checkedSellPriceDTO);
+    }
+
+    /**
+     * 查询问题件供应商
+     * @param
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-10-31 18:41:40
+     */
+    @ApiOperation(value = "查询问题件供应商", notes = "【张康健】")
+    @PostMapping("/queryproblemsupplier")
+    public StatusDto<List<QuerySupplierInfoDTO>> queryProblemsupplier(){
+
+//        return allocateApplyServiceImpl.queryProblemSupplier();
+        return null;
+    }
 
 
 }

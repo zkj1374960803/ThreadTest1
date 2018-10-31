@@ -2,11 +2,9 @@ package com.ccbuluo.business.platform.equipment.service;
 
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.ProductUnitEnum;
-import com.ccbuluo.business.entity.BizAllocateApply;
-import com.ccbuluo.business.entity.BizServiceEquipment;
-import com.ccbuluo.business.entity.BizServiceLog;
-import com.ccbuluo.business.entity.BizServiceProjectcode;
+import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
+import com.ccbuluo.business.platform.carparts.dao.CarpartsProductPriceDao;
 import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
 import com.ccbuluo.business.platform.equipment.dto.DetailBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.equipment.dto.SaveBizServiceEquipmentDTO;
@@ -20,8 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 物料service实现
@@ -44,6 +44,8 @@ public class EquipmentServiceImpl implements EquipmentService{
     private AllocateApplyService allocateApplyService;
     @Autowired
     private ServiceLogService serviceLogService;
+    @Resource
+    private CarpartsProductPriceDao carpartsProductPriceDao;
 
     /**
      * 保存物料
@@ -96,16 +98,7 @@ public class EquipmentServiceImpl implements EquipmentService{
      */
     @Override
     public DetailBizServiceEquipmentDTO getById(Long id) {
-        // 查询最新生效价格
-        DetailBizServiceEquipmentDTO equipmentDTO = bizServiceEquipmentDao.getById(id);
-        try {
-            BigDecimal suggestedPrice = bizServiceEquipmentDao.findSuggestedPrice(equipmentDTO.getEquipCode());
-            equipmentDTO.setSuggestedPrice(suggestedPrice);
-        }catch (Exception e){
-            e.printStackTrace();
-            equipmentDTO.setSuggestedPrice(new BigDecimal(0));
-        }
-        return equipmentDTO;
+        return bizServiceEquipmentDao.getById(id);
     }
 
     /**
@@ -146,7 +139,6 @@ public class EquipmentServiceImpl implements EquipmentService{
      * 查询物料列表
      * @param equiptypeId 物料类型id
      * @param keyword 关键字
-     * @param carpartsPriceType
      * @param offset 起始数
      * @param pageSize 每页数
      * @return 物料列表
@@ -154,10 +146,29 @@ public class EquipmentServiceImpl implements EquipmentService{
      * @date 2018-07-17 20:10:35
      */
     @Override
-    public Page<DetailBizServiceEquipmentDTO> queryList(Long equiptypeId, String keyword, String carpartsPriceType, Integer offset, Integer pageSize) {
+    public Page<DetailBizServiceEquipmentDTO> queryList(Long equiptypeId, String keyword, Integer offset, Integer pageSize) {
         // 查询有价格的物料code
-        List<String> productNoList = bizServiceEquipmentDao.queryProductPrice(Constants.PRODUCT_TYPE_EQUIPMENT);
-        return bizServiceEquipmentDao.queryList(carpartsPriceType, productNoList, equiptypeId, keyword, offset, pageSize);
+        List<RelProductPrice> relProductPrice =  carpartsProductPriceDao.queryCarpartsProductList(Constants.PRODUCT_TYPE_EQUIPMENT);
+        Map<String, List<RelProductPrice>> relProductPriceMap = relProductPrice.stream().collect(Collectors.groupingBy(RelProductPrice::getProductNo));
+        Page<DetailBizServiceEquipmentDTO> detailBizServiceEquipmentDTOPage = bizServiceEquipmentDao.queryList(equiptypeId, keyword, offset, pageSize);
+        Optional.ofNullable(detailBizServiceEquipmentDTOPage.getRows()).ifPresent(a ->{
+            a.forEach(item ->{
+                String equipCode = item.getEquipCode();
+                Optional.ofNullable(relProductPriceMap.get(equipCode)).ifPresent(rpp ->{
+                    rpp.forEach(itemPrice ->{
+                        Double suggestedPrice = itemPrice.getSuggestedPrice();
+                        Long priceLevel = itemPrice.getPriceLevel();
+                        if(priceLevel == 2){
+                            item.setServerCarpartsPrice(suggestedPrice);
+                        }
+                        if(priceLevel == 3){
+                            item.setCustCarpartsPrice(suggestedPrice);
+                        }
+                    });
+                });
+            });
+        });
+        return detailBizServiceEquipmentDTOPage;
     }
 
     /**

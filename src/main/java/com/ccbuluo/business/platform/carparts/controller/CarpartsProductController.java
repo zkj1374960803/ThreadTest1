@@ -8,7 +8,9 @@ import com.ccbuluo.business.platform.carparts.service.CarpartsProductPriceServic
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.controller.BaseController;
+import com.ccbuluo.core.entity.UploadFileInfo;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
+import com.ccbuluo.core.validate.ValidateUtils;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftUtils;
@@ -19,9 +21,11 @@ import com.ccbuluo.merchandiseintf.carparts.parts.dto.SaveBasicCarpartsProductDT
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import io.swagger.annotations.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
@@ -63,7 +67,8 @@ public class CarpartsProductController extends BaseController {
      */
     @ApiOperation(value = "添加零配件",notes = "【魏俊标】")
     @PostMapping("/savecarpartsproduct")
-    public StatusDto<String> saveCarpartsProduct(@ApiParam(name = "saveBasicCarpartsProductDTO对象", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO){
+    public StatusDto<String> saveCarpartsProduct(@ApiParam(name = "saveBasicCarpartsProductDTO对象", value = "传入json格式", required = true)
+                                                 @RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO){
         // 生成编码
         StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(BizServiceProjectcode.CodePrefixEnum.FP);
         // 获取code失败
@@ -74,6 +79,20 @@ public class CarpartsProductController extends BaseController {
         saveBasicCarpartsProductDTO.setCreator(userHolder.getLoggedUserId());
         return carpartsProductService.saveCarpartsProduct(saveBasicCarpartsProductDTO);
     }
+
+    /**
+     * 零配件图片上传
+     * @param base64 图片base64
+     * @return StatusDto<UploadFileInfo>
+     * @author zhangkangjian
+     * @date 2018-10-31 10:21:50
+     */
+    @ApiOperation(value = "上传零配件图片",notes = "【张康健】")
+    @PostMapping("/uploadImage")
+    public StatusDto<UploadFileInfo> uploadImage(@RequestBody String base64) throws UnsupportedEncodingException {
+        return carpartsProductServiceImpl.uploadImage(base64);
+    }
+
     /**
      * 编辑零部件
      * @param saveBasicCarpartsProductDTO
@@ -165,40 +184,14 @@ public class CarpartsProductController extends BaseController {
      * @author zhangkangjian
      * @date 2018-09-06 11:08:27
      */
-    @ApiOperation(value = "设置零配件的价格",notes = "【张康健】")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "productNo", value = "零部件的商品编号", required = true, paramType = "query"),
-        @ApiImplicitParam(name = "suggestedPrice", value = "零配件价格", required = true, paramType = "query"),
-        @ApiImplicitParam(name = "productType", value = "商品类型(注：FITTINGS零配件，EQUIPMENT物料)", required = true, paramType = "query")
-    })
+    @ApiOperation(value = "设置零配件和物料的价格",notes = "【张康健】")
     @PostMapping("/setprice")
-    public StatusDto<String> setPrice(@ApiIgnore RelProductPrice relProductPrice){
-        relProductPrice.setProductType(Constants.PRODUCT_TYPE_FITTINGS);
-        relProductPrice.setPriceLevel(4L);
+    public StatusDto<String> setPrice(@RequestBody @ApiParam(name = "relProductPrice", value = "传入json格式", required = true) List<RelProductPrice> relProductPrice){
+        ValidateUtils.validate(relProductPrice, null);
         carpartsProductServiceImpl.saveProductPrice(relProductPrice);
         return StatusDto.buildSuccessStatusDto();
     }
 
-
-    /**
-     * 设置物料的价格
-     * @param relProductPrice 物料价格实体
-     * @return StatusDto<String>
-     * @author zhangkangjian
-     * @date 2018-09-06 11:08:27
-     */
-    @ApiOperation(value = "设置物料的价格",notes = "【张康健】")
-    @ApiImplicitParams({
-        @ApiImplicitParam(name = "productNo", value = "物料的商品编号", required = true, paramType = "query"),
-        @ApiImplicitParam(name = "suggestedPrice", value = "物料的价格", required = true, paramType = "query")
-    })
-    @PostMapping("/setequipmentprice")
-    public StatusDto<String> setEquipmentPrice(@ApiIgnore RelProductPrice relProductPrice){
-        relProductPrice.setProductType(Constants.PRODUCT_TYPE_EQUIPMENT);
-        relProductPrice.setPriceLevel(3L);
-        carpartsProductServiceImpl.saveProductPrice(relProductPrice);
-        return StatusDto.buildSuccessStatusDto();
-    }
 
     /**
      * 查询零配件价格列表
@@ -210,7 +203,6 @@ public class CarpartsProductController extends BaseController {
     @ApiOperation(value = "查询零配件价格列表",notes = "【张康健】")
     @GetMapping("/querycarpartsproductpricelist")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "carpartsPriceType", value = "(注:无价格:NOPRICE，有价格:HAVEPRICE）", required = false, paramType = "query"),
         @ApiImplicitParam(name = "categoryCode", value = "零部件分类code", required = false, paramType = "query"),
         @ApiImplicitParam(name = "keyword", value = "零配件编号/名称", required = false, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
