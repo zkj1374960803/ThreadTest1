@@ -822,6 +822,9 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             Double aDouble = sellPrice.get(i);
             String product = productNo.get(i);
             Double suggestedPrice = (Double) suggestedPriceMap.get(product);
+            if(suggestedPrice == null){
+                continue;
+            }
             if(aDouble > suggestedPrice){
                 flag = Constants.ERROR_CODE;
                 map.put(product, suggestedPrice);
