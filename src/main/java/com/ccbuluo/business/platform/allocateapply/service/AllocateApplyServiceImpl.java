@@ -837,7 +837,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             hashMapStatusDto.setCode(flag);
             hashMapStatusDto.setMessage("失败！");
             return hashMapStatusDto;
-
         }
     }
 
@@ -921,8 +920,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      * @date 2018-08-22 14:37:40
      */
     @Override
-    public List<StockBizStockDetailDTO> queryProblemStockList(String orgCode, String productType) {
-        return bizAllocateApplyDao.queryProblemStockList(orgCode, productType);
+    public List<StockBizStockDetailDTO> queryProblemStockList(String orgCode, String productType, String supplierNo) {
+        return bizAllocateApplyDao.queryProblemStockList(orgCode, productType, supplierNo);
     }
 
     /**

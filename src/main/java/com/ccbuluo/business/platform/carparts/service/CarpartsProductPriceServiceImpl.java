@@ -6,7 +6,10 @@ import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.carconfiguration.service.BasicCarmodelManageService;
 import com.ccbuluo.business.platform.carparts.dao.CarpartsProductPriceDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
+import com.ccbuluo.codec.Base64;
 import com.ccbuluo.core.common.UserHolder;
+import com.ccbuluo.core.entity.UploadFileInfo;
+import com.ccbuluo.core.service.UploadService;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -20,9 +23,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 /**
  * 零配件实现类
@@ -44,7 +49,8 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     private CarpartsProductPriceDao carpartsProductPriceDao;
     @Resource
     private BizAllocateApplyDao bizAllocateApplyDao;
-
+    @Resource
+    private UploadService uploadService;
 
     /**
      * 查询零配件的信息和价格
@@ -114,6 +120,21 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     }
 
     /**
+     * 上传图片
+     * @param base64   图片base64编码
+     * @return StatusDto<UploadFileInfo>
+     * @author zhangkangjian
+     * @date 2018-10-31 10:45:26
+     */
+    @Override
+    public StatusDto<UploadFileInfo> uploadImage(String base64) throws UnsupportedEncodingException {
+        return uploadService.simpleUpload(new BASE64DecodedMultipartFile(base64), "carpartsimage");
+    }
+
+
+
+
+    /**
      * 填充销售价格和车型名称
      * @param queryCarpartsProductDTO 零配件
      * @param relProductPriceList 价格
@@ -165,7 +186,7 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
                     basicCarpartsProductDTO.setCustCarpartsPrice(suggestedPrice);
                 }
                 if(priceLevel == 4){
-                    basicCarpartsProductDTO.setCarpartsPrice(suggestedPrice + "");
+//                    basicCarpartsProductDTO.setCarpartsPrice(suggestedPrice + "");
                 }
             }
         }

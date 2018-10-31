@@ -10,6 +10,7 @@ import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
+import com.ccbuluo.business.platform.supplier.dto.QuerySupplierInfoDTO;
 import com.ccbuluo.core.annotation.validate.*;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
@@ -169,10 +170,7 @@ public class AllocateApplyController extends BaseController {
      */
     @ApiOperation(value = "保存申请单（填报价格）", notes = "【张康健】")
     @PostMapping("/saveprocessapply")
-    public StatusDto<String> saveProcessApply(@ApiParam(name = "processApplyDetailDTO", value = "json数组数据格式", required = true) @RequestBody List<ProcessApplyDetailDTO> processApplyDetailDTO){
-//        Class<MyGroup.Add>[] groups;
-//        Class<MyGroup.Edit> editClass = MyGroup.Edit.class;
-//        groups[0] = MyGroup.Add.class;
+    public StatusDto<String> saveProcessApply(@ApiParam(name = "processApplyDetailDTO", value = "json数组数据格式", required = true) @RequestBody List<ProcessApplyDetailDTO> processApplyDetailDTO){ ;
         ValidateUtils.validate(processApplyDetailDTO, null);
         allocateApplyServiceImpl.saveProcessApply(processApplyDetailDTO);
         return StatusDto.buildSuccessStatusDto();
@@ -384,6 +382,21 @@ public class AllocateApplyController extends BaseController {
         return allocateApplyServiceImpl.checkSellPrice(checkedSellPriceDTO);
     }
 
+    /**
+     * 查询问题件供应商
+     * @param
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-10-31 18:41:40
+     */
+    @ApiOperation(value = "查询问题件供应商", notes = "【张康健】")
+    @PostMapping("/queryproblemsupplier")
+    public StatusDto<List<QuerySupplierInfoDTO>> queryProblemsupplier(){
+
+//        return allocateApplyServiceImpl.queryProblemSupplier();
+        return null;
+    }
 
 
 }

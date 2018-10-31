@@ -1,11 +1,13 @@
 package com.ccbuluo.business.platform.carparts.service;
 
 import com.ccbuluo.business.entity.RelProductPrice;
+import com.ccbuluo.core.entity.UploadFileInfo;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
@@ -37,4 +39,12 @@ public interface CarpartsProductPriceService {
      * @date 2018-09-28 10:31:47
      */
     StatusDto<Page<BasicCarpartsProductDTO>> queryServiceProductList(QueryCarpartsProductDTO queryCarpartsProductDTO);
+    /**
+     * 上传图片
+     * @param base64 图片base64编码
+     * @return StatusDto<UploadFileInfo>
+     * @author zhangkangjian
+     * @date 2018-10-31 10:45:26
+     */
+    StatusDto<UploadFileInfo> uploadImage(String base64) throws UnsupportedEncodingException;
 }

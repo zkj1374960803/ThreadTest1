@@ -141,7 +141,7 @@ public interface AllocateApplyService {
      * @author zhangkangjian
      * @date 2018-08-22 14:37:40
      */
-    List<StockBizStockDetailDTO> queryProblemStockList(String orgCode, String productType);
+    List<StockBizStockDetailDTO> queryProblemStockList(String orgCode, String productType, String supplierNo);
     /**
      * 查询售后平台的信息
      * @return StatusDto<BasicUserOrganization>
