@@ -59,6 +59,21 @@ public class StockDetailDTO extends IdEntity {
      */
     @ApiModelProperty(name = "productNo", value = "商品编号")
     private String productNo;
+    /**
+     * 机构名称
+     */
+    @ApiModelProperty(name = "orgName", value = "机构名称")
+    private String orgName;
+    /**
+     * 机构编号
+     */
+    @ApiModelProperty(name = "orgNo", value = "机构编号")
+    private String orgNo;
+    /**
+     * 机构类型
+     */
+    @ApiModelProperty(name = "orgType", value = "机构类型")
+    private String orgType;
 
     /**
      * 成本价格
@@ -128,5 +143,33 @@ public class StockDetailDTO extends IdEntity {
 
     public void setCostPrice(BigDecimal costPrice) {
         this.costPrice = costPrice;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
+
+    public String getOrgNo() {
+        return orgNo;
+    }
+
+    public void setOrgNo(String orgNo) {
+        this.orgNo = orgNo;
+    }
+
+    public String getOrgNoAndSupplierNo() {
+        return orgNo + supplierNo;
+    }
+
+    public String getOrgType() {
+        return orgType;
+    }
+
+    public void setOrgType(String orgType) {
+        this.orgType = orgType;
     }
 }
