@@ -55,17 +55,19 @@ public class ProblemStockDetailController extends BaseController {
     @GetMapping("/equipmentlist")
     @ApiImplicitParams({@ApiImplicitParam(name = "productCategory", value = "物料分类", required = false, paramType = "query"),
             @ApiImplicitParam(name = "keyword", value = "关键字", required = false, paramType = "query"),
+            @ApiImplicitParam(name = "orgCode", value = "机构编号", required = false, paramType = "query"),
             @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
             @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
     public StatusDto<Page<StockBizStockDetailDTO>> queryequipmentStockList(@RequestParam(required = false) String productCategory,
                                                                                    @RequestParam(required = false) String keyword,
+                                                                                   @RequestParam(required = false) String orgCode,
                                                                                    @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                                    @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
         boolean category = false;
         if(StringUtils.isNotBlank(productCategory)){
             category = true;
         }
-        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.queryStockBizStockDetailDTOList(category, Constants.PRODUCT_TYPE_EQUIPMENT,productCategory, null, keyword, offset, pageSize));
+        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.queryStockBizStockDetailDTOList(orgCode, category, Constants.PRODUCT_TYPE_EQUIPMENT,productCategory, null, keyword, offset, pageSize));
     }
 
     /**
@@ -81,10 +83,12 @@ public class ProblemStockDetailController extends BaseController {
     @GetMapping("/fittingslist")
     @ApiImplicitParams({@ApiImplicitParam(name = "productCategory", value = "零配件分类code", required = false, paramType = "query"),
             @ApiImplicitParam(name = "keyword", value = "关键字", required = false, paramType = "query"),
+            @ApiImplicitParam(name = "orgCode", value = "机构code", required = false, paramType = "query"),
             @ApiImplicitParam(name = "offset", value = "起始数", required = false, paramType = "query", dataType = "int"),
             @ApiImplicitParam(name = "pageSize", value = "每页数量", required = false, paramType = "query", dataType = "int")})
     public StatusDto<Page<StockBizStockDetailDTO>> queryfittingsStockList(@RequestParam(required = false) String productCategory,
                                                                                    @RequestParam(required = false) String keyword,
+                                                                                   @RequestParam(required = false) String orgCode,
                                                                                    @RequestParam(required = false, defaultValue = "0") Integer offset,
                                                                                    @RequestParam(required = false, defaultValue = "20") Integer pageSize) {
         List<BasicCarpartsProductDTO> productList = null;
@@ -93,7 +97,7 @@ public class ProblemStockDetailController extends BaseController {
             category = true;
             productList = carpartsProductService.queryCarpartsProductListByCategoryCode(productCategory);
         }
-        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.queryStockBizStockDetailDTOList(category, Constants.PRODUCT_TYPE_FITTINGS,null, productList, keyword, offset, pageSize));
+        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.queryStockBizStockDetailDTOList(orgCode, category, Constants.PRODUCT_TYPE_FITTINGS,null, productList, keyword, offset, pageSize));
     }
 
     /**
