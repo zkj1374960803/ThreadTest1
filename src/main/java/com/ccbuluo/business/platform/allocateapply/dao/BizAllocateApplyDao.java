@@ -8,6 +8,7 @@ import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
+import com.ccbuluo.business.platform.supplier.dto.QuerySupplierInfoDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
@@ -372,7 +373,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     public Page<QueryAllocateApplyListDTO> findProblemProcessHandleList(String processType, String productType, String applyStatus, String applyNo, Integer offset, Integer pageSize) {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.process_type,a.apply_status,a.in_repository_no ")
+        sql.append(" SELECT a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.process_type,a.apply_status,a.in_repository_no,a.operate_time ")
                 .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE (a.apply_type='REFUND' or a.apply_type='BARTER') ");
         if(StringUtils.isNotBlank(processType)){
             map.put("processType", processType);
@@ -740,5 +741,34 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         sql.append(" UPDATE biz_allocateapply_detail SET");
         sql.append(" sell_price = :sellPrice WHERE id = :id ");
         batchUpdateForListBean(sql.toString(), purchaseProductInfo);
+    }
+
+    /**
+     * 查询问题件的供应商
+     *
+     * @param orgCode     机构的编号
+     * @param productType 商品的编号
+     * @return StatusDto<List < QuerySupplierInfoDTO>> 供应商列表
+     * @author zhangkangjian
+     * @date 2018-11-01 10:06:36
+     */
+    public List<QuerySupplierInfoDTO> queryProblemSupplier(String orgCode, String productType) {
+        Map<String, Object> param = Maps.newHashMap();
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT a.supplier_no AS 'supplierCode',b.supplier_name AS 'supplierName', ")
+            .append(" CONCAT(b.province_name,b.city_name,b.area_name,b.supplier_address) AS 'address' ")
+            .append(" FROM biz_stock_detail a LEFT JOIN biz_service_supplier b ON a.supplier_no = b.supplier_code ")
+            .append(" WHERE a.problem_stock > 0 ");
+        if (StringUtils.isNotBlank(orgCode)) {
+            param.put("orgCode", orgCode);
+            sql.append(" AND a.org_no = :orgCode ");
+        }
+        if (StringUtils.isNotBlank(productType)) {
+            param.put("productType", productType);
+            sql.append(" AND a.product_type = :productType ");
+        }
+        sql.append(" GROUP BY a.supplier_no ");
+        return queryListBean(QuerySupplierInfoDTO.class, sql.toString(), param);
+
     }
 }

@@ -47,7 +47,7 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
      * @date 2018-08-14 21:59:51
      */
     @Override
-    public Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(boolean category, String type, String productCategory, List<BasicCarpartsProductDTO> productList, String keyword, Integer offset, Integer pageSize){
+    public Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(String orgCode, boolean category, String type, String productCategory, List<BasicCarpartsProductDTO> productList, String keyword, Integer offset, Integer pageSize){
         List<String> productNames = null;
         if(null != productList && productList.size() > 0){
             productNames = productList.stream().map(BasicCarpartsProductDTO::getCarpartsName).collect(Collectors.toList());
@@ -57,7 +57,7 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
             List<DetailBizServiceEquipmentDTO> equis = bizServiceEquipmentDao.queryEqupmentByEquiptype(Long.valueOf(productCategory));
             productNames = equis.stream().map(DetailBizServiceEquipmentDTO::getEquipName).collect(Collectors.toList());
         }
-        return problemStockDetailDao.queryStockBizStockDetailDTOList(category, type,"", productNames, keyword,offset, pageSize);
+        return problemStockDetailDao.queryStockBizStockDetailDTOList(category, type, orgCode, productNames, keyword,offset, pageSize);
     }
     /**
      * 带条件分页查询本机构所有零配件的问题库存

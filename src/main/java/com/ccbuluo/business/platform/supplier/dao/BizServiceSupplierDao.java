@@ -264,12 +264,12 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("productCode", code);
         map.put("productType", type);
-        map.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+        map.put("supplierStatus", Constants.DELETE_FLAG_DELETE);
     StringBuilder sql = new StringBuilder();
         sql.append(" SELECT  a.supplier_code,b.supplier_name ")
             .append(" FROM rel_supplier_product a ")
             .append(" LEFT JOIN biz_service_supplier b ON a.supplier_code = b.supplier_code AND a.product_type = :productType ")
-            .append(" WHERE b.delete_flag = :deleteFlag ");
+            .append(" WHERE b.supplier_status = :supplierStatus ");
         if(StringUtils.isNotBlank(code)){
             sql.append(" AND a.product_code = :productCode ");
         }

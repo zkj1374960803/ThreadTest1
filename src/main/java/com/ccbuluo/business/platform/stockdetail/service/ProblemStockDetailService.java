@@ -28,7 +28,7 @@ public interface ProblemStockDetailService {
      * @author weijb
      * @date 2018-08-14 21:59:51
      */
-    Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(boolean category, String type, String productCategory, List<BasicCarpartsProductDTO> productList, String keyword, Integer offset, Integer pageSize);
+    Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(String orgCode,boolean category, String type, String productCategory, List<BasicCarpartsProductDTO> productList, String keyword, Integer offset, Integer pageSize);
     /**
      * 带条件分页查询本机构所有零配件的问题库存
      * @param category 是否根据类型查询
