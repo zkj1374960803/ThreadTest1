@@ -23,7 +23,7 @@ public class PlatformRefundStockInOutCallBack implements StockInOutCallBack{
     public StatusDto inStockCallBack(String docNo, String inRepositoryNo) {
         // 更改申请单状态
         inOutCallBackService.updateApplyStatus(docNo,inRepositoryNo);
-        return null;
+        return StatusDto.buildSuccessStatusDto();
     }
 
     @Override
@@ -33,6 +33,6 @@ public class PlatformRefundStockInOutCallBack implements StockInOutCallBack{
         bizInstockplanDetailDao.updateCompleteStatus(docNo);
         // 更改申请单状态
         inOutCallBackService.updateApplyOrderStatus(docNo,inRepositoryNo);
-        return null;
+        return StatusDto.buildSuccessStatusDto();
     }
 }

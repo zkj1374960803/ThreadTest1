@@ -717,6 +717,23 @@ public class PaymentServiceImpl implements PaymentService {
         return null;
     }
 
+    /**
+     * 平台退款
+     * @param applyNo 申请单号
+     * @param actualAmount 退款金额
+     * @author liuduo
+     * @date 2018-11-02 11:44:10
+     */
+    @Override
+    public StatusDto platformRefund(String applyNo, BigDecimal actualAmount) {
+        // TODO 平台需要给自己退款充钱，目前这个功能等待财务系统提供  刘铎
+        // 更改申请单状态为 REFUNDCOMPLETED  退款完成
+        bizAllocateApplyDao.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REFUNDCOMPLETED.name());
+        // 删除入库计划
+        inputStockPlanService.deleteInStockPlan(applyNo);
+        return StatusDto.buildSuccessStatusDto();
+    }
+
     private String getSupplierName(String supplierCode){
         // 供应商名称
         String supplierName = "";
