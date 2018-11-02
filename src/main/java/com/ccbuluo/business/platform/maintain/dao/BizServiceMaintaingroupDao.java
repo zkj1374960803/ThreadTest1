@@ -115,7 +115,7 @@ public class BizServiceMaintaingroupDao extends BaseDao<BizServiceMaintaingroup>
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT group_code,group_name,group_price,group_status,group_image ")
+        sql.append("SELECT id,group_code,group_name,group_price,group_status,group_image ")
             .append(" FROM biz_service_maintaingroup WHERE 1=1");
         if (StringUtils.isNotBlank(groupStatus)) {
             params.put("groupStatus", groupStatus);
