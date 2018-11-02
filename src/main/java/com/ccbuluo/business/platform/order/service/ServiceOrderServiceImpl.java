@@ -500,7 +500,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      */
     private void saveMerchandise(SaveOrderDetailDTO saveOrderDetailDTO) {
         List<SaveMerchandiseDTO> saveMerchandiseDTOS = saveOrderDetailDTO.getSaveMerchandiseDTOS();
-        if (!saveMerchandiseDTOS.isEmpty()) {
+        if (saveMerchandiseDTOS != null && !saveMerchandiseDTOS.isEmpty()) {
             List<SaveMerchandiseDTO> saveMerchandiseDTOS1 = Lists.newArrayList();
             saveMerchandiseDTOS.forEach(item -> {
                 if (StringUtils.isBlank(item.getServiceOrgno())) {
@@ -630,7 +630,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
      */
     private void saveMaintaintem(SaveOrderDetailDTO saveOrderDetailDTO) {
         List<SaveMaintaintemDTO> saveMaintaintemDTOS = saveOrderDetailDTO.getSaveMaintaintemDTOS();
-        if (!saveMaintaintemDTOS.isEmpty()) {
+        if (saveMaintaintemDTOS != null && !saveMaintaintemDTOS.isEmpty()) {
             List<SaveMaintaintemDTO> saveMaintaintemDTOS1 = Lists.newArrayList();
             saveMaintaintemDTOS.forEach(item -> {
                 if (StringUtils.isBlank(item.getServiceOrgno())) {
