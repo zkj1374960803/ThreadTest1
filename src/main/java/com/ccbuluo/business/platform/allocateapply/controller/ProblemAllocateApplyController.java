@@ -5,6 +5,7 @@ import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.ProblemAllocateapplyDetailDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
 import com.ccbuluo.business.platform.allocateapply.service.ProblemAllocateApply;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
 import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.annotation.validate.ValidatePattern;
 import com.ccbuluo.core.controller.BaseController;
@@ -114,6 +115,21 @@ public class ProblemAllocateApplyController extends BaseController {
     })
     public StatusDto<String> changeApplyType(@ValidateNotNull(message = "applyNo(申请applyNo)不能为空") String applyNo, @ValidatePattern(regexp = {"BARTER", "REFUND"},message = "类型不合法") String applyType){
         return problemAllocateApply.changeApplyType(applyNo,applyType);
+    }
+
+
+    /**
+     * 平台退换货生成出库计划
+     * @param applyNo 申请单号
+     * @return 是否成功
+     * @author liuduo
+     * @date 2018-10-31 10:55:41
+     */
+    @ApiOperation(value = "平台退换货生成出库计划", notes = "【刘铎】")
+    @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query")
+    @GetMapping("/generateoutstockplan")
+    public StatusDto generateOutStockPlan(@RequestParam @ValidateNotBlank(message = "申请单号不能为空") String applyNo) {
+        return problemAllocateApply.generateOutStockPlan(applyNo);
     }
 
 }

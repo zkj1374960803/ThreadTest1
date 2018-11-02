@@ -162,16 +162,5 @@ public class StockDetailServiceImpl implements StockDetailService{
         bizStockDetailDao.updateAdjustValidStock(bizStockDetailList1);
     }
 
-    /**
-     * 根据商品编号查询库存
-     * @param products 商品编号
-     * @return 商品与数量对应关系
-     * @author liuduo
-     * @date 2018-10-29 10:00:15
-     */
-    @Override
-    public List<ProductStockDTO> queryStockByProducts(List<String> products) {
-        return bizStockDetailDao.queryStockByProducts(products);
-    }
 
 }

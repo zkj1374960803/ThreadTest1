@@ -72,8 +72,8 @@ public class PaymentController {
             @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query"),
             @ApiImplicitParam(name = "actualAmount", value = "实际退货的金额", required = true, paramType = "query")
     })
-    public StatusDto<FindAllocateApplyDTO> refundPayment(@ValidateNotNull(message = "applyNo(申请applyNo)不能为空") String applyNo, BigDecimal actualAmount){
-        return paymentService.refundPayment(applyNo,actualAmount);
+    public StatusDto<FindAllocateApplyDTO> refundPayment(@ValidateNotNull(message = "applyNo(申请applyNo)不能为空") String applyNo, BigDecimal actualAmount,BigDecimal refundPrice){
+        return paymentService.refundPayment(applyNo,actualAmount, refundPrice);
     }
 
     /**

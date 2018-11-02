@@ -97,6 +97,7 @@ public class BizServiceProjectcode extends IdEntity{
         FR("维修车"),
         FO("客户经理组织架构"),
         FD("车型标签"),
+        FF("保养项目"),
         FB("车品牌"),
         FN("车系"),
         FH("车型"),

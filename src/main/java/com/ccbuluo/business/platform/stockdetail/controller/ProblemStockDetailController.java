@@ -6,6 +6,7 @@ import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHand
 import com.ccbuluo.business.platform.stockdetail.dto.ProblemStockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.service.ProblemStockDetailService;
+import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
 import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
@@ -114,4 +115,36 @@ public class ProblemStockDetailController extends BaseController {
         return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.getProblemStockDetailById(id));
     }
 
+    /**
+     * 根据商品类型和商品编号查询详情
+     * @param procudtType 商品类型
+     * @param productNo 商品编号
+     * @return 问题件详情
+     * @author liuduo
+     * @date 2018-10-29 14:05:14
+     */
+    @ApiOperation(value = "问题件库存总览-详情", notes = "【刘铎】")
+    @GetMapping("/findbyproductno")
+    @ApiImplicitParams({@ApiImplicitParam(name = "procudtType", value = "商品类型（物料或零配件）", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "productNo", value = "商品编号", required = true, paramType = "query")})
+    public StatusDto<ProblemStockBizStockDetailDTO> findByProductno(@RequestParam @ValidateNotBlank(message = "商品类型不能为空") String procudtType,
+                                                                    @RequestParam @ValidateNotBlank(message = "商品编号不能为空") String productNo) {
+        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.findByProductno(procudtType, productNo));
+    }
+
+    /**
+     * 根据申请单号修改退换类型
+     * @param applyNo 申请单号
+     * @param recedeType 退换类型
+     * @author liuduo
+     * @date 2018-10-29 16:59:30
+     */
+    @ApiOperation(value = "问题件退换或退款处理", notes = "【刘铎】")
+    @GetMapping("/problemhandle")
+    @ApiImplicitParams({@ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "recedeType", value = "退换类型", required = true, paramType = "query")})
+    public StatusDto problemHandle(@RequestParam @ValidateNotBlank(message = "申请单号不能为空") String applyNo,
+                                   @RequestParam @ValidateNotBlank(message = "退换类型不能为空") String recedeType) {
+        return problemStockDetailService.problemHandle(applyNo, recedeType);
+    }
 }

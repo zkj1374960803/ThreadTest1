@@ -44,7 +44,7 @@ public interface PaymentService {
      * @author weijb
      * @date 2018-08-22 17:02:58
      */
-    StatusDto refundPayment(String applyNo,BigDecimal actualAmount);
+    StatusDto refundPayment(String applyNo,BigDecimal actualAmount,BigDecimal refundPrice);
     /**
      *  根据申请单获取总价格
      * @param applyNo 申请单号
