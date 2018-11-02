@@ -58,7 +58,7 @@ public class BizServiceMaintaingroupDao extends BaseDao<BizServiceMaintaingroup>
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE biz_service_maintaingroup SET ")
             .append("group_name = :groupName,group_price = :groupPrice,")
-            .append("group_status = :groupStatus,group_image = :groupImage,")
+            .append("group_image = :groupImage,")
             .append("operator = :operator,operate_time = :operateTime,")
             .append("remark = :remark WHERE group_code= :groupCode");
         return super.updateForBean(sql.toString(), entity);
