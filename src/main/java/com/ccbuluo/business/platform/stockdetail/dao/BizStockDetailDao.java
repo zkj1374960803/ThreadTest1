@@ -392,7 +392,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         map.put("productType", productType);
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT SUM(IFNULL(a.valid_stock,0)) AS 'validStock',SUM(IFNULL(a.occupy_stock,0)) AS 'occupyStock',SUM(ifnull(a.valid_stock,0) + ifnull(a.occupy_stock,0)) AS 'totalStock', ")
-            .append(" SUM(ifnull(a.valid_stock,0) + ifnull(a.occupy_stock,0)) * a.cost_price AS 'totalAmount',a.product_unit AS 'unit' ")
+            .append(" SUM((IFNULL(a.valid_stock,0) + IFNULL(a.occupy_stock,0)) * a.cost_price) AS 'totalAmount',a.product_unit AS 'unit' ")
             .append(" FROM biz_stock_detail a  ")
             .append(" WHERE a.product_no = :productNo AND a.product_type = :productType ");
         if(orgDTOList != null && orgDTOList.size() > 0){
