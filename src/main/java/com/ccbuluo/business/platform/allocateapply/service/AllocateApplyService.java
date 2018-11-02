@@ -8,6 +8,7 @@ import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateApplyDTO;
 import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
+import com.ccbuluo.business.platform.supplier.dto.QuerySupplierInfoDTO;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
@@ -324,4 +325,13 @@ public interface AllocateApplyService {
      * @date 2018-10-29 17:26:10
      */
     StatusDto<HashMap<String, Double>> checkSellPrice(CheckedSellPriceDTO checkedSellPriceDTO);
+    /**
+     * 查询问题件的供应商
+     * @param orgCode 机构的编号
+     * @param productType 商品的编号
+     * @return StatusDto<List<QuerySupplierInfoDTO>> 供应商列表
+     * @author zhangkangjian
+     * @date 2018-11-01 10:06:36
+     */
+    StatusDto<List<QuerySupplierInfoDTO>> queryProblemSupplier(String orgCode, String productType);
 }

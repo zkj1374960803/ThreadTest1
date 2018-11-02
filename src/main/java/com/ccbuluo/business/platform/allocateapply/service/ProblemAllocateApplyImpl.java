@@ -172,12 +172,12 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             applyNos = rows.stream().map(QueryAllocateApplyListDTO::getApplyNo).collect(Collectors.toList());
             // 查询平台的入库计划
             applyList = problemAllocateApplyDao.queryProblemHandleList(applyNos,BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
-        }
-        for(QueryAllocateApplyListDTO apply : rows){
-            Optional<QueryAllocateApplyListDTO> applyFilter = applyList.stream() .filter(applyDetail -> apply.getApplyNo().equals(applyDetail.getApplyNo())) .findFirst();
-            if (applyFilter.isPresent()) {
-                apply.setInstockTime(applyFilter.get().getInstockTime());
-                apply.setOutstockTime(applyFilter.get().getOutstockTime());
+            for(QueryAllocateApplyListDTO apply : rows){
+                Optional<QueryAllocateApplyListDTO> applyFilter = applyList.stream() .filter(applyDetail -> apply.getApplyNo().equals(applyDetail.getApplyNo())) .findFirst();
+                if (applyFilter.isPresent()) {
+                    apply.setInstockTime(applyFilter.get().getInstockTime());
+                    apply.setOutstockTime(applyFilter.get().getOutstockTime());
+                }
             }
         }
         return page;

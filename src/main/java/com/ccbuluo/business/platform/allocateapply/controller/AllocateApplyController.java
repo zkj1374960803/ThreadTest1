@@ -36,6 +36,7 @@ import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author zhangkangjian
@@ -353,7 +354,8 @@ public class AllocateApplyController extends BaseController {
      * @date 2018-07-06 10:00:52
      */
     @ApiOperation(value = "查询可用的服务中心", notes = "【刘铎】")
-    @ApiImplicitParams({@ApiImplicitParam(name = "province", value = "省",  required = false, paramType = "query"),
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "province", value = "省",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "city", value = "市",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "area", value = "区",  required = false, paramType = "query"),
         @ApiImplicitParam(name = "name", value = "服务中心名字",  required = false, paramType = "query")})
@@ -392,10 +394,13 @@ public class AllocateApplyController extends BaseController {
      */
     @ApiOperation(value = "查询问题件供应商", notes = "【张康健】")
     @PostMapping("/queryproblemsupplier")
-    public StatusDto<List<QuerySupplierInfoDTO>> queryProblemsupplier(){
-
-//        return allocateApplyServiceImpl.queryProblemSupplier();
-        return null;
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "orgCode", value = "当前登陆人的机构", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "productType", value = "商品类型（注：FITTINGS零配件，EQUIPMENT物料）", required = true, paramType = "query")
+    })
+    public StatusDto<List<QuerySupplierInfoDTO>> queryProblemsupplier(@ValidateNotNull String orgCode,
+                                                                      @ValidateNotNull String productType){
+        return allocateApplyServiceImpl.queryProblemSupplier(orgCode, productType);
     }
 
 

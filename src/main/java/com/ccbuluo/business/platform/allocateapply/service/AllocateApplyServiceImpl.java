@@ -33,6 +33,7 @@ import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
+import com.ccbuluo.business.platform.supplier.dto.QuerySupplierInfoDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.BusinessUser;
 import com.ccbuluo.core.entity.Organization;
@@ -182,9 +183,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             allocateApplyDTO.setOutstockOrgno(null);
         }
 
-
         // 根据处理类型，设置申请的类型、各种相关机构、状态等属性
-
         if(AllocateApplyTypeEnum.BARTER.name().equals(processType) || AllocateApplyTypeEnum.REFUND.name().equals(processType)){
             allocateApplyDTO.setApplyType(processType);
             StatusDto<String> thcode = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.TH);
@@ -198,7 +197,14 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             // 根据处理机构类型判断
             allocateApplyDTO.setApplyType(AllocateApplyTypeEnum.SAMELEVEL.name());
         }
-
+        // 平台退换，状态改为 更换待入库
+        if(AllocateApplyTypeEnum.PLATFORMBARTER.name().equals(processType)){
+            allocateApplyDTO.setApplyStatus(BizAllocateApply.ReturnApplyStatusEnum.REPLACEWAITIN.name());
+        }
+        // 平台退款，状态改为 等待退款
+        if(AllocateApplyTypeEnum.PLATFORMREFUND.name().equals(processType)){
+            allocateApplyDTO.setApplyStatus(BizAllocateApply.ReturnApplyStatusEnum.WAITINGREFUND.name());
+        }
 
         // 默认出库机构类型orgType
         String outOrgType = getOrgTypeByCode(allocateApplyDTO.getOutstockOrgno());
@@ -219,7 +225,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         // 保存申请单详情数据
         batchInsertForapplyDetailList(allocateApplyDTO, loggedUserId, processType);
         // 已经自动处理了，调用 申请构建计划的方法
-        if(AllocateApplyTypeEnum.BARTER.name().equals(processType) || AllocateApplyTypeEnum.REFUND.name().equals(processType)){
+        if(AllocateApplyTypeEnum.BARTER.name().equals(processType) || AllocateApplyTypeEnum.REFUND.name().equals(processType)
+            || AllocateApplyTypeEnum.PLATFORMBARTER.name().equals(processType) || AllocateApplyTypeEnum.PLATFORMREFUND.name().equals(processType)){
             applyHandleContext.applyHandle(allocateApplyDTO.getApplyNo());
         }
 
@@ -389,7 +396,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             Map<String, BasicUserOrganization> outOrganizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(outstockOrgno);
             Map<String, BasicUserOrganization> inOrganizationMap = basicUserOrganizationService.queryOrganizationByOrgCodes(instockOrgno);
             Map<String, BasicUserOrganization> applyorgNoMap = basicUserOrganizationService.queryOrganizationByOrgCodes(applyorgNo);
-            a.stream().forEach(b ->{
+            a.forEach(b ->{
                 BasicUserOrganization outOrganization = outOrganizationMap.get(b.getOutstockOrgno());
                 BasicUserOrganization inOrganization = inOrganizationMap.get(b.getInstockOrgno());
                 BasicUserOrganization applyOrganization = applyorgNoMap.get(b.getApplyorgNo());
@@ -730,7 +737,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         if(outstockOrgno != null){
             if(outstockOrgno.equals(userOrgCode) || BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(userOrgCode)){
                 List<BizOutstockplanDetail> outstockplansByApplyNo = bizOutstockplanDetailDao.getOutstockplansByApplyNo(applyNo, null);
-//                paddingOrgName(outstockplansByApplyNo);
                 map.put("stockPlanList", outstockplansByApplyNo);
             }
         }
@@ -752,7 +758,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                 Object stockPlanList = map.get("stockPlanList");
                 if(stockPlanList == null){
                     List<BizOutstockplanDetail> instockplansByApplyNo = bizInstockplanDetailDao.getInstockplansByApplyNo(applyNo);
-//                    paddingOrgName(instockplansByApplyNo);
                     map.put("stockPlanList", instockplansByApplyNo);
                 }
             }
@@ -795,9 +800,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     /**
      * 保存采购单
      *
-     * @param confirmationQuoteDTO
-     * @exception
-     * @return
+     * @param confirmationQuoteDTO 采购单的信息
      * @author zhangkangjian
      * @date 2018-09-15 18:35:07
      */
@@ -845,6 +848,21 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         }
     }
 
+    /**
+     * 查询问题件的供应商
+     *
+     * @param orgCode     机构的编号
+     * @param productType 商品的编号
+     * @return StatusDto<List < QuerySupplierInfoDTO>> 供应商列表
+     * @author zhangkangjian
+     * @date 2018-11-01 10:06:36
+     */
+    @Override
+    public StatusDto<List<QuerySupplierInfoDTO>> queryProblemSupplier(String orgCode, String productType) {
+        List<QuerySupplierInfoDTO> supplierInfoDTOList = bizAllocateApplyDao.queryProblemSupplier(orgCode, productType);
+        return StatusDto.buildDataSuccessStatusDto(supplierInfoDTOList);
+    }
+
 
     /**
      * 查询可调拨库存列表
@@ -858,7 +876,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         // 根据分类查询供应商的code
         List<BasicCarpartsProductDTO> carpartsProductDTOList = Lists.newArrayList();
         if(Constants.PRODUCT_TYPE_EQUIPMENT.equals(findStockListDTO.getProductType())){
-            //            // 查询类型下所有的code
+            // 查询类型下所有的code
             carpartsProductDTOList  = bizAllocateApplyDao.findEquipmentCode(findStockListDTO.getEquiptypeId());
         }else {
             // 查询分类下所有商品的code
