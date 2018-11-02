@@ -6,6 +6,7 @@ import com.ccbuluo.business.entity.BizServiceMaintaingroup;
 import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.entity.BizServiceorderDetail;
 import com.ccbuluo.business.platform.claimorder.dao.ClaimOrderDao;
+import com.ccbuluo.business.platform.claimorder.service.ClaimOrderServiceImpl;
 import com.ccbuluo.business.platform.maintain.dao.BizServiceMaintaingroupDao;
 import com.ccbuluo.business.platform.maintain.dto.SaveBizServiceMaintaingroup;
 import com.ccbuluo.business.platform.maintain.dto.SaveMaintaintemDTO;
@@ -47,6 +48,8 @@ public class MainTainServiceImpl implements MainTainService{
     private BizServiceorderDetailDao bizServiceorderDetailDao;
     @Autowired
     private ClaimOrderDao  claimOrderDao;
+    @Autowired
+    private ClaimOrderServiceImpl claimOrderServiceImpl;
 
     Logger logger = LoggerFactory.getLogger(getClass());
     /**
@@ -184,7 +187,7 @@ public class MainTainServiceImpl implements MainTainService{
         ProductDetailDTO productDetailDTO2 = new ProductDetailDTO();
         productDetailDTO2.setProductType(BizServiceorderDetail.ProductTypeEnum.FITTING.name());
         productDetailDTO2.setServiceOrderno(groupNo);
-        List<ProductDetailDTO> maintainitemDetail2 = claimOrderDao.queryMaintainitemDetail(productDetailDTO2);
+        List<ProductDetailDTO> maintainitemDetail2 = claimOrderServiceImpl.queryFitingDetailList(productDetailDTO2);
         searchBizServiceMaintaingroup.setSaveMerchandiseDTOS(maintainitemDetail2);
         return StatusDto.buildDataSuccessStatusDto(searchBizServiceMaintaingroup);
     }
