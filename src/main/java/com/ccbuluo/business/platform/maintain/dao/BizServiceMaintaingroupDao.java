@@ -129,4 +129,39 @@ public class BizServiceMaintaingroupDao extends BaseDao<BizServiceMaintaingroup>
 
         return queryPageForBean(BizServiceMaintaingroup.class, sql.toString(), params, offset, pageSize);
     }
+
+    /**
+     * 名字校验（新增用）
+     * @param groupName 保养套餐名字
+     * @return 名字是否重复
+     * @author liuduo
+     * @date 2018-11-02 16:15:05
+     */
+    public Boolean checkName(String groupName) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("groupName", groupName);
+
+        String sql = "SELECT COUNT(id) > 0 FROM biz_service_maintaingroup WHERE group_name = :groupName";
+
+        return findForObject(sql, params, Boolean.class);
+    }
+
+    /**
+     * 名字校验（编辑用）
+     * @param id 保养套餐id
+     * @param groupName 保养套餐名字
+     * @return 名字是否重复
+     * @author liuduo
+     * @date 2018-11-02 16:15:05
+     */
+    public Boolean editCheckName(Long id, String groupName) {
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("groupName", groupName);
+        param.put("id", id);
+        param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+
+        String sql = "SELECT COUNT(id) > 0 FROM biz_service_maintaingroup WHERE id <> :id AND group_name = :groupName AND delete_flag = :deleteFlag";
+
+        return findForObject(sql, param, Boolean.class);
+    }
 }
