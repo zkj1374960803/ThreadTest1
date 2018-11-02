@@ -123,7 +123,7 @@ public class BizServiceMaintaingroupDao extends BaseDao<BizServiceMaintaingroup>
         }
         if (StringUtils.isNotBlank(keyword)) {
             params.put("keyword", keyword);
-            sql.append(" AND (group_code LIKE CONCAT('%',:keyword,'%') OR group_name LIKE CONCAT('%',:keyword,'%')");
+            sql.append(" AND (group_code LIKE CONCAT('%',:keyword,'%') OR group_name LIKE CONCAT('%',:keyword,'%'))");
         }
         sql.append(" AND delete_flag = :deleteFlag ORDER BY operate_time DESC");
 
