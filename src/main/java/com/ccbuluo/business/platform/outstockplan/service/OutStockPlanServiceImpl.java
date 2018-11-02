@@ -109,4 +109,15 @@ public class OutStockPlanServiceImpl implements OutStockPlanService {
     public List<String> getByApplyNo(String applyNo, String orgCode) {
         return bizOutstockplanDetailDao.getByApplyNo(applyNo, orgCode);
     }
+
+    /**
+     * 根据申请单号删除
+     * @param applyNo 申请单号
+     * @author liuduo
+     * @date 2018-10-31 16:27:00
+     */
+    @Override
+    public void deleteOutStockPlan(String applyNo) {
+        bizOutstockplanDetailDao.deleteOutStockPlan(applyNo);
+    }
 }

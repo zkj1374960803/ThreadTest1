@@ -252,4 +252,19 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
         params.put("planStatus", StockPlanStatusEnum.DOING.toString());
         return super.updateForMap(sql.toString(), params);
     }
+
+    /**
+     * 根据申请单号删除
+     * @param applyNo 申请单号
+     * @author liuduo
+     * @date 2018-10-31 16:27:00
+     */
+    public void deleteOutStockPlan(String applyNo) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+
+        String sql = "UPDATE biz_outstockplan_detail SET delete_flag = :deleteFlag WHERE apply_no = :applyNo";
+
+        updateForMap(sql, params);
+    }
 }

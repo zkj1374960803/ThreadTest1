@@ -44,7 +44,7 @@ public interface PaymentService {
      * @author weijb
      * @date 2018-08-22 17:02:58
      */
-    StatusDto refundPayment(String applyNo,BigDecimal actualAmount);
+    StatusDto refundPayment(String applyNo,BigDecimal actualAmount,BigDecimal refundPrice);
     /**
      *  根据申请单获取总价格
      * @param applyNo 申请单号
@@ -98,4 +98,13 @@ public interface PaymentService {
      * @date 2018-09-12 20:02:58
      */
     StatusDto saveCustomerServiceMarketCounter(String claimOrdno);
+
+    /**
+     * 平台退款
+     * @param applyNo 申请单号
+     * @param actualAmount 退款金额
+     * @author liuduo
+     * @date 2018-11-02 11:44:10
+     */
+    StatusDto platformRefund(String applyNo, BigDecimal actualAmount);
 }

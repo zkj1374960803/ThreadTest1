@@ -1162,6 +1162,20 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         return StatusDto.buildSuccessStatusDto("取消成功！");
     }
 
+    /**
+     * 查询工时列表(平台端添加保养套餐使用)
+     * @param keyword 关键字
+     * @param offset 起始数
+     *  @param pageSize 每页数
+     * @return 工时列表
+     * @author liuduo
+     * @date 2018-09-06 10:39:33
+     */
+    @Override
+    public StatusDto<Page<DetailBizServiceMaintainitemDTO>> platformQueryMaintainitem(String keyword, Integer offset, Integer pageSize) {
+        return StatusDto.buildDataSuccessStatusDto(maintainitemService.queryList(keyword, offset, pageSize));
+    }
+
     private void regainStock(String serviceOrderno){
         // 查询关联关系
         List<RelOrdstockOccupy> relOrdstockOccupyByApplyNo = bizAllocateTradeorderDao.getRelOrdstockOccupyByApplyNo(serviceOrderno);
