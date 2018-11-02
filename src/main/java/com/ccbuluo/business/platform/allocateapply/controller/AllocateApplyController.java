@@ -155,7 +155,7 @@ public class AllocateApplyController extends BaseController {
      * @author zhangkangjian
      * @date 2018-08-10 11:24:53
      */
-    @ApiOperation(value = "提交处理申请", notes = "【张康健】")
+    @ApiOperation(value = "提交申请单（填报价格）", notes = "【张康健】")
     @PostMapping("/processapply")
     public StatusDto<String> processApply(@ApiParam(name = "processApplyDTO", value = "json数据格式", required = true) @RequestBody @ValidateGroup(MyGroup.Edit.class) ProcessApplyDTO processApplyDTO){
         allocateApplyServiceImpl.processApply(processApplyDTO);
