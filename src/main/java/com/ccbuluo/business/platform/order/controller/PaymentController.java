@@ -70,10 +70,11 @@ public class PaymentController {
     @PostMapping("/refundpayment")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query"),
-            @ApiImplicitParam(name = "actualAmount", value = "实际退货的金额", required = true, paramType = "query")
+            @ApiImplicitParam(name = "actualAmount", value = "实际退货的金额", required = true, paramType = "query"),
+            @ApiImplicitParam(name = "refundPrice", value = "交易单的金额", required = true, paramType = "query")
     })
-    public StatusDto<FindAllocateApplyDTO> refundPayment(@ValidateNotNull(message = "applyNo(申请applyNo)不能为空") String applyNo, BigDecimal actualAmount){
-        return paymentService.refundPayment(applyNo,actualAmount);
+    public StatusDto<FindAllocateApplyDTO> refundPayment(@ValidateNotNull(message = "applyNo(申请applyNo)不能为空") String applyNo, BigDecimal actualAmount,BigDecimal refundPrice){
+        return paymentService.refundPayment(applyNo,actualAmount, refundPrice);
     }
 
     /**
@@ -159,5 +160,23 @@ public class PaymentController {
     @ApiImplicitParam(name = "claimOrdno", value = "申请单号", required = true, paramType = "path")
     public StatusDto<String> saveCustomerServiceMarketCounter(@PathVariable @ValidateNotNull(message = "claimOrdno(索赔单claimOrdno)不能为空") String claimOrdno){
         return paymentService.saveCustomerServiceMarketCounter(claimOrdno);
+    }
+
+    /**
+     * 平台退款
+     * @param applyNo 申请单号
+     * @param actualAmount 退款金额
+     * @author liuduo
+     * @date 2018-11-02 11:44:10
+     */
+    @ApiOperation(value = "平台退款", notes = "【刘铎】")
+    @PostMapping("/platformrefund")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "actualAmount", value = "实际退货的金额", required = true, paramType = "query")
+    })
+    public StatusDto platformRefund(@RequestParam String applyNo,
+                                    @RequestParam BigDecimal actualAmount) {
+        return paymentService.platformRefund(applyNo, actualAmount);
     }
 }

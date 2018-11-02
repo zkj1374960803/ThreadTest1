@@ -78,4 +78,13 @@ public interface ProblemAllocateApply {
      * @date 2018-09-21 19:02:58
      */
     StatusDto changeApplyType(String applyNo, String applyType);
+
+    /**
+     * 平台退换货生成出库计划
+     * @param applyNo 申请单号
+     * @return 是否成功
+     * @author liuduo
+     * @date 2018-10-31 10:55:41
+     */
+    StatusDto generateOutStockPlan(String applyNo);
 }

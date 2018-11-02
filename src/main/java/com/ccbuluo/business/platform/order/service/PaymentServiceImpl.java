@@ -14,6 +14,8 @@ import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
+import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleContext;
+import com.ccbuluo.business.platform.inputstockplan.service.InputStockPlanService;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceorderDetailDao;
@@ -80,6 +82,10 @@ public class PaymentServiceImpl implements PaymentService {
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
     @ThriftRPCClient("UserCoreSerService")
     private BasicUserOrganizationService basicUserOrganizationService;
+    @Autowired
+    private ApplyHandleContext applyHandleContext;
+    @Autowired
+    private InputStockPlanService inputStockPlanService;
 
     /**
      *  支付完成调用接口
@@ -204,7 +210,7 @@ public class PaymentServiceImpl implements PaymentService {
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public StatusDto refundPayment(String applyNo,BigDecimal actualAmount){
+    public StatusDto refundPayment(String applyNo,BigDecimal actualAmount,BigDecimal refundPrice){
         try {
             // 根据申请单获取申请单详情
             BizAllocateApply ba = bizAllocateApplyDao.getByNo(applyNo);
@@ -218,6 +224,10 @@ public class PaymentServiceImpl implements PaymentService {
             if(null == details || details.size() == 0){
                 throw new CommonException("0", "无效的申请单！");
             }
+            // 更新交易单信息
+            applyHandleContext.updateTradeorderInfo(applyNo, refundPrice);
+            // 删除入库计划
+            inputStockPlanService.deleteInStockPlan(applyNo);
             // 支付成功之后，如果是采购，则状态为平台待入库
             if(ba.getApplyType().equals(BizAllocateApply.AllocateApplyTypeEnum.PURCHASE.name())){
                 // 等待收货
@@ -705,6 +715,23 @@ public class PaymentServiceImpl implements PaymentService {
     public StatusDto saveCustomerServiceMarketCounter(String claimOrdno){
         // 目前不做实现
         return null;
+    }
+
+    /**
+     * 平台退款
+     * @param applyNo 申请单号
+     * @param actualAmount 退款金额
+     * @author liuduo
+     * @date 2018-11-02 11:44:10
+     */
+    @Override
+    public StatusDto platformRefund(String applyNo, BigDecimal actualAmount) {
+        // TODO 平台需要给自己退款充钱，目前这个功能等待财务系统提供  刘铎
+        // 更改申请单状态为 REFUNDCOMPLETED  退款完成
+        bizAllocateApplyDao.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REFUNDCOMPLETED.name());
+        // 删除入库计划
+        inputStockPlanService.deleteInStockPlan(applyNo);
+        return StatusDto.buildSuccessStatusDto();
     }
 
     private String getSupplierName(String supplierCode){

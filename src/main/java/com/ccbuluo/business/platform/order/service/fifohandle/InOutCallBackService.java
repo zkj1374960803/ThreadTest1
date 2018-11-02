@@ -76,6 +76,10 @@ public class InOutCallBackService {
                             allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.WAITINGREFUND.toString());
                         }
                         break;
+                    case PLATFORMBARTER:
+                    case PLATFORMREFUND:
+                        allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REPLACECOMPLETED.toString());
+                        break;
                 }
             }
 
@@ -122,6 +126,12 @@ public class InOutCallBackService {
                         } else {
                             allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.PRODRETURNED.toString());
                         }
+                        break;
+                    case PLATFORMBARTER:
+                        allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REPLACEWAITIN.toString());
+                        break;
+                    case PLATFORMREFUND:
+                        allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.WAITINGREFUND.toString());
                         break;
                 }
             }
