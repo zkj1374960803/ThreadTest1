@@ -341,4 +341,19 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
         return super.updateForMap(sql.toString(), params);
     }
 
+    /**
+     * 根据申请单号删除入库计划
+     * @param applyNo 入库计划ids
+     * @author liuduo
+     * @date 2018-10-31 16:15:12
+     */
+    public void deleteInStockPlan(String applyNo) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("deleteFlag", Constants.DELETE_FLAG_DELETE);
+
+        String sql = "UPDATE biz_instockplan_detail SET delete_flag = :deleteFlag WHERE apply_no = :applyNo";
+
+        updateForMap(sql, params);
+    }
 }

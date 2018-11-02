@@ -78,4 +78,12 @@ public interface OutStockPlanService {
      * @date 2018-08-13 15:20:27
      */
     List<String> getByApplyNo(String applyNo, String orgCode);
+
+    /**
+     * 根据申请单号删除
+     * @param applyNo 申请单号
+     * @author liuduo
+     * @date 2018-10-31 16:27:00
+     */
+    void deleteOutStockPlan(String applyNo);
 }

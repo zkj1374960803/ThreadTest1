@@ -1,8 +1,8 @@
 package com.ccbuluo.business.platform.stockdetail.service;
 
 import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
-import com.ccbuluo.business.platform.stockdetail.dao.FindBatchStockListDTO;
-import com.ccbuluo.business.platform.stockdetail.dao.FindStockDetailDTO;
+import com.ccbuluo.business.platform.stockdetail.dto.FindBatchStockListDTO;
+import com.ccbuluo.business.platform.stockdetail.dto.FindStockDetailDTO;
 import com.ccbuluo.db.Page;
 
 /**

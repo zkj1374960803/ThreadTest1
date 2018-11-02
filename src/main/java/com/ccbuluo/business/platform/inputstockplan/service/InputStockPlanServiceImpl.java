@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 入库计划
@@ -134,4 +135,16 @@ public class InputStockPlanServiceImpl implements InputStockPlanService {
     public List<UpdatePlanStatusDTO> getVersionNoByIds(List<Long> ids) {
         return bizInstockplanDetailDao.getVersionNoByIds(ids);
     }
+
+    /**
+     * 删除所有入库计划
+     * @param applyNo 申请单号
+     * @author liuduo
+     * @date 2018-10-31 16:13:14
+     */
+    @Override
+    public void deleteInStockPlan(String applyNo) {
+        bizInstockplanDetailDao.deleteInStockPlan(applyNo);
+    }
+
 }

@@ -264,11 +264,16 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("productCode", code);
         map.put("productType", type);
+        map.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
     StringBuilder sql = new StringBuilder();
         sql.append(" SELECT  a.supplier_code,b.supplier_name ")
             .append(" FROM rel_supplier_product a ")
             .append(" LEFT JOIN biz_service_supplier b ON a.supplier_code = b.supplier_code AND a.product_type = :productType ")
-            .append(" WHERE a.product_code = :productCode GROUP BY a.supplier_code ");
+            .append(" WHERE b.delete_flag = :deleteFlag ");
+        if(StringUtils.isNotBlank(code)){
+            sql.append(" AND a.product_code = :productCode ");
+        }
+        sql.append("GROUP BY a.supplier_code");
         return queryListBean(QuerySupplierInfoDTO.class, sql.toString(), map);
 }
 

@@ -37,9 +37,9 @@ public class CarpartsProductPriceDao extends BaseDao<CarpartsProductPriceDao> {
     public List<RelProductPrice> queryCarpartsProductList(String productType) {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuffer sql = new StringBuffer();
-        sql.append("SELECT a.product_no,a.suggested_price FROM rel_product_price a  ")
+        sql.append("SELECT a.product_no,a.suggested_price,a.price_level FROM rel_product_price a  ")
             .append(" INNER JOIN ( ")
-            .append(" SELECT a.product_no,MAX(a.id) AS 'id' FROM rel_product_price a  GROUP BY a.product_no ")
+            .append(" SELECT MAX(a.id) AS 'id' FROM rel_product_price a  GROUP BY a.price_level, a.product_no ")
             .append(" ) b ON a.id = b.id WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(productType)){
             map.put("productType", productType);
@@ -56,7 +56,7 @@ public class CarpartsProductPriceDao extends BaseDao<CarpartsProductPriceDao> {
      */
     public void updateProductEndTime(RelProductPrice relProductPrice) {
         StringBuffer sql = new StringBuffer();
-        sql.append(" UPDATE (SELECT a.id FROM rel_product_price a WHERE a.product_no = :productNo AND a.product_type = :productType ORDER BY a.create_time DESC LIMIT 1) b  ")
+        sql.append(" UPDATE (SELECT a.id FROM rel_product_price a WHERE a.product_no = :productNo AND a.product_type = :productType AND a.price_level = :priceLevel ORDER BY a.create_time DESC LIMIT 1) b  ")
             .append(" LEFT JOIN rel_product_price a ON a.id = b.id  SET a.end_time = NOW() ");
         updateForBean(sql.toString(), relProductPrice);
     }

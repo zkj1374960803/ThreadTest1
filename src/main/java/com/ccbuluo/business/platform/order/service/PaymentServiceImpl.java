@@ -14,6 +14,8 @@ import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.allocateapply.dto.FindAllocateApplyDTO;
+import com.ccbuluo.business.platform.allocateapply.service.applyhandle.ApplyHandleContext;
+import com.ccbuluo.business.platform.inputstockplan.service.InputStockPlanService;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceorderDetailDao;
@@ -80,6 +82,10 @@ public class PaymentServiceImpl implements PaymentService {
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
     @ThriftRPCClient("UserCoreSerService")
     private BasicUserOrganizationService basicUserOrganizationService;
+    @Autowired
+    private ApplyHandleContext applyHandleContext;
+    @Autowired
+    private InputStockPlanService inputStockPlanService;
 
     /**
      *  支付完成调用接口
@@ -204,7 +210,7 @@ public class PaymentServiceImpl implements PaymentService {
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public StatusDto refundPayment(String applyNo,BigDecimal actualAmount){
+    public StatusDto refundPayment(String applyNo,BigDecimal actualAmount,BigDecimal refundPrice){
         try {
             // 根据申请单获取申请单详情
             BizAllocateApply ba = bizAllocateApplyDao.getByNo(applyNo);
@@ -218,6 +224,10 @@ public class PaymentServiceImpl implements PaymentService {
             if(null == details || details.size() == 0){
                 throw new CommonException("0", "无效的申请单！");
             }
+            // 更新交易单信息
+            applyHandleContext.updateTradeorderInfo(applyNo, refundPrice);
+            // 删除入库计划
+            inputStockPlanService.deleteInStockPlan(applyNo);
             // 支付成功之后，如果是采购，则状态为平台待入库
             if(ba.getApplyType().equals(BizAllocateApply.AllocateApplyTypeEnum.PURCHASE.name())){
                 // 等待收货

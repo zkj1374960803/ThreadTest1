@@ -4,6 +4,7 @@ package com.ccbuluo.business.platform.stockdetail.service;
 import com.ccbuluo.business.platform.stockdetail.dto.ProblemStockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.db.Page;
+import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 
 import java.util.List;
@@ -82,4 +83,23 @@ public interface ProblemStockDetailService {
      * @date 2018-08-23 16:02:58
      */
     ProblemStockBizStockDetailDTO getProblemStockDetailById(Long id);
+
+    /**
+     * 根据商品类型和商品编号查询详情
+     * @param procudtType 商品类型
+     * @param productNo 商品编号
+     * @return 问题件详情
+     * @author liuduo
+     * @date 2018-10-29 14:05:14
+     */
+    ProblemStockBizStockDetailDTO findByProductno(String procudtType, String productNo);
+
+    /**
+     * 根据申请单号修改退换类型
+     * @param applyNo 申请单号
+     * @param recedeType 退换类型
+     * @author liuduo
+     * @date 2018-10-29 16:59:30
+     */
+    StatusDto problemHandle(String applyNo, String recedeType);
 }

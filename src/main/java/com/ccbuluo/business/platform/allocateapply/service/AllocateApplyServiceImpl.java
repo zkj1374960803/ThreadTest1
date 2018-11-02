@@ -18,6 +18,7 @@ import com.ccbuluo.business.platform.custmanager.dao.BizServiceCustmanagerDao;
 import com.ccbuluo.business.platform.custmanager.dto.QueryUserListDTO;
 import com.ccbuluo.business.platform.custmanager.entity.BizServiceCustmanager;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
+import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.instock.dao.BizInstockOrderDao;
 import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
@@ -115,6 +116,9 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     private BizOutstockOrderDao bizOutstockOrderDao;
     @Autowired
     private BarterStockInOutCallBack barterStockInOutCallBack;
+    @Resource
+    private BizServiceEquipmentDao bizServiceEquipmentDao;
+
 
 
     /**
@@ -802,6 +806,45 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         updateAllocateTradeorder(confirmationQuoteDTO, new ProcessApplyDTO());
     }
 
+    /**
+     * 校验销售单价
+     * @param checkedSellPriceDTO 销售价格
+     * @return StatusDto<String>
+     * @author zhangkangjian
+     * @date 2018-10-29 17:26:10
+     */
+    @Override
+    public StatusDto<HashMap<String, Double>> checkSellPrice(CheckedSellPriceDTO checkedSellPriceDTO) {
+        String flag = Constants.SUCCESS_CODE;
+        HashMap<String, Double> map = Maps.newHashMap();
+        List<String> productNo = checkedSellPriceDTO.getProductNo();
+        Map<String, Object> suggestedPriceMap = bizServiceEquipmentDao.findSuggestedPrice(productNo, checkedSellPriceDTO.getPriceTypeEnum().getLabel());
+        if(suggestedPriceMap == null || suggestedPriceMap.size() == 0){
+            return StatusDto.buildDataSuccessStatusDto(map);
+        }
+        List<Double> sellPrice = checkedSellPriceDTO.getSellPrice();
+        for (int i = 0; i < productNo.size(); i++) {
+            Double aDouble = sellPrice.get(i);
+            String product = productNo.get(i);
+            Double suggestedPrice = (Double) suggestedPriceMap.get(product);
+            if(suggestedPrice == null){
+                continue;
+            }
+            if(aDouble > suggestedPrice){
+                flag = Constants.ERROR_CODE;
+                map.put(product, suggestedPrice);
+            }
+        }
+        if(flag.equals(Constants.SUCCESS_CODE)){
+            return StatusDto.buildDataSuccessStatusDto(map);
+        }else {
+            StatusDto<HashMap<String, Double>> hashMapStatusDto = StatusDto.buildDataSuccessStatusDto(map);
+            hashMapStatusDto.setCode(flag);
+            hashMapStatusDto.setMessage("失败！");
+            return hashMapStatusDto;
+        }
+    }
+
 
     /**
      * 查询可调拨库存列表
@@ -882,8 +925,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      * @date 2018-08-22 14:37:40
      */
     @Override
-    public List<StockBizStockDetailDTO> queryProblemStockList(String orgCode, String productType) {
-        return bizAllocateApplyDao.queryProblemStockList(orgCode, productType);
+    public List<StockBizStockDetailDTO> queryProblemStockList(String orgCode, String productType, String supplierNo) {
+        return bizAllocateApplyDao.queryProblemStockList(orgCode, productType, supplierNo);
     }
 
     /**

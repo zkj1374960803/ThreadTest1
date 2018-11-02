@@ -1,5 +1,10 @@
 package com.ccbuluo.business.entity;
 
+import com.ccbuluo.core.annotation.validate.ValidateDigits;
+import com.ccbuluo.core.annotation.validate.ValidateMax;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.util.Date;
 
 /**
@@ -8,51 +13,95 @@ import java.util.Date;
  */
 public class RelProductPrice {
 
-
+    @ApiModelProperty(name = "id", value = "", hidden = true)
     private Long id;
 
     //物料或零配件的编号
+    @ApiModelProperty(name = "productNo", value = "物料或零配件的编号", required = true)
     private String productNo;
 
     //商品的类型：零配件或分类
+    @ApiModelProperty(name = "productType", value = "商品类型(注：FITTINGS零配件，EQUIPMENT物料)", required = true)
     private String productType;
 
     //集团定的建议的售价
-    private double suggestedPrice = 0.000;
+    @ApiModelProperty(name = "suggestedPrice", value = "集团定的建议的售价", required = true)
+    @ValidateDigits(integer = 7, fraction = 2)
+    private Double suggestedPrice;
 
     //允许上调抬价的比例对应的小数值，正数
+    @ApiModelProperty(name = "upRate", value = "许上调抬价的比例对应的小数值，正数", hidden = true)
     private float upRate = 0;
 
     //允许下调优惠的比例对应的小数值，正数
+    @ApiModelProperty(name = "downRate", value = "允许下调优惠的比例对应的小数值，正数", hidden = true)
     private float downRate = 0;
 
     //价格的级别，不同级别给不同机构用，用整数标识
+    @ApiModelProperty(name = "priceLevel", value = "价格的级别，不同级别给不同机构用，用整数标识(用户4，客户经理价格3，服务中心价格2)")
     private Long priceLevel;
 
     //价格生效的开始时间
+    @ApiModelProperty(name = "startTime", value = "价格生效的开始时间", hidden = true)
     private Date startTime;
 
     //价格生效的结束时间
+    @ApiModelProperty(name = "endTime", value = "价格生效的结束时间", hidden = true)
     private Date endTime;
 
     //创建人
+    @ApiModelProperty(name = "creator", value = "", hidden = true)
     private String creator;
 
     //创建时间
+    @ApiModelProperty(name = "createTime", value = "", hidden = true)
     private Long createTime;
 
     //更新人
+    @ApiModelProperty(name = "operator", value = "", hidden = true)
     private String operator;
 
     //更新时间
+    @ApiModelProperty(name = "operateTime", value = "", hidden = true)
     private Long operateTime;
 
     //删除标识
+    @ApiModelProperty(name = "deleteFlag", value = "", hidden = true)
     private int deleteFlag;
 
     //备注
+    @ApiModelProperty(name = "remark", value = "", hidden = true)
     private String remark;
 
+/*    @ApiModelProperty(name = "priceLevelEnum", value = " USER,CUSTMANAGER,SERVERCENTER")
+    private PriceLevelEnum priceLevelEnum;*/
+
+/*    public PriceLevelEnum getPriceLevelEnum() {
+        return priceLevelEnum;
+    }
+
+    public void setPriceLevelEnum(String priceLevelEnumStr) {
+        PriceLevelEnum priceLevelEnum = PriceLevelEnum.valueOf(priceLevelEnumStr);
+        long resulPriceLevel = priceLevelEnum.getPriceLevel();
+        priceLevel = resulPriceLevel;
+        this.priceLevelEnum = priceLevelEnum;
+    }*/
+
+    public enum PriceLevelEnum{
+        USER(4L),CUSTMANAGER(3L),SERVERCENTER(2L);
+        private long priceLevel;
+        PriceLevelEnum(long priceLevel) {
+            this.priceLevel = priceLevel;
+        }
+
+        public long getPriceLevel() {
+            return priceLevel;
+        }
+
+        public void setPriceLevel(long priceLevel) {
+            this.priceLevel = priceLevel;
+        }
+    }
 
     public Long getId() {
         return this.id;
@@ -84,13 +133,13 @@ public class RelProductPrice {
         this.productType = productType;
     }
 
-    public double getSuggestedPrice() {
+    public Double getSuggestedPrice() {
         return this.suggestedPrice;
     }
 
     ;
 
-    public void setSuggestedPrice(double suggestedPrice) {
+    public void setSuggestedPrice(Double suggestedPrice) {
         this.suggestedPrice = suggestedPrice;
     }
 

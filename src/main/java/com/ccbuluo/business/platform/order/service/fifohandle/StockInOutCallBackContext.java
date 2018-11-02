@@ -35,6 +35,10 @@ public class StockInOutCallBackContext {
     private RefundStockInOutCallBack refundStockInOutCallBack;
     @Autowired
     private BarterStockInOutCallBack barterStockInOutCallBack;
+    @Autowired
+    private PlatformBarterStockInOutCallBack platformBarterStockInOutCallBack;
+    @Autowired
+    private PlatformRefundStockInOutCallBack platformRefundStockInOutCallBack;
     /**
      * 对单据做完入库后的回调方法
      * @param docNo 单据编号
@@ -72,6 +76,14 @@ public class StockInOutCallBackContext {
                         case REFUND:
                             //  退货
                             callBack = refundStockInOutCallBack;
+                            break;
+                        case PLATFORMBARTER:
+                            //  平台调换
+                            callBack = platformBarterStockInOutCallBack;
+                            break;
+                        case PLATFORMREFUND:
+                            //  平台退款
+                            callBack = platformRefundStockInOutCallBack;
                             break;
                         default:
                             logger.error(typeEnum.toString() + "出现了未知处理类型！");
@@ -126,6 +138,14 @@ public class StockInOutCallBackContext {
             case REFUND:
                 //  退货
                 callBack = refundStockInOutCallBack;
+                break;
+            case PLATFORMBARTER:
+                //  平台调换
+                callBack = platformBarterStockInOutCallBack;
+                break;
+            case PLATFORMREFUND:
+                //  平台退款
+                callBack = platformRefundStockInOutCallBack;
                 break;
             default:
                 logger.error(typeEnum.toString() + "出现了未知处理类型！");

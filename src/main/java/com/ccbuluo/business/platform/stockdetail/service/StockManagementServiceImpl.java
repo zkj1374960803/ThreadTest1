@@ -7,9 +7,9 @@ import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
 import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
-import com.ccbuluo.business.platform.stockdetail.dao.FindBatchStockListDTO;
-import com.ccbuluo.business.platform.stockdetail.dao.FindProductDetailDTO;
-import com.ccbuluo.business.platform.stockdetail.dao.FindStockDetailDTO;
+import com.ccbuluo.business.platform.stockdetail.dto.FindBatchStockListDTO;
+import com.ccbuluo.business.platform.stockdetail.dto.FindProductDetailDTO;
+import com.ccbuluo.business.platform.stockdetail.dto.FindStockDetailDTO;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -18,8 +18,6 @@ import com.ccbuluo.http.StatusDtoThriftList;
 import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.merchandiseintf.carparts.category.dto.RelSupplierProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.category.service.CarpartsCategoryService;
-import com.ccbuluo.merchandiseintf.carparts.parameter.service.CarpartsParameterService;
-import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.EditBasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
@@ -28,9 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**

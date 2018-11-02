@@ -4,12 +4,15 @@ import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.OrganizationTypeEnum;
 import com.ccbuluo.business.entity.BizAllocateApply;
+import com.ccbuluo.business.entity.BizOutstockplanDetail;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.ProblemAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.BarterApplyHandleStrategy;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.RefundApplyHandleStrategy;
+import com.ccbuluo.business.platform.order.service.fifohandle.BarterStockInOutCallBack;
 import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
+import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dto.StockDetailDTO;
 import com.ccbuluo.core.common.UserHolder;
@@ -69,6 +72,10 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
     private RefundApplyHandleStrategy refundApplyHandleStrategy;
     @Resource
     private BarterApplyHandleStrategy barterApplyHandleStrategy;
+    @Autowired
+    private BarterStockInOutCallBack barterStockInOutCallBack;
+    @Autowired
+    private BizOutstockplanDetailDao bizOutstockplanDetailDao;
 
     /**
      * 问题件申请列表
@@ -321,6 +328,30 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             barterApplyHandleStrategy.applyHandle(ba);
         }
         return StatusDto.buildSuccessStatusDto("更改成功！");
+    }
+
+    /**
+     * 平台退换货生成出库计划
+     * @param applyNo 申请单号
+     * @return 是否成功
+     * @author liuduo
+     * @date 2018-10-31 10:55:41
+     */
+    @Override
+    public StatusDto generateOutStockPlan(String applyNo) {
+        // 判断有没有生成出库计划
+        List<BizOutstockplanDetail> outstockplansByApplyNo = bizOutstockplanDetailDao.getOutstockplansByApplyNo(applyNo, userHolder.getLoggedUser().getOrganization().getOrgCode());
+        if (null != outstockplansByApplyNo && !outstockplansByApplyNo.isEmpty()) {
+            return StatusDto.buildSuccessStatusDto();
+        }
+        // 生成出库计划
+        BizAllocateApply apply = bizAllocateApplyDao.getByNo(applyNo);
+        String curretOrgNo = userHolder.getLoggedUser().getOrganization().getOrgCode();
+        // 只有卖方机构入库的时候才生成出库计划
+        if(curretOrgNo.equals(apply.getOutstockOrgno())){
+            barterStockInOutCallBack.platformInstockCallback(applyNo);
+        }
+        return StatusDto.buildSuccessStatusDto();
     }
 
 }

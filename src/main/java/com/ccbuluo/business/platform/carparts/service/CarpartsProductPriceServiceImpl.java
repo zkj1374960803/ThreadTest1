@@ -6,7 +6,10 @@ import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.carconfiguration.service.BasicCarmodelManageService;
 import com.ccbuluo.business.platform.carparts.dao.CarpartsProductPriceDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
+import com.ccbuluo.codec.Base64;
 import com.ccbuluo.core.common.UserHolder;
+import com.ccbuluo.core.entity.UploadFileInfo;
+import com.ccbuluo.core.service.UploadService;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -20,9 +23,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 /**
  * 零配件实现类
@@ -44,7 +49,8 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     private CarpartsProductPriceDao carpartsProductPriceDao;
     @Resource
     private BizAllocateApplyDao bizAllocateApplyDao;
-
+    @Resource
+    private UploadService uploadService;
 
     /**
      * 查询零配件的信息和价格
@@ -71,14 +77,16 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
      * @date 2018-09-06 19:27:11
      */
     @Override
-    public void saveProductPrice(RelProductPrice relProductPrice) {
+    public void saveProductPrice(List<RelProductPrice> relProductPrice) {
         // 查询商品最新一条的价格，并更新结束时间
-        carpartsProductPriceDao.updateProductEndTime(relProductPrice);
-        String loggedUserId = userHolder.getLoggedUserId();
-        relProductPrice.setOperator(loggedUserId);
-        relProductPrice.setCreator(loggedUserId);
-        relProductPrice.setStartTime(new Date());
-        carpartsProductPriceDao.save(relProductPrice);
+        relProductPrice.forEach(item ->{
+            carpartsProductPriceDao.updateProductEndTime(item);
+            String loggedUserId = userHolder.getLoggedUserId();
+            item.setOperator(loggedUserId);
+            item.setCreator(loggedUserId);
+            item.setStartTime(new Date());
+            carpartsProductPriceDao.save(item);
+        });
     }
 
     /**
@@ -112,6 +120,21 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     }
 
     /**
+     * 上传图片
+     * @param base64   图片base64编码
+     * @return StatusDto<UploadFileInfo>
+     * @author zhangkangjian
+     * @date 2018-10-31 10:45:26
+     */
+    @Override
+    public StatusDto<UploadFileInfo> uploadImage(String base64) throws UnsupportedEncodingException {
+        return uploadService.simpleUpload(new BASE64DecodedMultipartFile(base64), "carpartsimage");
+    }
+
+
+
+
+    /**
      * 填充销售价格和车型名称
      * @param queryCarpartsProductDTO 零配件
      * @param relProductPriceList 价格
@@ -126,7 +149,7 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
         List<BasicCarpartsProductDTO> rows = basicCarpartsProductDTOResolve.getData().getRows();
 
         Optional.ofNullable(relProductPriceList).ifPresent(a ->{
-            Map<String, RelProductPrice> relProductPriceMap = a.stream().collect(Collectors.toMap(RelProductPrice::getProductNo, b -> b,(k1, k2)->k1));
+            Map<String, List<RelProductPrice>> relProductPriceMap = a.stream().collect(Collectors.groupingBy(RelProductPrice::getProductNo));
             if(rows != null && rows.size() > 0){
                 rows.forEach(item ->{
                     String categoryCodePath = item.getCategoryCodePath();
@@ -135,14 +158,37 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
                         String substring = categoryCodePath.substring(i, categoryCodePath.length());
                         item.setCategoryCodePath(substring);
                     }
-                    RelProductPrice relProductPrice = relProductPriceMap.get(item.getCarpartsCode());
-                    if(relProductPrice != null){
-                        item.setCarpartsPrice(String.valueOf(relProductPrice.getSuggestedPrice()));
-                    }
+                    buildCarpartsPrice(relProductPriceMap, item);
                 });
             }
         });
         basicCarmodelManageService.buildCarModeName(basicCarpartsProductDTOResolve.getData().getRows());
         return basicCarpartsProductDTOResolve;
+    }
+
+    /**
+     * 填充零配件的价格
+     * @param relProductPriceMap 价格信息
+     * @param basicCarpartsProductDTO 零配件信息
+     * @author zhangkangjian
+     * @date 2018-10-29 15:46:18
+     */
+    private void buildCarpartsPrice(Map<String, List<RelProductPrice>> relProductPriceMap, BasicCarpartsProductDTO basicCarpartsProductDTO) {
+        List<RelProductPrice> relProductPrice = relProductPriceMap.get(basicCarpartsProductDTO.getCarpartsCode());
+        if(relProductPrice != null && relProductPrice.size() > 0){
+            for (RelProductPrice priceItem : relProductPrice) {
+                Long priceLevel = priceItem.getPriceLevel();
+                double suggestedPrice = priceItem.getSuggestedPrice();
+                if(priceLevel == 2){
+                    basicCarpartsProductDTO.setServerCarpartsPrice(suggestedPrice);
+                }
+                if(priceLevel == 3){
+                    basicCarpartsProductDTO.setCustCarpartsPrice(suggestedPrice);
+                }
+                if(priceLevel == 4){
+                    basicCarpartsProductDTO.setCarpartsPrice(suggestedPrice);
+                }
+            }
+        }
     }
 }
