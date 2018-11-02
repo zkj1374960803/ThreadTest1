@@ -358,4 +358,26 @@ public class ServiceOrderController extends BaseController {
         return serviceOrderService.cancelApply(serviceOrderno);
     }
 
+
+
+    /**
+     * 查询工时列表(平台端添加保养套餐使用)
+     * @param keyword 关键字
+     * @param offset 起始数
+     *  @param pageSize 每页数
+     * @return 工时列表
+     * @author liuduo
+     * @date 2018-09-06 10:39:33
+     */
+    @ApiOperation(value = "查询工时列表(平台端添加保养套餐使用)", notes = "【刘铎】")
+    @ApiImplicitParams({@ApiImplicitParam(name = "keyword", value = "关键字", paramType = "query"),
+        @ApiImplicitParam(name = "offset", value = "起始数", paramType = "query", dataType = "int",required = true),
+        @ApiImplicitParam(name = "pageSize", value = "每页数", paramType = "query", dataType = "int",required = true)})
+    @GetMapping("/platformquerymaintainitem")
+    public StatusDto<Page<DetailBizServiceMaintainitemDTO>> platformQueryMaintainitem(@RequestParam(required = false) String keyword,
+                                                                              @RequestParam(defaultValue = "0") Integer offset,
+                                                                              @RequestParam(defaultValue = "10") Integer pageSize) {
+        return serviceOrderService.platformQueryMaintainitem(keyword, offset, pageSize);
+    }
+
 }

@@ -206,4 +206,15 @@ public interface ServiceOrderService {
      * @date 2018-09-22 18:41:58
      */
     StatusDto cancelApply(String serviceOrderno);
+
+    /**
+     * 查询工时列表(平台端添加保养套餐使用)
+     * @param keyword 关键字
+     * @param offset 起始数
+     *  @param pageSize 每页数
+     * @return 工时列表
+     * @author liuduo
+     * @date 2018-09-06 10:39:33
+     */
+    StatusDto<Page<DetailBizServiceMaintainitemDTO>> platformQueryMaintainitem(String keyword, Integer offset, Integer pageSize);
 }

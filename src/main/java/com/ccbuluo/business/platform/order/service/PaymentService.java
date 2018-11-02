@@ -98,4 +98,13 @@ public interface PaymentService {
      * @date 2018-09-12 20:02:58
      */
     StatusDto saveCustomerServiceMarketCounter(String claimOrdno);
+
+    /**
+     * 平台退款
+     * @param applyNo 申请单号
+     * @param actualAmount 退款金额
+     * @author liuduo
+     * @date 2018-11-02 11:44:10
+     */
+    StatusDto platformRefund(String applyNo, BigDecimal actualAmount);
 }
