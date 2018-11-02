@@ -200,4 +200,49 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
         sql.append(" GROUP BY product_no");
         return super.queryListBean(StockBizStockDetailDTO.class, sql.toString(), param);
     }
+
+    /**
+     * 根据商品编号查询商品基本信息
+     * @param productNo 商品编号
+     * @return 商品详情基本信息
+     * @author liuduo
+     * @date 2018-10-29 14:12:39
+     */
+    public ProblemStockBizStockDetailDTO getByProductNo(String productNo) {
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("productNo", productNo);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT product_no,product_name,product_categoryname,product_unit,sum(problem_stock) AS problemStock FROM biz_stock_detail WHERE product_no = :productNo");
+
+        return findForBean(ProblemStockBizStockDetailDTO.class, sql.toString(), param);
+    }
+
+    /**
+     * 根据商品类型和商品编号查询问题件库存
+     * @param procudtType 商品类型
+     * @param productNo 商品编号
+     * @return 问题件库存
+     * @author liuduo
+     * @date 2018-10-29 14:38:44
+     */
+    public List<StockDetailDTO> queryProblemStockByProduct(String procudtType, String productNo) {
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("procudtType", procudtType);
+        param.put("productNo", productNo);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT bsd.org_no,bsd.supplier_no,IFNULL(bsd.problem_stock,0) AS problemStock,bsd.product_unit,bss.supplier_name")
+            .append(" FROM biz_stock_detail AS bsd")
+            .append(" LEFT JOIN biz_service_supplier AS bss ON bss.supplier_code = bsd.supplier_no")
+            .append(" WHERE 1=1 ");
+        if (StringUtils.isNotBlank(procudtType)) {
+            sql.append(" AND bsd.product_type = :procudtType");
+        }
+        if (StringUtils.isNotBlank(productNo)) {
+            sql.append(" AND bsd.product_no = :productNo");
+        }
+
+        return queryListBean(StockDetailDTO.class, sql.toString(), param);
+    }
 }

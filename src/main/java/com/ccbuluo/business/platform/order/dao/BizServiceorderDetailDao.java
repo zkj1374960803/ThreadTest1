@@ -149,7 +149,7 @@ public class BizServiceorderDetailDao extends BaseDao<BizServiceorderDetail> {
      * @author liuduo
      * @date 2018-09-06 16:51:41
      */
-    public void saveMaintaintem(List<SaveMaintaintemDTO> saveMaintaintemDTOS1) {
+    public <T>void saveMaintaintem(List<T> saveMaintaintemDTOS1) {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO biz_serviceorder_detail ( order_no,product_no,")
             .append("product_type,unit_price,amount,warranty_type,service_orgno,")
@@ -190,7 +190,7 @@ public class BizServiceorderDetailDao extends BaseDao<BizServiceorderDetail> {
      * @author liuduo
      * @date 2018-09-06 16:51:41
      */
-    public void saveMerchandise(List<SaveMerchandiseDTO> saveMerchandiseDTOS1) {
+    public <T>void saveMerchandise(List<T> saveMerchandiseDTOS1) {
         StringBuilder sql = new StringBuilder();
         sql.append("INSERT INTO biz_serviceorder_detail ( order_no,product_no,")
             .append("product_type,unit_price,amount,warranty_type,service_orgno,")

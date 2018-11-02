@@ -1,15 +1,31 @@
 package com.ccbuluo.business.platform.stockdetail.service;
 
+import com.ccbuluo.business.constants.BusinessPropertyHolder;
+import com.ccbuluo.business.entity.BizAllocateApply;
+import com.ccbuluo.business.entity.BizInstockplanDetail;
+import com.ccbuluo.business.entity.BizOutstockplanDetail;
+import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
+import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
 import com.ccbuluo.business.platform.equipment.dto.DetailBizServiceEquipmentDTO;
+import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
+import com.ccbuluo.business.platform.inputstockplan.service.InputStockPlanServiceImpl;
+import com.ccbuluo.business.platform.order.service.fifohandle.BarterStockInOutCallBack;
+import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
+import com.ccbuluo.business.platform.outstockplan.service.OutStockPlanServiceImpl;
 import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dto.ProblemStockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockDetailDTO;
 import com.ccbuluo.core.common.UserHolder;
+import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
+import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
+import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
+import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +33,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -35,6 +52,18 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
     private UserHolder userHolder;
     @Autowired
     private BizServiceEquipmentDao bizServiceEquipmentDao;
+    @ThriftRPCClient("UserCoreSerService")
+    private BasicUserOrganizationService orgService;
+    @Autowired
+    private BizAllocateApplyDao bizAllocateApplyDao;
+    @Autowired
+    private InputStockPlanServiceImpl inputStockPlanService;
+    @Autowired
+    private OutStockPlanServiceImpl outStockPlanService;
+    @Autowired
+    private AllocateApplyService allocateApplyService;
+    @Autowired
+    private BarterStockInOutCallBack barterStockInOutCallBack;
 
     /**
      * 带条件分页查询所有零配件的问题库存
@@ -158,5 +187,82 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
         psd.setProblemDetailList(problemStockDetailDao.queryProblemStockBizStockList("", psd.getProductNo()));
         computerProblemProductCount(psd);
         return psd;
+    }
+
+    /**
+     * 根据商品类型和商品编号查询详情
+     * @param procudtType 商品类型
+     * @param productNo 商品编号
+     * @return 问题件详情
+     * @author liuduo
+     * @date 2018-10-29 14:05:14
+     */
+    @Override
+    public ProblemStockBizStockDetailDTO findByProductno(String procudtType, String productNo) {
+        // 根据商品编号查询基本信息
+        ProblemStockBizStockDetailDTO problemStockBizStockDetailDTO = problemStockDetailDao.getByProductNo(productNo);
+        //　查询该商品所有的库存
+        List<StockDetailDTO> stockDetailDTOS = problemStockDetailDao.queryProblemStockByProduct(procudtType, productNo);
+        // 取出问题件库存大于0的商品
+        List<StockDetailDTO> collect = stockDetailDTOS.stream().filter(item -> item.getProblemStock() > 0).collect(Collectors.toList());
+        // 取出所有机构
+        List<String> orgtNos = collect.stream().map(item -> item.getOrgNo()).collect(Collectors.toList());
+        // 根据机构编号查询机构名字
+        Map<String, BasicUserOrganization> stringBasicUserOrganizationMap = orgService.queryOrganizationByOrgCodes(orgtNos);
+        for (StockDetailDTO stockDetailDTO : collect) {
+            BasicUserOrganization basicUserOrganization = stringBasicUserOrganizationMap.get(stockDetailDTO.getOrgNo());
+            stockDetailDTO.setOrgName(basicUserOrganization.getOrgName());
+            stockDetailDTO.setOrgType(basicUserOrganization.getOrgType());
+        }
+        // 按照机构和供应商分组
+        Map<String, List<StockDetailDTO>> collect1 = collect.stream().collect(Collectors.groupingBy(item -> item.getOrgNoAndSupplierNo()));
+        List<StockDetailDTO> stockDetailDTOS1 = Lists.newArrayList();
+        for (Map.Entry<String, List<StockDetailDTO>> entry : collect1.entrySet()) {
+            List<StockDetailDTO> value = entry.getValue();
+            StockDetailDTO stockDetailDTO1 = value.get(0);
+            long count = value.stream().map(item -> item.getProblemStock()).count();
+            StockDetailDTO stockDetailDTO = new StockDetailDTO();
+            stockDetailDTO.setOrgType(stockDetailDTO1.getOrgType());
+            stockDetailDTO.setOrgName(stockDetailDTO1.getOrgName());
+            stockDetailDTO.setProblemStock(count);
+            stockDetailDTO.setSupplierName(stockDetailDTO1.getSupplierName());
+            stockDetailDTO.setProductUnit(stockDetailDTO1.getProductUnit());
+            stockDetailDTO.setProductNo(stockDetailDTO1.getProductNo());
+            stockDetailDTOS1.add(stockDetailDTO);
+        }
+        problemStockBizStockDetailDTO.setProblemDetailList(stockDetailDTOS1);
+        return problemStockBizStockDetailDTO;
+    }
+
+    /**
+     * 根据申请单号修改退换类型
+     * @param applyNo 申请单号
+     * @param recedeType 退换类型
+     * @author liuduo
+     * @date 2018-10-29 16:59:30
+     */
+    @Override
+    public StatusDto problemHandle(String applyNo, String recedeType) {
+        // 查询申请单的申请机构, 并判断修改的是平台还是机构
+        BizAllocateApply apply = bizAllocateApplyDao.getByNo(applyNo);
+        // 1、判断要修改为的类型是什么
+        // 如果要修改为退款，说明目前是换货
+        if (BizAllocateApply.AllocateApplyTypeEnum.PLATFORMREFUND.name().equals(recedeType)) {
+            // 删除所有的出入库计划
+            inputStockPlanService.deleteInStockPlan(applyNo);
+            outStockPlanService.deleteOutStockPlan(applyNo);
+            // 修改申请单为 -等待退款,
+           allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.WAITINGREFUND.name());
+           return StatusDto.buildSuccessStatusDto();
+        }
+
+        // 要修改为换货，说明目前是退款
+        // 如果修改的是平台，则直接修改申请单为 -等待入库
+        if (apply.getOutstockOrgno().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REPLACEWAITIN.name());
+        }
+        //　不是平台，修改申请单类型为  等待出库
+        allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.PLATFORMOUTBOUND.name());
+        return StatusDto.buildSuccessStatusDto();
     }
 }

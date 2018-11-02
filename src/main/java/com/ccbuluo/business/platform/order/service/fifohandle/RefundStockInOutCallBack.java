@@ -50,7 +50,7 @@ public class RefundStockInOutCallBack implements StockInOutCallBack{
     @Override
     public StatusDto inStockCallBack(String docNo,String inRepositoryNo) {
         // 平台还要出库
-        platformInstockCallback(docNo);
+//        platformInstockCallback(docNo);
         // 更改申请单状态
         inOutCallBackService.updateApplyStatus(docNo,inRepositoryNo);
         return StatusDto.buildSuccessStatusDto("操作成功！");

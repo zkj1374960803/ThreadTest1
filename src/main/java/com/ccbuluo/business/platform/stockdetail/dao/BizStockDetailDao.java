@@ -5,6 +5,9 @@ import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.adjust.dto.StockAdjustListDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
 import com.ccbuluo.business.platform.outstock.dto.ProductStockDTO;
+import com.ccbuluo.business.platform.stockdetail.dto.FindBatchStockListDTO;
+import com.ccbuluo.business.platform.stockdetail.dto.FindProductDetailDTO;
+import com.ccbuluo.business.platform.stockdetail.dto.FindStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.UpdateStockBizStockDetailDTO;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.dao.BaseDao;
@@ -392,7 +395,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         map.put("productType", productType);
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT SUM(IFNULL(a.valid_stock,0)) AS 'validStock',SUM(IFNULL(a.occupy_stock,0)) AS 'occupyStock',SUM(ifnull(a.valid_stock,0) + ifnull(a.occupy_stock,0)) AS 'totalStock', ")
-            .append(" SUM(ifnull(a.valid_stock,0) + ifnull(a.occupy_stock,0)) * a.cost_price AS 'totalAmount',a.product_unit AS 'unit' ")
+            .append(" SUM((IFNULL(a.valid_stock,0) + IFNULL(a.occupy_stock,0)) * a.cost_price) AS 'totalAmount',a.product_unit AS 'unit' ")
             .append(" FROM biz_stock_detail a  ")
             .append(" WHERE a.product_no = :productNo AND a.product_type = :productType ");
         if(orgDTOList != null && orgDTOList.size() > 0){
@@ -653,13 +656,29 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author liuduo
      * @date 2018-10-29 10:00:15
      */
-    public List<ProductStockDTO> queryStockByProducts(List<String> products) {
+    public List<BizStockDetail> queryStockByProducts(List<String> products, String orgCode) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("products", products);
+        params.put("orgCode", orgCode);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT product_no,SUM(valid_stock) AS productNum FROM biz_stock_detail WHERE product_no IN( 'FP0000257','FA0015') GROUP BY product_no");
+        sql.append("SELECT id,product_no,IFNULL(valid_stock,0) AS validStock,repository_no FROM biz_stock_detail WHERE product_no IN(:products) AND org_no = :orgCode");
 
-        return queryListBean(ProductStockDTO.class, sql.toString(), params);
+        return queryListBean(BizStockDetail.class, sql.toString(), params);
+    }
+
+    /**
+     * 问题件换货后更新库存
+     * @param bizStockDetailLists 库存
+     * @author liuduo
+     * @date 2018-10-29 20:15:14
+     */
+    public void updateValidStockByOutStockPlan(List<BizStockDetail> bizStockDetailLists) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("bizStockDetailLists", bizStockDetailLists);
+
+        String sql = "UPDATE biz_stock_detail SET valid_stock = :validStock,occupy_stock = :occupyStock  WHERE id = :id";
+
+        batchUpdateForListBean(sql, bizStockDetailLists);
     }
 }

@@ -96,4 +96,11 @@ public interface InputStockPlanService {
      */
     List<UpdatePlanStatusDTO> getVersionNoByIds(List<Long> ids);
 
+    /**
+     * 删除所有入库计划
+     * @param applyNo 申请单号
+     * @author liuduo
+     * @date 2018-10-31 16:13:14
+     */
+    void deleteInStockPlan(String applyNo);
 }

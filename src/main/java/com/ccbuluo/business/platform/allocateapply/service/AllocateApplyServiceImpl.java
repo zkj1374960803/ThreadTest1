@@ -25,6 +25,7 @@ import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
 import com.ccbuluo.business.platform.instock.service.InstockOrderService;
 import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.order.dto.ProductDetailDTO;
+import com.ccbuluo.business.platform.order.service.fifohandle.BarterStockInOutCallBack;
 import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
 import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
@@ -50,6 +51,8 @@ import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -112,6 +115,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     private BizInstockOrderDao bizInstockOrderDao;
     @Resource
     private BizOutstockOrderDao bizOutstockOrderDao;
+    @Autowired
+    private BarterStockInOutCallBack barterStockInOutCallBack;
     @Resource
     private BizServiceEquipmentDao bizServiceEquipmentDao;
 
