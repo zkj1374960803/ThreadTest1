@@ -373,7 +373,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     public Page<QueryAllocateApplyListDTO> findProblemProcessHandleList(String processType, String productType, String applyStatus, String applyNo, Integer offset, Integer pageSize) {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.process_type,a.apply_status,a.in_repository_no,a.operate_time ")
+        sql.append(" SELECT a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.process_type,a.apply_status,a.in_repository_no,UNIX_TIMESTAMP(a.operate_time) * 1000 as 'operateTime' ")
                 .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE (a.apply_type='REFUND' or a.apply_type='BARTER') ");
         if(StringUtils.isNotBlank(processType)){
             map.put("processType", processType);

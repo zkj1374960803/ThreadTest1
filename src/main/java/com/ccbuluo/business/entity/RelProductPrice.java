@@ -27,7 +27,7 @@ public class RelProductPrice {
     //集团定的建议的售价
     @ApiModelProperty(name = "suggestedPrice", value = "集团定的建议的售价", required = true)
     @ValidateDigits(integer = 7, fraction = 2)
-    private Double suggestedPrice;
+    private Double suggestedPrice = 0D;
 
     //允许上调抬价的比例对应的小数值，正数
     @ApiModelProperty(name = "upRate", value = "许上调抬价的比例对应的小数值，正数", hidden = true)
@@ -39,7 +39,7 @@ public class RelProductPrice {
 
     //价格的级别，不同级别给不同机构用，用整数标识
     @ApiModelProperty(name = "priceLevel", value = "价格的级别，不同级别给不同机构用，用整数标识(用户4，客户经理价格3，服务中心价格2)")
-    private Long priceLevel;
+    private Long priceLevel = 0L;
 
     //价格生效的开始时间
     @ApiModelProperty(name = "startTime", value = "价格生效的开始时间", hidden = true)

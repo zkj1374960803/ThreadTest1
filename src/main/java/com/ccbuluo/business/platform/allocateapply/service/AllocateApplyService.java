@@ -334,4 +334,12 @@ public interface AllocateApplyService {
      * @date 2018-11-01 10:06:36
      */
     StatusDto<List<QuerySupplierInfoDTO>> queryProblemSupplier(String orgCode, String productType);
+
+    /**
+     * 填充机构的名称
+     * @param page
+     * @author zhangkangjian
+     * @date 2018-11-05 15:17:08
+     */
+    void findOrgName(Page<QueryAllocateApplyListDTO> page);
 }

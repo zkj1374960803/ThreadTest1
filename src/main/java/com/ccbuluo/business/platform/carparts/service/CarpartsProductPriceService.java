@@ -4,7 +4,9 @@ import com.ccbuluo.business.entity.RelProductPrice;
 import com.ccbuluo.core.entity.UploadFileInfo;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftBean;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
+import com.ccbuluo.merchandiseintf.carparts.parts.dto.EditBasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
 
 import java.io.UnsupportedEncodingException;
@@ -47,4 +49,21 @@ public interface CarpartsProductPriceService {
      * @date 2018-10-31 10:45:26
      */
     StatusDto<UploadFileInfo> uploadImage(String base64) throws UnsupportedEncodingException;
+    /**
+     * 查询当前机构下所有的零配件（不限制数量，不限制是否设置价格）
+     * @param queryCarpartsProductDTO 查询的条件
+     * @return StatusDto<Page<BasicCarpartsProductDTO>> 分页的零配件列表
+     * @author zhangkangjian
+     * @date 2018-11-05 15:40:42
+     */
+    StatusDto<Page<BasicCarpartsProductDTO>> queryAllServiceProductList(QueryCarpartsProductDTO queryCarpartsProductDTO);
+
+    /**
+     * 查询零配件的详情
+     * @param carpartsCode 零配件code
+     * @return StatusDtoThriftBean<EditBasicCarpartsProductDTO>
+     * @author zhangkangjian
+     * @date 2018-11-05 16:56:30
+     */
+    StatusDto<EditBasicCarpartsProductDTO> findCarpartsProductdetail(String carpartsCode);
 }
