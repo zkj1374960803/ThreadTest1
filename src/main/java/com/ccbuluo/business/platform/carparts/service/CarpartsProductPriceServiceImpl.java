@@ -135,17 +135,26 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     @Override
     public StatusDto<Page<BasicCarpartsProductDTO>> queryAllServiceProductList(QueryCarpartsProductDTO queryCarpartsProductDTO) {
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+        List<RelProductPrice> relProductPrices = carpartsProductPriceDao.queryCarpartsProductList(Constants.PRODUCT_TYPE_FITTINGS);
         // 查询当前机构库存的商品
+        List<RelProductPrice> newRelProductPrices = Optional.ofNullable(relProductPrices).orElse(new ArrayList<>());
+        Map<String, List<RelProductPrice>> relProductPriceMap = newRelProductPrices.stream().collect(Collectors.groupingBy(RelProductPrice::getProductNo));
         Map<String, Object> mapProductNo = bizAllocateApplyDao.queryStockQuantity(orgCode, null);
         Set<String> keyProductNo = mapProductNo.keySet();
         List<String> productNoList = new ArrayList<>(keyProductNo);
         queryCarpartsProductDTO.setCarpartsCodeList(productNoList);
         List<RelProductPrice> relProductPriceList = Lists.newArrayList();
-        productNoList.forEach(a ->{
-            RelProductPrice relProductPrice = new RelProductPrice();
-            relProductPrice.setProductNo(a);
-            relProductPriceList.add(relProductPrice);
+        productNoList.forEach(b ->{
+            List<RelProductPrice> getRelProduct = relProductPriceMap.get(b);
+            if(getRelProduct != null){
+                relProductPriceList.addAll(getRelProduct);
+            }else {
+                RelProductPrice relProductPrice = new RelProductPrice();
+                relProductPrice.setProductNo(b);
+                relProductPriceList.add(relProductPrice);
+            }
         });
+
         return getPageStatusDto(queryCarpartsProductDTO, relProductPriceList);
     }
 
@@ -242,6 +251,32 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
                 }
                 if(priceLevel == 4){
                     basicCarpartsProductDTO.setCarpartsPrice(suggestedPrice);
+                }
+            }
+        }
+    }
+
+    /**
+     * 填充零配件的价格
+     * @param relProductPriceMap 价格信息
+     * @param basicCarpartsProductDTO 零配件信息
+     * @author zhangkangjian
+     * @date 2018-10-29 15:46:18
+     */
+    private void buildCarpartsPrice(Map<String, List<RelProductPrice>> relProductPriceMap, RelProductPrice basicCarpartsProductDTO) {
+        List<RelProductPrice> relProductPrice = relProductPriceMap.get(basicCarpartsProductDTO.getProductNo());
+        if(relProductPrice != null && relProductPrice.size() > 0){
+            for (RelProductPrice priceItem : relProductPrice) {
+                long priceLevel = priceItem.getPriceLevel();
+                double suggestedPrice = priceItem.getSuggestedPrice();
+                if(priceLevel == 2){
+                    basicCarpartsProductDTO.setSuggestedPrice(suggestedPrice);
+                }
+                if(priceLevel == 3){
+                    basicCarpartsProductDTO.setSuggestedPrice(suggestedPrice);
+                }
+                if(priceLevel == 4){
+                    basicCarpartsProductDTO.setSuggestedPrice(suggestedPrice);
                 }
             }
         }
