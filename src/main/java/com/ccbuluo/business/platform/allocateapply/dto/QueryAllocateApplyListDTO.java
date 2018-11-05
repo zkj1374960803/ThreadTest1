@@ -88,13 +88,13 @@ public class QueryAllocateApplyListDTO {
     @ApiModelProperty(name = "inRepositoryNo", value = "仓库编号", hidden = true)
     private String inRepositoryNo;
     @ApiModelProperty(name = "operateTime", value = "更新时间", hidden = true)
-    private Date operateTime;
+    private Long operateTime;
 
     public Long getOperateTime() {
-        return operateTime.getTime();
+        return operateTime;
     }
 
-    public void setOperateTime(Date operateTime) {
+    public void setOperateTime(Long operateTime) {
         this.operateTime = operateTime;
     }
 
