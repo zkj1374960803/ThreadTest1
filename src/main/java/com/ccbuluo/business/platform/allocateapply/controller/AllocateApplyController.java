@@ -403,5 +403,23 @@ public class AllocateApplyController extends BaseController {
         return allocateApplyServiceImpl.queryProblemSupplier(orgCode, productType);
     }
 
+    /**
+     * 问题件申请查询(创建问题件，查询问题件列表)
+     * @param orgCode 机构的code
+     * @return StatusDto<List<StockBizStockDetailDTO>>
+     * @author zhangkangjian
+     * @date 2018-08-22 14:37:40
+     */
+    @ApiOperation(value = "问题件申请查询(创建问题件，查询问题件列表)",notes = "【张康健】")
+    @GetMapping("/queryproblemstocklist")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "orgCode", value = "所属机构的编号", required = true, paramType = "query"),
+        @ApiImplicitParam(name = "productType", value = "商品类型(注：FITTINGS零配件，EQUIPMENT物料)", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "supplierNo", value = "供应商编号", required = true, paramType = "query"),
+    })
+    public StatusDto<List<StockBizStockDetailDTO>> queryProblemStockList(String orgCode, String productType, String supplierNo) {
+        return StatusDto.buildDataSuccessStatusDto(allocateApplyServiceImpl.queryProblemStockList(orgCode, productType, supplierNo));
+    }
+
 
 }
