@@ -58,7 +58,7 @@ public class BizServiceMaintaingroupDao extends BaseDao<BizServiceMaintaingroup>
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE biz_service_maintaingroup SET ")
             .append("group_name = :groupName,group_price = :groupPrice,")
-            .append("group_status = :groupStatus,group_image = :groupImage,")
+            .append("group_image = :groupImage,")
             .append("operator = :operator,operate_time = :operateTime,")
             .append("remark = :remark WHERE group_code= :groupCode");
         return super.updateForBean(sql.toString(), entity);
@@ -115,7 +115,7 @@ public class BizServiceMaintaingroupDao extends BaseDao<BizServiceMaintaingroup>
         params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT group_code,group_name,group_price,group_status,group_image ")
+        sql.append("SELECT id,group_code,group_name,group_price,group_status,group_image ")
             .append(" FROM biz_service_maintaingroup WHERE 1=1");
         if (StringUtils.isNotBlank(groupStatus)) {
             params.put("groupStatus", groupStatus);
@@ -123,10 +123,45 @@ public class BizServiceMaintaingroupDao extends BaseDao<BizServiceMaintaingroup>
         }
         if (StringUtils.isNotBlank(keyword)) {
             params.put("keyword", keyword);
-            sql.append(" AND (group_code LIKE CONCAT('%',:keyword,'%') OR group_name LIKE CONCAT('%',:keyword,'%')");
+            sql.append(" AND (group_code LIKE CONCAT('%',:keyword,'%') OR group_name LIKE CONCAT('%',:keyword,'%'))");
         }
         sql.append(" AND delete_flag = :deleteFlag ORDER BY operate_time DESC");
 
         return queryPageForBean(BizServiceMaintaingroup.class, sql.toString(), params, offset, pageSize);
+    }
+
+    /**
+     * 名字校验（新增用）
+     * @param groupName 保养套餐名字
+     * @return 名字是否重复
+     * @author liuduo
+     * @date 2018-11-02 16:15:05
+     */
+    public Boolean checkName(String groupName) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("groupName", groupName);
+
+        String sql = "SELECT COUNT(id) > 0 FROM biz_service_maintaingroup WHERE group_name = :groupName";
+
+        return findForObject(sql, params, Boolean.class);
+    }
+
+    /**
+     * 名字校验（编辑用）
+     * @param id 保养套餐id
+     * @param groupName 保养套餐名字
+     * @return 名字是否重复
+     * @author liuduo
+     * @date 2018-11-02 16:15:05
+     */
+    public Boolean editCheckName(Long id, String groupName) {
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("groupName", groupName);
+        param.put("id", id);
+        param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+
+        String sql = "SELECT COUNT(id) > 0 FROM biz_service_maintaingroup WHERE id <> :id AND group_name = :groupName AND delete_flag = :deleteFlag";
+
+        return findForObject(sql, param, Boolean.class);
     }
 }

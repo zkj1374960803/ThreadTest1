@@ -6,6 +6,7 @@ import com.ccbuluo.business.entity.BizServiceMaintaingroup;
 import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.entity.BizServiceorderDetail;
 import com.ccbuluo.business.platform.claimorder.dao.ClaimOrderDao;
+import com.ccbuluo.business.platform.claimorder.service.ClaimOrderServiceImpl;
 import com.ccbuluo.business.platform.maintain.dao.BizServiceMaintaingroupDao;
 import com.ccbuluo.business.platform.maintain.dto.SaveBizServiceMaintaingroup;
 import com.ccbuluo.business.platform.maintain.dto.SaveMaintaintemDTO;
@@ -15,6 +16,7 @@ import com.ccbuluo.business.platform.order.dao.BizServiceorderDetailDao;
 import com.ccbuluo.business.platform.order.dto.ProductDetailDTO;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.core.common.UserHolder;
+import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.google.common.collect.Lists;
@@ -46,6 +48,8 @@ public class MainTainServiceImpl implements MainTainService{
     private BizServiceorderDetailDao bizServiceorderDetailDao;
     @Autowired
     private ClaimOrderDao  claimOrderDao;
+    @Autowired
+    private ClaimOrderServiceImpl claimOrderServiceImpl;
 
     Logger logger = LoggerFactory.getLogger(getClass());
     /**
@@ -59,6 +63,11 @@ public class MainTainServiceImpl implements MainTainService{
     @Transactional(rollbackFor = Exception.class)
     public StatusDto saveMainTain(SaveBizServiceMaintaingroup bizServiceMaintaingroup) {
         try {
+            // 名字验重
+            Boolean aboolean = bizServiceMaintaingroupDao.checkName(bizServiceMaintaingroup.getGroupName());
+            if (aboolean) {
+                throw new CommonException("0", "保养套餐名字重复，请核对！");
+            }
             // 生成保养单号
             String code = null;
             StatusDto<String> order = generateProjectCodeService.grantCode(BizServiceProjectcode.CodePrefixEnum.FF);
@@ -94,6 +103,11 @@ public class MainTainServiceImpl implements MainTainService{
     @Transactional(rollbackFor = Exception.class)
     public StatusDto editMainTain(SaveBizServiceMaintaingroup bizServiceMaintaingroup) {
         try {
+            // 名字验重
+            Boolean aboolean = bizServiceMaintaingroupDao.editCheckName(bizServiceMaintaingroup.getId(),bizServiceMaintaingroup.getGroupName());
+            if (aboolean) {
+                throw new CommonException("0", "保养套餐名字重复，请核对！");
+            }
             // 编辑保养套餐
             bizServiceMaintaingroup.preUpdate(userHolder.getLoggedUserId());
             bizServiceMaintaingroupDao.update(bizServiceMaintaingroup);
@@ -162,6 +176,7 @@ public class MainTainServiceImpl implements MainTainService{
         searchBizServiceMaintaingroup.setGroupPrice(byGroupNo.getGroupPrice());
         searchBizServiceMaintaingroup.setGroupStatus(byGroupNo.getGroupStatus());
         searchBizServiceMaintaingroup.setGroupImage(byGroupNo.getGroupImage());
+        searchBizServiceMaintaingroup.setId(byGroupNo.getId());
         // 查询工时
         ProductDetailDTO productDetailDTO = new ProductDetailDTO();
         productDetailDTO.setProductType(BizServiceorderDetail.ProductTypeEnum.MAINTAINITEM.name());
@@ -172,7 +187,7 @@ public class MainTainServiceImpl implements MainTainService{
         ProductDetailDTO productDetailDTO2 = new ProductDetailDTO();
         productDetailDTO2.setProductType(BizServiceorderDetail.ProductTypeEnum.FITTING.name());
         productDetailDTO2.setServiceOrderno(groupNo);
-        List<ProductDetailDTO> maintainitemDetail2 = claimOrderDao.queryMaintainitemDetail(productDetailDTO2);
+        List<ProductDetailDTO> maintainitemDetail2 = claimOrderServiceImpl.queryFitingDetailList(productDetailDTO2);
         searchBizServiceMaintaingroup.setSaveMerchandiseDTOS(maintainitemDetail2);
         return StatusDto.buildDataSuccessStatusDto(searchBizServiceMaintaingroup);
     }
@@ -186,7 +201,7 @@ public class MainTainServiceImpl implements MainTainService{
      */
     private void saveMaintaintem(SaveBizServiceMaintaingroup bizServiceMaintaingroup) {
         List<SaveMaintaintemDTO> saveMaintaintemDTOS = bizServiceMaintaingroup.getSaveMaintaintemDTOS();
-        if (!saveMaintaintemDTOS.isEmpty()) {
+        if (saveMaintaintemDTOS != null && !saveMaintaintemDTOS.isEmpty()) {
             List<SaveMaintaintemDTO> saveMaintaintemDTOS1 = Lists.newArrayList();
             saveMaintaintemDTOS.forEach(item -> {
                 if (StringUtils.isBlank(item.getServiceOrgno())) {
@@ -211,7 +226,7 @@ public class MainTainServiceImpl implements MainTainService{
      */
     private void saveMerchandise(SaveBizServiceMaintaingroup bizServiceMaintaingroup) {
         List<SaveMerchandiseDTO> saveMerchandiseDTOS = bizServiceMaintaingroup.getSaveMerchandiseDTOS();
-        if (!saveMerchandiseDTOS.isEmpty()) {
+        if (saveMerchandiseDTOS != null && !saveMerchandiseDTOS.isEmpty()) {
             List<SaveMerchandiseDTO> saveMerchandiseDTOS1 = Lists.newArrayList();
             saveMerchandiseDTOS.forEach(item -> {
                 if (StringUtils.isBlank(item.getServiceOrgno())) {
