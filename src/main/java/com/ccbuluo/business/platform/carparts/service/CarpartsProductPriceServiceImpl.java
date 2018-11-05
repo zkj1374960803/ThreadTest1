@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.carparts.service;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.RelProductPrice;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
+import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarmodelManageDao;
 import com.ccbuluo.business.platform.carconfiguration.service.BasicCarmodelManageService;
 import com.ccbuluo.business.platform.carparts.dao.CarpartsProductPriceDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
@@ -13,14 +14,17 @@ import com.ccbuluo.core.service.UploadService;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftBean;
 import com.ccbuluo.http.StatusDtoThriftPage;
 import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
+import com.ccbuluo.merchandiseintf.carparts.parts.dto.EditBasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
@@ -51,6 +55,8 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     private BizAllocateApplyDao bizAllocateApplyDao;
     @Resource
     private UploadService uploadService;
+    @Resource
+    private BasicCarmodelManageDao basicCarmodelManageDao;
 
     /**
      * 查询零配件的信息和价格
@@ -143,6 +149,29 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
         return getPageStatusDto(queryCarpartsProductDTO, relProductPriceList);
     }
 
+    /**
+     * 查询零配件的详情
+     * @param carpartsCode 零配件code
+     * @return StatusDtoThriftBean<EditBasicCarpartsProductDTO>
+     * @author zhangkangjian
+     * @date 2018-11-05 16:56:30
+     */
+    @Override
+    public StatusDto<EditBasicCarpartsProductDTO> findCarpartsProductdetail(String carpartsCode) {
+        StatusDtoThriftBean<EditBasicCarpartsProductDTO> carpartsProductdetail = carpartsProductService.findCarpartsProductdetail(carpartsCode);
+        StatusDto<EditBasicCarpartsProductDTO> resolve = StatusDtoThriftUtils.resolve(carpartsProductdetail, EditBasicCarpartsProductDTO.class);
+        EditBasicCarpartsProductDTO data = resolve.getData();
+        List<Map<String, Object>> mList = basicCarmodelManageDao.queryAllCarMobelList();
+        for(EditBasicCarpartsProductDTO bd : List.of(data)){
+            for(Map<String, Object> map : mList){
+                if(map.get("id").toString().equals(bd.getFitCarmodel())){
+                    bd.setFitCarmodel(map.get("name").toString());
+                    continue;
+                }
+            }
+        }
+        return resolve;
+    }
 
 
     /**

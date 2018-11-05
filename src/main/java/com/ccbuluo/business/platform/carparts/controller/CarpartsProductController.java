@@ -13,6 +13,7 @@ import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.core.validate.ValidateUtils;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftBean;
 import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.EditBasicCarpartsProductDTO;
@@ -27,6 +28,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 零配件
@@ -135,7 +137,7 @@ public class CarpartsProductController extends BaseController {
     @ApiImplicitParam(name = "carpartsCode", value = "零部件Code", required = true, dataType = "String", paramType = "path")
     @GetMapping("/findcarpartsproductdetail/{carpartsCode}")
     public StatusDto<EditBasicCarpartsProductDTO> findCarpartsProductdetail(@PathVariable String carpartsCode){
-        return StatusDtoThriftUtils.resolve(carpartsProductService.findCarpartsProductdetail(carpartsCode),EditBasicCarpartsProductDTO.class);
+        return carpartsProductServiceImpl.findCarpartsProductdetail(carpartsCode);
     }
 
     /**
