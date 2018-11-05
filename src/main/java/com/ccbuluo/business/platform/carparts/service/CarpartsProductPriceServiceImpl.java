@@ -99,7 +99,7 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     @Override
     public StatusDto<Page<BasicCarpartsProductDTO>> queryServiceProductList(QueryCarpartsProductDTO queryCarpartsProductDTO) {
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
-        // 查询当前客户经理已有库存的商品
+        // 查询当前机构库存的商品
         Map<String, Object> map = bizAllocateApplyDao.queryStockQuantity(orgCode, null);
         List<RelProductPrice> relProductPrice =  carpartsProductPriceDao.queryCarpartsProductList(Constants.PRODUCT_TYPE_FITTINGS);
         Optional.ofNullable(relProductPrice).ifPresent(a ->{
@@ -118,6 +118,32 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
         });
         return getPageStatusDto(queryCarpartsProductDTO, relProductPrice);
     }
+
+    /**
+     * 查询当前机构下所有的零配件（不限制数量，不限制是否设置价格）
+     * @param queryCarpartsProductDTO 查询的条件
+     * @return StatusDto<Page<BasicCarpartsProductDTO>> 分页的零配件列表
+     * @author zhangkangjian
+     * @date 2018-11-05 15:40:42
+     */
+    @Override
+    public StatusDto<Page<BasicCarpartsProductDTO>> queryAllServiceProductList(QueryCarpartsProductDTO queryCarpartsProductDTO) {
+        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
+        // 查询当前机构库存的商品
+        Map<String, Object> mapProductNo = bizAllocateApplyDao.queryStockQuantity(orgCode, null);
+        Set<String> keyProductNo = mapProductNo.keySet();
+        List<String> productNoList = new ArrayList<>(keyProductNo);
+        queryCarpartsProductDTO.setCarpartsCodeList(productNoList);
+        List<RelProductPrice> relProductPriceList = Lists.newArrayList();
+        productNoList.forEach(a ->{
+            RelProductPrice relProductPrice = new RelProductPrice();
+            relProductPrice.setProductNo(a);
+            relProductPriceList.add(relProductPrice);
+        });
+        return getPageStatusDto(queryCarpartsProductDTO, relProductPriceList);
+    }
+
+
 
     /**
      * 上传图片
@@ -177,7 +203,7 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
         List<RelProductPrice> relProductPrice = relProductPriceMap.get(basicCarpartsProductDTO.getCarpartsCode());
         if(relProductPrice != null && relProductPrice.size() > 0){
             for (RelProductPrice priceItem : relProductPrice) {
-                Long priceLevel = priceItem.getPriceLevel();
+                long priceLevel = priceItem.getPriceLevel();
                 double suggestedPrice = priceItem.getSuggestedPrice();
                 if(priceLevel == 2){
                     basicCarpartsProductDTO.setServerCarpartsPrice(suggestedPrice);

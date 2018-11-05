@@ -179,6 +179,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
                     apply.setOutstockTime(applyFilter.get().getOutstockTime());
                 }
             }
+            allocateApplyServiceImpl.findOrgName(page);
         }
         return page;
     }

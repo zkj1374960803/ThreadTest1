@@ -387,8 +387,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     }
 
 
-
-    private void findOrgName(Page<QueryAllocateApplyListDTO> page) {
+// todo
+    public void findOrgName(Page<QueryAllocateApplyListDTO> page) {
         Optional.ofNullable(page.getRows()).ifPresent(a ->{
             List<String> outstockOrgno = a.stream().filter(b -> b.getOutstockOrgno() != null).map(QueryAllocateApplyListDTO::getOutstockOrgno).collect(Collectors.toList());
             List<String> instockOrgno = a.stream().filter(b -> b.getInstockOrgno() != null).map(QueryAllocateApplyListDTO::getInstockOrgno).collect(Collectors.toList());

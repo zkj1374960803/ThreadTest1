@@ -47,4 +47,12 @@ public interface CarpartsProductPriceService {
      * @date 2018-10-31 10:45:26
      */
     StatusDto<UploadFileInfo> uploadImage(String base64) throws UnsupportedEncodingException;
+    /**
+     * 查询当前机构下所有的零配件（不限制数量，不限制是否设置价格）
+     * @param queryCarpartsProductDTO 查询的条件
+     * @return StatusDto<Page<BasicCarpartsProductDTO>> 分页的零配件列表
+     * @author zhangkangjian
+     * @date 2018-11-05 15:40:42
+     */
+    StatusDto<Page<BasicCarpartsProductDTO>> queryAllServiceProductList(QueryCarpartsProductDTO queryCarpartsProductDTO);
 }

@@ -192,7 +192,6 @@ public class CarpartsProductController extends BaseController {
         return StatusDto.buildSuccessStatusDto();
     }
 
-
     /**
      * 查询零配件价格列表
      * @param queryCarpartsProductDTO 查询条件
@@ -212,7 +211,18 @@ public class CarpartsProductController extends BaseController {
         return carpartsProductServiceImpl.queryCarpartsProductPriceList(queryCarpartsProductDTO);
     }
 
-
+    /**
+     * 查询当前机构下所有的零配件（不限制数量，不限制是否设置价格）
+     * @param queryCarpartsProductDTO 查询的条件
+     * @return StatusDto<Page<BasicCarpartsProductDTO>> 分页的零配件列表
+     * @author zhangkangjian
+     * @date 2018-11-05 15:40:42
+     */
+    @ApiOperation(value = "查询当前机构下所有的零配件（不限制数量，不限制是否设置价格）",notes = "【张康健】")
+    @PostMapping("/queryallserviceproductlist")
+    public StatusDto<Page<BasicCarpartsProductDTO>> queryAllServiceProductList(@ApiParam(name = "queryCarpartsProductDTO", value = "查询的条件", required = true) @RequestBody QueryCarpartsProductDTO queryCarpartsProductDTO){
+        return carpartsProductServiceImpl.queryAllServiceProductList(queryCarpartsProductDTO);
+    }
 
 
 }
