@@ -284,7 +284,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         if(instockOrderDTO != null){
             QueryStorehouseDTO queryStorehouse = bizServiceStorehouseDao.queryQueryStorehouseDTOByCode(instockOrderDTO.getInRepositoryNo());
             if(queryStorehouse != null){
-                allocateApplyDTO.setInRepositoryName(queryStorehouse.getStorehouseName());
+                allocateApplyDTO.setPlatformInRepositoryName(queryStorehouse.getStorehouseName());
             }
         }
         // 计算成本价格
