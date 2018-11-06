@@ -282,7 +282,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         // 根据申请单号查询入库单号
         BizInstockOrderDTO instockOrderDTO = bizInstockOrderDao.getByTradeDocno(applyNo);
         if(instockOrderDTO != null){
-            QueryStorehouseDTO queryStorehouse = bizServiceStorehouseDao.queryQueryStorehouseDTOByCode(allocateApplyDTO.getInRepositoryNo());
+            QueryStorehouseDTO queryStorehouse = bizServiceStorehouseDao.queryQueryStorehouseDTOByCode(instockOrderDTO.getInRepositoryNo());
             if(queryStorehouse != null){
                 allocateApplyDTO.setPlatformInRepositoryName(queryStorehouse.getStorehouseName());
             }
