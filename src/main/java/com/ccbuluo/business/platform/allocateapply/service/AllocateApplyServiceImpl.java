@@ -184,7 +184,10 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         }
 
         // 根据处理类型，设置申请的类型、各种相关机构、状态等属性
-        if(AllocateApplyTypeEnum.BARTER.name().equals(processType) || AllocateApplyTypeEnum.REFUND.name().equals(processType)){
+        if(AllocateApplyTypeEnum.BARTER.name().equals(processType)
+            || AllocateApplyTypeEnum.REFUND.name().equals(processType)
+            || AllocateApplyTypeEnum.PLATFORMBARTER.name().equals(processType)
+            || AllocateApplyTypeEnum.PLATFORMREFUND.name().equals(processType)){
             allocateApplyDTO.setApplyType(processType);
             StatusDto<String> thcode = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.TH);
             allocateApplyDTO.setApplyNo(thcode.getData());
@@ -205,7 +208,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         if(AllocateApplyTypeEnum.PLATFORMREFUND.name().equals(processType)){
             allocateApplyDTO.setApplyStatus(BizAllocateApply.ReturnApplyStatusEnum.WAITINGREFUND.name());
         }
-
         // 默认出库机构类型orgType
         String outOrgType = getOrgTypeByCode(allocateApplyDTO.getOutstockOrgno());
         if(StringUtils.isBlank(outOrgType)){
