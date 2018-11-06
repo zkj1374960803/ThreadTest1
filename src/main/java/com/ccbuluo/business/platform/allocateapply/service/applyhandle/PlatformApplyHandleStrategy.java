@@ -192,7 +192,7 @@ public class PlatformApplyHandleStrategy extends DefaultApplyHandleStrategy {
             instockplanPurchaser.setCostPrice(BigDecimal.ZERO);
             instockplanPurchaser.setInstockRepositoryNo(ad.getInRepositoryNo());// 入库仓库编号
             instockplanPurchaser.setInstockOrgno(ad.getApplyorgNo());// 申请方入机构编号
-            instockplanPurchaser.setCompleteStatus(StockPlanStatusEnum.NOTEFFECTIVE.toString());// 完成状态（未生效）
+            instockplanPurchaser.setCompleteStatus(StockPlanStatusEnum.DOING.toString());// 完成状态（未生效）
             inList.add(instockplanPurchaser);
         }
     }
