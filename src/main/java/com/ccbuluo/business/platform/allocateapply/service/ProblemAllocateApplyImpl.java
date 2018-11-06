@@ -10,6 +10,8 @@ import com.ccbuluo.business.platform.allocateapply.dao.ProblemAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.BarterApplyHandleStrategy;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.RefundApplyHandleStrategy;
+import com.ccbuluo.business.platform.instock.dao.BizInstockOrderDao;
+import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
 import com.ccbuluo.business.platform.order.service.fifohandle.BarterStockInOutCallBack;
 import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
@@ -84,6 +86,9 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
     private BizServiceStorehouseDao bizServiceStorehouseDao;
     @Resource
     private BizServiceSupplierDao bizServiceSupplierDao;
+
+    @Resource
+    private BizInstockOrderDao bizInstockOrderDao;
     /**
      * 问题件申请列表
      *   @param type 物料或是零配件
@@ -263,21 +268,24 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             allocateApplyDTO.setTransportorderNo(info.getTransportorderNo());// 物流单号
             allocateApplyDTO.setTotalPrice(info.getTotalPrice());
         }
-        String inRepositoryNo = allocateApplyDTO.getInRepositoryNo();
-        if(StringUtils.isNotBlank(inRepositoryNo)){
-            // 设置入库仓库名称
-            List<QueryStorehouseDTO> queryStorehouseDTOList = bizServiceStorehouseDao.queryByCode(List.of(inRepositoryNo));
-            if(queryStorehouseDTOList != null && queryStorehouseDTOList.size() > 0){
-                QueryStorehouseDTO queryStorehouseDTO = queryStorehouseDTOList.get(0);
-                String storehouseName = queryStorehouseDTO.getStorehouseName();
-                allocateApplyDTO.setInRepositoryName(storehouseName);
-            }
+
+        QueryStorehouseDTO queryStorehouseDTO = bizServiceStorehouseDao.queryQueryStorehouseDTOByCode(allocateApplyDTO.getInRepositoryNo());
+        if(queryStorehouseDTO != null){
+            allocateApplyDTO.setInRepositoryName(queryStorehouseDTO.getStorehouseName());
         }
         // 设置完成时间
         if(!BizAllocateApply.ReturnApplyStatusEnum.REPLACECOMPLETED.name().equals(allocateApplyDTO.getApplyStatus())
             && !BizAllocateApply.ReturnApplyStatusEnum.REFUNDCOMPLETED.name().equals(allocateApplyDTO.getApplyStatus())) {
             // 状态没有完成，时间为空
             allocateApplyDTO.setOperateTime(null);
+        }
+        // 根据申请单号查询入库单号
+        BizInstockOrderDTO instockOrderDTO = bizInstockOrderDao.getByTradeDocno(applyNo);
+        if(instockOrderDTO != null){
+            QueryStorehouseDTO queryStorehouse = bizServiceStorehouseDao.queryQueryStorehouseDTOByCode(instockOrderDTO.getInRepositoryNo());
+            if(queryStorehouse != null){
+                allocateApplyDTO.setInRepositoryName(queryStorehouse.getStorehouseName());
+            }
         }
         // 计算成本价格
         convertCostPrice(allocateApplyDTO);

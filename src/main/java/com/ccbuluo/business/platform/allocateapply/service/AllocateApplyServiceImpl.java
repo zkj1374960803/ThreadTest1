@@ -744,7 +744,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                 map.put("stockPlanList", outstockplansByApplyNo);
             }
         }
-        // 根据单号查询入库单号
+        // 根据申请单号查询入库单号
         BizInstockOrderDTO instockOrderDTO = bizInstockOrderDao.getByTradeDocno(applyNo);
         if(instockOrderDTO != null){
             BizInstockOrderDTO bizInstockOrderDTO = bizInstockOrderDao.getByInstockNo(instockOrderDTO.getInstockOrderno());

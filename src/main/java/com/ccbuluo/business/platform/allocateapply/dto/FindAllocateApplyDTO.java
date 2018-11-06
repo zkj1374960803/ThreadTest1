@@ -187,6 +187,16 @@ public class FindAllocateApplyDTO {
     @ApiModelProperty(name = "operateTime", value = "操作时间", hidden = true)
     private Long operateTime;
 
+    @ApiModelProperty(name = "platformInRepositoryName", value = "平台入库仓库", hidden = true)
+    private String platformInRepositoryName;
+
+    public String getPlatformInRepositoryName() {
+        return platformInRepositoryName;
+    }
+
+    public void setPlatformInRepositoryName(String platformInRepositoryName) {
+        this.platformInRepositoryName = platformInRepositoryName;
+    }
 
     public Long getOperateTime() {
         return operateTime;
