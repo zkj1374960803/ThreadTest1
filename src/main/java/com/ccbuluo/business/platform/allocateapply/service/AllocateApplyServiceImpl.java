@@ -227,9 +227,11 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         // 保存申请单详情数据
         batchInsertForapplyDetailList(allocateApplyDTO, loggedUserId, processType);
         // 已经自动处理了，调用 申请构建计划的方法
-        if(AllocateApplyTypeEnum.BARTER.name().equals(processType) || AllocateApplyTypeEnum.REFUND.name().equals(processType)
-            || AllocateApplyTypeEnum.PLATFORMBARTER.name().equals(processType) || AllocateApplyTypeEnum.PLATFORMREFUND.name().equals(processType)){
-            applyHandleContext.applyHandle(allocateApplyDTO.getApplyNo());
+        if(AllocateApplyTypeEnum.BARTER.name().equals(processType)
+            || AllocateApplyTypeEnum.REFUND.name().equals(processType)
+            || AllocateApplyTypeEnum.PLATFORMBARTER.name().equals(processType)
+            || AllocateApplyTypeEnum.PLATFORMREFUND.name().equals(processType)){
+//            applyHandleContext.applyHandle(allocateApplyDTO.getApplyNo());
         }
 
     }
