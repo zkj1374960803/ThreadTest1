@@ -328,7 +328,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                 List<BasicCarpartsProductDTO> basicCarpartsProductList = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOList, BasicCarpartsProductDTO.class).getData();
                 Optional.ofNullable(basicCarpartsProductList).ifPresent(a ->{
                     Map<String, BasicCarpartsProductDTO> basicCarpartsProductDTOMap = a.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, b -> b, (k1, k2) -> k1));
-                    queryAllocateapplyDetailDTOS.stream().forEach(c -> {
+                    queryAllocateapplyDetailDTOS.forEach(c -> {
                         BasicCarpartsProductDTO basicCarpartsProductDTO = basicCarpartsProductDTOMap.get(c.getProductNo());
                         if (basicCarpartsProductDTO != null) {
                             c.setProductName(basicCarpartsProductDTO.getCarpartsName());

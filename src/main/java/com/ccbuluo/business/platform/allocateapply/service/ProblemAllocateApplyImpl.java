@@ -15,6 +15,10 @@ import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dto.StockDetailDTO;
+import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
+import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
+import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
+import com.ccbuluo.business.platform.supplier.dto.QuerySupplierInfoDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.BusinessUser;
 import com.ccbuluo.core.entity.Organization;
@@ -76,7 +80,10 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
     private BarterStockInOutCallBack barterStockInOutCallBack;
     @Autowired
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
-
+    @Resource
+    private BizServiceStorehouseDao bizServiceStorehouseDao;
+    @Resource
+    private BizServiceSupplierDao bizServiceSupplierDao;
     /**
      * 问题件申请列表
      *   @param type 物料或是零配件
@@ -232,6 +239,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         }
         // 计算成本价格
         convertCostPrice(allocateApplyDTO);
+
         return allocateApplyDTO;
     }
     /**
@@ -254,6 +262,20 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             allocateApplyDTO.setInstockTime(info.getInstockTime());// 入库时间
             allocateApplyDTO.setTransportorderNo(info.getTransportorderNo());// 物流单号
             allocateApplyDTO.setTotalPrice(info.getTotalPrice());
+        }
+
+        // 设置入库仓库名称
+        List<QueryStorehouseDTO> queryStorehouseDTOList = bizServiceStorehouseDao.queryByCode(List.of(allocateApplyDTO.getInRepositoryNo()));
+        if(queryStorehouseDTOList != null && queryStorehouseDTOList.size() > 0){
+            QueryStorehouseDTO queryStorehouseDTO = queryStorehouseDTOList.get(0);
+            String storehouseName = queryStorehouseDTO.getStorehouseName();
+            allocateApplyDTO.setInRepositoryName(storehouseName);
+        }
+        // 设置完成时间
+        if(!allocateApplyDTO.getApplyStatus().equals(BizAllocateApply.ReturnApplyStatusEnum.REPLACECOMPLETED.name())
+            || !allocateApplyDTO.getApplyStatus().equals(BizAllocateApply.ReturnApplyStatusEnum.REFUNDCOMPLETED.name())) {
+            // 状态没有完成，时间为空
+            allocateApplyDTO.setOperateTime(null);
         }
         // 计算成本价格
         convertCostPrice(allocateApplyDTO);

@@ -172,7 +172,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     public FindAllocateApplyDTO findDetail(String applyNo) {
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.process_memo,a.process_orgtype,a.process_orgno,a.apply_type,a.apply_no,a.applyorg_no,a.apply_status,a.applyer_name,b.storehouse_name,b.storehouse_address, ")
-            .append(" a.create_time,a.process_type,b.servicecenter_code as 'instockOrgno',a.outstock_orgno,a.in_repository_no as 'inRepositoryNo',a.refund_address,a.remark ")
+            .append(" a.create_time,a.process_type,b.servicecenter_code as 'instockOrgno',a.outstock_orgno,a.in_repository_no as 'inRepositoryNo',a.refund_address,a.remark,UNIX_TIMESTAMP(a.operate_time) * 1000 as 'operateTime' ")
             .append(" FROM biz_allocate_apply a LEFT JOIN biz_service_storehouse b ON a.in_repository_no = b.storehouse_code ")
             .append(" WHERE a.apply_no = :applyNo ");
         HashMap<String, Object> map = Maps.newHashMap();
@@ -189,7 +189,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     public List<QueryAllocateapplyDetailDTO> queryAllocateapplyDetail(String applyNo) {
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.id,a.apply_no,a.product_no,a.product_type,a.product_categoryname, ")
-            .append("  a.apply_num,a.unit,a.sell_price,a.cost_price,a.supplier_no,b.supplier_name,c.equip_name as 'productName' ")
+            .append("  a.apply_num,a.unit,a.sell_price,a.cost_price,a.supplier_no,b.supplier_name,c.equip_name as 'productName', CONCAT(b.province_name,b.city_name,b.area_name,b.supplier_address) AS 'address' ")
             .append("  FROM biz_allocateapply_detail a LEFT JOIN  biz_service_supplier b ON a.supplier_no = b.supplier_code ")
             .append("  LEFT JOIN biz_service_equipment c ON a.product_no = c.equip_code  ")
             .append(" WHERE a.delete_flag = :deleteFlag AND a.apply_no = :applyNo");

@@ -72,7 +72,19 @@ public class QueryAllocateapplyDetailDTO {
      */
     @ApiModelProperty(name = "supplierName", value = "供应商的名称")
     private String supplierName;
+    /**
+     * 供应商的地址
+     */
+    @ApiModelProperty(name = "address", value = "供应商的地址")
+    private String address;
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
     public Double getTotalPrice(){
         if(sellPrice != null){

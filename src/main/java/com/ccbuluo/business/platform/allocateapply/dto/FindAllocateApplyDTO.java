@@ -71,6 +71,12 @@ public class FindAllocateApplyDTO {
     @ApiModelProperty(name = "inRepositoryNo", value = "入库仓库编号")
     private String inRepositoryNo;
 
+    /**
+     * 入库仓库名称
+     */
+    @ApiModelProperty(name = "inRepositoryName", value = "入库仓库名称")
+    private String inRepositoryName;
+
 
     /**
      * 入库组织架构
@@ -178,7 +184,25 @@ public class FindAllocateApplyDTO {
     @ApiModelProperty(name = "processMemo", value = "驳回理由", hidden = true)
     private String processMemo;
 
+    @ApiModelProperty(name = "operateTime", value = "操作时间", hidden = true)
+    private Long operateTime;
 
+
+    public Long getOperateTime() {
+        return operateTime;
+    }
+
+    public void setOperateTime(Long operateTime) {
+        this.operateTime = operateTime;
+    }
+
+    public String getInRepositoryName() {
+        return inRepositoryName;
+    }
+
+    public void setInRepositoryName(String inRepositoryName) {
+        this.inRepositoryName = inRepositoryName;
+    }
 
     public String getOutstockOrgType() {
         return outstockOrgType;
