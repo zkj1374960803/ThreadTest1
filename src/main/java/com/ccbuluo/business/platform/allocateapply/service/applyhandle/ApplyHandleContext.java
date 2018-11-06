@@ -11,7 +11,7 @@ import com.ccbuluo.http.StatusDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 
@@ -38,6 +38,8 @@ public class ApplyHandleContext {
     private BarterApplyHandleStrategy barterApplyHandleStrategy;
     @Resource
     private BizAllocateTradeorderDao bizAllocateTradeorderDao;
+    @Resource
+    private PlatformApplyHandleStrategy platformApplyHandleStrategy;
 
     /**
      * 申请处理
@@ -68,6 +70,12 @@ public class ApplyHandleContext {
                     break;
                 case REFUND:    //  退货
                     handle = refundApplyHandleStrategy;
+                    break;
+                case PLATFORMBARTER:    //  平台调换
+                    handle = platformApplyHandleStrategy;
+                    break;
+                case PLATFORMREFUND:    //  平台退货
+                    handle = platformApplyHandleStrategy;
                     break;
                 default:
                     logger.error(typeEnum.toString() + "出现了未知处理类型！");

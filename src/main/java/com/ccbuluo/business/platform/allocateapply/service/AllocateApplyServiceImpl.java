@@ -231,7 +231,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             || AllocateApplyTypeEnum.REFUND.name().equals(processType)
             || AllocateApplyTypeEnum.PLATFORMBARTER.name().equals(processType)
             || AllocateApplyTypeEnum.PLATFORMREFUND.name().equals(processType)){
-//            applyHandleContext.applyHandle(allocateApplyDTO.getApplyNo());
+            applyHandleContext.applyHandle(allocateApplyDTO.getApplyNo());
         }
 
     }

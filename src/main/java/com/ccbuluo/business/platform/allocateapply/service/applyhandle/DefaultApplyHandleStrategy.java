@@ -316,6 +316,14 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         if(AllocateApplyTypeEnum.REFUND.toString().equals(ba.getApplyType())){
             sellerOrgno =  ba.getApplyorgNo();//  发起申请的机构编号
         }
+        // 平台换货
+        if(AllocateApplyTypeEnum.PLATFORMBARTER.toString().equals(ba.getApplyType())){
+            sellerOrgno =  ba.getApplyorgNo();//  发起申请的机构编号
+        }
+        // 平台退货
+        if(AllocateApplyTypeEnum.PLATFORMREFUND.toString().equals(ba.getApplyType())){
+            sellerOrgno =  ba.getApplyorgNo();//  发起申请的机构编号
+        }
         return sellerOrgno;
     }
 
