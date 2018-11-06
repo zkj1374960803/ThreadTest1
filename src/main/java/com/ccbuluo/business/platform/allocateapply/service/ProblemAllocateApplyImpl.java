@@ -161,7 +161,6 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
      */
     @Override
     public Page<QueryAllocateApplyListDTO> queryProblemHandleList(String type,String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
-        // 如果类型是空的话，全部类型，查询所有的申请数据
         Page<QueryAllocateApplyListDTO> page;
         page = bizAllocateApplyDao.findProblemProcessHandleList(processType, type, applyStatus, applyNo, offset, pageSize);
         List<QueryAllocateApplyListDTO> rows = page.getRows();

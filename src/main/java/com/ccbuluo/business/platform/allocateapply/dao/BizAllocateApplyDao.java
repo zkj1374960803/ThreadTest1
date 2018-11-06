@@ -13,6 +13,7 @@ import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -20,10 +21,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 物料和零配件调拨的申请 dao
@@ -373,8 +371,12 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     public Page<QueryAllocateApplyListDTO> findProblemProcessHandleList(String processType, String productType, String applyStatus, String applyNo, Integer offset, Integer pageSize) {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
+        ArrayList<String> allocateApplyTypeList = Lists.newArrayList();
+        allocateApplyTypeList.add(BizAllocateApply.AllocateApplyTypeEnum.PURCHASE.name());
+        allocateApplyTypeList.add(BizAllocateApply.AllocateApplyTypeEnum.SAMELEVEL.name());
+        map.put("allocateApplyTypeList", allocateApplyTypeList);
         sql.append(" SELECT a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.process_type,a.apply_status,a.in_repository_no,UNIX_TIMESTAMP(a.operate_time) * 1000 as 'operateTime' ")
-                .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE (a.apply_type='REFUND' or a.apply_type='BARTER') ");
+                .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE a.apply_type not in (:allocateApplyTypeList) ");
         if(StringUtils.isNotBlank(processType)){
             map.put("processType", processType);
             sql.append(" AND a.process_type = :processType ");
