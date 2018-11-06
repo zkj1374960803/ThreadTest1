@@ -263,17 +263,19 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             allocateApplyDTO.setTransportorderNo(info.getTransportorderNo());// 物流单号
             allocateApplyDTO.setTotalPrice(info.getTotalPrice());
         }
-
-        // 设置入库仓库名称
-        List<QueryStorehouseDTO> queryStorehouseDTOList = bizServiceStorehouseDao.queryByCode(List.of(allocateApplyDTO.getInRepositoryNo()));
-        if(queryStorehouseDTOList != null && queryStorehouseDTOList.size() > 0){
-            QueryStorehouseDTO queryStorehouseDTO = queryStorehouseDTOList.get(0);
-            String storehouseName = queryStorehouseDTO.getStorehouseName();
-            allocateApplyDTO.setInRepositoryName(storehouseName);
+        String inRepositoryNo = allocateApplyDTO.getInRepositoryNo();
+        if(StringUtils.isNotBlank(inRepositoryNo)){
+            // 设置入库仓库名称
+            List<QueryStorehouseDTO> queryStorehouseDTOList = bizServiceStorehouseDao.queryByCode(List.of(inRepositoryNo));
+            if(queryStorehouseDTOList != null && queryStorehouseDTOList.size() > 0){
+                QueryStorehouseDTO queryStorehouseDTO = queryStorehouseDTOList.get(0);
+                String storehouseName = queryStorehouseDTO.getStorehouseName();
+                allocateApplyDTO.setInRepositoryName(storehouseName);
+            }
         }
         // 设置完成时间
-        if(!allocateApplyDTO.getApplyStatus().equals(BizAllocateApply.ReturnApplyStatusEnum.REPLACECOMPLETED.name())
-            || !allocateApplyDTO.getApplyStatus().equals(BizAllocateApply.ReturnApplyStatusEnum.REFUNDCOMPLETED.name())) {
+        if(!BizAllocateApply.ReturnApplyStatusEnum.REPLACECOMPLETED.name().equals(allocateApplyDTO.getApplyStatus())
+            && !BizAllocateApply.ReturnApplyStatusEnum.REFUNDCOMPLETED.name().equals(allocateApplyDTO.getApplyStatus())) {
             // 状态没有完成，时间为空
             allocateApplyDTO.setOperateTime(null);
         }
