@@ -94,7 +94,7 @@ public class ServiceProblemAllocateApplyController extends BaseController {
     @GetMapping("/problemApplydetail/{applyNo}")
     @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
             public StatusDto<FindAllocateApplyDTO> getProblemdetailApplyDetail(@PathVariable @ValidateNotNull(message = "applyNo(申请applyNo)不能为空") String applyNo){
-        return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.getProblemdetailApplyDetail(applyNo));
+        return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.getProblemdetailDetail(applyNo));
     }
 
 }

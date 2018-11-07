@@ -194,6 +194,20 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         }
         return page;
     }
+
+    /**
+     * 查询退换货申请单详情(申请)
+     *
+     * @param applyNo 申请单号
+     * @return StatusDto
+     * @author weijb
+     * @date 2018-08-20 20:02:58
+     */
+    @Override
+    public FindAllocateApplyDTO getProblemdetailApplyDetail(String applyNo) {
+        return null;
+    }
+
     /**
      *  根据类型查询服务中心的code
      * @param type 机构的类型
@@ -220,33 +234,32 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         }
         return orgCode;
     }
-
-    /**
-     * 查询退换货申请单详情(申请)
-     * @param applyNo 申请单号
-     * @return StatusDto
-     * @author weijb
-     * @date 2018-08-20 20:02:58
-     */
-    @Override
-    public FindAllocateApplyDTO getProblemdetailApplyDetail(String applyNo){
-        FindAllocateApplyDTO allocateApplyDTO = allocateApplyServiceImpl.findDetail(applyNo);
-        // 获取出库人和出库时间
-        ProblemAllocateapplyDetailDTO info = problemAllocateApplyDao.getProblemdetailApplyDetail(applyNo, allocateApplyDTO.getApplyorgNo());
-        if(null != info){
-            String inOperatorName = getUserNameByUuid(info.getInstockOperator());
-            allocateApplyDTO.setOutstockOperatorName(allocateApplyDTO.getApplyerName());// 出库人（自动出库人）
-            allocateApplyDTO.setOutstockTime(allocateApplyDTO.getCreateTime());// 出库时间 （自动出库时间）
-            allocateApplyDTO.setInstockOperatorName(inOperatorName); // 入库人
-            allocateApplyDTO.setInstockTime(info.getInstockTime());// 入库时间
-            allocateApplyDTO.setTransportorderNo(info.getTransportorderNo());// 物流单号
-            allocateApplyDTO.setTotalPrice(info.getTotalPrice());
-        }
-        // 计算成本价格
-        convertCostPrice(allocateApplyDTO);
-
-        return allocateApplyDTO;
-    }
+//
+//    /**
+//     * 查询退换货申请单详情(申请)
+//     * @param applyNo 申请单号
+//     * @return StatusDto
+//     * @author weijb
+//     * @date 2018-08-20 20:02:58
+//     */
+//    @Override
+//    public FindAllocateApplyDTO getProblemdetailApplyDetail(String applyNo){
+//        FindAllocateApplyDTO allocateApplyDTO = allocateApplyServiceImpl.findDetail(applyNo);
+//        // 获取出库人和出库时间
+//        ProblemAllocateapplyDetailDTO info = problemAllocateApplyDao.getProblemdetailApplyDetail(applyNo, allocateApplyDTO.getApplyorgNo());
+//        if(null != info){
+//            String inOperatorName = getUserNameByUuid(info.getInstockOperator());
+//            allocateApplyDTO.setOutstockOperatorName(allocateApplyDTO.getApplyerName());// 出库人（自动出库人）
+//            allocateApplyDTO.setOutstockTime(allocateApplyDTO.getCreateTime());// 出库时间 （自动出库时间）
+//            allocateApplyDTO.setInstockOperatorName(inOperatorName); // 入库人
+//            allocateApplyDTO.setInstockTime(info.getInstockTime());// 入库时间
+//            allocateApplyDTO.setTransportorderNo(info.getTransportorderNo());// 物流单号
+//            allocateApplyDTO.setTotalPrice(info.getTotalPrice());
+//        }
+//        // 计算成本价格
+//        convertCostPrice(allocateApplyDTO);
+//        return allocateApplyDTO;
+//    }
     /**
      * 查询退换货申请单详情（处理）
      * @param applyNo 申请单号
@@ -302,10 +315,8 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
     private void convertCostPrice(FindAllocateApplyDTO allocateApplyDTO){
          List<StockDetailDTO> list = problemStockDetailDao.queryStockDetailListByAppNo(allocateApplyDTO.getApplyorgNo());
         for(QueryAllocateapplyDetailDTO applyDetail : allocateApplyDTO.getQueryAllocateapplyDetailDTO()){
-            Optional<StockDetailDTO> applyFilter = list.stream() .filter(stockDetail -> applyDetail.getProductNo().equals(stockDetail.getProductNo())) .findFirst();
-            if (applyFilter.isPresent()) {
-                applyDetail.setCostPrice(applyFilter.get().getCostPrice());
-            }
+            Optional<StockDetailDTO> applyFilter = list.stream().filter(stockDetail -> applyDetail.getProductNo().equals(stockDetail.getProductNo())).findFirst();
+            applyFilter.ifPresent(stockDetailDTO -> applyDetail.setCostPrice(stockDetailDTO.getCostPrice()));
         }
     }
 
