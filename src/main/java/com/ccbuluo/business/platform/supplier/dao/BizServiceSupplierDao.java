@@ -126,16 +126,19 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
 
     /**
      * 查询供应商的id根据名称
-     * @param supplierName 供应商的名称
+     * @param supplierCode 供应商的code
      * @return List<String> 供应商的ids
      * @author zhangkangjian
      * @date 2018-07-03 15:40:42
      */
-    public List<String> querySupplierIdByName(String supplierName) {
+    public QuerySupplierInfoDTO querySupplierInfoByCode(String supplierCode) {
         HashMap<String, Object> map = Maps.newHashMap();
-        map.put("supplierName", supplierName);
-        String sql = "SELECT a.id FROM biz_service_supplier a WHERE a.supplier_name = :supplierName ";
-        return querySingColum(String.class, sql, map);
+        map.put("supplierCode", supplierCode);
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT a.supplier_name AS 'supplierName', ")
+            .append(" CONCAT(b.province_name,b.city_name,b.area_name,b.supplier_address) AS 'address' ")
+            .append(" FROM biz_service_supplier a WHERE a.supplier_code = :supplierCode ");
+        return findForBean(QuerySupplierInfoDTO.class, sql.toString(), map);
     }
     /**
      * 查询ids

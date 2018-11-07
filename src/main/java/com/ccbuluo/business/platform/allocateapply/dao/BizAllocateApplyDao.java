@@ -13,6 +13,7 @@ import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -20,10 +21,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 物料和零配件调拨的申请 dao
@@ -174,7 +172,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     public FindAllocateApplyDTO findDetail(String applyNo) {
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.process_memo,a.process_orgtype,a.process_orgno,a.apply_type,a.apply_no,a.applyorg_no,a.apply_status,a.applyer_name,b.storehouse_name,b.storehouse_address, ")
-            .append(" a.create_time,a.process_type,b.servicecenter_code as 'instockOrgno',a.outstock_orgno,a.in_repository_no as 'inRepositoryNo',a.refund_address,a.remark ")
+            .append(" a.create_time,a.process_type,b.servicecenter_code as 'instockOrgno',a.outstock_orgno,a.in_repository_no as 'inRepositoryNo',a.refund_address,a.remark,UNIX_TIMESTAMP(a.operate_time) * 1000 as 'operateTime' ")
             .append(" FROM biz_allocate_apply a LEFT JOIN biz_service_storehouse b ON a.in_repository_no = b.storehouse_code ")
             .append(" WHERE a.apply_no = :applyNo ");
         HashMap<String, Object> map = Maps.newHashMap();
@@ -191,7 +189,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     public List<QueryAllocateapplyDetailDTO> queryAllocateapplyDetail(String applyNo) {
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.id,a.apply_no,a.product_no,a.product_type,a.product_categoryname, ")
-            .append("  a.apply_num,a.unit,a.sell_price,a.cost_price,a.supplier_no,b.supplier_name,c.equip_name as 'productName' ")
+            .append("  a.apply_num,a.unit,a.sell_price,a.cost_price,a.supplier_no,b.supplier_name,c.equip_name as 'productName', CONCAT(b.province_name,b.city_name,b.area_name,b.supplier_address) AS 'address' ")
             .append("  FROM biz_allocateapply_detail a LEFT JOIN  biz_service_supplier b ON a.supplier_no = b.supplier_code ")
             .append("  LEFT JOIN biz_service_equipment c ON a.product_no = c.equip_code  ")
             .append(" WHERE a.delete_flag = :deleteFlag AND a.apply_no = :applyNo");
@@ -373,8 +371,12 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
     public Page<QueryAllocateApplyListDTO> findProblemProcessHandleList(String processType, String productType, String applyStatus, String applyNo, Integer offset, Integer pageSize) {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
+        ArrayList<String> allocateApplyTypeList = Lists.newArrayList();
+        allocateApplyTypeList.add(BizAllocateApply.AllocateApplyTypeEnum.PURCHASE.name());
+        allocateApplyTypeList.add(BizAllocateApply.AllocateApplyTypeEnum.SAMELEVEL.name());
+        map.put("allocateApplyTypeList", allocateApplyTypeList);
         sql.append(" SELECT a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.process_type,a.apply_status,a.in_repository_no,UNIX_TIMESTAMP(a.operate_time) * 1000 as 'operateTime' ")
-                .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE (a.apply_type='REFUND' or a.apply_type='BARTER') ");
+                .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE a.apply_type not in (:allocateApplyTypeList) ");
         if(StringUtils.isNotBlank(processType)){
             map.put("processType", processType);
             sql.append(" AND a.process_type = :processType ");
@@ -770,5 +772,22 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         sql.append(" GROUP BY a.supplier_no ");
         return queryListBean(QuerySupplierInfoDTO.class, sql.toString(), param);
 
+    }
+
+    /**
+     * 根据申请单号更改申请类型
+     * @param applyNo 申请单号
+     * @param applyType 申请类型
+     * @author liuduo
+     * @date 2018-11-07 13:37:21
+     */
+    public void updateApplyType(String applyNo, String applyType) {
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("applyNo", applyNo);
+        param.put("applyType", applyType);
+
+        String sql = "UPDATE biz_allocate_apply SET apply_type = :applyType WHERE apply_no = :applyNo";
+
+        updateForMap(sql, param);
     }
 }

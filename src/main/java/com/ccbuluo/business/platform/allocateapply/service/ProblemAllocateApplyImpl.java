@@ -10,11 +10,17 @@ import com.ccbuluo.business.platform.allocateapply.dao.ProblemAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.BarterApplyHandleStrategy;
 import com.ccbuluo.business.platform.allocateapply.service.applyhandle.RefundApplyHandleStrategy;
+import com.ccbuluo.business.platform.instock.dao.BizInstockOrderDao;
+import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
 import com.ccbuluo.business.platform.order.service.fifohandle.BarterStockInOutCallBack;
 import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dto.StockDetailDTO;
+import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
+import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
+import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
+import com.ccbuluo.business.platform.supplier.dto.QuerySupplierInfoDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.BusinessUser;
 import com.ccbuluo.core.entity.Organization;
@@ -76,7 +82,13 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
     private BarterStockInOutCallBack barterStockInOutCallBack;
     @Autowired
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
+    @Resource
+    private BizServiceStorehouseDao bizServiceStorehouseDao;
+    @Resource
+    private BizServiceSupplierDao bizServiceSupplierDao;
 
+    @Resource
+    private BizInstockOrderDao bizInstockOrderDao;
     /**
      * 问题件申请列表
      *   @param type 物料或是零配件
@@ -161,7 +173,6 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
      */
     @Override
     public Page<QueryAllocateApplyListDTO> queryProblemHandleList(String type,String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
-        // 如果类型是空的话，全部类型，查询所有的申请数据
         Page<QueryAllocateApplyListDTO> page;
         page = bizAllocateApplyDao.findProblemProcessHandleList(processType, type, applyStatus, applyNo, offset, pageSize);
         List<QueryAllocateApplyListDTO> rows = page.getRows();
@@ -233,6 +244,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         }
         // 计算成本价格
         convertCostPrice(allocateApplyDTO);
+
         return allocateApplyDTO;
     }
     /**
@@ -255,6 +267,25 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             allocateApplyDTO.setInstockTime(info.getInstockTime());// 入库时间
             allocateApplyDTO.setTransportorderNo(info.getTransportorderNo());// 物流单号
             allocateApplyDTO.setTotalPrice(info.getTotalPrice());
+        }
+
+        QueryStorehouseDTO queryStorehouseDTO = bizServiceStorehouseDao.queryQueryStorehouseDTOByCode(allocateApplyDTO.getInRepositoryNo());
+        if(queryStorehouseDTO != null){
+            allocateApplyDTO.setInRepositoryName(queryStorehouseDTO.getStorehouseName());
+        }
+        // 设置完成时间
+        if(!BizAllocateApply.ReturnApplyStatusEnum.REPLACECOMPLETED.name().equals(allocateApplyDTO.getApplyStatus())
+            && !BizAllocateApply.ReturnApplyStatusEnum.REFUNDCOMPLETED.name().equals(allocateApplyDTO.getApplyStatus())) {
+            // 状态没有完成，时间为空
+            allocateApplyDTO.setOperateTime(null);
+        }
+        // 根据申请单号查询入库单号
+        BizInstockOrderDTO instockOrderDTO = bizInstockOrderDao.getByTradeDocno(applyNo);
+        if(instockOrderDTO != null){
+            QueryStorehouseDTO queryStorehouse = bizServiceStorehouseDao.queryQueryStorehouseDTOByCode(instockOrderDTO.getInRepositoryNo());
+            if(queryStorehouse != null){
+                allocateApplyDTO.setPlatformInRepositoryName(queryStorehouse.getStorehouseName());
+            }
         }
         // 计算成本价格
         convertCostPrice(allocateApplyDTO);

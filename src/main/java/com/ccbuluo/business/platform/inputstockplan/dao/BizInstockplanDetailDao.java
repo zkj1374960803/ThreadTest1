@@ -352,7 +352,7 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
         params.put("applyNo", applyNo);
         params.put("deleteFlag", Constants.DELETE_FLAG_DELETE);
 
-        String sql = "UPDATE biz_instockplan_detail SET delete_flag = :deleteFlag WHERE apply_no = :applyNo";
+        String sql = "UPDATE biz_instockplan_detail SET delete_flag = :deleteFlag WHERE trade_no = :applyNo";
 
         updateForMap(sql, params);
     }

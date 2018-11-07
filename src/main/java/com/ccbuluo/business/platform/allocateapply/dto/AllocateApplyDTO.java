@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.allocateapply.dto;
 
 import com.ccbuluo.business.constants.MyGroup;
 import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.annotation.validate.ValidatePattern;
 import com.ccbuluo.core.validate.Group;
 import io.swagger.annotations.ApiModel;
@@ -84,7 +85,7 @@ public class AllocateApplyDTO {
     /**
      * 平台决定的处理类型：调拨、采购
      */
-    @ValidatePattern(regexp = {"TRANSFER", "PURCHASE", "BARTER", "REFUND"}, groups = MyGroup.Add.class)
+    @ValidateNotNull
     @ApiModelProperty(name = "processType", value = "平台决定的处理类型(注：TRANSFER调拨、PURCHASE采购、BARTER调换、REFUND退款)")
     private String processType;
     /**

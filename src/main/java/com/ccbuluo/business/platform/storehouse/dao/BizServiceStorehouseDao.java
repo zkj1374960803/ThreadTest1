@@ -289,4 +289,20 @@ public class BizServiceStorehouseDao extends BaseDao<BizServiceStorehouse> {
 
         return queryListBean(QueryStorehouseDTO.class, sql.toString(), param);
     }
+
+    /**
+     * 根据仓库code查询仓库信息
+     * @param codes 仓库code
+     * @return 仓库信息
+     * @author liuduo
+     * @date 2018-08-13 11:58:35
+     */
+    public QueryStorehouseDTO queryQueryStorehouseDTOByCode(String codes) {
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("codes", codes);
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT storehouse_code,storehouse_name FROM biz_service_storehouse ")
+            .append(" WHERE storehouse_code = :codes");
+        return findForBean(QueryStorehouseDTO.class, sql.toString(), param);
+    }
 }
