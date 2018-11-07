@@ -725,13 +725,19 @@ public class PaymentServiceImpl implements PaymentService {
      * @date 2018-11-02 11:44:10
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public StatusDto platformRefund(String applyNo, BigDecimal actualAmount) {
-        // TODO 平台需要给自己退款充钱，目前这个功能等待财务系统提供  刘铎
-        // 更改申请单状态为 REFUNDCOMPLETED  退款完成
-        bizAllocateApplyDao.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REFUNDCOMPLETED.name());
-        // 删除入库计划
-        inputStockPlanService.deleteInStockPlan(applyNo);
-        return StatusDto.buildSuccessStatusDto();
+        try {
+            // TODO 平台需要给自己退款充钱，目前这个功能等待财务系统提供  刘铎
+            // 更改申请单状态为 REFUNDCOMPLETED  退款完成
+            bizAllocateApplyDao.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REFUNDCOMPLETED.name());
+            // 删除入库计划
+            inputStockPlanService.deleteInStockPlan(applyNo);
+            return StatusDto.buildSuccessStatusDto();
+        } catch (Exception e) {
+            logger.error("退款失败", e);
+            throw e;
+        }
     }
 
     private String getSupplierName(String supplierCode){

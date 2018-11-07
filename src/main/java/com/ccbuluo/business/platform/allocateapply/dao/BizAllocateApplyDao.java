@@ -773,4 +773,21 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         return queryListBean(QuerySupplierInfoDTO.class, sql.toString(), param);
 
     }
+
+    /**
+     * 根据申请单号更改申请类型
+     * @param applyNo 申请单号
+     * @param applyType 申请类型
+     * @author liuduo
+     * @date 2018-11-07 13:37:21
+     */
+    public void updateApplyType(String applyNo, String applyType) {
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("applyNo", applyNo);
+        param.put("applyType", applyType);
+
+        String sql = "UPDATE biz_allocate_apply SET apply_type = :applyType WHERE apply_no = :applyNo";
+
+        updateForMap(sql, param);
+    }
 }
