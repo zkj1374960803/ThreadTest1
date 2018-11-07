@@ -225,7 +225,7 @@ public class PaymentServiceImpl implements PaymentService {
                 throw new CommonException("0", "无效的申请单！");
             }
             // 更新交易单信息
-            applyHandleContext.updateTradeorderInfo(applyNo, refundPrice);
+            applyHandleContext.updateTradeorderInfo(applyNo, actualAmount);
             // 删除入库计划
             inputStockPlanService.deleteInStockPlan(applyNo);
             // 支付成功之后，如果是采购，则状态为平台待入库
