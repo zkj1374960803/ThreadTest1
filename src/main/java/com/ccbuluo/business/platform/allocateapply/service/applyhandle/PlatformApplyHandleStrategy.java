@@ -90,6 +90,8 @@ public class PlatformApplyHandleStrategy extends DefaultApplyHandleStrategy {
 
             // 批量保存入库计划详情
             bizInstockplanDetailDao.batchInsertInstockplanDetail(pir.getRight());
+            // 调用自动出库
+            outstockOrderService.autoSaveOutstockOrder(applyNo, pir.getLeft(),ApplyTypeEnum.APPLYORDER.name());
         } catch (Exception e) {
             logger.error("提交失败！", e);
             throw e;
