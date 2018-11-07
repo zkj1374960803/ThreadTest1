@@ -247,7 +247,8 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
         BizAllocateApply apply = bizAllocateApplyDao.getByNo(applyNo);
         // 1、判断要修改为的类型是什么
         // 如果要修改为退款，说明目前是换货
-        if (BizAllocateApply.AllocateApplyTypeEnum.PLATFORMREFUND.name().equals(recedeType)) {
+        if (BizAllocateApply.AllocateApplyTypeEnum.PLATFORMREFUND.name().equals(recedeType)
+            || BizAllocateApply.AllocateApplyTypeEnum.REFUND.name().equals(recedeType) ) {
             //　更改申请单申请类型
             if (apply.getApplyorgNo().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
                 bizAllocateApplyDao.updateApplyType(applyNo, BizAllocateApply.AllocateApplyTypeEnum.PLATFORMREFUND.name());
