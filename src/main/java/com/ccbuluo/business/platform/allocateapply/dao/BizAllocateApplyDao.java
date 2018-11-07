@@ -786,7 +786,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         param.put("applyNo", applyNo);
         param.put("applyType", applyType);
 
-        String sql = "UPDATE biz_stock_detail SET apply_type = :applyType WHERE apply_no = :applyNo";
+        String sql = "UPDATE biz_allocate_apply SET apply_type = :applyType WHERE apply_no = :applyNo";
 
         updateForMap(sql, param);
     }
