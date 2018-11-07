@@ -243,14 +243,13 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
      */
     @Override
     public StatusDto problemHandle(String applyNo, String recedeType) {
-        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         // 查询申请单的申请机构, 并判断修改的是平台还是机构
         BizAllocateApply apply = bizAllocateApplyDao.getByNo(applyNo);
         // 1、判断要修改为的类型是什么
         // 如果要修改为退款，说明目前是换货
         if (BizAllocateApply.AllocateApplyTypeEnum.PLATFORMREFUND.name().equals(recedeType)) {
             //　更改申请单申请类型
-            if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+            if (apply.getApplyorgNo().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
                 bizAllocateApplyDao.updateApplyType(applyNo, BizAllocateApply.AllocateApplyTypeEnum.PLATFORMREFUND.name());
             } else {
                 bizAllocateApplyDao.updateApplyType(applyNo, BizAllocateApply.AllocateApplyTypeEnum.REFUND.name());
@@ -263,7 +262,7 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
            return StatusDto.buildSuccessStatusDto();
         }
         //　更改申请单申请类型
-        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+        if (apply.getApplyorgNo().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
             bizAllocateApplyDao.updateApplyType(applyNo, BizAllocateApply.AllocateApplyTypeEnum.PLATFORMBARTER.name());
         } else {
             bizAllocateApplyDao.updateApplyType(applyNo, BizAllocateApply.AllocateApplyTypeEnum.BARTER.name());
