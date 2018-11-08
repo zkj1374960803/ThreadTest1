@@ -118,4 +118,12 @@ public interface StockDetailService {
      */
     void updateAdjustValidStock(List<BizStockDetail> bizStockDetailList1);
 
+    /**
+     * 修改问题件库存数量
+     * @param bizStockDetails 库存
+     * @author liuduo
+     * @date 2018-11-07 17:08:46
+     */
+    void updateProblemStock(List<BizStockDetail> bizStockDetails);
+
 }

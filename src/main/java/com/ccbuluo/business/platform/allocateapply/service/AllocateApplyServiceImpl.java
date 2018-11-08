@@ -247,11 +247,14 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         List<AllocateapplyDetailDTO> allocateapplyDetailList = allocateApplyDTO.getAllocateapplyDetailList();
         // 过滤掉申请数量小于零的
         List<AllocateapplyDetailDTO> filterAllocateapply = allocateapplyDetailList.stream().filter(dto -> dto.getApplyNum() > 0).collect(Collectors.toList());
-        filterAllocateapply.stream().forEach(a -> {
+        filterAllocateapply.forEach(a -> {
             a.setApplyNo(allocateApplyDTO.getApplyNo());
             a.setOperator(loggedUserId);
             a.setCreator(loggedUserId);
-            if(AllocateApplyTypeEnum.BARTER.name().equals(processType) || AllocateApplyTypeEnum.REFUND.name().equals(processType)){
+            if(AllocateApplyTypeEnum.BARTER.name().equals(processType)
+                || AllocateApplyTypeEnum.REFUND.name().equals(processType)
+                || AllocateApplyTypeEnum.PLATFORMBARTER.name().equals(processType)
+                || AllocateApplyTypeEnum.PLATFORMREFUND.name().equals(processType)){
                 a.setStockType(BizStockDetail.StockTypeEnum.PROBLEMSTOCK.name());
             }else {
                 a.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());

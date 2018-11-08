@@ -39,7 +39,9 @@ public class ApplyHandleContext {
     @Resource
     private BizAllocateTradeorderDao bizAllocateTradeorderDao;
     @Resource
-    private PlatformApplyHandleStrategy platformApplyHandleStrategy;
+    private PlatformBarterApplyHandleStrategy platformBarterApplyHandleStrategy;
+    @Resource
+    private PlatformRefundApplyHandleStrategy platformRefundApplyHandleStrategy;
 
     /**
      * 申请处理
@@ -72,10 +74,10 @@ public class ApplyHandleContext {
                     handle = refundApplyHandleStrategy;
                     break;
                 case PLATFORMBARTER:    //  平台调换
-                    handle = platformApplyHandleStrategy;
+                    handle = platformBarterApplyHandleStrategy;
                     break;
                 case PLATFORMREFUND:    //  平台退货
-                    handle = platformApplyHandleStrategy;
+                    handle = platformRefundApplyHandleStrategy;
                     break;
                 default:
                     logger.error(typeEnum.toString() + "出现了未知处理类型！");

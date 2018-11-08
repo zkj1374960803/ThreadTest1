@@ -184,7 +184,7 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         ProblemStockBizStockDetailDTO psd = problemStockDetailDao.getProblemStockDetail(id);
         // 查询本机构下面，本条记录所对应的商品的所有问题库存列表
-        psd.setProblemDetailList(problemStockDetailDao.queryProblemStockBizStockList("", psd.getProductNo()));
+        psd.setProblemDetailList(problemStockDetailDao.queryProblemStockBizStockList(orgCode, psd.getProductNo()));
         computerProblemProductCount(psd);
         return psd;
     }
@@ -220,7 +220,7 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
         for (Map.Entry<String, List<StockDetailDTO>> entry : collect1.entrySet()) {
             List<StockDetailDTO> value = entry.getValue();
             StockDetailDTO stockDetailDTO1 = value.get(0);
-            long count = value.stream().map(item -> item.getProblemStock()).count();
+            long count = value.stream().map(item -> item.getProblemStock()).reduce((sum,item) -> sum + item).get();
             StockDetailDTO stockDetailDTO = new StockDetailDTO();
             stockDetailDTO.setOrgType(stockDetailDTO1.getOrgType());
             stockDetailDTO.setOrgName(stockDetailDTO1.getOrgName());
@@ -243,14 +243,14 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
      */
     @Override
     public StatusDto problemHandle(String applyNo, String recedeType) {
-        String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         // 查询申请单的申请机构, 并判断修改的是平台还是机构
         BizAllocateApply apply = bizAllocateApplyDao.getByNo(applyNo);
         // 1、判断要修改为的类型是什么
         // 如果要修改为退款，说明目前是换货
-        if (BizAllocateApply.AllocateApplyTypeEnum.PLATFORMREFUND.name().equals(recedeType)) {
+        if (BizAllocateApply.AllocateApplyTypeEnum.PLATFORMREFUND.name().equals(recedeType)
+            || BizAllocateApply.AllocateApplyTypeEnum.REFUND.name().equals(recedeType) ) {
             //　更改申请单申请类型
-            if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+            if (apply.getApplyorgNo().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
                 bizAllocateApplyDao.updateApplyType(applyNo, BizAllocateApply.AllocateApplyTypeEnum.PLATFORMREFUND.name());
             } else {
                 bizAllocateApplyDao.updateApplyType(applyNo, BizAllocateApply.AllocateApplyTypeEnum.REFUND.name());
@@ -263,7 +263,7 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
            return StatusDto.buildSuccessStatusDto();
         }
         //　更改申请单申请类型
-        if (orgCode.equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+        if (apply.getApplyorgNo().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
             bizAllocateApplyDao.updateApplyType(applyNo, BizAllocateApply.AllocateApplyTypeEnum.PLATFORMBARTER.name());
         } else {
             bizAllocateApplyDao.updateApplyType(applyNo, BizAllocateApply.AllocateApplyTypeEnum.BARTER.name());
@@ -271,11 +271,12 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
 
         // 要修改为换货，说明目前是退款
         // 如果修改的是平台，则直接修改申请单为 -等待入库
-        if (apply.getOutstockOrgno().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+        if (apply.getApplyorgNo().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
             allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REPLACEWAITIN.name());
+        } else {
+            //　不是平台，修改申请单类型为  等待出库
+            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.PLATFORMOUTBOUND.name());
         }
-        //　不是平台，修改申请单类型为  等待出库
-        allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.PLATFORMOUTBOUND.name());
         return StatusDto.buildSuccessStatusDto();
     }
 }

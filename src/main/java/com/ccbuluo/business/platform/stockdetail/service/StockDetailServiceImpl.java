@@ -162,5 +162,16 @@ public class StockDetailServiceImpl implements StockDetailService{
         bizStockDetailDao.updateAdjustValidStock(bizStockDetailList1);
     }
 
+    /**
+     * 修改问题件库存数量
+     * @param bizStockDetails 库存
+     * @author liuduo
+     * @date 2018-11-07 17:08:46
+     */
+    @Override
+    public void updateProblemStock(List<BizStockDetail> bizStockDetails) {
+        bizStockDetailDao.updateProblemStock(bizStockDetails);
+    }
+
 
 }

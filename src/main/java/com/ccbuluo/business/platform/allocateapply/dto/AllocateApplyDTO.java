@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.allocateapply.dto;
 
 import com.ccbuluo.business.constants.MyGroup;
+import com.ccbuluo.core.annotation.validate.ValidateLength;
 import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
 import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.annotation.validate.ValidatePattern;
@@ -127,6 +128,7 @@ public class AllocateApplyDTO {
     /**
      * 货物退回的地址
      */
+    @ValidateLength(min = 0, max = 50, groups = MyGroup.Add.class, excludeNull = true)
     @ApiModelProperty(name = "refundAddress", value = "货物退回的地址")
     private String refundAddress;
 

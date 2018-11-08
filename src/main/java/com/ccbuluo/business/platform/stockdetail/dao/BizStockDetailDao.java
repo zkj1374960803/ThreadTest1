@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.stockdetail.dao;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.adjust.dto.StockAdjustListDTO;
+import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
 import com.ccbuluo.business.platform.outstock.dto.ProductStockDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.FindBatchStockListDTO;
@@ -680,5 +681,19 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         String sql = "UPDATE biz_stock_detail SET valid_stock = :validStock,occupy_stock = :occupyStock  WHERE id = :id";
 
         batchUpdateForListBean(sql, bizStockDetailLists);
+    }
+
+    /**
+     * 修改问题件库存数量
+     * @param bizStockDetails 库存
+     * @author liuduo
+     * @date 2018-11-07 17:08:46
+     */
+    public void updateProblemStock(List<BizStockDetail> bizStockDetails) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE biz_stock_detail SET problem_stock = IFNULL(problem_stock,0) - IFNULL(:problemStock,0),version_no = version_no+1,")
+            .append(" operator = :operator,operate_time = :operateTime WHERE id = :id AND :versionNo > version_no");
+
+        batchUpdateForListBean(sql.toString(), bizStockDetails);
     }
 }

@@ -176,7 +176,35 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
         problemOutstockplanPurchaser(outList,relOrdstockOccupies,stockDetails,details);
         // 平台入库
         instockplanPlatform(inList,outList,details);
+        // 申请方入库（换货：买方机构的入库要以出库的数据来构建（不同批次，不同价格）（问题件库存））
+        problemInstockplanPurchaser(inList,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
         return Pair.of(outList, inList);
+    }
+
+
+    /**
+     * 申请方入库
+     * @param details 申请详细
+     * @param applyType 申请类型
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    public void problemInstockplanPurchaser(List<BizInstockplanDetail> inList, List<AllocateapplyDetailBO> details, String applyType){
+        // 买入方入库计划
+        for(AllocateapplyDetailBO ad : details){
+            BizInstockplanDetail instockplanPurchaser = new BizInstockplanDetail();
+            instockplanPurchaser = buildBizInstockplanDetail(ad);
+            // 交易类型
+            instockplanPurchaser.setInstockType(InstockTypeEnum.BARTER.toString());
+            // 库存类型 （问题件申请机构入库的时候应该是有效库存）
+            instockplanPurchaser.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
+            // 成本价(退货和换货的成本价是零)
+            instockplanPurchaser.setCostPrice(BigDecimal.ZERO);
+            instockplanPurchaser.setInstockRepositoryNo(ad.getInRepositoryNo());// 入库仓库编号
+            instockplanPurchaser.setInstockOrgno(ad.getApplyorgNo());// 申请方入机构编号
+            instockplanPurchaser.setCompleteStatus(StockPlanStatusEnum.DOING.toString());// 完成状态（未生效）
+            inList.add(instockplanPurchaser);
+        }
     }
 
     /**
