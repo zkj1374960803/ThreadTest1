@@ -318,4 +318,25 @@ public class BizAllocateTradeorderDao extends BaseDao<BizAllocateTradeorder> {
 
         return queryListBean(RelOrdstockOccupy.class, sql.toString(), params);
     }
+
+    /**
+     *
+     * @param applyNo 申请单号
+     * @return 交易单
+     * @author liuduo
+     * @date 2018-11-08 15:52:12
+     */
+    public BizAllocateTradeorder getByApplyNo(String applyNo) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("applyNo", applyNo);
+        params.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT id,order_no,apply_no,purchaser_orgno,seller_orgno,")
+            .append("order_status,total_price,payer,pay_method,payed_time,creator,")
+            .append("create_time,operator,operate_time,delete_flag,remark,perpay_amount")
+            .append(" FROM biz_allocate_tradeorder WHERE apply_no= :applyNo AND delete_flag = :deleteFlag");
+
+        return findForBean(BizAllocateTradeorder.class, sql.toString(), params);
+    }
 }

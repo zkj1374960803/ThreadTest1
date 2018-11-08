@@ -13,7 +13,7 @@ import java.util.Date;
  * @version V1.0.0
  */
 @ApiModel(value = "调拨申请交易订单实体", description = "调拨申请交易订单")
-public class BizAllocateTradeorder {
+public class BizAllocateTradeorder extends AftersaleCommonEntity{
     /**
      * 
      */

@@ -38,7 +38,7 @@ public interface PaymentService {
     StatusDto samelevelPayment(String applyNo);
 
     /**
-     *  支付完成调用接口（退货）
+     *  平台退款给机构调用
      * @param applyNo 申请单号
      * @return StatusDto
      * @author weijb
