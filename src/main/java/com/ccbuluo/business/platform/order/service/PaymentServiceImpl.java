@@ -228,11 +228,7 @@ public class PaymentServiceImpl implements PaymentService {
             applyHandleContext.updateTradeorderInfo(applyNo, actualAmount);
             // 删除入库计划
             inputStockPlanService.deleteInStockPlan(applyNo);
-            // 支付成功之后，如果是采购，则状态为平台待入库
-            if(ba.getApplyType().equals(BizAllocateApply.AllocateApplyTypeEnum.PURCHASE.name())){
-                // 等待收货
-                status = BizAllocateApply.ApplyStatusEnum.WAITINGRECEIPT.name();
-            }
+
             // 商品类型
             String productType = details.get(0).getProductType();
             if(null == actualAmount){
@@ -245,7 +241,7 @@ public class PaymentServiceImpl implements PaymentService {
             // 如果支付成功
             if(statusDto.isSuccess()){
                 //更新申请单状态
-                bizAllocateApplyDao.updateApplyOrderStatus(applyNo, status);
+                bizAllocateApplyDao.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REFUNDCOMPLETED.name());
                 // 更新订单状态
                 bizAllocateTradeorderDao.updateTradeorderStatus(applyNo,OrderStatusEnum.PAYMENTCOMPLETION.name());
                 // 如果是调拨，要更改卖方出库计划状态
