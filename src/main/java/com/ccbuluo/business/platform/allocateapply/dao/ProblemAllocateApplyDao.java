@@ -145,7 +145,7 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         param.put("applyNo", applyNo);
         StringBuilder sql = new StringBuilder();
 
-        sql.append("SELECT t1.id,t1.apply_no,t1.apply_type,t1.apply_status ,t3.instock_time,t3.instock_operator,bat.total_price")
+        sql.append("SELECT t1.id,t1.apply_no,t1.apply_type,t1.apply_status ,t3.instock_time,t3.transportorder_no,t3.instock_operator,bat.total_price")
                 .append(" FROM biz_allocate_apply t1 LEFT JOIN biz_instock_order t3 on t1.apply_no=t3.trade_docno and t3.instock_orgno = :orgCode ")
                 .append(" LEFT JOIN biz_allocate_tradeorder bat on t1.apply_no=bat.apply_no")
                 .append(" WHERE t1.delete_flag = :deleteFlag and t1.process_orgno = :orgCode ")
