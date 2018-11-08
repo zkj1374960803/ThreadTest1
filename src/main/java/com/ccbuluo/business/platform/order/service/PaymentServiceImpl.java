@@ -253,6 +253,7 @@ public class PaymentServiceImpl implements PaymentService {
             }
             // 删除入库计划
             inputStockPlanService.deleteInStockPlan(applyNo);
+
             // 商品类型
             String productType = details.get(0).getProductType();
             if(null == actualAmount){
