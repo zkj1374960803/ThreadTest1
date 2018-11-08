@@ -7,12 +7,14 @@ import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,16 +91,15 @@ public class ProblemAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @author weijb
      * @date 2018-08-15 18:51:51
      */
-    public List<QueryAllocateApplyListDTO> queryProblemHandleList(List<String> applyNos,String userOrgCode){
+    public List<QueryAllocateApplyListDTO> queryProblemHandleList(List<String> applyNos,String userOrgCode, List<String> applyTypeList){
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         param.put("userOrgCode", userOrgCode);
         StringBuilder sql = new StringBuilder();
-
+        param.put("applyTypeList", applyTypeList);
         sql.append("SELECT t1.id,t1.apply_no,t1.apply_type,t1.apply_status ,t3.checked_time as instock_time,t2.checked_time as outstock_time ")
                 .append(" FROM biz_allocate_apply t1 LEFT JOIN biz_outstock_order t2 on t1.apply_no=t2.trade_docno LEFT JOIN biz_instock_order t3 on t1.apply_no=t3.trade_docno ")
-                .append(" WHERE t1.delete_flag = :deleteFlag and t1.apply_type in('BARTER','REFUND') and t3.instock_orgno = :userOrgCode");
-
+                .append(" WHERE t1.delete_flag = :deleteFlag and t1.apply_type in(:applyTypeList) and t3.instock_orgno = :userOrgCode");
         // 申请编号
         if (null != applyNos && applyNos.size() > 0 ) {
             param.put("applyNos", applyNos);

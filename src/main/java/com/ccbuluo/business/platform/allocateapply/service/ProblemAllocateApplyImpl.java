@@ -121,14 +121,19 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         // 获取用户的组织机构
         String userOrgCode = getUserOrgCode();
         // 查询分页的申请列表
-        Page<QueryAllocateApplyListDTO> page = bizAllocateApplyDao.findProblemApplyList(type, applyType, applyStatus, applyNo, offset, pageSize, userOrgCode);
+        // 设置查询类型
+        List<String> applyTypeList = List.of(BizAllocateApply.AllocateApplyTypeEnum.BARTER.name(),
+            BizAllocateApply.AllocateApplyTypeEnum.REFUND.name(),
+            BizAllocateApply.AllocateApplyTypeEnum.PLATFORMREFUND.name(),
+            BizAllocateApply.AllocateApplyTypeEnum.PLATFORMBARTER.name());
+        Page<QueryAllocateApplyListDTO> page = bizAllocateApplyDao.findProblemApplyList(type, applyType, applyStatus, applyNo, offset, pageSize, userOrgCode, applyTypeList);
         List<QueryAllocateApplyListDTO> rows = page.getRows();
         List<String> applyNos = null;
         List<QueryAllocateApplyListDTO> applyList = new ArrayList<QueryAllocateApplyListDTO>();
         if(rows != null){
             // 查出申请单号
             applyNos = rows.stream().map(QueryAllocateApplyListDTO::getApplyNo).collect(Collectors.toList());
-            applyList = problemAllocateApplyDao.queryProblemHandleList(applyNos,BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+            applyList = problemAllocateApplyDao.queryProblemHandleList(applyNos,BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM, applyTypeList);
         }
         for(QueryAllocateApplyListDTO apply : rows){
             Optional<QueryAllocateApplyListDTO> applyFilter = applyList.stream() .filter(applyDetail -> apply.getApplyNo().equals(applyDetail.getApplyNo())) .findFirst();
@@ -173,8 +178,13 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
      */
     @Override
     public Page<QueryAllocateApplyListDTO> queryProblemHandleList(String type,String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize){
-        Page<QueryAllocateApplyListDTO> page;
-        page = bizAllocateApplyDao.findProblemProcessHandleList(processType, type, applyStatus, applyNo, offset, pageSize);
+
+        // 设置查询类型
+        List<String> applyTypeList = List.of(BizAllocateApply.AllocateApplyTypeEnum.BARTER.name(),
+            BizAllocateApply.AllocateApplyTypeEnum.REFUND.name(),
+            BizAllocateApply.AllocateApplyTypeEnum.PLATFORMREFUND.name(),
+            BizAllocateApply.AllocateApplyTypeEnum.PLATFORMBARTER.name());
+        Page<QueryAllocateApplyListDTO> page = bizAllocateApplyDao.findProblemProcessHandleList(processType, type, applyStatus, applyNo, offset, pageSize, applyTypeList);
         List<QueryAllocateApplyListDTO> rows = page.getRows();
         List<QueryAllocateApplyListDTO> applyList = new ArrayList<QueryAllocateApplyListDTO>();
         List<String> applyNos = null;
@@ -182,7 +192,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             // 查出申请单号
             applyNos = rows.stream().map(QueryAllocateApplyListDTO::getApplyNo).collect(Collectors.toList());
             // 查询平台的入库计划
-            applyList = problemAllocateApplyDao.queryProblemHandleList(applyNos,BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+            applyList = problemAllocateApplyDao.queryProblemHandleList(applyNos,BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM, applyTypeList);
             for(QueryAllocateApplyListDTO apply : rows){
                 Optional<QueryAllocateApplyListDTO> applyFilter = applyList.stream() .filter(applyDetail -> apply.getApplyNo().equals(applyDetail.getApplyNo())) .findFirst();
                 if (applyFilter.isPresent()) {

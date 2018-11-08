@@ -247,15 +247,18 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @author zhangkangjian
      * @date 2018-08-09 10:36:34
      */
-    public Page<QueryAllocateApplyListDTO> findProblemApplyList(String productType, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode) {
+    public Page<QueryAllocateApplyListDTO> findProblemApplyList(String productType, String processType, String applyStatus, String applyNo, Integer offset, Integer pageSize, String userOrgCode, List<String> applyType) {
         HashMap<String, Object> map = Maps.newHashMap();
-
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.apply_status,a.process_type,a.process_orgtype as 'orgType',a.outstock_orgno ")
-                .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE (a.apply_type='REFUND' or a.apply_type='BARTER') ");
+                .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(userOrgCode)){
             map.put("userOrgCode", userOrgCode);
             sql.append(" AND (a.applyorg_no = :userOrgCode or a.instock_orgno = :userOrgCode) ");
+        }
+        if(applyType != null && applyType.size() > 0){
+            map.put("applyType", applyType);
+            sql.append(" AND a.apply_type in (:applyType) ");
         }
         if(StringUtils.isNotBlank(processType)){
             map.put("processType", processType);
@@ -368,18 +371,18 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
      * @author weijb
      * @date 2018-08-09 10:36:34
      */
-    public Page<QueryAllocateApplyListDTO> findProblemProcessHandleList(String processType, String productType, String applyStatus, String applyNo, Integer offset, Integer pageSize) {
+    public Page<QueryAllocateApplyListDTO> findProblemProcessHandleList(String processType, String productType, String applyStatus, String applyNo, Integer offset, Integer pageSize, List<String> applyTypeList) {
         HashMap<String, Object> map = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
-        ArrayList<String> allocateApplyTypeList = Lists.newArrayList();
-        allocateApplyTypeList.add(BizAllocateApply.AllocateApplyTypeEnum.PURCHASE.name());
-        allocateApplyTypeList.add(BizAllocateApply.AllocateApplyTypeEnum.SAMELEVEL.name());
-        map.put("allocateApplyTypeList", allocateApplyTypeList);
         sql.append(" SELECT a.applyorg_no,a.apply_no,a.applyer_name,a.create_time,a.apply_type,a.process_type,a.apply_status,a.in_repository_no,UNIX_TIMESTAMP(a.operate_time) * 1000 as 'operateTime' ")
-                .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE a.apply_type not in (:allocateApplyTypeList) ");
+                .append(" FROM biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ON a.apply_no = b.apply_no WHERE 1 = 1  ");
         if(StringUtils.isNotBlank(processType)){
             map.put("processType", processType);
             sql.append(" AND a.process_type = :processType ");
+        }
+        if(applyTypeList != null && applyTypeList.size() > 0){
+            map.put("applyTypeList", applyTypeList);
+            sql.append(" AND a.apply_type in (:applyTypeList) ");
         }
         if(StringUtils.isNotBlank(applyStatus)){
             map.put("applyStatus", applyStatus);
