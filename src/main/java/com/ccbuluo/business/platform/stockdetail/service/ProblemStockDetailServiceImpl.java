@@ -256,7 +256,7 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
                 bizAllocateApplyDao.updateApplyType(applyNo, BizAllocateApply.AllocateApplyTypeEnum.REFUND.name());
             }
             // 删除所有的出入库计划
-            inputStockPlanService.deleteInStockPlan(applyNo);
+//            inputStockPlanService.deleteInStockPlan(applyNo);
             outStockPlanService.deleteOutStockPlan(applyNo);
             // 修改申请单为 -等待退款,
            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.WAITINGREFUND.name());
