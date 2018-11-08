@@ -509,7 +509,7 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
                     bizStockDetail.preUpdate(userHolder.getLoggedUserId());
                     bizStockDetails.add(bizStockDetail);
                     // 更新库存明细中的占用库存
-                    stockDetailService.updateOccupyStock(bizStockDetails);
+                    stockDetailService.updateProblemStock(bizStockDetails);
                 }
             }
         });

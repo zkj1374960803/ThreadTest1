@@ -220,7 +220,7 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
         for (Map.Entry<String, List<StockDetailDTO>> entry : collect1.entrySet()) {
             List<StockDetailDTO> value = entry.getValue();
             StockDetailDTO stockDetailDTO1 = value.get(0);
-            long count = value.stream().map(item -> item.getProblemStock()).count();
+            long count = value.stream().map(item -> item.getProblemStock()).reduce((sum,item) -> sum + item).get();
             StockDetailDTO stockDetailDTO = new StockDetailDTO();
             stockDetailDTO.setOrgType(stockDetailDTO1.getOrgType());
             stockDetailDTO.setOrgName(stockDetailDTO1.getOrgName());
@@ -271,11 +271,12 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
 
         // 要修改为换货，说明目前是退款
         // 如果修改的是平台，则直接修改申请单为 -等待入库
-        if (apply.getOutstockOrgno().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
+        if (apply.getApplyorgNo().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
             allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REPLACEWAITIN.name());
+        } else {
+            //　不是平台，修改申请单类型为  等待出库
+            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.PLATFORMOUTBOUND.name());
         }
-        //　不是平台，修改申请单类型为  等待出库
-        allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.PLATFORMOUTBOUND.name());
         return StatusDto.buildSuccessStatusDto();
     }
 }
