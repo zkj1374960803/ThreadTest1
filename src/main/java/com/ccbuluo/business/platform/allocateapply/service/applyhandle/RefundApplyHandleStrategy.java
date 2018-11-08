@@ -33,7 +33,9 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 退货申请处理
@@ -83,7 +85,7 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
             checkStock(ba.getApplyorgNo(),details);
             //获取申请方机构code
             String applyorgNo = getProductOrgNo(ba);
-            // 构建生成订单(调拨)
+            // 构建生成交易单
             List<BizAllocateTradeorder> list = buildOrderEntityList(details);
             // 退货只生成一个订单
             if(null != list && list.size() >0 ){
@@ -105,7 +107,7 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
             List<BizStockDetail> stockDetailList = buildStockAndRelOrdEntity(details,stockDetails,applyType,relOrdstockOccupies);
             // 构建出库和入库计划并保存(平台入库，平台出库，买方入库)
             Pair<List<BizOutstockplanDetail>, List<BizInstockplanDetail>> pir = buildOutAndInstockplanDetail(details, stockDetails, BizAllocateApply.AllocateApplyTypeEnum.REFUND, relOrdstockOccupies);
-            // 保存生成订单
+            // 保存交易单
             bizAllocateTradeorderDao.batchInsertAllocateTradeorder(list);
             // 批量保存出库计划详情
             bizOutstockplanDetailDao.batchOutstockplanDetail(pir.getLeft());
@@ -177,7 +179,7 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
         // 平台入库
         instockplanPlatform(inList,outList,details);
         // 申请方入库（换货：买方机构的入库要以出库的数据来构建（不同批次，不同价格）（问题件库存））
-        problemInstockplanPurchaser(inList,details, BizAllocateApply.AllocateApplyTypeEnum.BARTER.toString());
+        problemInstockplanPurchaser(inList,details,outList);
         return Pair.of(outList, inList);
     }
 
@@ -185,26 +187,63 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
     /**
      * 申请方入库
      * @param details 申请详细
-     * @param applyType 申请类型
      * @author weijb
      * @date 2018-08-11 13:35:41
      */
-    public void problemInstockplanPurchaser(List<BizInstockplanDetail> inList, List<AllocateapplyDetailBO> details, String applyType){
-        // 买入方入库计划
-        for(AllocateapplyDetailBO ad : details){
-            BizInstockplanDetail instockplanPurchaser = new BizInstockplanDetail();
-            instockplanPurchaser = buildBizInstockplanDetail(ad);
-            // 交易类型
-            instockplanPurchaser.setInstockType(InstockTypeEnum.BARTER.toString());
-            // 库存类型 （问题件申请机构入库的时候应该是有效库存）
+    public void  problemInstockplanPurchaser(List<BizInstockplanDetail> inList, List<AllocateapplyDetailBO> details, List<BizOutstockplanDetail> outList){
+        Map<String, List<AllocateapplyDetailBO>> byProductNoGroup = details.stream().collect(Collectors.groupingBy(AllocateapplyDetailBO::getProductNo));
+        for (BizOutstockplanDetail outstockplan : outList) {
+            List<AllocateapplyDetailBO> allocateapplyDetailBOS = byProductNoGroup.get(outstockplan.getProductNo());
+            AllocateapplyDetailBO allocateapplyDetailBO = allocateapplyDetailBOS.get(0);
+            BizInstockplanDetail instockplanPurchaser;
+            instockplanPurchaser = buildApplyBizInstockplanDetail(allocateapplyDetailBO);
+            instockplanPurchaser.setInstockType(InstockTypeEnum.BARTER.name());
             instockplanPurchaser.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
-            // 成本价(退货和换货的成本价是零)
-            instockplanPurchaser.setCostPrice(BigDecimal.ZERO);
-            instockplanPurchaser.setInstockRepositoryNo(ad.getInRepositoryNo());// 入库仓库编号
-            instockplanPurchaser.setInstockOrgno(ad.getApplyorgNo());// 申请方入机构编号
-            instockplanPurchaser.setCompleteStatus(StockPlanStatusEnum.DOING.toString());// 完成状态（未生效）
+            instockplanPurchaser.setCostPrice(outstockplan.getCostPrice());
             inList.add(instockplanPurchaser);
         }
+        // 买入方入库计划
+//        for(AllocateapplyDetailBO ad : details){
+//            BizInstockplanDetail instockplanPurchaser = new BizInstockplanDetail();
+//            instockplanPurchaser = buildBizInstockplanDetail(ad);
+//            // 交易类型
+//            instockplanPurchaser.setInstockType(InstockTypeEnum.BARTER.toString());
+//            // 库存类型 （问题件申请机构入库的时候应该是有效库存）
+//            instockplanPurchaser.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
+//            // 成本价(退货和换货的成本价是零)
+//            instockplanPurchaser.setCostPrice(BigDecimal.ZERO);
+//            instockplanPurchaser.setInstockRepositoryNo(ad.getInRepositoryNo());// 入库仓库编号
+//            instockplanPurchaser.setInstockOrgno(ad.getApplyorgNo());// 申请方入机构编号
+//            instockplanPurchaser.setCompleteStatus(StockPlanStatusEnum.DOING.toString());// 完成状态（未生效）
+//            inList.add(instockplanPurchaser);
+//        }
+    }
+
+
+    /**
+     * 构建申请方入库计划
+     * @param ad 申请详情
+     * @author weijb
+     * @date 2018-08-11 13:35:41
+     */
+    private BizInstockplanDetail buildApplyBizInstockplanDetail(AllocateapplyDetailBO ad){
+        BizInstockplanDetail inPlan = new BizInstockplanDetail();
+        inPlan.setProductNo(ad.getProductNo());// 商品编号
+        inPlan.setProductType(ad.getProductType());// 商品类型
+        inPlan.setProductCategoryname(ad.getProductCategoryname());// 商品分类名称
+        inPlan.setProductName(ad.getProductName());// 商品名称
+        inPlan.setProductUnit(ad.getUnit());// 商品计量单位
+        inPlan.setTradeNo(String.valueOf(ad.getApplyNo()));// 交易批次号（申请单编号）
+        inPlan.setSupplierNo(ad.getSupplierNo());//供应商编号
+        inPlan.setPlanInstocknum(ad.getApplyNum());// 计划入库数量
+        inPlan.setCompleteStatus(StockPlanStatusEnum.DOING.toString());// 完成状态（计划执行中）
+        inPlan.preInsert(userHolder.getLoggedUserId());
+        inPlan.setRemark(ad.getRemark());// 备注
+        inPlan.setInstockRepositoryNo(ad.getInRepositoryNo());
+        inPlan.setInstockOrgno(ad.getApplyorgNo());// 申请方入机构编号
+        // 卖方机构的编号
+        inPlan.setSellerOrgno(ad.getOutstockOrgno());
+        return inPlan;
     }
 
     /**
@@ -226,7 +265,7 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
                 // 买入机构编号
                 inPlan.setInstockOrgno(ad.getInstockOrgno());
                 // 卖方机构的编号
-                inPlan.setSellerOrgno(ad.getOutstockOrgno());
+                inPlan.setSellerOrgno(ad.getApplyorgNo());
             }
             inPlan.setPlanInstocknum(outstockplan.getPlanOutstocknum());
             // 根据平台的no查询平台的仓库

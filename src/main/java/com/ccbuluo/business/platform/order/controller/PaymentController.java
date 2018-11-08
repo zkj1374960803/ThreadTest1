@@ -60,13 +60,13 @@ public class PaymentController {
     }
 
     /**
-     *  申请单支付功能（退货）
+     *  平台退款给机构调用
      * @param applyNo 申请单号
      * @return StatusDto
      * @author weijb
      * @date 2018-08-22 17:02:58
      */
-    @ApiOperation(value = "申请单支付功能（退货）", notes = "【魏俊标】")
+    @ApiOperation(value = "平台退款给机构调用", notes = "【刘铎】")
     @PostMapping("/refundpayment")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query"),

@@ -8,6 +8,7 @@ import com.ccbuluo.account.BizFinanceAccountService;
 import com.ccbuluo.account.TransactionTypeEnumThrift;
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.constants.DocCodePrefixEnum;
 import com.ccbuluo.business.constants.OrderStatusEnum;
 import com.ccbuluo.business.entity.*;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
@@ -20,6 +21,7 @@ import com.ccbuluo.business.platform.order.dao.BizAllocateTradeorderDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceorderDetailDao;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
+import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.servicelog.service.ServiceLogService;
 import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
 import com.ccbuluo.business.platform.supplier.dto.ResultFindSupplierDetailDTO;
@@ -86,6 +88,8 @@ public class PaymentServiceImpl implements PaymentService {
     private ApplyHandleContext applyHandleContext;
     @Autowired
     private InputStockPlanService inputStockPlanService;
+    @Autowired
+    private GenerateDocCodeService generateDocCodeService;
 
     /**
      *  支付完成调用接口
@@ -202,10 +206,10 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     /**
-     *  支付完成调用接口
+     *  平台退款给机构
      * @param applyNo 申请单号
      * @return StatusDto
-     * @author weijb
+     * @author weijb   刘铎 于2018-11-08 15:24改动
      * @date 2018-08-22 17:02:58
      */
     @Transactional(rollbackFor = Exception.class)
@@ -217,15 +221,36 @@ public class PaymentServiceImpl implements PaymentService {
             if(null == ba){
                 throw new CommonException("0", "无效的申请单！");
             }
-            // 等待发货
-            String status = BizAllocateApply.ApplyStatusEnum.WAITDELIVERY.name();
             // 根据申请单获取申请单详情
             List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(ba.getApplyNo());
             if(null == details || details.size() == 0){
                 throw new CommonException("0", "无效的申请单！");
             }
-            // 更新交易单信息
-            applyHandleContext.updateTradeorderInfo(applyNo, actualAmount);
+            // 根据申请单号查询关联的交易单
+            BizAllocateTradeorder allocateTradeorder = bizAllocateTradeorderDao.getByApplyNo(applyNo);
+            if (null != allocateTradeorder) {
+                // 更新交易单信息
+                applyHandleContext.updateTradeorderInfo(applyNo, actualAmount);
+            } else {
+                // 新增交易单
+                // 生成交易单号
+                StatusDto<String> tradeorder = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.JY);
+                if(!tradeorder.isSuccess()){
+                    throw new CommonException(tradeorder.getCode(), "生成交易单号失败！");
+                }
+                BizAllocateTradeorder bizAllocateTradeorder = new BizAllocateTradeorder();
+                bizAllocateTradeorder.setOrderNo(tradeorder.getData());
+                bizAllocateTradeorder.setApplyNo(applyNo);
+                bizAllocateTradeorder.setPurchaserOrgno(ba.getApplyorgNo());
+                bizAllocateTradeorder.setSellerOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+                bizAllocateTradeorder.setTradeType(BizAllocateApply.AllocateApplyTypeEnum.REFUND.name());
+                bizAllocateTradeorder.setTotalPrice(actualAmount);
+                bizAllocateTradeorder.setOrderStatus(OrderStatusEnum.PAYMENTCOMPLETION.name());
+                bizAllocateTradeorder.setPayer(userHolder.getLoggedUserId());
+                bizAllocateTradeorder.setPayedTime(new Date());
+                bizAllocateTradeorder.preInsert(userHolder.getLoggedUserId());
+                bizAllocateTradeorderDao.saveEntity(bizAllocateTradeorder);
+            }
             // 删除入库计划
             inputStockPlanService.deleteInStockPlan(applyNo);
 
@@ -724,7 +749,37 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional(rollbackFor = Exception.class)
     public StatusDto platformRefund(String applyNo, BigDecimal actualAmount) {
         try {
-            // TODO 平台需要给自己退款充钱，目前这个功能等待财务系统提供  刘铎
+            // 支付
+            List<AccountTransactionDTO> accountTransactionDTOS = buildRefund(applyNo, actualAmount);
+
+            StatusDto statusDto = bizFinanceAccountService.makeTrading(accountTransactionDTOS);
+            if (statusDto.getCode().equals(Constants.ERROR_CODE)) {
+                throw new CommonException(statusDto.getCode(), statusDto.getMessage());
+            }
+            // 根据申请单号查询关联的交易单
+            BizAllocateTradeorder allocateTradeorder = bizAllocateTradeorderDao.getByApplyNo(applyNo);
+            if (null != allocateTradeorder) {
+                // 更新交易单信息
+                applyHandleContext.updateTradeorderInfo(applyNo, actualAmount);
+            } else {
+                // 保存交易单
+                // 生成交易单号
+                StatusDto<String> tradeorder = generateDocCodeService.grantCodeByPrefix(DocCodePrefixEnum.JY);
+                if (!tradeorder.isSuccess()) {
+                    throw new CommonException(tradeorder.getCode(), "生成交易单号失败！");
+                }
+                BizAllocateTradeorder bizAllocateTradeorder = new BizAllocateTradeorder();
+                bizAllocateTradeorder.setOrderNo(tradeorder.getData());
+                bizAllocateTradeorder.setApplyNo(applyNo);
+                bizAllocateTradeorder.setPurchaserOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+                bizAllocateTradeorder.setTradeType(BizAllocateApply.AllocateApplyTypeEnum.PLATFORMREFUND.name());
+                bizAllocateTradeorder.setTotalPrice(actualAmount);
+                bizAllocateTradeorder.setOrderStatus(OrderStatusEnum.PAYMENTCOMPLETION.name());
+                bizAllocateTradeorder.setPayer(userHolder.getLoggedUserId());
+                bizAllocateTradeorder.setPayedTime(new Date());
+                bizAllocateTradeorder.preInsert(userHolder.getLoggedUserId());
+                bizAllocateTradeorderDao.saveEntity(bizAllocateTradeorder);
+            }
             // 更改申请单状态为 REFUNDCOMPLETED  退款完成
             bizAllocateApplyDao.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REFUNDCOMPLETED.name());
             // 删除入库计划
@@ -775,6 +830,27 @@ public class PaymentServiceImpl implements PaymentService {
             outOrgName = map.get(outstockOrgno).getOrgName();
         }
         return Pair.of(inOrgName, outOrgName);
+    }
+
+
+    /**
+     *  构建退款实体
+     * @param
+     * @exception
+     * @return
+     * @author weijb
+     * @date 2018-09-12 10:07:36
+     */
+    private List<AccountTransactionDTO> buildRefund(String appluNo,BigDecimal sellTotal){
+        List<AccountTransactionDTO> list = new ArrayList<AccountTransactionDTO>();
+        // 收款方
+        AccountTransactionDTO accountReceive = buildAccountTransactionDTO(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM, appluNo);
+        // 收款
+        accountReceive.setAmount(sellTotal.doubleValue());
+        // 收款
+        accountReceive.setTransactionTypeEnumThrift(TransactionTypeEnumThrift.PROBLEM_PIECE_SUPPLIER_REFUND);
+        list.add(accountReceive);
+        return list;
     }
 
 }
