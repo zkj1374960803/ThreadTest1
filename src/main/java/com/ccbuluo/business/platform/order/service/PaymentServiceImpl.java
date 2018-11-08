@@ -135,7 +135,7 @@ public class PaymentServiceImpl implements PaymentService {
             }else{
                 return statusDto;
             }
-            return StatusDto.buildSuccessStatusDto("创建预付款单据成功！");
+            return StatusDto.buildSuccessStatusDto("创建付款单据成功！");
 
         } catch (Exception e) {
             logger.error("创建预付款单据失败！", e);
