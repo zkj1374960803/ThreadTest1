@@ -168,26 +168,29 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
         List<String> products = instockplanDetails.stream().map(BizInstockplanDetail::getProductNo).collect(Collectors.toList());
         List<BizStockDetail> bizStockDetailList = bizStockDetailDao.queryStockByProducts(products, userHolder.getLoggedUser().getOrganization().getOrgCode());
         // 以商品分组，并计算商品库存
-        Map<String, List<BizStockDetail>> collect1 = bizStockDetailList.stream().collect(Collectors.groupingBy(BizStockDetail::getProductNo));
-        Map<String, BizInstockplanDetail> collect = instockplanDetails.stream().collect(Collectors.toMap(BizInstockplanDetail::getProductNo, Function.identity()));
-        for (Map.Entry<String, List<BizStockDetail>> entryP : collect1.entrySet()) {
+        Map<String, List<BizStockDetail>> groupProduct = bizStockDetailList.stream().collect(Collectors.groupingBy(BizStockDetail::getProductNo));
+        Map<String, BizInstockplanDetail> singleProductStockDetail = instockplanDetails.stream().collect(Collectors.toMap(BizInstockplanDetail::getProductNo, Function.identity()));
+        for (Map.Entry<String, List<BizStockDetail>> entryP : groupProduct.entrySet()) {
             // 校验库存是否满足
             List<BizStockDetail> value = entryP.getValue();
             long count = value.stream().map(BizStockDetail::getValidStock).count();
-            BizInstockplanDetail bizInstockplanDetail = collect.get(entryP.getKey());
+            BizInstockplanDetail bizInstockplanDetail = singleProductStockDetail.get(entryP.getKey());
             if (bizInstockplanDetail.getPlanInstocknum() > count) {
                 throw new CommonException(ba.getApplyNo(), "可用库存不足，无法满足该申请的换货需求，请核对！");
             }
         }
         // 用来存储新的有效库存和占用库存
         List<BizStockDetail> bizStockDetailLists = Lists.newArrayList();
-        List<BizStockDetail> collect2 = bizStockDetailList.stream().filter(item -> item.getValidStock() > 0).collect(Collectors.toList());
+        List<BizStockDetail> ValidStockDetail = bizStockDetailList.stream().filter(item -> item.getValidStock() > 0).collect(Collectors.toList());
+        Map<String, List<BizStockDetail>> byProductGroupStockDetail = ValidStockDetail.stream().collect(Collectors.groupingBy(BizStockDetail::getProductNo));
         for(BizInstockplanDetail in : instockplanDetails){
             // 计划入库数量
             Long planInstocknum = in.getPlanInstocknum();
-            for (BizStockDetail stockDetail : collect2) {
-                BizOutstockplanDetail outstockplanPlatform = new BizOutstockplanDetail();
+            List<BizStockDetail> actualStockDetailList = byProductGroupStockDetail.get(in.getProductNo());
+            for (BizStockDetail stockDetail : actualStockDetailList) {
+                BizOutstockplanDetail outstockplanPlatform;
                 outstockplanPlatform = buildBizOutstockplanDetail(in);
+                outstockplanPlatform.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
                 Optional<AllocateapplyDetailBO> applyFilter = details.stream() .filter(applyDetail -> in.getProductNo().equals(applyDetail.getProductNo())) .findFirst();
                 if (applyFilter.isPresent()) {
                     outstockplanPlatform.setApplyDetailId(applyFilter.get().getId());//申请单详单id
