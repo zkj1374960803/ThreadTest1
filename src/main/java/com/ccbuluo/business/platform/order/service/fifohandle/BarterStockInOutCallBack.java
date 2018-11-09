@@ -205,6 +205,7 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
                     bizStockDetailLists.add(stockDetail);
                     outstockplanPlatform.setPlanOutstocknum(inStockPlanSum);
                     buildOutStockPlan(bizInstockplanDetail,stockDetail, outstockplanPlatform);
+                    outstockplanPlatform.setCostPrice(stockDetail.getCostPrice());
                     outstockplanDetails.add(outstockplanPlatform);
                     break;
                 } else {
@@ -215,6 +216,7 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
                     bizStockDetailLists.add(stockDetail);
                     outstockplanPlatform.setPlanOutstocknum(validStock);
                     buildOutStockPlan(bizInstockplanDetail,stockDetail, outstockplanPlatform);
+                    outstockplanPlatform.setCostPrice(stockDetail.getCostPrice());
                     outstockplanDetails.add(outstockplanPlatform);
                     if (inStockPlanSum <= 0) {
                         break;
@@ -272,7 +274,6 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
         outstockplanPlatform.setOutRepositoryNo(stockDetail.getRepositoryNo());
         outstockplanPlatform.setOutOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
         outstockplanPlatform.setStockId(stockDetail.getId());
-        outstockplanPlatform.setCostPrice(bizInstockplanDetail.getCostPrice());
         outstockplanPlatform.setOutstockType(OutstockTypeEnum.BARTER.toString());
         outstockplanPlatform.setProductNo(bizInstockplanDetail.getProductNo());
         outstockplanPlatform.setProductType(bizInstockplanDetail.getProductType());
