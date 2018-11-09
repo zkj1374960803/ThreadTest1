@@ -200,7 +200,7 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
                 BizOutstockplanDetail outstockplanPlatform = new BizOutstockplanDetail();
                 if (inStockPlanSum <= validStock) {
                     // 设置新的有效库存数量和占用库存数量
-                    stockDetail.setValidStock(validStock - inStockPlanSum);
+                    stockDetail.setValidStock(inStockPlanSum);
                     stockDetail.setOccupyStock(inStockPlanSum);
                     bizStockDetailLists.add(stockDetail);
                     outstockplanPlatform.setPlanOutstocknum(inStockPlanSum);

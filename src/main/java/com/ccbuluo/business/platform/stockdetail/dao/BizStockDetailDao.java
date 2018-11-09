@@ -678,7 +678,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("bizStockDetailLists", bizStockDetailLists);
 
-        String sql = "UPDATE biz_stock_detail SET valid_stock = :validStock,occupy_stock = :occupyStock  WHERE id = :id";
+        String sql = "UPDATE biz_stock_detail SET valid_stock =IFNULL(valid_stock,0) - :validStock,occupy_stock = IFNULL(occupy_stock,0) + :occupyStock  WHERE id = :id";
 
         batchUpdateForListBean(sql, bizStockDetailLists);
     }
