@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.order.service.fifohandle;
 
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.OutstockTypeEnum;
 import com.ccbuluo.business.constants.StockPlanStatusEnum;
 import com.ccbuluo.business.entity.BizAllocateApply;
@@ -177,7 +178,7 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
             List<BizStockDetail> bizStockDetailList1 = groupProduct.get(entryP.getKey());
             long stockSum = bizStockDetailList1.stream().mapToLong(BizStockDetail::getValidStock).sum();
             if (planOutStockSum > stockSum) {
-                throw new CommonException(ba.getApplyNo(), "可用库存不足，无法满足该申请的换货需求，请核对！");
+                throw new CommonException(Constants.ERROR_CODE, "可用库存不足，无法满足该申请的换货需求，请核对！");
             }
         }
         // 用来存储新的有效库存和占用库存
