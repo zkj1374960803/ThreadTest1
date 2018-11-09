@@ -239,6 +239,8 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
                     outstockplanSeller.setOutstockType(OutstockTypeEnum.TRANSFER.toString());
                     // 未执行
                     outstockplanSeller.setPlanStatus(StockPlanStatusEnum.NOTEFFECTIVE.toString());
+                    // 采购信息
+                    outstockplanSeller.setPurchaseInfo(stockDetail.getPurchaseInfo());
                     outList.add(outstockplanSeller);
                     continue;
                 }
@@ -379,6 +381,7 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
         inPlan.setStockType(bd.getStockType());
         inPlan.setRemark(bd.getRemark());
         inPlan.setInstockType(InstockTypeEnum.TRANSFER.toString());
+        inPlan.setPurchaseInfo(bd.getPurchaseInfo());
         return inPlan;
     }
 

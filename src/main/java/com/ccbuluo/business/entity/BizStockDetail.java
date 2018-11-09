@@ -124,6 +124,11 @@ public class BizStockDetail extends AftersaleCommonEntity{
      */
     @ApiModelProperty(name = "remark", value = "备注")
     private String remark;
+    /**
+     *  采购信息
+     */
+    @ApiModelProperty(name = "purchaseInfo", value = "采购信息(目前包含采购价格和采购时间)")
+    private String purchaseInfo;
 
     public void setRepositoryNo(String repositoryNo) {
         this.repositoryNo = repositoryNo;
@@ -299,6 +304,14 @@ public class BizStockDetail extends AftersaleCommonEntity{
 
     public void setOutstockNum(Long outstockNum) {
         this.outstockNum = outstockNum;
+    }
+
+    public String getPurchaseInfo() {
+        return purchaseInfo;
+    }
+
+    public void setPurchaseInfo(String purchaseInfo) {
+        this.purchaseInfo = purchaseInfo;
     }
 
     /**

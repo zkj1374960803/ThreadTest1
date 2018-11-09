@@ -173,6 +173,7 @@ public class PlatformBarterApplyHandleStrategy extends DefaultApplyHandleStrateg
                     outstockplanPurchaser.setCostPrice(bd.getCostPrice());
                     // 交易类型
                     outstockplanPurchaser.setOutstockType(OutstockTypeEnum.BARTER.toString());
+                    outstockplanPurchaser.setPurchaseInfo(bd.getPurchaseInfo());
                     outList.add(outstockplanPurchaser);
                     continue;
                 }
@@ -196,6 +197,7 @@ public class PlatformBarterApplyHandleStrategy extends DefaultApplyHandleStrateg
             instockplanPurchaser.setInstockType(InstockTypeEnum.BARTER.name());
             instockplanPurchaser.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
             instockplanPurchaser.setCostPrice(outstockplan.getCostPrice());
+            instockplanPurchaser.setPurchaseInfo(outstockplan.getPurchaseInfo());
             inList.add(instockplanPurchaser);
         }
     }

@@ -42,12 +42,12 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
         sql.append("INSERT INTO biz_outstockplan_detail ( outstock_type,stock_id,")
                 .append("product_no,product_type,trade_no,supplier_no,apply_detail_id,")
                 .append("cost_price,sales_price,out_repository_no,plan_outstocknum,")
-                .append("actual_outstocknum,plan_status,complete_time,creator,create_time,")
+                .append("actual_outstocknum,plan_status,complete_time,purchase_info,creator,create_time,")
                 .append("operator,operate_time,delete_flag,remark,product_categoryname,product_unit,product_name,stock_type,out_orgno")
                 .append(" ) VALUES (  :outstockType, :stockId, :productNo, :productType,")
                 .append(" :tradeNo, :supplierNo, :applyDetailId, :costPrice, :salesPrice,")
                 .append(" :outRepositoryNo, :planOutstocknum, :actualOutstocknum, :planStatus,")
-                .append(" :completeTime, :creator, :createTime, :operator, :operateTime,")
+                .append(" :completeTime, :purchaseInfo,:creator, :createTime, :operator, :operateTime,")
                 .append(" :deleteFlag, :remark, :productCategoryname, :productUnit, :productName, :stockType, :outOrgno )");
         List<Long> longs = super.batchInsertForListBean(sql.toString(), list);
         return longs;

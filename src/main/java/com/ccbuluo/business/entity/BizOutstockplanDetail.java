@@ -143,6 +143,12 @@ public class BizOutstockplanDetail extends AftersaleCommonEntity{
      */
     @ApiModelProperty(name = "stockType", value = "库存类型（正常库存、问题库存、报损件库存，等等）")
     private String stockType;
+    /**
+     *  采购信息
+     */
+    @ApiModelProperty(name = "purchaseInfo", value = "采购信息(目前包含采购价格和采购时间)")
+    private String purchaseInfo;
+
 
 
     @JsonIgnore
@@ -363,5 +369,13 @@ public class BizOutstockplanDetail extends AftersaleCommonEntity{
 
     public void setShouldOutstocknum(Long shouldOutstocknum) {
         this.shouldOutstocknum = shouldOutstocknum;
+    }
+
+    public String getPurchaseInfo() {
+        return purchaseInfo;
+    }
+
+    public void setPurchaseInfo(String purchaseInfo) {
+        this.purchaseInfo = purchaseInfo;
     }
 }

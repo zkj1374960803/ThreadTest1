@@ -13,16 +13,20 @@ import com.ccbuluo.business.platform.stockdetail.dao.BizStockDetailDao;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.json.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.weakref.jmx.internal.guava.collect.Maps;
+
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 采购申请处理
@@ -130,6 +134,11 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
             // 平台机构编号
             instockplanPlatform.setInstockOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
             instockplanPlatform.setInstockType(InstockTypeEnum.PURCHASE.toString());// 交易类型
+            // 采购价
+            Map<String, Object> map = Maps.newHashMap();
+            map.put("purchasePrice", ad.getSellPrice());
+            map.put("purchaseDate", new Date());
+            instockplanPlatform.setPurchaseInfo(JsonUtils.writeValue(map));
             inList.add(instockplanPlatform);
         }
     }
