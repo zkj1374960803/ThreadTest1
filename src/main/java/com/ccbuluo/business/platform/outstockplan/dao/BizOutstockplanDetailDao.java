@@ -93,12 +93,8 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
      * @author liuduo
      * @date 2018-08-09 14:38:57
      */
-    public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String status, String outRepositoryNo) {
+    public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String status, String outRepositoryNo, String outOrgno) {
         Map<String, Object> params = Maps.newHashMap();
-        params.put("applyNo", applyNo);
-        params.put("outRepositoryNo", outRepositoryNo);
-        params.put("status", status);
-
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,outstock_type,stock_id,product_no,product_type,trade_no,")
             .append("supplier_no,apply_detail_id,cost_price,sales_price,out_repository_no,")
@@ -106,12 +102,19 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
             .append("creator,create_time,operator,operate_time,delete_flag,remark,version_no,")
             .append("product_categoryname FROM biz_outstockplan_detail WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(applyNo)){
+            params.put("applyNo", applyNo);
             sql.append(" AND trade_no= :applyNo ");
         }
+        if(StringUtils.isNotBlank(outOrgno)){
+            params.put("outOrgno", outOrgno);
+            sql.append(" AND out_orgno= :outOrgno ");
+        }
         if(StringUtils.isNotBlank(outRepositoryNo)){
+            params.put("outRepositoryNo", outRepositoryNo);
             sql.append(" AND out_repository_no = :outRepositoryNo ");
         }
         if(StringUtils.isNotBlank(status)){
+            params.put("status", status);
             sql.append(" AND plan_status = :status ");
         }
         return queryListBean(BizOutstockplanDetail.class, sql.toString(), params);
