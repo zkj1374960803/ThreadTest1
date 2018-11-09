@@ -307,9 +307,15 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             Map<String, QueryAllocateapplyDetailDTO> allocateapplyDetailMap = queryAllocateapplyDetailDTO.stream().collect(Collectors.toMap(QueryAllocateapplyDetailDTO::getProductNo, a -> a,(k1, k2)->k1));
             if(bizOutstockplanDetails != null && bizOutstockplanDetails.size() > 0){
                 bizOutstockplanDetails.forEach(a ->{
-                    QueryAllocateapplyDetailDTO queryAllocateapply = allocateapplyDetailMap.get(a.getProductNo());
-                    queryAllocateapply.setCostPrice(a.getCostPrice());
-                    allocateapplyDetailList.add(queryAllocateapply);
+                    try {
+                        QueryAllocateapplyDetailDTO queryAllocateapply = allocateapplyDetailMap.get(a.getProductNo());
+                        QueryAllocateapplyDetailDTO cloneAllocateapply = queryAllocateapply.clone();
+                        cloneAllocateapply.setApplyNum(a.getActualOutstocknum());
+                        cloneAllocateapply.setCostPrice(a.getCostPrice());
+                        allocateapplyDetailList.add(cloneAllocateapply);
+                    } catch (Exception e) {
+                        throw new CommonException(Constants.ERROR_CODE, "拷贝失败！");
+                    }
                 });
             }
         }

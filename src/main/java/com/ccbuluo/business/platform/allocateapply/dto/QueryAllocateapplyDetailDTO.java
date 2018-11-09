@@ -13,7 +13,9 @@ import java.util.Date;
  * @version V1.0.0
  */
 @ApiModel(value = "QueryAllocateapplyDetailDTO", description = "查询申请详单DTO")
-public class QueryAllocateapplyDetailDTO {
+public class QueryAllocateapplyDetailDTO implements Cloneable{
+
+
 
 
     private Long id;
@@ -93,6 +95,11 @@ public class QueryAllocateapplyDetailDTO {
             return costPrice.doubleValue() * applyNum;
         }
         return 0D;
+    }
+
+    @Override
+    public QueryAllocateapplyDetailDTO clone() throws CloneNotSupportedException {
+        return (QueryAllocateapplyDetailDTO)super.clone();
     }
 
     public Long getId() {
