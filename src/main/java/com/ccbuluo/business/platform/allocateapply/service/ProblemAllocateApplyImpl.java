@@ -21,6 +21,7 @@ import com.ccbuluo.business.platform.stockdetail.dto.StockDetailDTO;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
+import com.ccbuluo.business.platform.supplier.dto.QuerySupplierInfoDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.BusinessUser;
 import com.ccbuluo.core.entity.Organization;
@@ -313,6 +314,9 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
                         QueryAllocateapplyDetailDTO cloneAllocateapply = queryAllocateapply.clone();
                         cloneAllocateapply.setApplyNum(a.getActualOutstocknum());
                         cloneAllocateapply.setCostPrice(a.getCostPrice());
+                        QuerySupplierInfoDTO querySupplierInfoDTO =
+                            bizServiceSupplierDao.querySupplierInfoByCode(a.getSupplierNo());
+                        cloneAllocateapply.setSupplierName(querySupplierInfoDTO.getSupplierName());
                         allocateapplyDetailList.add(cloneAllocateapply);
                     } catch (Exception e) {
                         throw new CommonException(Constants.ERROR_CODE, "拷贝失败！");
