@@ -191,6 +191,7 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
         for (Map.Entry<String, List<BizStockDetail>> entry : validStockProduct.entrySet()) {
             List<BizStockDetail> productStockDetail = entry.getValue();
             List<BizInstockplanDetail> bizInstockplanDetails = inStockPlanProduct.get(entry.getKey());
+            BizInstockplanDetail bizInstockplanDetail = bizInstockplanDetails.get(0);
             // 获取入库计划中的每个商品的计划入库总数量
             long inStockPlanSum = bizInstockplanDetails.stream().mapToLong(BizInstockplanDetail::getPlanInstocknum).sum();
             for (BizStockDetail stockDetail : productStockDetail) {
@@ -203,7 +204,7 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
                     stockDetail.setOccupyStock(inStockPlanSum);
                     bizStockDetailLists.add(stockDetail);
                     outstockplanPlatform.setPlanOutstocknum(inStockPlanSum);
-                    buildOutStockPlan(stockDetail, outstockplanPlatform);
+                    buildOutStockPlan(bizInstockplanDetail,stockDetail, outstockplanPlatform);
                     outstockplanDetails.add(outstockplanPlatform);
                     break;
                 } else {
@@ -213,7 +214,7 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
                     inStockPlanSum = inStockPlanSum - validStock;
                     bizStockDetailLists.add(stockDetail);
                     outstockplanPlatform.setPlanOutstocknum(validStock);
-                    buildOutStockPlan(stockDetail, outstockplanPlatform);
+                    buildOutStockPlan(bizInstockplanDetail,stockDetail, outstockplanPlatform);
                     outstockplanDetails.add(outstockplanPlatform);
                     if (inStockPlanSum <= 0) {
                         break;
@@ -267,19 +268,19 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
      * @author liuduo
      * @date 2018-11-10 00:24:15
      */
-    private void buildOutStockPlan(BizStockDetail stockDetail, BizOutstockplanDetail outstockplanPlatform) {
+    private void buildOutStockPlan(BizInstockplanDetail bizInstockplanDetail, BizStockDetail stockDetail, BizOutstockplanDetail outstockplanPlatform) {
         outstockplanPlatform.setOutRepositoryNo(stockDetail.getRepositoryNo());
         outstockplanPlatform.setOutOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
         outstockplanPlatform.setStockId(stockDetail.getId());
-        outstockplanPlatform.setCostPrice(stockDetail.getCostPrice());
+        outstockplanPlatform.setCostPrice(bizInstockplanDetail.getCostPrice());
         outstockplanPlatform.setOutstockType(OutstockTypeEnum.BARTER.toString());
-        outstockplanPlatform.setProductNo(stockDetail.getProductNo());
-        outstockplanPlatform.setProductType(stockDetail.getProductType());
-        outstockplanPlatform.setProductCategoryname(stockDetail.getProductCategoryname());
-        outstockplanPlatform.setProductName(stockDetail.getProductName());
-        outstockplanPlatform.setProductUnit(stockDetail.getProductUnit());
-        outstockplanPlatform.setTradeNo(stockDetail.getTradeNo());
-        outstockplanPlatform.setSupplierNo(stockDetail.getSupplierNo());
+        outstockplanPlatform.setProductNo(bizInstockplanDetail.getProductNo());
+        outstockplanPlatform.setProductType(bizInstockplanDetail.getProductType());
+        outstockplanPlatform.setProductCategoryname(bizInstockplanDetail.getProductCategoryname());
+        outstockplanPlatform.setProductName(bizInstockplanDetail.getProductName());
+        outstockplanPlatform.setProductUnit(bizInstockplanDetail.getProductUnit());
+        outstockplanPlatform.setTradeNo(bizInstockplanDetail.getTradeNo());
+        outstockplanPlatform.setSupplierNo(bizInstockplanDetail.getSupplierNo());
         outstockplanPlatform.setSalesPrice(BigDecimal.ZERO);
         outstockplanPlatform.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
         outstockplanPlatform.setPlanStatus(StockPlanStatusEnum.DOING.toString());
