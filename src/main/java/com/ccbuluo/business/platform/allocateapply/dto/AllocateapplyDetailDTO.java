@@ -54,7 +54,6 @@ public class AllocateapplyDetailDTO {
      * 申请的商品数量
      */
     @ApiModelProperty(name = "applyNum", value = "申请的商品数量")
-    @ValidateMin(value = 1, groups = MyGroup.Add.class)
     private Long applyNum;
     /**
      * 计量单位，用作展示冗余
