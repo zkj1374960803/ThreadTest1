@@ -14,6 +14,7 @@ import com.ccbuluo.business.platform.instock.dao.BizInstockOrderDao;
 import com.ccbuluo.business.platform.instock.dto.BizInstockOrderDTO;
 import com.ccbuluo.business.platform.order.service.fifohandle.BarterStockInOutCallBack;
 import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
+import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dto.StockDetailDTO;
@@ -288,7 +289,8 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             allocateApplyDTO.setOutstockTime(allocateApplyDTO.getCreateTime());// 出库时间 （自动出库时间）
             allocateApplyDTO.setInstockOperatorName(inOperatorName); // 入库人
             allocateApplyDTO.setInstockTime(info.getInstockTime());// 入库时间
-            allocateApplyDTO.setTransportorderNo(info.getTransportorderNo());// 物流单号
+            BizOutstockOrderDTO sigleOutStockByTradeDocno = bizOutstockOrderDao.getSigleOutStockByTradeDocno(applyNo);
+            allocateApplyDTO.setTransportorderNo(sigleOutStockByTradeDocno.getTransportorderNo());// 物流单号
             allocateApplyDTO.setTotalPrice(info.getTotalPrice());
         }
 
