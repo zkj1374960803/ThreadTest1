@@ -315,7 +315,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
                         cloneAllocateapply.setApplyNum(a.getActualOutstocknum());
                         cloneAllocateapply.setCostPrice(a.getCostPrice());
                         QuerySupplierInfoDTO querySupplierInfoDTO =
-                            bizServiceSupplierDao.querySupplierInfoByCode(queryAllocateapply.getSupplierNo());
+                            bizServiceSupplierDao.querySupplierInfoByCode(a.getSupplierNo());
                         cloneAllocateapply.setSupplierName(querySupplierInfoDTO.getSupplierName());
                         allocateapplyDetailList.add(cloneAllocateapply);
                     } catch (Exception e) {

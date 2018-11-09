@@ -135,8 +135,7 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
         HashMap<String, Object> map = Maps.newHashMap();
         map.put("supplierCode", supplierCode);
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT a.supplier_name AS 'supplierName', ")
-            .append(" CONCAT(b.province_name,b.city_name,b.area_name,b.supplier_address) AS 'address' ")
+        sql.append(" SELECT a.supplier_name AS 'supplierName'")
             .append(" FROM biz_service_supplier a WHERE a.supplier_code = :supplierCode ");
         return findForBean(QuerySupplierInfoDTO.class, sql.toString(), map);
     }
