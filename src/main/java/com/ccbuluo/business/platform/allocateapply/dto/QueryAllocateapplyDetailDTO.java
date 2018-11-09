@@ -89,6 +89,8 @@ public class QueryAllocateapplyDetailDTO {
     public Double getTotalPrice(){
         if(sellPrice != null){
             return sellPrice.doubleValue() * applyNum;
+        }else if(costPrice != null){
+            return costPrice.doubleValue() * applyNum;
         }
         return 0D;
     }
