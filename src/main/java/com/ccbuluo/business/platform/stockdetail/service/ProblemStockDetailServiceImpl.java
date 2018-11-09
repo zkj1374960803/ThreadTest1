@@ -260,7 +260,7 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
             }
             // 删除所有的出入库计划
 //            inputStockPlanService.deleteInStockPlan(applyNo);
-            outStockPlanService.deleteOutStockPlan(applyNo);
+//            outStockPlanService.deleteOutStockPlan(applyNo);
             // 修改申请单为 -等待退款,
            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.WAITINGREFUND.name());
            return StatusDto.buildSuccessStatusDto();
@@ -276,7 +276,6 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
         // 如果修改的是平台，则直接修改申请单为 -等待入库
         if (apply.getApplyorgNo().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
             allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REPLACEWAITIN.name());
-            problemAllocateApply.generateOutStockPlan(applyNo);
         } else {
             //　不是平台，修改申请单类型为  等待出库
             allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.PLATFORMOUTBOUND.name());
