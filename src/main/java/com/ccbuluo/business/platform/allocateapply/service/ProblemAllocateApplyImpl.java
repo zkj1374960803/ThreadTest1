@@ -308,7 +308,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             if(bizOutstockplanDetails != null && bizOutstockplanDetails.size() > 0){
                 bizOutstockplanDetails.forEach(a ->{
                     QueryAllocateapplyDetailDTO queryAllocateapply = allocateapplyDetailMap.get(a.getProductNo());
-                    queryAllocateapply.setCostPrice(a.getCostPrice());
+                    queryAllocateapply.setSellPrice(a.getCostPrice());
                     allocateapplyDetailList.add(queryAllocateapply);
                 });
             }
