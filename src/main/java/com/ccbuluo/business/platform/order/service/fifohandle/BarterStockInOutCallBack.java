@@ -10,6 +10,7 @@ import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
+import com.ccbuluo.business.platform.allocateapply.dto.ProductStockInfoDTO;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.outstock.dto.ProductStockDTO;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
@@ -169,13 +170,13 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
         List<BizStockDetail> bizStockDetailList = bizStockDetailDao.queryStockByProducts(products, userHolder.getLoggedUser().getOrganization().getOrgCode());
         // 以商品分组，并计算商品库存
         Map<String, List<BizStockDetail>> groupProduct = bizStockDetailList.stream().collect(Collectors.groupingBy(BizStockDetail::getProductNo));
-        Map<String, BizInstockplanDetail> singleProductStockDetail = instockplanDetails.stream().collect(Collectors.toMap(BizInstockplanDetail::getProductNo, Function.identity()));
-        for (Map.Entry<String, List<BizStockDetail>> entryP : groupProduct.entrySet()) {
-            // 校验库存是否满足
-            List<BizStockDetail> value = entryP.getValue();
-            long count = value.stream().map(BizStockDetail::getValidStock).count();
-            BizInstockplanDetail bizInstockplanDetail = singleProductStockDetail.get(entryP.getKey());
-            if (bizInstockplanDetail.getPlanInstocknum() > count) {
+        Map<String, List<BizInstockplanDetail>> collect = instockplanDetails.stream().collect(Collectors.groupingBy(BizInstockplanDetail::getProductNo));
+        for (Map.Entry<String, List<BizInstockplanDetail>> entryP : collect.entrySet()) {
+            List<BizInstockplanDetail> value = entryP.getValue();
+            long planOutStockSum = value.stream().mapToLong(BizInstockplanDetail::getPlanInstocknum).sum();
+            List<BizStockDetail> bizStockDetailList1 = groupProduct.get(entryP.getKey());
+            long stockSum = bizStockDetailList1.stream().mapToLong(BizStockDetail::getValidStock).sum();
+            if (planOutStockSum > stockSum) {
                 throw new CommonException(ba.getApplyNo(), "可用库存不足，无法满足该申请的换货需求，请核对！");
             }
         }
