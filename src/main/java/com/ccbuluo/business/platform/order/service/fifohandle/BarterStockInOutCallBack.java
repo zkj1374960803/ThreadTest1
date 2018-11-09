@@ -109,6 +109,7 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
             if(null == stockDetails || stockDetails.size() == 0){
                 return StatusDto.buildFailureStatusDto("库存列表为空！");
             }
+            // 生成平台出库计划
             List<BizOutstockplanDetail> outstockplans = buildPlatformOutstockplan(apply, details, stockDetails);
             // 根据平台出库计划生成机构入库计划
             List<BizInstockplanDetail> bizInstockplanDetails = buildOrgInStockPlan(apply, outstockplans);
@@ -170,7 +171,7 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
         // 根据入库计划里的商品查询商品库存
         List<String> products = instockplanDetails.stream().map(BizInstockplanDetail::getProductNo).collect(Collectors.toList());
         List<BizStockDetail> bizStockDetailList = bizStockDetailDao.queryStockByProducts(products, userHolder.getLoggedUser().getOrganization().getOrgCode());
-        // 以商品分组，并计算商品库存
+        // 校验库存是否足够
         Map<String, List<BizStockDetail>> groupProduct = bizStockDetailList.stream().collect(Collectors.groupingBy(BizStockDetail::getProductNo));
         Map<String, List<BizInstockplanDetail>> inStockPlanProduct = instockplanDetails.stream().collect(Collectors.groupingBy(BizInstockplanDetail::getProductNo));
         for (Map.Entry<String, List<BizInstockplanDetail>> entryP : inStockPlanProduct.entrySet()) {
@@ -184,7 +185,10 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
         }
         // 用来存储新的有效库存和占用库存
         List<BizStockDetail> bizStockDetailLists = Lists.newArrayList();
-        for (Map.Entry<String, List<BizStockDetail>> entry : groupProduct.entrySet()) {
+        // 以商品分组，并计算商品库存
+        List<BizStockDetail> validStockList = bizStockDetailList.stream().filter(item -> item.getValidStock() > 0).collect(Collectors.toList());
+        Map<String, List<BizStockDetail>> validStockProduct = validStockList.stream().collect(Collectors.groupingBy(BizStockDetail::getProductNo));
+        for (Map.Entry<String, List<BizStockDetail>> entry : validStockProduct.entrySet()) {
             List<BizStockDetail> productStockDetail = entry.getValue();
             List<BizInstockplanDetail> bizInstockplanDetails = inStockPlanProduct.get(entry.getKey());
             // 获取入库计划中的每个商品的计划入库总数量
