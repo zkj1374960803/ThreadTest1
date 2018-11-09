@@ -381,7 +381,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
     }
 
     /**
-     * 平台退换货生成出库计划
+     * 平台处理机构发起的退换货申请生成平台出库计划及机构的入库计划
      * @param applyNo 申请单号
      * @return 是否成功
      * @author liuduo
