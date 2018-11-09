@@ -445,7 +445,9 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         // 根据仓库编号查询机构号
         String orgCodeByStoreHouseCode = storeHouseService.getOrgCodeByStoreHouseCode(inRepositoryNo);
         List<Long> stockIds = Lists.newArrayList();
+        Map<Long, BizInstockplanDetail> inStockPlan = bizInstockplanDetails.stream().collect(Collectors.toMap(BizInstockplanDetail::getId, Function.identity()));
         bizInstockorderDetailList.forEach(item -> {
+            BizInstockplanDetail bizInstockplanDetail = inStockPlan.get(item.getInstockPlanid());
             Long id = stockDetailService.getByinstockorderDeatil(item.getSupplierNo(), item.getProductNo(), item.getCostPrice(), inRepositoryNo, applyNo);
             if (null != id) {
                 // 根据id查询乐观锁
@@ -486,6 +488,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                 bizStockDetail.setInstockPlanid(item.getInstockPlanid());
                 bizStockDetail.setProductUnit(item.getUnit());
                 bizStockDetail.preInsert(userHolder.getLoggedUserId());
+                bizStockDetail.setPurchaseInfo(bizInstockplanDetail.getPurchaseInfo());
                 Long stockDetailId = stockDetailService.saveStockDetail(bizStockDetail);
                 stockIds.add(stockDetailId);
                 // 把库存id回填到入库详单中
