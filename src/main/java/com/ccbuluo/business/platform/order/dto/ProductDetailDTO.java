@@ -75,6 +75,9 @@ public class ProductDetailDTO extends AftersaleCommonEntity {
 
 
     public Double getTotalPrice() {
+        if (null == unitPrice) {
+            return null;
+        }
         return unitPrice.doubleValue() * amount;
     }
 
