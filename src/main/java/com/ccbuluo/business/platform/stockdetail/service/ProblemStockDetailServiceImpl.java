@@ -7,6 +7,7 @@ import com.ccbuluo.business.entity.BizOutstockplanDetail;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
+import com.ccbuluo.business.platform.allocateapply.service.ProblemAllocateApplyImpl;
 import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
 import com.ccbuluo.business.platform.equipment.dto.DetailBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
@@ -64,6 +65,8 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
     private AllocateApplyService allocateApplyService;
     @Autowired
     private BarterStockInOutCallBack barterStockInOutCallBack;
+    @Autowired
+    private ProblemAllocateApplyImpl problemAllocateApply;
 
     /**
      * 带条件分页查询所有零配件的问题库存
@@ -273,6 +276,7 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
         // 如果修改的是平台，则直接修改申请单为 -等待入库
         if (apply.getApplyorgNo().equals(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM)) {
             allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.REPLACEWAITIN.name());
+            problemAllocateApply.generateOutStockPlan(applyNo);
         } else {
             //　不是平台，修改申请单类型为  等待出库
             allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.PLATFORMOUTBOUND.name());

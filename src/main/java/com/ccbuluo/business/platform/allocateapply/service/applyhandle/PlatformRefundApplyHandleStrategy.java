@@ -206,6 +206,8 @@ public class PlatformRefundApplyHandleStrategy extends DefaultApplyHandleStrateg
             instockplanPurchaser.setInstockType(InstockTypeEnum.BARTER.name());
             instockplanPurchaser.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
             instockplanPurchaser.setCostPrice(outstockplan.getCostPrice());
+            instockplanPurchaser.setPlanInstocknum(outstockplan.getPlanOutstocknum());
+            instockplanPurchaser.setSupplierNo(outstockplan.getSupplierNo());
             inList.add(instockplanPurchaser);
         }
     }
@@ -225,8 +227,6 @@ public class PlatformRefundApplyHandleStrategy extends DefaultApplyHandleStrateg
         inPlan.setProductName(ad.getProductName());// 商品名称
         inPlan.setProductUnit(ad.getUnit());// 商品计量单位
         inPlan.setTradeNo(String.valueOf(ad.getApplyNo()));// 交易批次号（申请单编号）
-        inPlan.setSupplierNo(ad.getSupplierNo());//供应商编号
-        inPlan.setPlanInstocknum(ad.getApplyNum());// 计划入库数量
         inPlan.setCompleteStatus(StockPlanStatusEnum.DOING.toString());// 完成状态（计划执行中）
         inPlan.preInsert(userHolder.getLoggedUserId());
         inPlan.setRemark(ad.getRemark());// 备注
