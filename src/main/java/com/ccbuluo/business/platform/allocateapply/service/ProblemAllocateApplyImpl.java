@@ -21,7 +21,6 @@ import com.ccbuluo.business.platform.stockdetail.dto.StockDetailDTO;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
-import com.ccbuluo.business.platform.supplier.dto.QuerySupplierInfoDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.BusinessUser;
 import com.ccbuluo.core.entity.Organization;
@@ -37,16 +36,14 @@ import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
 import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -245,32 +242,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         }
         return orgCode;
     }
-//
-//    /**
-//     * 查询退换货申请单详情(申请)
-//     * @param applyNo 申请单号
-//     * @return StatusDto
-//     * @author weijb
-//     * @date 2018-08-20 20:02:58
-//     */
-//    @Override
-//    public FindAllocateApplyDTO getProblemdetailApplyDetail(String applyNo){
-//        FindAllocateApplyDTO allocateApplyDTO = allocateApplyServiceImpl.findDetail(applyNo);
-//        // 获取出库人和出库时间
-//        ProblemAllocateapplyDetailDTO info = problemAllocateApplyDao.getProblemdetailApplyDetail(applyNo, allocateApplyDTO.getApplyorgNo());
-//        if(null != info){
-//            String inOperatorName = getUserNameByUuid(info.getInstockOperator());
-//            allocateApplyDTO.setOutstockOperatorName(allocateApplyDTO.getApplyerName());// 出库人（自动出库人）
-//            allocateApplyDTO.setOutstockTime(allocateApplyDTO.getCreateTime());// 出库时间 （自动出库时间）
-//            allocateApplyDTO.setInstockOperatorName(inOperatorName); // 入库人
-//            allocateApplyDTO.setInstockTime(info.getInstockTime());// 入库时间
-//            allocateApplyDTO.setTransportorderNo(info.getTransportorderNo());// 物流单号
-//            allocateApplyDTO.setTotalPrice(info.getTotalPrice());
-//        }
-//        // 计算成本价格
-//        convertCostPrice(allocateApplyDTO);
-//        return allocateApplyDTO;
-//    }
+
     /**
      * 查询退换货申请单详情（处理）
      * @param applyNo 申请单号
@@ -293,12 +265,12 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             allocateApplyDTO.setTransportorderNo(sigleOutStockByTradeDocno.getTransportorderNo());// 物流单号
             allocateApplyDTO.setTotalPrice(info.getTotalPrice());
         }
-
+        // 设置入库仓库名称
         QueryStorehouseDTO queryStorehouseDTO = bizServiceStorehouseDao.queryQueryStorehouseDTOByCode(allocateApplyDTO.getInRepositoryNo());
         if(queryStorehouseDTO != null){
             allocateApplyDTO.setInRepositoryName(queryStorehouseDTO.getStorehouseName());
         }
-        // 设置完成时间
+        // 设置申请完成时间
         if(!BizAllocateApply.ReturnApplyStatusEnum.REPLACECOMPLETED.name().equals(allocateApplyDTO.getApplyStatus())
             && !BizAllocateApply.ReturnApplyStatusEnum.REFUNDCOMPLETED.name().equals(allocateApplyDTO.getApplyStatus())) {
             // 状态没有完成，时间为空
@@ -309,27 +281,39 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         if(instockOrderDTO != null){
             QueryStorehouseDTO queryStorehouse = bizServiceStorehouseDao.queryQueryStorehouseDTOByCode(instockOrderDTO.getInRepositoryNo());
             if(queryStorehouse != null){
+                // 设置平台入库仓库
                 allocateApplyDTO.setPlatformInRepositoryName(queryStorehouse.getStorehouseName());
             }
         }
-        // 计算成本价格
-        convertCostPrice(allocateApplyDTO);
+        // 设置问题件详单
+        ArrayList<QueryAllocateapplyDetailDTO> allocateapplyDetailList = setingProblemDetailList(applyNo, allocateApplyDTO);
+        allocateApplyDTO.setQueryAllocateapplyDetailDTO(allocateapplyDetailList);
         return allocateApplyDTO;
     }
+
     /**
-     *  获取成本价格
-     * @param
-     * @exception
-     * @return
-     * @author weijb
-     * @date 2018-09-03 10:18:33
+     * 查询问题件详单
+     * @param applyNo 申请单编号
+     * @param allocateApplyDTO 问题件信息
+     * @return ArrayList<QueryAllocateapplyDetailDTO>
+     * @author zhangkangjian
+     * @date 2018-11-09 15:02:32
      */
-    private void convertCostPrice(FindAllocateApplyDTO allocateApplyDTO){
-         List<StockDetailDTO> list = problemStockDetailDao.queryStockDetailListByAppNo(allocateApplyDTO.getApplyorgNo());
-        for(QueryAllocateapplyDetailDTO applyDetail : allocateApplyDTO.getQueryAllocateapplyDetailDTO()){
-            Optional<StockDetailDTO> applyFilter = list.stream().filter(stockDetail -> applyDetail.getProductNo().equals(stockDetail.getProductNo())).findFirst();
-            applyFilter.ifPresent(stockDetailDTO -> applyDetail.setCostPrice(stockDetailDTO.getCostPrice()));
+    private ArrayList<QueryAllocateapplyDetailDTO> setingProblemDetailList(String applyNo, FindAllocateApplyDTO allocateApplyDTO) {
+        List<BizOutstockplanDetail> bizOutstockplanDetails = bizOutstockplanDetailDao.queryOutstockplan(applyNo, null, null);
+        ArrayList<QueryAllocateapplyDetailDTO> allocateapplyDetailList = Lists.newArrayList();
+        List<QueryAllocateapplyDetailDTO> queryAllocateapplyDetailDTO = allocateApplyDTO.getQueryAllocateapplyDetailDTO();
+        if(queryAllocateapplyDetailDTO != null && queryAllocateapplyDetailDTO.size() > 0){
+            Map<String, QueryAllocateapplyDetailDTO> allocateapplyDetailMap = queryAllocateapplyDetailDTO.stream().collect(Collectors.toMap(QueryAllocateapplyDetailDTO::getProductNo, a -> a,(k1, k2)->k1));
+            if(bizOutstockplanDetails != null && bizOutstockplanDetails.size() > 0){
+                bizOutstockplanDetails.forEach(a ->{
+                    QueryAllocateapplyDetailDTO queryAllocateapply = allocateapplyDetailMap.get(a.getProductNo());
+                    queryAllocateapply.setCostPrice(a.getCostPrice());
+                    allocateapplyDetailList.add(queryAllocateapply);
+                });
+            }
         }
+        return allocateapplyDetailList;
     }
 
     /**
