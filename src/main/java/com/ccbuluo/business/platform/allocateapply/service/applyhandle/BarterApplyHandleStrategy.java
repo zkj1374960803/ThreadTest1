@@ -163,7 +163,7 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
         // 平台入库
         problemInstockplanPlatform(inList,details, outList);
         // 申请方入库（换货：买方机构的入库要以出库的数据来构建（不同批次，不同价格）（问题件库存））
-        problemInstockplanPurchaser(inList,details, outList);
+//        problemInstockplanPurchaser(inList,details, outList);
         return Pair.of(outList, inList);
     }
 
