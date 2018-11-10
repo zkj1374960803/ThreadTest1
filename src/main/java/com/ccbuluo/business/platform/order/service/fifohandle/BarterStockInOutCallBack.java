@@ -210,7 +210,7 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
                     break;
                 } else {
                     // 申请的数量大于库存的数量
-                    stockDetail.setValidStock(0L);
+                    stockDetail.setValidStock(validStock);
                     stockDetail.setOccupyStock(validStock);
                     inStockPlanSum = inStockPlanSum - validStock;
                     bizStockDetailLists.add(stockDetail);

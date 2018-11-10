@@ -663,7 +663,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         params.put("orgCode", orgCode);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,product_no,IFNULL(valid_stock,0) AS validStock,repository_no,cost_price FROM biz_stock_detail WHERE product_no IN(:products) AND org_no = :orgCode");
+        sql.append("SELECT id,product_no,IFNULL(valid_stock,0) AS validStock,repository_no,cost_price,supplier_no FROM biz_stock_detail WHERE product_no IN(:products) AND org_no = :orgCode");
 
         return queryListBean(BizStockDetail.class, sql.toString(), params);
     }
