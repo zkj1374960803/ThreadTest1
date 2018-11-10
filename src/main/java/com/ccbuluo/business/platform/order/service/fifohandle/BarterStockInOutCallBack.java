@@ -281,7 +281,7 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
         outstockplanPlatform.setProductName(bizInstockplanDetail.getProductName());
         outstockplanPlatform.setProductUnit(bizInstockplanDetail.getProductUnit());
         outstockplanPlatform.setTradeNo(bizInstockplanDetail.getTradeNo());
-        outstockplanPlatform.setSupplierNo(bizInstockplanDetail.getSupplierNo());
+        outstockplanPlatform.setSupplierNo(stockDetail.getSupplierNo());
         outstockplanPlatform.setSalesPrice(BigDecimal.ZERO);
         outstockplanPlatform.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
         outstockplanPlatform.setPlanStatus(StockPlanStatusEnum.DOING.toString());
