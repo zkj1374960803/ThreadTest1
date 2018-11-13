@@ -19,6 +19,7 @@ import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.merchandiseintf.carparts.category.dto.RelSupplierProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.category.service.CarpartsCategoryService;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.EditBasicCarpartsProductDTO;
+import com.ccbuluo.merchandiseintf.carparts.parts.dto.SaveBasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
@@ -96,9 +97,9 @@ public class StockManagementServiceImpl implements StockManagementService {
      */
     private FindStockDetailDTO findFtingStockDetailDTO(String productNo) {
         // 零备件
-        StatusDtoThriftBean<EditBasicCarpartsProductDTO> carpartsProductdetail = carpartsProductService.findCarpartsProductdetail(productNo);
-        StatusDto<EditBasicCarpartsProductDTO> resolve = StatusDtoThriftUtils.resolve(carpartsProductdetail, EditBasicCarpartsProductDTO.class);
-        EditBasicCarpartsProductDTO data = resolve.getData();
+        StatusDtoThriftBean<SaveBasicCarpartsProductDTO> carpartsProductdetail = carpartsProductService.findCarpartsProductdetail(productNo);
+        StatusDto<SaveBasicCarpartsProductDTO> resolve = StatusDtoThriftUtils.resolve(carpartsProductdetail, SaveBasicCarpartsProductDTO.class);
+        SaveBasicCarpartsProductDTO data = resolve.getData();
         if(data != null){
             FindStockDetailDTO findStockDetailDTOs = new FindStockDetailDTO();
             findStockDetailDTOs.setProductNo(data.getCarpartsCode());

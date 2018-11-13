@@ -1,9 +1,11 @@
 package com.ccbuluo.business.platform.carparts.service;
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.entity.RelProductPrice;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarmodelManageDao;
+import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelManage;
 import com.ccbuluo.business.platform.carconfiguration.service.BasicCarmodelManageService;
 import com.ccbuluo.business.platform.carparts.dao.CarpartsProductPriceDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
@@ -13,13 +15,11 @@ import com.ccbuluo.core.entity.UploadFileInfo;
 import com.ccbuluo.core.service.UploadService;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
-import com.ccbuluo.http.StatusDto;
-import com.ccbuluo.http.StatusDtoThriftBean;
-import com.ccbuluo.http.StatusDtoThriftPage;
-import com.ccbuluo.http.StatusDtoThriftUtils;
+import com.ccbuluo.http.*;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.EditBasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
+import com.ccbuluo.merchandiseintf.carparts.parts.dto.SaveBasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
@@ -57,6 +57,8 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     private UploadService uploadService;
     @Resource
     private BasicCarmodelManageDao basicCarmodelManageDao;
+    @Resource(name = "carpartsProductPriceServiceImpl")
+    private CarpartsProductPriceService carpartsProductServiceImpl;
 
     /**
      * 查询零配件的信息和价格
@@ -166,22 +168,104 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
      * @date 2018-11-05 16:56:30
      */
     @Override
-    public StatusDto<EditBasicCarpartsProductDTO> findCarpartsProductdetail(String carpartsCode) {
-        StatusDtoThriftBean<EditBasicCarpartsProductDTO> carpartsProductdetail = carpartsProductService.findCarpartsProductdetail(carpartsCode);
-        StatusDto<EditBasicCarpartsProductDTO> resolve = StatusDtoThriftUtils.resolve(carpartsProductdetail, EditBasicCarpartsProductDTO.class);
-        EditBasicCarpartsProductDTO data = resolve.getData();
-        List<Map<String, Object>> mList = basicCarmodelManageDao.queryAllCarMobelList();
-        for(EditBasicCarpartsProductDTO bd : List.of(data)){
-            for(Map<String, Object> map : mList){
-                if(map.get("id").toString().equals(bd.getFitCarmodel())){
-                    bd.setFitCarmodel(map.get("name").toString());
-                    continue;
+    public StatusDto<SaveBasicCarpartsProductDTO> findCarpartsProductdetail(String carpartsCode) {
+        StatusDtoThriftBean<SaveBasicCarpartsProductDTO> carpartsProductdetail = carpartsProductService.findCarpartsProductdetail(carpartsCode);
+        StatusDto<SaveBasicCarpartsProductDTO> carpartsProductStatusDto = StatusDtoThriftUtils.resolve(carpartsProductdetail, SaveBasicCarpartsProductDTO.class);
+        SaveBasicCarpartsProductDTO carpartsProductDTO = carpartsProductStatusDto.getData();
+        String fitCarmodel = carpartsProductDTO.getFitCarmodel();
+        if(StringUtils.isNotBlank(fitCarmodel)){
+            Long fitCarmodelId = Long.valueOf(fitCarmodel);
+            List<CarmodelManage> carmodelManages = basicCarmodelManageDao.queryPartModel(List.of(fitCarmodelId));
+            carmodelManages.forEach(item->{
+                Long carbrandId = item.getCarbrandId();
+                if(carbrandId.equals(fitCarmodelId)){
+                    carpartsProductDTO.setFitCarmodel(item.getCarmodelName());
                 }
-            }
+            });
         }
-        return resolve;
+        return carpartsProductStatusDto;
     }
 
+    /**
+     * 保存零配件
+     *
+     * @param saveBasicCarpartsProductDTO 零配件实体
+     * @return StatusDto<String>
+     * @author zhangkangjian
+     * @date 2018-11-12 14:37:33
+     */
+    @Override
+    public StatusDto<String> saveCarpartsProduct(SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO) {
+        // 生成编码
+        StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(BizServiceProjectcode.CodePrefixEnum.FP);
+        // 获取code失败
+        if(!Constants.SUCCESS_CODE.equals(stringStatusDto.getCode())){
+            return stringStatusDto;
+        }
+        saveBasicCarpartsProductDTO.setCarpartsCode(stringStatusDto.getData());
+        saveBasicCarpartsProductDTO.setCreator(userHolder.getLoggedUserId());
+        saveBasicCarpartsProductDTO.setOperator(userHolder.getLoggedUserId());
+        if(StringUtils.isNotBlank(saveBasicCarpartsProductDTO.getCarpartsName())){
+            String pinYinHeadChar = PinyinTool.getPinYinHeadChar(saveBasicCarpartsProductDTO.getCarpartsName());
+            saveBasicCarpartsProductDTO.setCarpartsPinyinname(pinYinHeadChar);
+        }
+        return carpartsProductService.saveCarpartsProduct(saveBasicCarpartsProductDTO);
+    }
+
+    /**
+     * 编辑零部件
+     *
+     * @param saveBasicCarpartsProductDTO 零配件实体
+     * @return StatusDto<String>
+     * @author weijb
+     * @date 2018-07-02 18:52:40
+     */
+    @Override
+    public StatusDto<String> editCarpartsProduct(SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO) {
+        if(StringUtils.isNotBlank(saveBasicCarpartsProductDTO.getCarpartsName())){
+            String pinYinHeadChar = PinyinTool.getPinYinHeadChar(saveBasicCarpartsProductDTO.getCarpartsName());
+            saveBasicCarpartsProductDTO.setCarpartsPinyinname(pinYinHeadChar);
+        }
+        return carpartsProductService.editCarpartsProduct(saveBasicCarpartsProductDTO);
+    }
+
+    /**
+     * 零配件列表分页查询
+     *
+     * @param keyword  零部件名称
+     * @param offset   起始数
+     * @param pageSize 每页数量
+     * @author zhangkangjian
+     * @date 2018-11-12 19:52:44
+     */
+    @Override
+    public  StatusDto<Page<BasicCarpartsProductDTO>> queryCarpartsProductList(String keyword, Integer offset, Integer pageSize) {
+        StatusDto<Page<BasicCarpartsProductDTO>> list = StatusDtoThriftUtils.resolve(carpartsProductService.queryCarpartsProductList(keyword, offset, pageSize),BasicCarpartsProductDTO.class);
+        // 把车型id转换成车型名字
+        if(null != list) {
+            basicCarmodelManageService.buildCarModeName(list.getData().getRows());
+        }
+        return list;
+    }
+
+    /**
+     * 查询零配件的信息
+     * @param keyword 查询的条件
+     * @return StatusDto<List<BasicCarpartsProductDTO>
+     * @author zhangkangjian
+     * @date 2018-11-13 10:07:23
+     */
+    @Override
+    public StatusDto<List<BasicCarpartsProductDTO>> queryCarparts(String keyword) {
+        StatusDto<Page<BasicCarpartsProductDTO>> list = StatusDtoThriftUtils.resolve(carpartsProductService.queryCarpartsProductList(keyword, 0, Integer.MAX_VALUE),BasicCarpartsProductDTO.class);
+        Page<BasicCarpartsProductDTO> data = list.getData();
+        List<BasicCarpartsProductDTO> basicCarpartsProductDTOS = Lists.newArrayList();
+        if(data != null){
+            basicCarpartsProductDTOS = data.getRows();
+        }
+        return StatusDto.buildDataSuccessStatusDto(basicCarpartsProductDTOS);
+
+    }
 
     /**
      * 上传图片
@@ -194,8 +278,6 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     public StatusDto<UploadFileInfo> uploadImage(String base64) throws UnsupportedEncodingException {
         return uploadService.simpleUpload(new BASE64DecodedMultipartFile(base64), "carpartsimage");
     }
-
-
 
 
     /**
@@ -216,12 +298,6 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
             Map<String, List<RelProductPrice>> relProductPriceMap = a.stream().collect(Collectors.groupingBy(RelProductPrice::getProductNo));
             if(rows != null && rows.size() > 0){
                 rows.forEach(item ->{
-                    String categoryCodePath = item.getCategoryCodePath();
-                    if(StringUtils.isNotBlank(categoryCodePath)){
-                        int i = categoryCodePath.indexOf("-") + 1;
-                        String substring = categoryCodePath.substring(i, categoryCodePath.length());
-                        item.setCategoryCodePath(substring);
-                    }
                     buildCarpartsPrice(relProductPriceMap, item);
                 });
             }

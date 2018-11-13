@@ -482,26 +482,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         throw new CommonException(Constants.ERROR_CODE, "获取用户信息异常！");
     }
 
-    /**
-     * 人为触发的正常调拨类型的申请处理
-     * @param processApplyDTO
-     * @author zhangkangjian
-     * @date 2018-08-10 11:24:53
-     */
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void processApply(ProcessApplyDTO processApplyDTO) {
-        // 更新基础数据
-        processApplyDTO.setApplyProcessor(userHolder.getLoggedUserId());
-        processApplyDTO.setProcessTime(new Date());
-        processApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
-        Long versionNo = bizAllocateApplyDao.findVersionNo(processApplyDTO.getApplyNo());
-        processApplyDTO.setVersionNo(versionNo);
-        bizAllocateApplyDao.updateAllocateApply(processApplyDTO);
-        saveProcessApply(processApplyDTO.getProcessApplyDetailDTO());
-        // 生成出入库计划
-        applyHandleContext.applyHandle(processApplyDTO.getApplyNo());
-    }
+
 
     /**
      * 保存申请详单数据
@@ -546,6 +527,26 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         }else {
             throw new CommonException(Constants.ERROR_CODE, "申请单状态不正确，不可以驳回申请");
         }
+    }
+    /**
+     * 人为触发的正常调拨类型的申请处理
+     * @param processApplyDTO
+     * @author zhangkangjian
+     * @date 2018-08-10 11:24:53
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void processApply(ProcessApplyDTO processApplyDTO) {
+        // 更新基础数据
+        processApplyDTO.setApplyProcessor(userHolder.getLoggedUserId());
+        processApplyDTO.setProcessTime(new Date());
+        processApplyDTO.setApplyStatus(ApplyStatusEnum.WAITINGPAYMENT.name());
+        Long versionNo = bizAllocateApplyDao.findVersionNo(processApplyDTO.getApplyNo());
+        processApplyDTO.setVersionNo(versionNo);
+        bizAllocateApplyDao.updateAllocateApply(processApplyDTO);
+        saveProcessApply(processApplyDTO.getProcessApplyDetailDTO());
+        // 生成出入库计划
+        applyHandleContext.applyHandle(processApplyDTO.getApplyNo());
     }
 
     /**
@@ -1092,7 +1093,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     @Override
     public Page<FindStockListDTO> findAllStockList(FindStockListDTO findStockListDTO) {
         List<FindStockListDTO> findStockListDTOList = Lists.newArrayList();
-        StatusDtoThriftPage<BasicCarpartsProductDTO> basicCarpartsProductDTO = carpartsProductService.queryCarpartsProductList(findStockListDTO.getCategoryCode(), findStockListDTO.getProductNo(), findStockListDTO.getOffset(), findStockListDTO.getPageSize());
+        StatusDtoThriftPage<BasicCarpartsProductDTO> basicCarpartsProductDTO = carpartsProductService.queryCarpartsProductList(findStockListDTO.getProductNo(), findStockListDTO.getOffset(), findStockListDTO.getPageSize());
         StatusDto<Page<BasicCarpartsProductDTO>> basicCarpartsProductDTOResolve = StatusDtoThriftUtils.resolve(basicCarpartsProductDTO, BasicCarpartsProductDTO.class);
         Page<BasicCarpartsProductDTO> basicCarpartsProductDTOPage = basicCarpartsProductDTOResolve.getData();
         // 统计库存列表里所有的库存
