@@ -650,7 +650,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             param.put("supplierNo", supplierNo);
             sql.append(" AND a.supplier_no = :supplierNo ");
         }
-        sql.append(" GROUP BY a.product_no having SUM(a.problem_stock) > 0 ORDER BY a.create_time DESC");
+        sql.append(" GROUP BY a.product_no,a.supplier_no having SUM(a.problem_stock) > 0 ORDER BY a.create_time DESC");
         return queryListBean(StockBizStockDetailDTO.class, sql.toString(), param);
     }
 

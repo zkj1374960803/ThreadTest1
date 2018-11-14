@@ -1005,7 +1005,24 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public List<StockBizStockDetailDTO> queryProblemStockList(String orgCode, String productType, String supplierNo) {
-        return bizAllocateApplyDao.queryProblemStockList(orgCode, productType, supplierNo);
+        List<StockBizStockDetailDTO> stockBizStockDetailDTOS = bizAllocateApplyDao.queryProblemStockList(orgCode, productType, supplierNo);
+            if(stockBizStockDetailDTOS != null && stockBizStockDetailDTOS.size() > 0){
+                List<String> productNoList = stockBizStockDetailDTOS.stream().map(StockBizStockDetailDTO::getProductNo).collect(Collectors.toList());
+                StatusDtoThriftList<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThrift = carpartsProductService.queryCarpartsProductListByCarpartsCodes(productNoList);
+                StatusDto<List<BasicCarpartsProductDTO>> resolve = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOStatusDtoThrift, BasicCarpartsProductDTO.class);
+                List<BasicCarpartsProductDTO> data = resolve.getData();
+                if(data != null && data.size() > 0){
+                    Map<String, BasicCarpartsProductDTO> productMap = data.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, a -> a,(k1,k2)->k1));
+                    stockBizStockDetailDTOS.forEach(item ->{
+                        BasicCarpartsProductDTO basicCarpartsProductDTO = productMap.get(item.getProductNo());
+                        item.setProductName(basicCarpartsProductDTO.getCarpartsName());
+                        item.setProductUnit(basicCarpartsProductDTO.getUnitName());
+                        item.setCarpartsImage(basicCarpartsProductDTO.getCarpartsImage());
+                        item.setCarpartsMarkno(basicCarpartsProductDTO.getCarpartsMarkno());
+                    });
+                }
+            }
+        return stockBizStockDetailDTOS;
     }
 
     /**
