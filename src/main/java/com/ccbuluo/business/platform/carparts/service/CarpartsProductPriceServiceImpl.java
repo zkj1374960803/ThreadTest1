@@ -192,7 +192,7 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
         if(fitCarmodelLongIds != null && fitCarmodelLongIds.size() > 0){
             List<CarmodelManage> carmodelManages = basicCarmodelManageDao.queryPartModel(fitCarmodelLongIds);
             String fitCarmodelName = StringUtils.join(carmodelManages.stream().map(CarmodelManage::getCarmodelName).toArray(), Constants.COMMA);
-            carpartsProductDTO.setFitCarmodel(fitCarmodelName);
+            carpartsProductDTO.setCarpartsName(fitCarmodelName);
         }
         return carpartsProductStatusDto;
     }
@@ -265,7 +265,7 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
                     if(fitCarmodelLongIds != null && fitCarmodelLongIds.size() > 0){
                         List<CarmodelManage> carmodelManages = basicCarmodelManageDao.queryPartModel(fitCarmodelLongIds);
                         String fitCarmodelName = StringUtils.join(carmodelManages.stream().map(CarmodelManage::getCarmodelName).toArray(), Constants.COMMA);
-                        item.setFitCarmodel(fitCarmodelName);
+                        item.setCarmodelName(fitCarmodelName);
                     }
                 });
             });
@@ -300,7 +300,6 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
      */
     @Override
     public StatusDto<String> deleteCarpartsProduct(String productNo) {
-
         Boolean resultRelStock =  bizAllocateApplyDao.checkProductRelStock(productNo);
         if(resultRelStock){
             return StatusDto.buildFailureStatusDto("该零配件已与库存建立关联关系！");
