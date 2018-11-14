@@ -108,38 +108,37 @@ public class StockAdjustController extends BaseController {
 
 
     /**
-     * 根据零配件分类code查询零配件
-     * @param categoryCode 零配件分类code
-     * @return 零配件类型集合
+     * 根据零配件代码查询准备盘库的零配件
+     * @param carpartsCode 零配件代码
      * @author liuduo
      * @date 2018-08-15 09:16:23
      */
-    @ApiOperation(value = "根据零配件分类code查询零配件", notes = "【刘铎】")
-    @ApiImplicitParam(name = "categoryCode", value = "零配件分类code", required = false, paramType = "query")
+    @ApiOperation(value = "根据零配件代码查询准备盘库的零配件", notes = "【刘铎】")
+    @ApiImplicitParam(name = "carpartsCode", value = "零配件代码", required = false, paramType = "query")
     @GetMapping("/queryproductbycode")
-    public StatusDto<List<StockAdjustListDTO>> queryProductByCode(@RequestParam(required = false) String categoryCode) {
-        return StatusDto.buildDataSuccessStatusDto(stockAdjustService.queryProductByCode(categoryCode));
+    public StatusDto<List<StockAdjustListDTO>> queryProductByCode(@RequestParam(required = false) String carpartsCode) {
+        return StatusDto.buildDataSuccessStatusDto(stockAdjustService.queryProductByCode(carpartsCode));
     }
 
 
-    /**
-     * 新增盘库时用的列表中根据分类查询列表
-     * @param categoryCode 零配件分类code
-     * @param productCode 商品code
-     * @return 新增零配件盘库时用的列表
-     * @author liuduo
-     * @date 2018-08-15 09:23:53
-     */
-    @ApiOperation(value = "新增盘库时用的列表中根据分类查询列表", notes = "【刘铎】")
-    @ApiImplicitParams({@ApiImplicitParam(name = "categoryCode", value = "零配件分类code",  required = false, paramType = "query", dataType = "int"),
-        @ApiImplicitParam(name = "productCode", value = "商品编号",  required = false, paramType = "query"),
-        @ApiImplicitParam(name = "productType", value = "商品类型（备件）",  required = true, paramType = "query")})
-    @GetMapping("/queryadjustlistbycategorycode")
-    public StatusDto<List<StockAdjustListDTO>> queryAdjustListByCategoryCode(@RequestParam(required = false) String categoryCode,
-                                                                             @RequestParam(required = false) String productCode,
-                                                                             @RequestParam @ValidateNotBlank(message = "productType(商品类型（备件）)不能为空") String productType) {
-        return StatusDto.buildDataSuccessStatusDto(stockAdjustService.queryAdjustListByCategoryCode(categoryCode, productCode, productType));
-    }
+//    /**
+//     * 新增盘库时用的列表中根据分类查询列表
+//     * @param categoryCode 零配件分类code
+//     * @param productCode 商品code
+//     * @return 新增零配件盘库时用的列表
+//     * @author liuduo
+//     * @date 2018-08-15 09:23:53
+//     */
+//    @ApiOperation(value = "新增盘库时用的列表中根据分类查询列表", notes = "【刘铎】")
+//    @ApiImplicitParams({@ApiImplicitParam(name = "categoryCode", value = "零配件分类code",  required = false, paramType = "query", dataType = "int"),
+//        @ApiImplicitParam(name = "productCode", value = "商品编号",  required = false, paramType = "query"),
+//        @ApiImplicitParam(name = "productType", value = "商品类型（备件）",  required = true, paramType = "query")})
+//    @GetMapping("/queryadjustlistbycategorycode")
+//    public StatusDto<List<StockAdjustListDTO>> queryAdjustListByCategoryCode(@RequestParam(required = false) String categoryCode,
+//                                                                             @RequestParam(required = false) String productCode,
+//                                                                             @RequestParam @ValidateNotBlank(message = "productType(商品类型（备件）)不能为空") String productType) {
+//        return StatusDto.buildDataSuccessStatusDto(stockAdjustService.queryAdjustListByCategoryCode(categoryCode, productCode, productType));
+//    }
 
     /**
      * 查询零配件类型集合
@@ -196,5 +195,34 @@ public class StockAdjustController extends BaseController {
     @GetMapping("/getbyadjustno")
     public StatusDto<StockAdjustDetailDTO> getByAdjustNo(@RequestParam @ValidateNotBlank(message = "adjustNo(盘库单code)不能为空") String adjustNo) {
         return StatusDto.buildDataSuccessStatusDto(stockAdjustService.getByAdjustNo(adjustNo));
+    }
+
+
+    /**
+     * 平台盘库总览
+     * @param adjustResult 盘库结果
+     * @param adjustSource 盘库单来源
+     * @param keyWord 关键字（盘库单号/服务中心/客户经理）
+     * @param offset 起始数
+     * @param pageSize 每页数
+     * @return 盘库单列表
+     * @author liuduo
+     * @date 2018-08-15 11:03:46
+     */
+    @ApiOperation(value = "平台盘库总览", notes = "【刘铎】")
+    @ApiImplicitParams({@ApiImplicitParam(name = "adjustResult", value = "盘库结果（有差异、无差异）",  required = false, paramType = "query", dataType = "int"),
+        @ApiImplicitParam(name = "adjustSource", value = "盘库单来源(传code)",  required = false, paramType = "query"),
+        @ApiImplicitParam(name = "productType", value = "商品类型（物料或者备件）",  required = false, paramType = "query"),
+        @ApiImplicitParam(name = "keyWord", value = "关键字（盘库单号/服务中心/客户经理）",  required = false, paramType = "query"),
+        @ApiImplicitParam(name = "offset", value = "起始数",  required = true, paramType = "query", dataType = "int"),
+        @ApiImplicitParam(name = "pageSize", value = "每页数",  required = true, paramType = "query", dataType = "int")})
+    @GetMapping("/platformqueryadjuststocklist")
+    public StatusDto<Page<SearchStockAdjustListDTO>> platformQueryAdjustStockList(@RequestParam(required = false) Integer adjustResult,
+                                                                          @RequestParam(required = false) String adjustSource,
+                                                                          @RequestParam(required = false) String productType,
+                                                                          @RequestParam(required = false) String keyWord,
+                                                                          @RequestParam(defaultValue = "0") Integer offset,
+                                                                          @RequestParam(defaultValue = "10") Integer pageSize) {
+        return StatusDto.buildDataSuccessStatusDto(stockAdjustService.queryAdjustStockList(adjustResult, adjustSource, keyWord, productType, offset, pageSize));
     }
 }

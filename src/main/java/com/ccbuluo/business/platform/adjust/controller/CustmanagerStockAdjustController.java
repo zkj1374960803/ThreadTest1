@@ -109,38 +109,37 @@ public class CustmanagerStockAdjustController extends BaseController {
 
 
     /**
-     * 根据零配件分类code查询零配件
-     * @param categoryCode 零配件分类code
-     * @return 零配件类型集
+     * 根据零配件代码查询准备盘库的零配件
+     * @param carpartsCode 零配件代码
      * @author liuduo
      * @date 2018-08-15 09:16:23
      */
-    @ApiOperation(value = "根据零配件分类code查询零配件", notes = "【刘铎】")
-    @ApiImplicitParam(name = "categoryCode", value = "零配件分类code", required = false, paramType = "query")
+    @ApiOperation(value = "根据零配件代码查询准备盘库的零配件", notes = "【刘铎】")
+    @ApiImplicitParam(name = "carpartsCode", value = "零配件代码", required = false, paramType = "query")
     @GetMapping("/queryproductbycode")
-    public StatusDto<List<BasicCarpartsProductDTO>> queryProductByCode(@RequestParam(required = false) String categoryCode) {
-        return StatusDto.buildDataSuccessStatusDto(carpartsProductService.queryCarpartsProductListByCategoryCode(categoryCode));
+    public StatusDto<List<StockAdjustListDTO>> queryProductByCode(@RequestParam(required = false) String carpartsCode) {
+        return StatusDto.buildDataSuccessStatusDto(stockAdjustService.queryProductByCode(carpartsCode));
     }
 
 
-    /**
-     * 新增盘库时用的列表中根据分类查询列表
-     * @param categoryCode 零配件分类code
-     * @param productCode 商品code
-     * @return 新增零配件盘库时用的列表
-     * @author liuduo
-     * @date 2018-08-15 09:23:53
-     */
-    @ApiOperation(value = "新增盘库时用的列表中根据分类查询列表", notes = "【刘铎】")
-    @ApiImplicitParams({@ApiImplicitParam(name = "categoryCode", value = "零配件分类code",  required = false, paramType = "query", dataType = "int"),
-        @ApiImplicitParam(name = "productCode", value = "商品编号",  required = false, paramType = "query"),
-        @ApiImplicitParam(name = "productType", value = "商品类型（备件）",  required = true, paramType = "query")})
-    @GetMapping("/queryadjustlistbycategorycode")
-    public StatusDto<List<StockAdjustListDTO>> queryAdjustListByCategoryCode(@RequestParam(required = false) String categoryCode,
-                                                                             @RequestParam(required = false) String productCode,
-                                                                             @RequestParam @ValidateNotBlank(message = "productType(商品类型（物料）)不能为空") String productType) {
-        return StatusDto.buildDataSuccessStatusDto(stockAdjustService.queryAdjustListByCategoryCode(categoryCode, productCode, productType));
-    }
+//    /**
+//     * 新增盘库时用的列表中根据分类查询列表
+//     * @param categoryCode 零配件分类code
+//     * @param productCode 商品code
+//     * @return 新增零配件盘库时用的列表
+//     * @author liuduo
+//     * @date 2018-08-15 09:23:53
+//     */
+//    @ApiOperation(value = "新增盘库时用的列表中根据分类查询列表", notes = "【刘铎】")
+//    @ApiImplicitParams({@ApiImplicitParam(name = "categoryCode", value = "零配件分类code",  required = false, paramType = "query", dataType = "int"),
+//        @ApiImplicitParam(name = "productCode", value = "商品编号",  required = false, paramType = "query"),
+//        @ApiImplicitParam(name = "productType", value = "商品类型（备件）",  required = true, paramType = "query")})
+//    @GetMapping("/queryadjustlistbycategorycode")
+//    public StatusDto<List<StockAdjustListDTO>> queryAdjustListByCategoryCode(@RequestParam(required = false) String categoryCode,
+//                                                                             @RequestParam(required = false) String productCode,
+//                                                                             @RequestParam @ValidateNotBlank(message = "productType(商品类型（物料）)不能为空") String productType) {
+//        return StatusDto.buildDataSuccessStatusDto(stockAdjustService.queryAdjustListByCategoryCode(categoryCode, productCode, productType));
+//    }
 
     /**
      * 查询零配件类型集合
