@@ -10,6 +10,7 @@ import com.ccbuluo.business.platform.stockdetail.dto.FindBatchStockListDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.FindStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.service.StockManagementService;
 import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
+import com.ccbuluo.core.annotation.validate.ValidatePattern;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.validate.ValidateUtils;
 import com.ccbuluo.db.Page;
@@ -99,7 +100,10 @@ public class StockManagementController extends BaseController {
         @ApiImplicitParam(name = "type", value = "(注：PLATFORM集团，SERVICECENTER服务中心，CUSTMANAGER客户经理)", required = true, paramType = "query"),
         @ApiImplicitParam(name = "code", value = "服务中心的code或者客户经理的orgcode", required = false, paramType = "query")
     })
-    public StatusDto<FindStockDetailDTO> findStockProductDetail(String productNo, @ValidateNotBlank String productType,@ValidateNotBlank String type, String code){
+    public StatusDto<FindStockDetailDTO> findStockProductDetail(@ValidateNotBlank String productNo,
+                                                                @ValidateNotBlank String productType,
+                                                                @ValidatePattern(regexp = {"PLATFORM", "SERVICECENTER", "CUSTMANAGER"}) String type,
+                                                                String code){
         FindStockDetailDTO findStockDetailDTO = stockManagementService.findStockProductDetail(productNo, productType, type, code);
         return StatusDto.buildDataSuccessStatusDto(findStockDetailDTO);
     }

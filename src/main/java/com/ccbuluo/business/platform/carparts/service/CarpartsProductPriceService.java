@@ -105,4 +105,11 @@ public interface CarpartsProductPriceService {
      * @date 2018-11-13 11:04:47
      */
     StatusDto<List<BasicCarpartsProductDTO>> queryCarparts(String keyword);
+    /**
+     *  删除零配件
+     * @param carpartsCode 零配件code
+     * @author zhangkangjian
+     * @date 2018-11-14 15:42:34
+     */
+    StatusDto<String> deleteCarpartsProduct(String carpartsCode);
 }

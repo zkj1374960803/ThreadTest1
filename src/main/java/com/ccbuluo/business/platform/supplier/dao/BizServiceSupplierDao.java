@@ -281,17 +281,17 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
 }
 
     /**
-     * 根据物料code查询是否已经关联
-     * @param equipCode 物料code
-     * @return 是否已经关联
+     * 根据商品的code查询物料是否被申请
+     * @param productNo 商品的code
+     * @return 物料是否被申请
      * @author liuduo
-     * @date 2018-08-23 11:14:29
+     * @date 2018-08-23 16:01:38
      */
-    public Boolean getSupplier(String equipCode) {
+    public Boolean checkProductRelSupplier(String productNo) {
         Map<String, Object> map = Maps.newHashMap();
-        map.put("equipCode", equipCode);
+        map.put("productNo", productNo);
 
-        String sql = "SELECT COUNT(id) > 0 FROM rel_supplier_product WHERE product_code = :equipCode";
+        String sql = "SELECT COUNT(id) > 0 FROM rel_supplier_product WHERE product_code = :productNo";
 
         return findForObject(sql, map, Boolean.class);
     }

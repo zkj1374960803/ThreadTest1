@@ -351,7 +351,7 @@ public class SupplierServiceImpl implements SupplierService{
      */
     @Override
     public Boolean getSupplier(String equipCode) {
-        return bizServiceSupplierDao.getSupplier(equipCode);
+        return bizServiceSupplierDao.checkProductRelSupplier(equipCode);
     }
 
 

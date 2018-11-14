@@ -793,4 +793,18 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
 
         updateForMap(sql, param);
     }
+
+    /**
+     * 查询商品是否与库存建立关联关系
+     * @param productNo 商品的编号
+     * @return Boolean 1是 0否
+     * @author zhangkangjian
+     * @date 2018-11-14 16:25:10
+     */
+    public Boolean checkProductRelStock(String productNo) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("productNo", productNo);
+        String sql = "SELECT COUNT(id) > 0 FROM biz_stock_detail WHERE product_no = :productNo";
+        return findForObject(sql, params, Boolean.class);
+    }
 }

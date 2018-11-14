@@ -48,7 +48,48 @@ public class FindStockDetailDTO {
     private FindProductDetailDTO problemPiece;
     @ApiModelProperty(name = "damagedPiece", value = "损坏件")
     private FindProductDetailDTO damagedPiece;
+    @ApiModelProperty(name = "carpartsImage", value = "零配件图片在服务端的相对路径")
+    private String carpartsImage;
 
+    @ApiModelProperty(name = "carpartsMarkno", value = "零配件代码")
+    private String carpartsMarkno;
+    @ApiModelProperty(name = "usedAmount", value = "单车使用配件的个数")
+    private Long usedAmount;
+
+    @ApiModelProperty(name = "keyword", value = "零配件代码/名称/名称首字母大写")
+    private String keyword;
+
+    public String getCarpartsImage() {
+        return carpartsImage;
+    }
+
+    public void setCarpartsImage(String carpartsImage) {
+        this.carpartsImage = carpartsImage;
+    }
+
+    public String getCarpartsMarkno() {
+        return carpartsMarkno;
+    }
+
+    public void setCarpartsMarkno(String carpartsMarkno) {
+        this.carpartsMarkno = carpartsMarkno;
+    }
+
+    public Long getUsedAmount() {
+        return usedAmount;
+    }
+
+    public void setUsedAmount(Long usedAmount) {
+        this.usedAmount = usedAmount;
+    }
+
+    public String getKeyword() {
+        return keyword;
+    }
+
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
+    }
 
     public FindProductDetailDTO getNormalPiece() {
         return normalPiece;
