@@ -21,10 +21,7 @@ import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
-import com.ccbuluo.http.StatusDto;
-import com.ccbuluo.http.StatusDtoThriftBean;
-import com.ccbuluo.http.StatusDtoThriftList;
-import com.ccbuluo.http.StatusDtoThriftUtils;
+import com.ccbuluo.http.*;
 import com.ccbuluo.json.JsonUtils;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
@@ -45,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.constraints.Max;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -263,20 +261,24 @@ public class StockAdjustServiceImpl implements StockAdjustService{
     }
 
     /**
-     * 根据零配件分类code查询零配件
-     * @param categoryCode 零配件分类code
-     * @return 零配件类型集合
+     * 根据零配件代码查询准备盘库的零配件
+     * @param carpartsCode 零配件代码
      * @author liuduo
      * @date 2018-08-15 09:16:23
      */
     @Override
-    public List<StockAdjustListDTO> queryProductByCode(String categoryCode) {
-        List<BasicCarpartsProductDTO> basicCarpartsProductDTOS = carpartsProductService.queryCarpartsProductListByCategoryCode(categoryCode);
-        if (null == basicCarpartsProductDTOS || basicCarpartsProductDTOS.size() == 0) {
+    public List<StockAdjustListDTO> queryProductByCode(String carpartsCode) {
+        // 根据零配件代码查询零配件
+        StatusDtoThriftPage<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThriftPage = carpartsProductService.queryCarpartsProductList(carpartsCode, 0, Integer.MAX_VALUE);
+        StatusDto<Page<BasicCarpartsProductDTO>> list = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOStatusDtoThriftPage, BasicCarpartsProductDTO.class);
+        if (null == list) {
             return Lists.newArrayList();
         }
-        List<String> carparts = basicCarpartsProductDTOS.stream().map(BasicCarpartsProductDTO::getCarpartsCode).collect(Collectors.toList());
-        return stockDetailService.queryAdjustList(carparts, userHolder.getLoggedUser().getOrganization().getOrgCode(), Constants.PRODUCT_TYPE_FITTINGS);
+        List<BasicCarpartsProductDTO> rows = list.getData().getRows();
+        // 获取查询到的零配件的代码
+        List<String> carpartsCodes = rows.stream().map(BasicCarpartsProductDTO::getCarpartsCode).collect(Collectors.toList());
+        // 根据零配件代码查询零配件数量
+        return stockDetailService.queryAdjustList(carpartsCodes, userHolder.getLoggedUser().getOrganization().getOrgCode(), Constants.PRODUCT_TYPE_FITTINGS);
     }
 
     /**
