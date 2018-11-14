@@ -301,10 +301,11 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     @Override
     public StatusDto<String> deleteCarpartsProduct(String productNo) {
         Boolean resultRelStock =  bizAllocateApplyDao.checkProductRelStock(productNo);
+        // 查询库存
         if(resultRelStock){
             return StatusDto.buildFailureStatusDto("该零配件已与库存建立关联关系！");
         }
-        // 查询申请列表
+        // 查询申请
         Boolean resultApply = bizAllocateapplyDetailDao.checkProductRelApply(productNo);
         if(resultApply){
             return StatusDto.buildFailureStatusDto("该零配件已与申请建立关联关系！");
@@ -350,7 +351,6 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
             carpartsProductService.queryCarpartsProductListByPriceType(queryCarpartsProductDTO);
         StatusDto<Page<BasicCarpartsProductDTO>> basicCarpartsProductDTOResolve = StatusDtoThriftUtils.resolve(basicCarpartsProductDTO, BasicCarpartsProductDTO.class);
         List<BasicCarpartsProductDTO> rows = basicCarpartsProductDTOResolve.getData().getRows();
-
         Optional.ofNullable(relProductPriceList).ifPresent(a ->{
             Map<String, List<RelProductPrice>> relProductPriceMap = a.stream().collect(Collectors.groupingBy(RelProductPrice::getProductNo));
             if(rows != null && rows.size() > 0){
@@ -376,42 +376,18 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
             for (RelProductPrice priceItem : relProductPrice) {
                 long priceLevel = priceItem.getPriceLevel();
                 double suggestedPrice = priceItem.getSuggestedPrice();
-                if(priceLevel == 2){
+                if(priceLevel == Constants.LADDER_PRICE_2){
                     basicCarpartsProductDTO.setServerCarpartsPrice(suggestedPrice);
                 }
-                if(priceLevel == 3){
+                if(priceLevel == Constants.LADDER_PRICE_3){
                     basicCarpartsProductDTO.setCustCarpartsPrice(suggestedPrice);
                 }
-                if(priceLevel == 4){
+                if(priceLevel == Constants.LADDER_PRICE_4){
                     basicCarpartsProductDTO.setCarpartsPrice(suggestedPrice);
                 }
             }
         }
     }
 
-    /**
-     * 填充零配件的价格
-     * @param relProductPriceMap 价格信息
-     * @param basicCarpartsProductDTO 零配件信息
-     * @author zhangkangjian
-     * @date 2018-10-29 15:46:18
-     */
-    private void buildCarpartsPrice(Map<String, List<RelProductPrice>> relProductPriceMap, RelProductPrice basicCarpartsProductDTO) {
-        List<RelProductPrice> relProductPrice = relProductPriceMap.get(basicCarpartsProductDTO.getProductNo());
-        if(relProductPrice != null && relProductPrice.size() > 0){
-            for (RelProductPrice priceItem : relProductPrice) {
-                long priceLevel = priceItem.getPriceLevel();
-                double suggestedPrice = priceItem.getSuggestedPrice();
-                if(priceLevel == 2){
-                    basicCarpartsProductDTO.setSuggestedPrice(suggestedPrice);
-                }
-                if(priceLevel == 3){
-                    basicCarpartsProductDTO.setSuggestedPrice(suggestedPrice);
-                }
-                if(priceLevel == 4){
-                    basicCarpartsProductDTO.setSuggestedPrice(suggestedPrice);
-                }
-            }
-        }
-    }
+
 }

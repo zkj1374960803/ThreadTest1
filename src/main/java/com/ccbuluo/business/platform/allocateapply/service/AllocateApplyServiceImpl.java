@@ -234,9 +234,9 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     }
     /**
      * 批量保存申请详单数据
-     * @param
-     * @exception
-     * @return
+     * @param allocateApplyDTO 申请信息
+     * @param loggedUserId 当前登陆人id
+     * @param processType 处理的类型
      * @author zhangkangjian
      * @date 2018-08-23 16:49:20
      */
@@ -293,6 +293,19 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             throw new CommonException(Constants.ERROR_CODE, "根据申请编号查询详情数据异常！");
         }
         // 查询组织架构的名字
+        buildFindAllocateApplyDTO(allocateApplyDTO);
+        // 查询申请单的详单
+        allocateApplyDTO.setQueryAllocateapplyDetailDTO(findAllocateApplyDetail(applyNo));
+        return allocateApplyDTO;
+    }
+
+    /**
+     * 设置机构的名称
+     * @param allocateApplyDTO 申请实体
+     * @author zhangkangjian
+     * @date 2018-11-14 17:35:30
+     */
+    private void buildFindAllocateApplyDTO(FindAllocateApplyDTO allocateApplyDTO) {
         StatusDtoThriftBean<BasicUserOrganization> outstockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getOutstockOrgno());
         StatusDtoThriftBean<BasicUserOrganization> instockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getInstockOrgno());
         StatusDtoThriftBean<BasicUserOrganization> applyorgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getApplyorgNo());
@@ -317,7 +330,16 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                 }
                 allocateApplyDTO.setApplyorgName(orgName);
         });
-        // 查询申请单的详单
+    }
+
+    /**
+     * 查询申请单的详单
+     * @param applyNo 申请单的编号
+     * @return List<QueryAllocateapplyDetailDTO> 申请单详单的列表
+     * @author zhangkangjian
+     * @date 2018-11-14 17:26:22
+     */
+    private List<QueryAllocateapplyDetailDTO> findAllocateApplyDetail(String applyNo) {
         List<QueryAllocateapplyDetailDTO> queryAllocateapplyDetailDTOS = bizAllocateApplyDao.queryAllocateapplyDetail(applyNo);
         if (null != queryAllocateapplyDetailDTOS && queryAllocateapplyDetailDTOS.size() > 0) {
             String productType = queryAllocateapplyDetailDTOS.get(0).getProductType();
@@ -332,15 +354,15 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                         BasicCarpartsProductDTO basicCarpartsProductDTO = basicCarpartsProductDTOMap.get(c.getProductNo());
                         if (basicCarpartsProductDTO != null) {
                             c.setProductName(basicCarpartsProductDTO.getCarpartsName());
+                            c.setCarpartsImage(basicCarpartsProductDTO.getCarpartsImage());
+                            c.setCarpartsMarkno(basicCarpartsProductDTO.getCarpartsImage());
+                            c.setUnit(basicCarpartsProductDTO.getUnitName());
                         }
                     });
                 });
             }
         }
-        allocateApplyDTO.setQueryAllocateapplyDetailDTO(queryAllocateapplyDetailDTOS);
-
-
-        return allocateApplyDTO;
+        return queryAllocateapplyDetailDTOS;
     }
 
     /**
@@ -390,8 +412,12 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         return page;
     }
 
-
-// todo
+    /**
+     * 填充机构的名称
+     * @param page 分页的信息
+     * @author zhangkangjian
+     * @date 2018-11-14 17:37:43
+     */
     public void findOrgName(Page<QueryAllocateApplyListDTO> page) {
         Optional.ofNullable(page.getRows()).ifPresent(a ->{
             List<String> outstockOrgno = a.stream().filter(b -> b.getOutstockOrgno() != null).map(QueryAllocateApplyListDTO::getOutstockOrgno).collect(Collectors.toList());
@@ -420,11 +446,11 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
 
     /**
      * 查询处理申请列表
-     * @param orgType
-     * @param applyStatus
-     * @param applyNo
-     * @param offset
-     * @param pageSize
+     * @param orgType 机构的类型
+     * @param applyStatus 申请的状态
+     * @param applyNo 申请的编号
+     * @param offset 偏移量
+     * @param pageSize 每页显示的数量
      * @return Page<QueryAllocateApplyListDTO> 分页的信息
      * @author zhangkangjian
      * @date 2018-08-09 10:36:34
@@ -775,12 +801,12 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     }
 
     /**
-     * 构建出库计划（填充零配件的信息）
+     * 构建出库计划实体（填充零配件的信息）
      * @param instockplansByApplyNo 入库计划
      * @author zhangkangjian
      * @date 2018-11-14 10:19:00
      */
-    private void buildStockPlanDetail(List<BizOutstockplanDetail> instockplansByApplyNo) {
+    public void buildStockPlanDetail(List<BizOutstockplanDetail> instockplansByApplyNo) {
         if(instockplansByApplyNo != null && instockplansByApplyNo.size() > 0){
             List<String> collect = instockplansByApplyNo.stream().map(BizOutstockplanDetail::getProductNo).collect(Collectors.toList());
             StatusDtoThriftList<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThriftList = carpartsProductService.queryCarpartsProductListByCarpartsCodes(collect);

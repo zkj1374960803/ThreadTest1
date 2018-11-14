@@ -169,7 +169,6 @@ public class CarpartsProductController extends BaseController {
     @ApiOperation(value = "查询零配件价格列表",notes = "【张康健】")
     @GetMapping("/querycarpartsproductpricelist")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "categoryCode", value = "零部件分类code", required = false, paramType = "query"),
         @ApiImplicitParam(name = "keyword", value = "零配件编号/名称", required = false, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
         @ApiImplicitParam(name = "pageSize", value = "每页显示的数量", required = true, paramType = "query")
