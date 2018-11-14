@@ -192,7 +192,7 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
         if(fitCarmodelLongIds != null && fitCarmodelLongIds.size() > 0){
             List<CarmodelManage> carmodelManages = basicCarmodelManageDao.queryPartModel(fitCarmodelLongIds);
             String fitCarmodelName = StringUtils.join(carmodelManages.stream().map(CarmodelManage::getCarmodelName).toArray(), Constants.COMMA);
-            carpartsProductDTO.setCarpartsName(fitCarmodelName);
+            carpartsProductDTO.setCarmodelName(fitCarmodelName);
         }
         return carpartsProductStatusDto;
     }

@@ -93,7 +93,7 @@ public class ServiceProblemAllocateApplyController extends BaseController {
     @ApiOperation(value = "查询退换货申请单详情（申请）", notes = "【魏俊标】")
     @GetMapping("/problemApplydetail/{applyNo}")
     @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "path")
-            public StatusDto<FindAllocateApplyDTO> getProblemdetailApplyDetail(@PathVariable @ValidateNotNull(message = "applyNo(申请applyNo)不能为空") String applyNo){
+    public StatusDto<FindAllocateApplyDTO> getProblemdetailApplyDetail(@PathVariable @ValidateNotNull(message = "applyNo(申请applyNo)不能为空") String applyNo){
         return StatusDto.buildDataSuccessStatusDto(problemAllocateApply.getProblemdetailDetail(applyNo));
     }
 
