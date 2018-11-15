@@ -950,27 +950,35 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         // 根据类型查询服务中心的code
         List<String> orgCode = null;
         String orgNo = findStockListDTO.getOrgNo();
+        Page<FindStockListDTO> stockPage;
         if(StringUtils.isBlank(orgNo)){
             String type = findStockListDTO.getType();
             if(StringUtils.isBlank(type)){
-                Page<FindStockListDTO> stockList = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, null);
-                return bizAllocateApplyDao.findStockList(findStockListDTO, productCode, null);
+                stockPage = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, null);
             }else {
                 orgCode = getOrgCodesByOrgType(type);
                 if(orgCode == null || orgCode.size() == 0){
-                    return new Page<>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
+                    stockPage =  new Page<>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
                 }else {
-                    return bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
+                    stockPage =  bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
                 }
             }
         }else {
-            return bizAllocateApplyDao.findStockList(findStockListDTO, productCode, null);
+            stockPage =  bizAllocateApplyDao.findStockList(findStockListDTO, productCode, null);
         }
-
-
-//        FindStockListDTO findStockDTO = findStockListDTOMap.get(carpartsCode);
-//        FindStockListDTO newStockListDTO = new FindStockListDTO(c.getCarpartsCode(), c.getCarpartsName(), c.getUnitName(), 0, c.getCarpartsImage(), c.getCarpartsMarkno());
-
+        List<FindStockListDTO> rows = stockPage.getRows();
+        if(rows != null){
+            Map<String, BasicCarpartsProductDTO> productMap = carpartsProductDTOList.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, a -> a,(k1,k2)->k1));
+            rows.forEach(item ->{
+                String productNo = item.getProductNo();
+                BasicCarpartsProductDTO basicCarparts = productMap.get(productNo);
+                item.setCarpartsImage(basicCarparts.getCarpartsImage());
+                item.setCarpartsMarkno(basicCarparts.getCarpartsMarkno());
+                item.setProductName(basicCarparts.getCarpartsName());
+                item.setUnit(basicCarparts.getUnitName());
+            });
+        }
+        return stockPage;
     }
 
     /**
