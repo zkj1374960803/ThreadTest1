@@ -92,8 +92,7 @@ public class CarpartsProductController extends BaseController {
     @GetMapping("/deletecarpartsproduct/{carpartsCode}")
     @ApiImplicitParam(name = "carpartsCode", value = "零部件Code", required = true, dataType = "String", paramType = "path")
     public StatusDto deleteCarpartsProduct(@PathVariable String carpartsCode) {
-        carpartsProductPriceService.deleteCarpartsProduct(carpartsCode);
-        return StatusDto.buildSuccessStatusDto();
+        return carpartsProductPriceService.deleteCarpartsProduct(carpartsCode);
     }
 
     /**
