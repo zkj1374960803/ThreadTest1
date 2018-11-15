@@ -278,7 +278,13 @@ public class StockAdjustServiceImpl implements StockAdjustService{
         // 获取查询到的零配件的代码
         List<String> carpartsCodes = rows.stream().map(BasicCarpartsProductDTO::getCarpartsCode).collect(Collectors.toList());
         // 根据零配件代码查询零配件数量
-        return stockDetailService.queryAdjustList(carpartsCodes, userHolder.getLoggedUser().getOrganization().getOrgCode(), Constants.PRODUCT_TYPE_FITTINGS);
+        List<StockAdjustListDTO> stockAdjustListDTOList = stockDetailService.queryAdjustList(carpartsCodes, userHolder.getLoggedUser().getOrganization().getOrgCode(), Constants.PRODUCT_TYPE_FITTINGS);
+        Map<String, BasicCarpartsProductDTO> cappartsProductMap = rows.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, Function.identity()));
+        for (StockAdjustListDTO stockAdjustListDTO : stockAdjustListDTOList) {
+            BasicCarpartsProductDTO basicCarpartsProductDTO = cappartsProductMap.get(stockAdjustListDTO.getProductNo());
+            stockAdjustListDTO.setCarpartsMarkno(basicCarpartsProductDTO.getCarpartsMarkno());
+        }
+        return stockAdjustListDTOList;
     }
 
     /**

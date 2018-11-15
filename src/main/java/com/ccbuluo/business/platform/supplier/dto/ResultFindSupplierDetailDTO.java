@@ -1,5 +1,7 @@
 package com.ccbuluo.business.platform.supplier.dto;
 
+import com.ccbuluo.core.annotation.validate.ValidateLength;
+import com.ccbuluo.core.validate.Group;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -23,6 +25,11 @@ public class ResultFindSupplierDetailDTO {
      */
     @ApiModelProperty(name = "supplierCode", value = "供应商编号", hidden = true)
     private String supplierCode;
+    /**
+     * 供应商代码
+     */
+    @ApiModelProperty(name = "supplierMarkno", value = "供应商代码")
+    private String supplierMarkno;
     /**
      * 供应商名称
      */
@@ -220,5 +227,13 @@ public class ResultFindSupplierDetailDTO {
 
     public void setMajorProduct(String majorProduct) {
         this.majorProduct = majorProduct;
+    }
+
+    public String getSupplierMarkno() {
+        return supplierMarkno;
+    }
+
+    public void setSupplierMarkno(String supplierMarkno) {
+        this.supplierMarkno = supplierMarkno;
     }
 }

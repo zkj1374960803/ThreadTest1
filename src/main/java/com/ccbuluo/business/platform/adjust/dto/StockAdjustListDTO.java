@@ -54,6 +54,9 @@ public class StockAdjustListDTO {
     @ApiModelProperty(name = "differenceNum", value = "差异数量")
     private Integer differenceNum;
 
+    @ApiModelProperty(name = "carpartsMarkno", value = "零配件代码", required = true)
+    private String carpartsMarkno;
+
 
     public Long getId() {
         return id;
@@ -117,5 +120,13 @@ public class StockAdjustListDTO {
 
     public void setDifferenceNum(Integer differenceNum) {
         this.differenceNum = differenceNum;
+    }
+
+    public String getCarpartsMarkno() {
+        return carpartsMarkno;
+    }
+
+    public void setCarpartsMarkno(String carpartsMarkno) {
+        this.carpartsMarkno = carpartsMarkno;
     }
 }
