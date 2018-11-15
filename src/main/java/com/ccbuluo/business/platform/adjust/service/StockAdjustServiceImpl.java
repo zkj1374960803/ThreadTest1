@@ -296,6 +296,7 @@ public class StockAdjustServiceImpl implements StockAdjustService{
             BasicCarpartsProductDTO basicCarpartsProductDTO = cappartsProductMap.get(stockAdjustListDTO.getProductNo());
             stockAdjustListDTO.setCarpartsMarkno(basicCarpartsProductDTO.getCarpartsMarkno());
             stockAdjustListDTO.setCarpartsImage(basicCarpartsProductDTO.getCarpartsImage());
+            stockAdjustListDTO.setProductName(basicCarpartsProductDTO.getCarpartsName());
         }
         return stockAdjustListDTOList;
     }
