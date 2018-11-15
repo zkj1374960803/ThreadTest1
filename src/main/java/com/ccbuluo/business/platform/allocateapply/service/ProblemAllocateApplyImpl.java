@@ -21,6 +21,7 @@ import com.ccbuluo.business.platform.stockdetail.dto.StockDetailDTO;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
+import com.ccbuluo.business.platform.supplier.dto.QuerySupplierInfoDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.BusinessUser;
 import com.ccbuluo.core.entity.Organization;
@@ -274,6 +275,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
      * @date 2018-11-09 15:02:32
      */
     private ArrayList<QueryAllocateapplyDetailDTO> setingProblemDetailList(String applyNo, FindAllocateApplyDTO allocateApplyDTO) {
+        String applyorgNo = allocateApplyDTO.getApplyorgNo();
         List<BizOutstockplanDetail> bizOutstockplanDetails = bizOutstockplanDetailDao.queryOutstockplan(applyNo, null, null);
         allocateApplyServiceImpl.buildStockPlanDetail(bizOutstockplanDetails);
         ArrayList<QueryAllocateapplyDetailDTO> allocateapplyDetailList = Lists.newArrayList();
@@ -282,13 +284,23 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             Map<String, QueryAllocateapplyDetailDTO> allocateapplyDetailMap = queryAllocateapplyDetailDTO.stream().collect(Collectors.toMap(QueryAllocateapplyDetailDTO::getProductNo, a -> a,(k1, k2)->k1));
             if(bizOutstockplanDetails != null && bizOutstockplanDetails.size() > 0){
                 bizOutstockplanDetails.forEach(a ->{
-                    QueryAllocateapplyDetailDTO queryAllocateapply = allocateapplyDetailMap.get(a.getProductNo());
-                    queryAllocateapply.setCarpartsMarkno(a.getCarpartsMarkno());
-                    queryAllocateapply.setProductName(a.getProductName());
-                    queryAllocateapply.setUnit(a.getProductUnit());
-                    queryAllocateapply.setCarpartsImage(a.getCarpartsImage());
-                    queryAllocateapply.setCostPrice(a.getCostPrice());
-                    allocateapplyDetailList.add(queryAllocateapply);
+                    try {
+                        QueryAllocateapplyDetailDTO queryAllocateapply = allocateapplyDetailMap.get(a.getProductNo());
+                        QueryAllocateapplyDetailDTO cloneAllocateapply = queryAllocateapply.clone();
+                        cloneAllocateapply.setApplyNum(a.getActualOutstocknum());
+                        cloneAllocateapply.setCostPrice(a.getCostPrice());
+                        QuerySupplierInfoDTO querySupplierInfoDTO =
+                            bizServiceSupplierDao.querySupplierInfoByCode(a.getSupplierNo());
+                        cloneAllocateapply.setSupplierName(querySupplierInfoDTO.getSupplierName());
+                        cloneAllocateapply.setCarpartsMarkno(a.getCarpartsMarkno());
+                        cloneAllocateapply.setProductName(a.getProductName());
+                        cloneAllocateapply.setUnit(a.getProductUnit());
+                        cloneAllocateapply.setCarpartsImage(a.getCarpartsImage());
+                        cloneAllocateapply.setCostPrice(a.getCostPrice());
+                        allocateapplyDetailList.add(cloneAllocateapply);
+                    } catch (Exception e) {
+                        throw new CommonException(Constants.ERROR_CODE, "拷贝失败！");
+                    }
                 });
             }
         }
@@ -349,7 +361,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
     }
 
     /**
-     * 平台退换货生成出库计划
+     * 平台处理机构发起的退换货申请生成平台出库计划及机构的入库计划
      * @param applyNo 申请单号
      * @return 是否成功
      * @author liuduo

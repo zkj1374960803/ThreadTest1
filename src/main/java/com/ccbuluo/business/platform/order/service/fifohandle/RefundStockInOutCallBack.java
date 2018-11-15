@@ -62,49 +62,6 @@ public class RefundStockInOutCallBack implements StockInOutCallBack{
         return StatusDto.buildSuccessStatusDto("操作成功！");
     }
 
-    /**
-     *  入库之后回调事件(换货)
-     * @param applyNo 申请单编号
-     * @return
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public StatusDto platformInstockCallback(String applyNo){
-        // 根据申请单获取申请单详情
-        BizAllocateApply apply = bizAllocateApplyDao.getByNo(applyNo);
-        String applyType = apply.getApplyType();
-        // 根据申请单获取申请单详情
-        List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
-        if(null == details || details.size() == 0){
-            return StatusDto.buildFailureStatusDto("申请单为空！");
-        }
-        //查询平台库存列表
-        List<BizStockDetail> stockDetails = getStockDetailList(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM, details);
-        if(null == stockDetails || stockDetails.size() == 0){
-            throw new CommonException("0", "库存为空！");
-        }
-        // 构建订单占用库存关系
-        List<RelOrdstockOccupy> relOrdstockOccupies = new ArrayList<RelOrdstockOccupy>();
-        // 构建占用库存和订单占用库存关系
-        List<BizStockDetail> stockDetailList = buildStockAndRelOrdEntity(details,stockDetails,applyType,relOrdstockOccupies);
-
-        List<BizOutstockplanDetail> outstockplans = buildOutAndInstockplanDetail(details, stockDetails, relOrdstockOccupies);
-        // 构建平台出库计划并保存(特殊处理，根据平台的入库计划来构建)
-        String stockType = getStockType(details);
-        // 只有正常件才保存库存和占用关系
-        if(BizStockDetail.StockTypeEnum.VALIDSTOCK.name().equals(stockType)){
-            // 保存占用库存
-            int flag = bizStockDetailDao.batchUpdateStockDetil(stockDetailList);
-            // 更新失败
-            if(flag == 0){
-                throw new CommonException("0", "更新占用库存失败！");
-            }
-            // 保存订单占用库存关系
-            bizAllocateTradeorderDao.batchInsertRelOrdstockOccupy(relOrdstockOccupies);
-        }
-        // 批量保存出库计划详情
-        bizOutstockplanDetailDao.batchOutstockplanDetail(outstockplans);
-        return StatusDto.buildSuccessStatusDto("出库计划生成成功");
-    }
 
     /**
      *  构建出库和入库计划并保存

@@ -7,6 +7,7 @@ import com.ccbuluo.business.entity.BizOutstockplanDetail;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
+import com.ccbuluo.business.platform.allocateapply.service.ProblemAllocateApplyImpl;
 import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
 import com.ccbuluo.business.platform.equipment.dto.DetailBizServiceEquipmentDTO;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
@@ -64,6 +65,8 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
     private AllocateApplyService allocateApplyService;
     @Autowired
     private BarterStockInOutCallBack barterStockInOutCallBack;
+    @Autowired
+    private ProblemAllocateApplyImpl problemAllocateApply;
 
     /**
      * 带条件分页查询所有零配件的问题库存
@@ -257,7 +260,7 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
             }
             // 删除所有的出入库计划
 //            inputStockPlanService.deleteInStockPlan(applyNo);
-            outStockPlanService.deleteOutStockPlan(applyNo);
+//            outStockPlanService.deleteOutStockPlan(applyNo);
             // 修改申请单为 -等待退款,
            allocateApplyService.updateApplyOrderStatus(applyNo, BizAllocateApply.ReturnApplyStatusEnum.WAITINGREFUND.name());
            return StatusDto.buildSuccessStatusDto();

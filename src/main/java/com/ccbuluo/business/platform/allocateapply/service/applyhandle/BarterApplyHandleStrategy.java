@@ -163,7 +163,7 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
         // 平台入库
         problemInstockplanPlatform(inList,details, outList);
         // 申请方入库（换货：买方机构的入库要以出库的数据来构建（不同批次，不同价格）（问题件库存））
-        problemInstockplanPurchaser(inList,details, outList);
+//        problemInstockplanPurchaser(inList,details, outList);
         return Pair.of(outList, inList);
     }
 
@@ -228,6 +228,8 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
             instockplanPurchaser.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
             instockplanPurchaser.setCostPrice(outstockplan.getCostPrice());
             instockplanPurchaser.setPurchaseInfo(outstockplan.getPurchaseInfo());
+            instockplanPurchaser.setPlanInstocknum(outstockplan.getPlanOutstocknum());
+            instockplanPurchaser.setSupplierNo(outstockplan.getSupplierNo());
             inList.add(instockplanPurchaser);
         }
     }
@@ -246,8 +248,6 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
         inPlan.setProductName(ad.getProductName());// 商品名称
         inPlan.setProductUnit(ad.getUnit());// 商品计量单位
         inPlan.setTradeNo(String.valueOf(ad.getApplyNo()));// 交易批次号（申请单编号）
-        inPlan.setSupplierNo(ad.getSupplierNo());//供应商编号
-        inPlan.setPlanInstocknum(ad.getApplyNum());// 计划入库数量
         inPlan.setCompleteStatus(StockPlanStatusEnum.DOING.toString());// 完成状态（计划执行中）
         inPlan.preInsert(userHolder.getLoggedUserId());
         inPlan.setRemark(ad.getRemark());// 备注

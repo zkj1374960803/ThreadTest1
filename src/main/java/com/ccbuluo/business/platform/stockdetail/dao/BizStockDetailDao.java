@@ -467,7 +467,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         map.put("productNo", productNo);
         map.put("productType", productType);
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT SUM(ifnull(a.problem_stock,0)) AS 'totalStock',SUM(ifnull(a.problem_stock,0)) * a.cost_price AS 'totalAmount',a.product_unit AS 'unit' ")
+        sql.append(" SELECT SUM(ifnull(a.problem_stock,0)) AS 'totalStock',SUM(ifnull(a.problem_stock,0) * a.cost_price)  AS 'totalAmount',a.product_unit AS 'unit' ")
             .append(" FROM biz_stock_detail a  ")
             .append(" WHERE a.product_no = :productNo AND a.product_type = :productType  ");
         if(orgDTOList != null && orgDTOList.size() > 0){
@@ -663,7 +663,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         params.put("orgCode", orgCode);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,product_no,IFNULL(valid_stock,0) AS validStock,repository_no FROM biz_stock_detail WHERE product_no IN(:products) AND org_no = :orgCode");
+        sql.append("SELECT id,product_no,IFNULL(valid_stock,0) AS validStock,repository_no,cost_price,supplier_no FROM biz_stock_detail WHERE product_no IN(:products) AND org_no = :orgCode");
 
         return queryListBean(BizStockDetail.class, sql.toString(), params);
     }
@@ -678,7 +678,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         Map<String, Object> params = Maps.newHashMap();
         params.put("bizStockDetailLists", bizStockDetailLists);
 
-        String sql = "UPDATE biz_stock_detail SET valid_stock = :validStock,occupy_stock = :occupyStock  WHERE id = :id";
+        String sql = "UPDATE biz_stock_detail SET valid_stock =IFNULL(valid_stock,0) - :validStock,occupy_stock = IFNULL(occupy_stock,0) + :occupyStock  WHERE id = :id";
 
         batchUpdateForListBean(sql, bizStockDetailLists);
     }
