@@ -250,7 +250,7 @@ public class StockAdjustServiceImpl implements StockAdjustService{
         // 查询详情
         List<StockAdjustListDTO> stockAdjustListDTOList = bizStockAdjustdetailDao.getByAdjustNo(adjustNo);
         // 获取零配件编号
-        List<String> carpartsCodes = stockAdjustListDTOList.stream().map(StockAdjustListDTO::getProductNo).collect(Collectors.toList());
+        List<String> carpartsCodes = stockAdjustListDTOList.stream().filter(item -> item.getProductType().equals(Constants.PRODUCT_TYPE_FITTINGS)).map(StockAdjustListDTO::getProductNo).collect(Collectors.toList());
         StatusDtoThriftList<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThriftList = carpartsProductService.queryCarpartsProductListByCarpartsCodes(carpartsCodes);
         List<BasicCarpartsProductDTO> data2 = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOStatusDtoThriftList, BasicCarpartsProductDTO.class).getData();
         if (null == data2 && data2.isEmpty()) {
