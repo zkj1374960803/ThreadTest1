@@ -941,7 +941,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             carpartsProductDTOList  = bizAllocateApplyDao.findEquipmentCode(findStockListDTO.getEquiptypeId());
         }else {
             // 查询分类下所有商品的code
-            carpartsProductDTOList = carpartsProductService.queryCarpartsProductListByCategoryCode(findStockListDTO.getCategoryCode());
+            carpartsProductDTOList = carpartsProductService.queryCarpartsProductListByCategoryCode(findStockListDTO.getKeyword());
         }
         List<String> productCode = carpartsProductDTOList.stream().map(BasicCarpartsProductDTO::getCarpartsCode).collect(Collectors.toList());
         if(productCode == null || productCode.size() == 0){
@@ -953,6 +953,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         if(StringUtils.isBlank(orgNo)){
             String type = findStockListDTO.getType();
             if(StringUtils.isBlank(type)){
+                Page<FindStockListDTO> stockList = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, null);
                 return bizAllocateApplyDao.findStockList(findStockListDTO, productCode, null);
             }else {
                 orgCode = getOrgCodesByOrgType(type);
@@ -965,6 +966,10 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         }else {
             return bizAllocateApplyDao.findStockList(findStockListDTO, productCode, null);
         }
+
+
+//        FindStockListDTO findStockDTO = findStockListDTOMap.get(carpartsCode);
+//        FindStockListDTO newStockListDTO = new FindStockListDTO(c.getCarpartsCode(), c.getCarpartsName(), c.getUnitName(), 0, c.getCarpartsImage(), c.getCarpartsMarkno());
 
     }
 
