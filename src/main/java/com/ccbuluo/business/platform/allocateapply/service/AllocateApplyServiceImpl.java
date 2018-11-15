@@ -260,9 +260,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                 a.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
             }
         });
-
-        //
-
         bizAllocateApplyDao.batchInsertForapplyDetailList(filterAllocateapply);
     }
 
@@ -362,7 +359,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                             c.setProductName(basicCarpartsProductDTO.getCarpartsName());
                             c.setCarpartsImage(basicCarpartsProductDTO.getCarpartsImage());
                             c.setCarpartsMarkno(basicCarpartsProductDTO.getCarpartsMarkno());
-                            c.setUnit(basicCarpartsProductDTO.getUnitName());
+                            c.setUnit(basicCarpartsProductDTO.getCarpartsUnit());
                         }
                     });
                 });
