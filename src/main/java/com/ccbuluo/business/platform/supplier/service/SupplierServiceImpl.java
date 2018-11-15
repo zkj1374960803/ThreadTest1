@@ -18,6 +18,8 @@ import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.json.JsonUtils;
 import com.ccbuluo.merchandiseintf.carparts.category.dto.RelSupplierProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.category.service.CarpartsCategoryService;
+import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
+import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +30,7 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -46,6 +49,8 @@ public class SupplierServiceImpl implements SupplierService{
     private GenerateProjectCodeService generateProjectCodeService;
     @ThriftRPCClient("BasicMerchandiseSer")
     private CarpartsCategoryService carpartsCategoryService;
+    @ThriftRPCClient("BasicMerchandiseSer")
+    private CarpartsProductService carpartsProductService;
 
 
     /**
@@ -110,7 +115,7 @@ public class SupplierServiceImpl implements SupplierService{
         // 手机号校验
         checkPhone(bizServiceSupplier.getSupplierPhone());
         // 信息校验
-        checkSupplierInfo(bizServiceSupplier.getId(), bizServiceSupplier.getSupplierPhone(), bizServiceSupplier.getSupplierName());
+        checkSupplierInfo(bizServiceSupplier.getId(), bizServiceSupplier.getSupplierPhone(), bizServiceSupplier.getSupplierName(), bizServiceSupplier.getSupplierMarkno());
     }
 
 
@@ -122,11 +127,13 @@ public class SupplierServiceImpl implements SupplierService{
      * @author zhangkangjian
      * @date 2018-07-03 16:39:32
      */
-    private void checkSupplierInfo(Long id, String phone, String name) {
+    private void checkSupplierInfo(Long id, String phone, String name, String markNo) {
         // 手机号校验
         compareRepeat(id , phone, "supplier_phone", "biz_service_supplier", "手机号重复！");
         // 名字验重
         compareRepeat(id , name, "supplier_name", "biz_service_supplier", "供应商名称重复！");
+        // 代码验重
+        compareRepeat(id , markNo, "supplier_markno", "biz_service_supplier", "供应商代码重复！");
     }
 
     /**
@@ -306,14 +313,17 @@ public class SupplierServiceImpl implements SupplierService{
         Page<QueryRelSupplierProductDTO> queryRelSupplierProductPage = bizServiceSupplierDao.querySupplierProduct(queryRelSupplierProductDTO);
         List<QueryRelSupplierProductDTO> products = queryRelSupplierProductPage.getRows();
         List<String> productCodes = products.stream().map(QueryRelSupplierProductDTO::getProductCode).collect(Collectors.toList());
-        StatusDtoThriftList<RelSupplierProductDTO> productDto = carpartsCategoryService.queryCarpartsByProductCode(productCodes);
-        StatusDto<List<RelSupplierProductDTO>> resolve = StatusDtoThriftUtils.resolve(productDto, RelSupplierProductDTO.class);
-        List<RelSupplierProductDTO> data = resolve.getData();
-        Map<String, RelSupplierProductDTO> dataMap = data.stream().collect(Collectors.toMap(RelSupplierProductDTO::getProductCode, a -> a,(k1, k2)->k1));
+        // 根据零配件code查询零配件代码
+        StatusDtoThriftList<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThriftList = carpartsProductService.queryCarpartsProductListByCarpartsCodes(productCodes);
+        List<BasicCarpartsProductDTO> data = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOStatusDtoThriftList, BasicCarpartsProductDTO.class).getData();
+        if (null == data && data.isEmpty()) {
+            return new Page<>();
+        }
+        Map<String, BasicCarpartsProductDTO> carpartsProduct = data.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, Function.identity()));
         products.stream().forEach(a ->{
-            RelSupplierProductDTO relSupplierProductDTO = dataMap.get(a.getProductCode());
-            a.setCategoryName(relSupplierProductDTO.getCategoryName());
-            a.setProductName(relSupplierProductDTO.getProductName());
+            BasicCarpartsProductDTO basicCarpartsProductDTO = carpartsProduct.get(a.getProductCode());
+            a.setProductName(basicCarpartsProductDTO.getCarpartsName());
+            a.setSupplierMarkno(basicCarpartsProductDTO.getCarpartsMarkno());
         });
         return queryRelSupplierProductPage;
     }
@@ -351,7 +361,7 @@ public class SupplierServiceImpl implements SupplierService{
      */
     @Override
     public Boolean getSupplier(String equipCode) {
-        return bizServiceSupplierDao.getSupplier(equipCode);
+        return bizServiceSupplierDao.checkProductRelSupplier(equipCode);
     }
 
 

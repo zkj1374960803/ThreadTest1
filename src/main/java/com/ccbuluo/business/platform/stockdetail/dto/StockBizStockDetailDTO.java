@@ -81,7 +81,37 @@ public class StockBizStockDetailDTO extends IdEntity {
      */
     @ApiModelProperty(name = "costPrice", value = "成本价格")
     private BigDecimal costPrice;
+    @ApiModelProperty(name = "carpartsImage", value = "零配件图片在服务端的相对路径", required = true)
+    private String carpartsImage;
 
+    @ApiModelProperty(name = "carpartsMarkno", value = "零配件代码", required = true)
+    private String carpartsMarkno;
+    @ApiModelProperty(name = "usedAmount", value = "单车使用配件的个数", required = true)
+    private Long usedAmount;
+
+    public String getCarpartsImage() {
+        return carpartsImage;
+    }
+
+    public void setCarpartsImage(String carpartsImage) {
+        this.carpartsImage = carpartsImage;
+    }
+
+    public String getCarpartsMarkno() {
+        return carpartsMarkno;
+    }
+
+    public void setCarpartsMarkno(String carpartsMarkno) {
+        this.carpartsMarkno = carpartsMarkno;
+    }
+
+    public Long getUsedAmount() {
+        return usedAmount;
+    }
+
+    public void setUsedAmount(Long usedAmount) {
+        this.usedAmount = usedAmount;
+    }
 
     public BigDecimal getCostPrice() {
         return costPrice;

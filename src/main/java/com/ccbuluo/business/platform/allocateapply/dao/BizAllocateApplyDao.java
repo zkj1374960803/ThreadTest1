@@ -650,7 +650,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             param.put("supplierNo", supplierNo);
             sql.append(" AND a.supplier_no = :supplierNo ");
         }
-        sql.append(" GROUP BY a.product_no having SUM(a.problem_stock) > 0 ORDER BY a.create_time DESC");
+        sql.append(" GROUP BY a.product_no,a.supplier_no having SUM(a.problem_stock) > 0 ORDER BY a.create_time DESC");
         return queryListBean(StockBizStockDetailDTO.class, sql.toString(), param);
     }
 
@@ -792,5 +792,19 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         String sql = "UPDATE biz_allocate_apply SET apply_type = :applyType WHERE apply_no = :applyNo";
 
         updateForMap(sql, param);
+    }
+
+    /**
+     * 查询商品是否与库存建立关联关系
+     * @param productNo 商品的编号
+     * @return Boolean 1是 0否
+     * @author zhangkangjian
+     * @date 2018-11-14 16:25:10
+     */
+    public Boolean checkProductRelStock(String productNo) {
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("productNo", productNo);
+        String sql = "SELECT COUNT(id) > 0 FROM biz_stock_detail WHERE product_no = :productNo";
+        return findForObject(sql, params, Boolean.class);
     }
 }

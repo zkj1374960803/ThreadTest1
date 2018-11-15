@@ -8,7 +8,6 @@ import com.ccbuluo.business.entity.BizStockDetail;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
-import com.ccbuluo.business.platform.allocateapply.dto.ProductStockInfoDTO;
 import com.ccbuluo.business.platform.inputstockplan.dao.BizInstockplanDetailDao;
 import com.ccbuluo.business.platform.outstock.dto.ProductStockDTO;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
@@ -41,6 +40,8 @@ import java.util.stream.Collectors;
 @Service
 public class BarterStockInOutCallBack implements StockInOutCallBack{
 
+    Logger logger = LoggerFactory.getLogger(getClass());
+
     @Autowired
     private BizAllocateApplyDao bizAllocateApplyDao;
     @Autowired
@@ -55,7 +56,6 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
     @Autowired
     InOutCallBackService inOutCallBackService;
-    Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public StatusDto inStockCallBack(String docNo,String inRepositoryNo) {
@@ -210,7 +210,7 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
                     break;
                 } else {
                     // 申请的数量大于库存的数量
-                    stockDetail.setValidStock(0L);
+                    stockDetail.setValidStock(validStock);
                     stockDetail.setOccupyStock(validStock);
                     inStockPlanSum = inStockPlanSum - validStock;
                     bizStockDetailLists.add(stockDetail);
@@ -281,7 +281,7 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
         outstockplanPlatform.setProductName(bizInstockplanDetail.getProductName());
         outstockplanPlatform.setProductUnit(bizInstockplanDetail.getProductUnit());
         outstockplanPlatform.setTradeNo(bizInstockplanDetail.getTradeNo());
-        outstockplanPlatform.setSupplierNo(bizInstockplanDetail.getSupplierNo());
+        outstockplanPlatform.setSupplierNo(stockDetail.getSupplierNo());
         outstockplanPlatform.setSalesPrice(BigDecimal.ZERO);
         outstockplanPlatform.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
         outstockplanPlatform.setPlanStatus(StockPlanStatusEnum.DOING.toString());

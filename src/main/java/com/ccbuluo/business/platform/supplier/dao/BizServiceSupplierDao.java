@@ -42,11 +42,11 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
      */
     public int saveEntity(BizServiceSupplier entity) {
         StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO biz_service_supplier ( supplier_code,supplier_name,")
+        sql.append("INSERT INTO biz_service_supplier ( supplier_code,supplier_markno,supplier_name,")
             .append("linkman,supplier_phone,supplier_address,supplier_status,")
             .append("supplier_nature,establish_time,province_name,province_code,city_name,")
             .append("city_code,area_name,area_code,major_product,creator,create_time,")
-            .append("operator,operate_time,delete_flag ) VALUES (  :supplierCode,")
+            .append("operator,operate_time,delete_flag ) VALUES (  :supplierCode,:supplierMarkno,")
             .append(" :supplierName, :linkman, :supplierPhone, :supplierAddress,")
             .append(" :supplierStatus, :supplierNature, :establishTime, :provinceName,")
             .append(" :provinceCode, :cityName, :cityCode, :areaName, :areaCode,")
@@ -65,7 +65,7 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
     public int update(EditSupplierDTO entity) {
         StringBuilder sql = new StringBuilder();
         sql.append("UPDATE biz_service_supplier SET ")
-            .append("supplier_name = :supplierName,linkman = :linkman,")
+            .append("supplier_name = :supplierName,linkman = :linkman,supplier_markno = :supplierMarkno,")
             .append("supplier_phone = :supplierPhone,supplier_address = :supplierAddress,")
             .append("supplier_status = :supplierStatus,supplier_nature = :supplierNature,")
             .append("establish_time = :establishTime,province_name = :provinceName,")
@@ -85,7 +85,7 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
      */
     public ResultFindSupplierDetailDTO getById(Long id) {
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,supplier_code,supplier_name,linkman,supplier_phone,")
+        sql.append("SELECT id,supplier_code,supplier_name,linkman,supplier_phone,supplier_markno,")
             .append("supplier_address,supplier_status,supplier_nature,establish_time,")
             .append("province_name,province_code,city_name,city_code,area_name,area_code,")
             .append("major_product ")
@@ -178,7 +178,7 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
      */
     public Page<ResultSupplierListDTO> querySupplierList(QuerySupplierListDTO querySupplierListDTO) {
         StringBuilder sql = new StringBuilder();
-        sql.append(" SELECT id,supplier_code,supplier_name, ")
+        sql.append(" SELECT id,supplier_code,supplier_name,supplier_markno, ")
             .append(" linkman,supplier_phone,supplier_address, ")
             .append(" supplier_status,province_name,city_name,area_name ")
             .append(" FROM biz_service_supplier ")
@@ -280,17 +280,17 @@ public class BizServiceSupplierDao extends BaseDao<BizServiceSupplier> {
 }
 
     /**
-     * 根据物料code查询是否已经关联
-     * @param equipCode 物料code
-     * @return 是否已经关联
+     * 根据商品的code查询物料是否被申请
+     * @param productNo 商品的code
+     * @return 物料是否被申请
      * @author liuduo
-     * @date 2018-08-23 11:14:29
+     * @date 2018-08-23 16:01:38
      */
-    public Boolean getSupplier(String equipCode) {
+    public Boolean checkProductRelSupplier(String productNo) {
         Map<String, Object> map = Maps.newHashMap();
-        map.put("equipCode", equipCode);
+        map.put("productNo", productNo);
 
-        String sql = "SELECT COUNT(id) > 0 FROM rel_supplier_product WHERE product_code = :equipCode";
+        String sql = "SELECT COUNT(id) > 0 FROM rel_supplier_product WHERE product_code = :productNo";
 
         return findForObject(sql, map, Boolean.class);
     }
