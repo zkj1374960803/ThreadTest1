@@ -249,11 +249,23 @@ public class StockAdjustServiceImpl implements StockAdjustService{
         stockAdjustDetailDTO.setAdjustName(collect.get(stockAdjustDetailDTO.getAdjustUserid()));
         // 查询详情
         List<StockAdjustListDTO> stockAdjustListDTOList = bizStockAdjustdetailDao.getByAdjustNo(adjustNo);
+        // 获取零配件编号
+        List<String> carpartsCodes = stockAdjustListDTOList.stream().filter(item -> item.getProductType().equals(Constants.PRODUCT_TYPE_FITTINGS)).map(StockAdjustListDTO::getProductNo).collect(Collectors.toList());
+        StatusDtoThriftList<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThriftList = carpartsProductService.queryCarpartsProductListByCarpartsCodes(carpartsCodes);
+        List<BasicCarpartsProductDTO> data2 = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOStatusDtoThriftList, BasicCarpartsProductDTO.class).getData();
+        Map<String, BasicCarpartsProductDTO> carpartsProduct = data2.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, Function.identity()));
         stockAdjustListDTOList.forEach(item -> {
             if (item.getActualNum().equals(item.getDueNum())) {
                 item.setDifferenceNum(0);
             } else {
                 item.setDifferenceNum(item.getActualNum() - item.getDueNum());
+            }
+            // 是零配件才设置图片和代码
+            if (item.getProductType().equals(Constants.PRODUCT_TYPE_FITTINGS)) {
+                BasicCarpartsProductDTO basicCarpartsProductDTO = carpartsProduct.get(item.getProductNo());
+                item.setCarpartsMarkno(basicCarpartsProductDTO.getCarpartsMarkno());
+                item.setCarpartsImage(basicCarpartsProductDTO.getCarpartsImage());
+                item.setProductName(basicCarpartsProductDTO.getCarpartsName());
             }
         });
         stockAdjustDetailDTO.setStockAdjustListDTOList(stockAdjustListDTOList);
@@ -284,6 +296,7 @@ public class StockAdjustServiceImpl implements StockAdjustService{
             BasicCarpartsProductDTO basicCarpartsProductDTO = cappartsProductMap.get(stockAdjustListDTO.getProductNo());
             stockAdjustListDTO.setCarpartsMarkno(basicCarpartsProductDTO.getCarpartsMarkno());
             stockAdjustListDTO.setCarpartsImage(basicCarpartsProductDTO.getCarpartsImage());
+            stockAdjustListDTO.setProductName(basicCarpartsProductDTO.getCarpartsName());
         }
         return stockAdjustListDTOList;
     }

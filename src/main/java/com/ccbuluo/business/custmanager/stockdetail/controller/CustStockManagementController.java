@@ -56,7 +56,6 @@ public class CustStockManagementController extends BaseController {
     @GetMapping("/findequipmentstocklist")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "equiptypeId", value = "物料类型的id", required = false, paramType = "query"),
-        @ApiImplicitParam(name = "productNo", value = "商品的编号", required = false, paramType = "query"),
         @ApiImplicitParam(name = "orgNo", value = "服务中心的编号", required = false, paramType = "query"),
         @ApiImplicitParam(name = "type", value = "(注：PLATFORM集团，SERVICECENTER服务中心，CUSTMANAGER客户经理)", required = false, paramType = "query"),
         @ApiImplicitParam(name = "offset", value = "偏移量", required = true, paramType = "query"),
@@ -78,7 +77,7 @@ public class CustStockManagementController extends BaseController {
     @ApiOperation(value = "查看零配件调拨库存", notes = "【张康健】")
     @GetMapping("/findfittingsstocklist")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "categoryCode", value = "零配件类型的code", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "keyword", value = "零配件代码/名称/名称首字母大写", required = false, paramType = "query"),
         @ApiImplicitParam(name = "productNo", value = "商品的编号", required = false, paramType = "query"),
         @ApiImplicitParam(name = "orgNo", value = "服务中心的编号", required = false, paramType = "query"),
         @ApiImplicitParam(name = "type", value = "(注：PLATFORM集团，SERVICECENTER服务中心，CUSTMANAGER客户经理)", required = true, paramType = "query"),

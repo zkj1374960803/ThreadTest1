@@ -309,6 +309,8 @@ public class ClaimOrderServiceImpl implements ClaimOrderService{
                     c.setCarModelName(carparts.getCarmodelName());
                     c.setProductCategoryname(carparts.getCategoryCodePath());
                     c.setProductUnit(carparts.getUnitName());
+                    c.setCarpartsImage(carparts.getCarpartsImage());
+                    c.setCarpartsMarkno(carparts.getCarpartsMarkno());
                 });
             }
         });

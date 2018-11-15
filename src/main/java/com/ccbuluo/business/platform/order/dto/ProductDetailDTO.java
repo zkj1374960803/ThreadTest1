@@ -72,13 +72,54 @@ public class ProductDetailDTO extends AftersaleCommonEntity {
     private String productUnit;
     @ApiModelProperty(name = "carModelName", value = "适配车型")
     private String carModelName;
-
+    @ApiModelProperty(
+        name = "carpartsImage",
+        value = "零配件图片",
+        required = true
+    )
+    private String carpartsImage;
+    @ApiModelProperty(
+        name = "carpartsMarkno",
+        value = "零配件代码",
+        required = true
+    )
+    private String carpartsMarkno;
+    @ApiModelProperty(
+        name = "usedAmount",
+        value = "单车使用配件的个数",
+        required = true
+    )
+    private Long usedAmount;
 
     public Double getTotalPrice() {
         if (null == unitPrice) {
             return null;
         }
         return unitPrice.doubleValue() * amount;
+    }
+
+    public String getCarpartsImage() {
+        return carpartsImage;
+    }
+
+    public void setCarpartsImage(String carpartsImage) {
+        this.carpartsImage = carpartsImage;
+    }
+
+    public String getCarpartsMarkno() {
+        return carpartsMarkno;
+    }
+
+    public void setCarpartsMarkno(String carpartsMarkno) {
+        this.carpartsMarkno = carpartsMarkno;
+    }
+
+    public Long getUsedAmount() {
+        return usedAmount;
+    }
+
+    public void setUsedAmount(Long usedAmount) {
+        this.usedAmount = usedAmount;
     }
 
     public String getProductName() {

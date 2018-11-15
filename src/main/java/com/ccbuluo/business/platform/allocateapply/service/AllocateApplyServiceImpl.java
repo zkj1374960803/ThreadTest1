@@ -31,6 +31,7 @@ import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
+import com.ccbuluo.business.platform.stockdetail.service.ProblemStockDetailService;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.business.platform.supplier.dto.QuerySupplierInfoDTO;
@@ -116,6 +117,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     private BarterStockInOutCallBack barterStockInOutCallBack;
     @Resource
     private BizServiceEquipmentDao bizServiceEquipmentDao;
+    @Resource
+    private ProblemStockDetailService problemStockDetailService;
 
 
 
@@ -356,7 +359,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                             c.setProductName(basicCarpartsProductDTO.getCarpartsName());
                             c.setCarpartsImage(basicCarpartsProductDTO.getCarpartsImage());
                             c.setCarpartsMarkno(basicCarpartsProductDTO.getCarpartsMarkno());
-                            c.setUnit(basicCarpartsProductDTO.getUnitName());
+                            c.setUnit(basicCarpartsProductDTO.getCarpartsUnit());
                         }
                     });
                 });
@@ -812,7 +815,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             StatusDtoThriftList<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThriftList = carpartsProductService.queryCarpartsProductListByCarpartsCodes(collect);
             StatusDto<List<BasicCarpartsProductDTO>> resolve = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOStatusDtoThriftList, BasicCarpartsProductDTO.class);
             List<BasicCarpartsProductDTO> data = resolve.getData();
-            if(data != null){
+            if(data != null && data.size() > 0){
                 Map<String, BasicCarpartsProductDTO> basicCarpartsProductDTOMap = data.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, a -> a, (k1, k2) -> k1));
                 instockplansByApplyNo.forEach(item ->{
                     BasicCarpartsProductDTO bizOutstockplanDetail = basicCarpartsProductDTOMap.get(item.getProductNo());
@@ -934,7 +937,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO) {
-        // 根据分类查询供应商的code
         List<BasicCarpartsProductDTO> carpartsProductDTOList = Lists.newArrayList();
         if(Constants.PRODUCT_TYPE_EQUIPMENT.equals(findStockListDTO.getProductType())){
             // 查询类型下所有的code
@@ -950,27 +952,24 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         // 根据类型查询服务中心的code
         List<String> orgCode = null;
         String orgNo = findStockListDTO.getOrgNo();
+        Page<FindStockListDTO> stockPage;
         if(StringUtils.isBlank(orgNo)){
             String type = findStockListDTO.getType();
             if(StringUtils.isBlank(type)){
-                Page<FindStockListDTO> stockList = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, null);
-                return bizAllocateApplyDao.findStockList(findStockListDTO, productCode, null);
+                stockPage = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, null);
             }else {
                 orgCode = getOrgCodesByOrgType(type);
                 if(orgCode == null || orgCode.size() == 0){
-                    return new Page<>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
+                    stockPage =  new Page<>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
                 }else {
-                    return bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
+                    stockPage =  bizAllocateApplyDao.findStockList(findStockListDTO, productCode, orgCode);
                 }
             }
         }else {
-            return bizAllocateApplyDao.findStockList(findStockListDTO, productCode, null);
+            stockPage =  bizAllocateApplyDao.findStockList(findStockListDTO, productCode, null);
         }
-
-
-//        FindStockListDTO findStockDTO = findStockListDTOMap.get(carpartsCode);
-//        FindStockListDTO newStockListDTO = new FindStockListDTO(c.getCarpartsCode(), c.getCarpartsName(), c.getUnitName(), 0, c.getCarpartsImage(), c.getCarpartsMarkno());
-
+        problemStockDetailService.buildStockPage(findStockListDTO, carpartsProductDTOList, stockPage);
+        return stockPage;
     }
 
     /**

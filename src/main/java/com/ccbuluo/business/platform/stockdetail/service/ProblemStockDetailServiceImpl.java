@@ -1,10 +1,12 @@
 package com.ccbuluo.business.platform.stockdetail.service;
 
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
+import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.entity.BizInstockplanDetail;
 import com.ccbuluo.business.entity.BizOutstockplanDetail;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
+import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.QueryAllocateApplyListDTO;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.allocateapply.service.ProblemAllocateApplyImpl;
@@ -24,6 +26,7 @@ import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
+import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.google.common.collect.Lists;
@@ -36,6 +39,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.weakref.jmx.internal.guava.collect.Lists.newArrayList;
 
 /**
  * 功能描述（1）
@@ -67,30 +72,61 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
     private BarterStockInOutCallBack barterStockInOutCallBack;
     @Autowired
     private ProblemAllocateApplyImpl problemAllocateApply;
+    @ThriftRPCClient("BasicMerchandiseSer")
+    private CarpartsProductService carpartsProductService;
 
     /**
      * 带条件分页查询所有零配件的问题库存
-     * @param type 物料或是零配件
-     * @param productCategory 物料类型
-     * @param productList 商品
-     * @param offset 起始数
-     * @param pageSize 每页数量
+
      * @author weijb
      * @date 2018-08-14 21:59:51
      */
     @Override
-    public Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(String orgCode, boolean category, String type, String productCategory, List<BasicCarpartsProductDTO> productList, String keyword, Integer offset, Integer pageSize){
-        List<String> productNames = null;
-        if(null != productList && productList.size() > 0){
-            productNames = productList.stream().map(BasicCarpartsProductDTO::getCarpartsName).collect(Collectors.toList());
+    public Page<FindStockListDTO> queryStockBizStockDetailDTOList(FindStockListDTO findStockListDTO){
+        List<BasicCarpartsProductDTO> carpartsProductDTOList;
+        if(Constants.PRODUCT_TYPE_EQUIPMENT.equals(findStockListDTO.getProductType())){
+            // 查询类型下所有的code
+            carpartsProductDTOList  = bizAllocateApplyDao.findEquipmentCode(findStockListDTO.getEquiptypeId());
+        }else {
+            // 查询零配件
+            carpartsProductDTOList = carpartsProductService.queryCarpartsProductListByCategoryCode(findStockListDTO.getKeyword());
         }
-
-        if(StringUtils.isNotBlank(productCategory)){
-            List<DetailBizServiceEquipmentDTO> equis = bizServiceEquipmentDao.queryEqupmentByEquiptype(Long.valueOf(productCategory));
-            productNames = equis.stream().map(DetailBizServiceEquipmentDTO::getEquipName).collect(Collectors.toList());
+        List<String> productCode = carpartsProductDTOList.stream().map(BasicCarpartsProductDTO::getCarpartsCode).collect(Collectors.toList());
+        if(productCode == null || productCode.size() == 0){
+            return new Page<FindStockListDTO>(findStockListDTO.getOffset(), findStockListDTO.getPageSize());
         }
-        return problemStockDetailDao.queryStockBizStockDetailDTOList(category, type, orgCode, productNames, keyword,offset, pageSize);
+        String orgNo = findStockListDTO.getOrgNo();
+        List<String> orgCodeList = orgNo == null ? null : List.of(orgNo);
+        Page<FindStockListDTO> stockPage = bizAllocateApplyDao.findProblemStockList(findStockListDTO, productCode, orgCodeList);
+        buildStockPage(findStockListDTO, carpartsProductDTOList, stockPage);
+        return stockPage;
     }
+
+    /**
+     * 构建库存（填充零配件信息）
+     * @param findStockListDTO 配件基础信息条件
+     * @param carpartsProductDTOList 配件信息
+     * @param stockPage 库存分页信息
+     * @author zhangkangjian
+     * @date 2018-11-15 16:31:07
+     */
+    public void buildStockPage(FindStockListDTO findStockListDTO, List<BasicCarpartsProductDTO> carpartsProductDTOList, Page<FindStockListDTO> stockPage) {
+        if(Constants.PRODUCT_TYPE_FITTINGS.equals(findStockListDTO.getProductType())) {
+            List<FindStockListDTO> rows = stockPage.getRows();
+            if (rows != null) {
+                Map<String, BasicCarpartsProductDTO> productMap = carpartsProductDTOList.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, a -> a, (k1, k2) -> k1));
+                rows.forEach(item -> {
+                    String productNo = item.getProductNo();
+                    BasicCarpartsProductDTO basicCarparts = productMap.get(productNo);
+                    item.setCarpartsImage(basicCarparts.getCarpartsImage());
+                    item.setCarpartsMarkno(basicCarparts.getCarpartsMarkno());
+                    item.setProductName(basicCarparts.getCarpartsName());
+                    item.setUnit(basicCarparts.getUnitName());
+                });
+            }
+        }
+    }
+
     /**
      * 带条件分页查询本机构所有零配件的问题库存
      * @param type 物料或是零配件
@@ -112,7 +148,9 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
             List<DetailBizServiceEquipmentDTO> equis = bizServiceEquipmentDao.queryEqupmentByEquiptype(Long.valueOf(productCategory));
             productNames = equis.stream().map(DetailBizServiceEquipmentDTO::getEquipName).collect(Collectors.toList());;
         }
-        return problemStockDetailDao.queryStockBizStockDetailDTOList(category, type,orgCode, productNames, keyword,offset, pageSize);
+        // TODO: 2018/11/15
+//        return problemStockDetailDao.queryStockBizStockDetailDTOList(category, type,orgCode, productNames, keyword,offset, pageSize);
+        return null;
     }
 
     /**
