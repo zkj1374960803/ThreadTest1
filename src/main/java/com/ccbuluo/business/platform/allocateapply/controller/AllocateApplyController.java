@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.List;
@@ -386,9 +387,9 @@ public class AllocateApplyController extends BaseController {
 
     /**
      * 查询问题件供应商
-     * @param
-     * @exception
-     * @return
+     * @param orgCode 当前登陆人的机构
+     * @param productType 商品类型（注：FITTINGS零配件，EQUIPMENT物料）
+     * @return StatusDto<List<QuerySupplierInfoDTO>>
      * @author zhangkangjian
      * @date 2018-10-31 18:41:40
      */

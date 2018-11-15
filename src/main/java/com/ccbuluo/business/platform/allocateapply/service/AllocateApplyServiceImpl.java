@@ -355,7 +355,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                         if (basicCarpartsProductDTO != null) {
                             c.setProductName(basicCarpartsProductDTO.getCarpartsName());
                             c.setCarpartsImage(basicCarpartsProductDTO.getCarpartsImage());
-                            c.setCarpartsMarkno(basicCarpartsProductDTO.getCarpartsImage());
+                            c.setCarpartsMarkno(basicCarpartsProductDTO.getCarpartsMarkno());
                             c.setUnit(basicCarpartsProductDTO.getUnitName());
                         }
                     });
