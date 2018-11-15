@@ -162,7 +162,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                 throw new CommonException("1003", "生成入库单详单失败！");
             }
             // 复核库存和入库计划
-            checkStockAndPlan(applyNo, inRepositoryNo, instockNo);
+            checkStockAndPlan(applyNo, inRepositoryNo, instockNo, bizInstockplanDetails);
             BizServiceLog bizServiceLog = new BizServiceLog();
             bizServiceLog.setModel(BizServiceLog.modelEnum.ERP.name());
             bizServiceLog.setAction(BizServiceLog.actionEnum.SAVE.name());
@@ -188,11 +188,11 @@ public class InstockOrderServiceImpl implements InstockOrderService {
      * @author liuduo
      * @date 2018-08-20 11:32:13
      */
-    private void checkStockAndPlan(String applyNo, String inRepositoryNo, String instockNo) {
+    private void checkStockAndPlan(String applyNo, String inRepositoryNo, String instockNo, List<BizInstockplanDetail> bizInstockplanDetails) {
         // 3、修改库存明细
         // 根据入库单号查询入库单详单
         List<BizInstockorderDetail> bizInstockorderDetailList1 = instockorderDetailService.queryListByinstockNo(instockNo);
-        List<Long> stockIds = saveStockDetail(applyNo, bizInstockorderDetailList1, inRepositoryNo);
+        List<Long> stockIds = saveStockDetail(applyNo, bizInstockorderDetailList1, inRepositoryNo, bizInstockplanDetails);
         // 4、更新入库计划明细中的实际入库数量
         updateInstockplan(bizInstockorderDetailList1);
         List<BizInstockplanDetail> bizInstockplanDetails2 = inputStockPlanService.queryListByApplyNo(applyNo, StockPlanStatusEnum.DOING.toString(), inRepositoryNo);
@@ -438,14 +438,16 @@ public class InstockOrderServiceImpl implements InstockOrderService {
      * @author liuduo
      * @date 2018-08-08 15:41:54
      */
-    private List<Long> saveStockDetail(String applyNo, List<BizInstockorderDetail> bizInstockorderDetailList,  String inRepositoryNo) {
+    private List<Long> saveStockDetail(String applyNo, List<BizInstockorderDetail> bizInstockorderDetailList,  String inRepositoryNo, List<BizInstockplanDetail> bizInstockplanDetails) {
         String orgCode = userHolder.getLoggedUser().getOrganization().getOrgCode();
         // 根据入库详单的  供应商、商品、仓库、批次号  查询在库存中有无记录，有则更新，无则新增
         List<BizInstockorderDetail> bizInstockorderDetailList1 = Lists.newArrayList();
         // 根据仓库编号查询机构号
         String orgCodeByStoreHouseCode = storeHouseService.getOrgCodeByStoreHouseCode(inRepositoryNo);
         List<Long> stockIds = Lists.newArrayList();
+        Map<Long, BizInstockplanDetail> inStockPlan = bizInstockplanDetails.stream().collect(Collectors.toMap(BizInstockplanDetail::getId, Function.identity()));
         bizInstockorderDetailList.forEach(item -> {
+            BizInstockplanDetail bizInstockplanDetail = inStockPlan.get(item.getInstockPlanid());
             Long id = stockDetailService.getByinstockorderDeatil(item.getSupplierNo(), item.getProductNo(), item.getCostPrice(), inRepositoryNo, applyNo);
             if (null != id) {
                 // 根据id查询乐观锁
@@ -486,6 +488,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                 bizStockDetail.setInstockPlanid(item.getInstockPlanid());
                 bizStockDetail.setProductUnit(item.getUnit());
                 bizStockDetail.preInsert(userHolder.getLoggedUserId());
+                bizStockDetail.setPurchaseInfo(bizInstockplanDetail.getPurchaseInfo());
                 Long stockDetailId = stockDetailService.saveStockDetail(bizStockDetail);
                 stockIds.add(stockDetailId);
                 // 把库存id回填到入库详单中

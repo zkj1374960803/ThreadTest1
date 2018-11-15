@@ -28,6 +28,12 @@ public class EditSupplierDTO {
     @ApiModelProperty(name = "supplierCode", value = "供应商编号", hidden = true)
     private String supplierCode;
     /**
+     * 供应商代码
+     */
+    @ValidateLength(min = 1, max = 20, groups = Group.Update.class, message = "供应商代码长度必须在1~20之间")
+    @ApiModelProperty(name = "supplierMarkno", value = "供应商代码")
+    private String supplierMarkno;
+    /**
      * 供应商名称
      */
     @ValidateLength(min = 1, max = 50, groups = Group.Update.class, message = "供应商名称长度必须在1~50之间")
@@ -144,6 +150,14 @@ public class EditSupplierDTO {
 
     public String getSupplierName() {
         return supplierName;
+    }
+
+    public String getSupplierMarkno() {
+        return supplierMarkno;
+    }
+
+    public void setSupplierMarkno(String supplierMarkno) {
+        this.supplierMarkno = supplierMarkno;
     }
 
     public void setSupplierName(String supplierName) {

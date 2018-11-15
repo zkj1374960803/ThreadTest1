@@ -23,18 +23,17 @@ import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.json.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.weakref.jmx.internal.guava.collect.Maps;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -200,6 +199,7 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
             instockplanPurchaser.setInstockType(InstockTypeEnum.BARTER.name());
             instockplanPurchaser.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
             instockplanPurchaser.setCostPrice(outstockplan.getCostPrice());
+            instockplanPurchaser.setPurchaseInfo(outstockplan.getPurchaseInfo());
             instockplanPurchaser.setPlanInstocknum(outstockplan.getPlanOutstocknum());
             instockplanPurchaser.setSupplierNo(outstockplan.getSupplierNo());
             inList.add(instockplanPurchaser);
@@ -276,6 +276,7 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
             }
             inPlan.setInstockRepositoryNo(repositoryNo);// 平台仓库编号
             inPlan.setInstockOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 平台机构编号
+            inPlan.setPurchaseInfo(outstockplan.getPurchaseInfo());
             inList.add(inPlan);
         }
     }
@@ -334,6 +335,8 @@ public class RefundApplyHandleStrategy extends DefaultApplyHandleStrategy {
                     outstockplanPurchaser.setStockId(bd.getId());// 库存编号id
                     outstockplanPurchaser.setCostPrice(bd.getCostPrice());// 成本价
                     outstockplanPurchaser.setOutstockType(OutstockTypeEnum.REFUND.toString());// 交易类型
+                    // 采购价
+                    outstockplanPurchaser.setPurchaseInfo(bd.getPurchaseInfo());
                     outList.add(outstockplanPurchaser);
                     continue;
                 }

@@ -140,6 +140,12 @@ public class Constants {
      * 物料
      */
     public static final String PRODUCT_TYPE_EQUIPMENT = "EQUIPMENT";
+    /**
+     * 三阶梯价格
+     */
+    public static final Integer LADDER_PRICE_2  = 2;
+    public static final Integer LADDER_PRICE_3  = 3;
+    public static final Integer LADDER_PRICE_4  = 4;
 
 
 

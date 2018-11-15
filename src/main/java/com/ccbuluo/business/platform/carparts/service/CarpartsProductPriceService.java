@@ -1,13 +1,16 @@
 package com.ccbuluo.business.platform.carparts.service;
 
 import com.ccbuluo.business.entity.RelProductPrice;
+import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
 import com.ccbuluo.core.entity.UploadFileInfo;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftBean;
+import com.ccbuluo.http.StatusDtoThriftPage;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.EditBasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
+import com.ccbuluo.merchandiseintf.carparts.parts.dto.SaveBasicCarpartsProductDTO;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -65,5 +68,48 @@ public interface CarpartsProductPriceService {
      * @author zhangkangjian
      * @date 2018-11-05 16:56:30
      */
-    StatusDto<EditBasicCarpartsProductDTO> findCarpartsProductdetail(String carpartsCode);
+    StatusDto<SaveBasicCarpartsProductDTO> findCarpartsProductdetail(String carpartsCode);
+
+    /**
+     * 保存零配件
+     * @param saveBasicCarpartsProductDTO 零配件实体
+     * @return StatusDto<String>
+     * @author zhangkangjian
+     * @date 2018-11-12 14:37:33
+     */
+    StatusDto<String> saveCarpartsProduct(SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO);
+
+    /**
+     * 编辑零部件
+     * @param saveBasicCarpartsProductDTO 零配件实体
+     * @return StatusDto<String>
+     * @author weijb
+     * @date 2018-07-02 18:52:40
+     */
+    StatusDto<String> editCarpartsProduct(SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO);
+    /**
+     * 零配件列表分页查询
+     * @param keyword 零部件名称
+     * @param offset 起始数
+     * @param pageSize 每页数量
+     * @author zhangkangjian
+     * @date 2018-11-12 19:52:44
+     */
+    StatusDto<Page<BasicCarpartsProductDTO>> queryCarpartsProductList(String keyword, Integer offset, Integer pageSize);
+
+    /**
+     * 查询零配件的信息
+     * @param keyword 查询条件
+     * @return
+     * @author zhangkangjian
+     * @date 2018-11-13 11:04:47
+     */
+    StatusDto<List<BasicCarpartsProductDTO>> queryCarparts(String keyword);
+    /**
+     *  删除零配件
+     * @param carpartsCode 零配件code
+     * @author zhangkangjian
+     * @date 2018-11-14 15:42:34
+     */
+    StatusDto<String> deleteCarpartsProduct(String carpartsCode);
 }

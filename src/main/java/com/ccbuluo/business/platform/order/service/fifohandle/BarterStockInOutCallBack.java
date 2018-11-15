@@ -91,33 +91,35 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
      */
     @Transactional(rollbackFor = Exception.class)
     public StatusDto platformInstockCallback(String applyNo){
-        // 根据申请单获取申请单详情
-        BizAllocateApply apply = bizAllocateApplyDao.getByNo(applyNo);
-        String applyType = apply.getApplyType();
-        // 根据申请单获取申请单详情
-        List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
-        if(null == details || details.size() == 0){
-            return StatusDto.buildFailureStatusDto("申请单为空！");
+        try {
+            // 根据单号查询申请单
+            BizAllocateApply apply = bizAllocateApplyDao.getByNo(applyNo);
+            String applyType = apply.getApplyType();
+            // 根据申请单获取申请单详情
+            List<AllocateapplyDetailBO> details = bizAllocateapplyDetailDao.getAllocateapplyDetailByapplyNo(applyNo);
+            if(null == details || details.size() == 0){
+                return StatusDto.buildFailureStatusDto("申请单为空！");
+            }
+            //获取卖方机构code
+            String productOrgNo = getProductOrgNo(apply);
+            //查询库存列表
+            List<BizStockDetail> stockDetails = bizStockDetailDao.getStockDetailListByApplyNo(applyNo);
+            if(null == stockDetails || stockDetails.size() == 0){
+                return StatusDto.buildFailureStatusDto("库存列表为空！");
+            }
+            // 生成平台出库计划
+            List<BizOutstockplanDetail> outstockplans = buildPlatformOutstockplan(apply, details, stockDetails);
+            // 根据平台出库计划生成机构入库计划
+            List<BizInstockplanDetail> bizInstockplanDetails = buildOrgInStockPlan(apply, outstockplans);
+            // 批量保存出库计划详情
+            bizOutstockplanDetailDao.batchOutstockplanDetail(outstockplans);
+            // 保存机构入库计划
+            bizInstockplanDetailDao.batchInsertInstockplanDetail(bizInstockplanDetails);
+            return StatusDto.buildSuccessStatusDto("出库计划生成成功");
+        } catch (Exception e) {
+            logger.error("生成出入库计划失败！", e);
+            throw e;
         }
-        //获取卖方机构code
-        String productOrgNo = getProductOrgNo(apply);
-        //查询库存列表
-        List<BizStockDetail> stockDetails = bizStockDetailDao.getStockDetailListByApplyNo(applyNo);
-        if(null == stockDetails || stockDetails.size() == 0){
-            return StatusDto.buildFailureStatusDto("库存列表为空！");
-        }
-        List<BizOutstockplanDetail> outstockplans = buildPlatformOutstockplan(apply, details, stockDetails);
-        // 构建平台出库计划并保存(特殊处理，根据平台的入库计划来构建)
-//        convertStockDetail(stockDetails);
-        // 保存占用库存
-//        int flag = bizStockDetailDao.batchUpdateStockDetil(stockDetails);
-//        // 更新失败
-//        if(flag == 0){
-//            throw new CommonException("0", "更新占用库存失败！");
-//        }
-        // 批量保存出库计划详情
-        bizOutstockplanDetailDao.batchOutstockplanDetail(outstockplans);
-        return StatusDto.buildSuccessStatusDto("出库计划生成成功");
     }
 
     /**
@@ -167,72 +169,121 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
         // 根据入库计划里的商品查询商品库存
         List<String> products = instockplanDetails.stream().map(BizInstockplanDetail::getProductNo).collect(Collectors.toList());
         List<BizStockDetail> bizStockDetailList = bizStockDetailDao.queryStockByProducts(products, userHolder.getLoggedUser().getOrganization().getOrgCode());
-        // 以商品分组，并计算商品库存
+        // 校验库存是否足够
         Map<String, List<BizStockDetail>> groupProduct = bizStockDetailList.stream().collect(Collectors.groupingBy(BizStockDetail::getProductNo));
-        Map<String, BizInstockplanDetail> singleProductStockDetail = instockplanDetails.stream().collect(Collectors.toMap(BizInstockplanDetail::getProductNo, Function.identity()));
-
-        for (Map.Entry<String, List<BizStockDetail>> entryP : groupProduct.entrySet()) {
-            // 校验库存是否满足
-            List<BizStockDetail> value = entryP.getValue();
-            long count = value.stream().map(BizStockDetail::getValidStock).count();
-            BizInstockplanDetail bizInstockplanDetail = singleProductStockDetail.get(entryP.getKey());
-            if (bizInstockplanDetail.getPlanInstocknum() > count) {
-                throw new CommonException(ba.getApplyNo(), "可用库存不足，无法满足该申请的换货需求，请核对！");
+        Map<String, List<BizInstockplanDetail>> inStockPlanProduct = instockplanDetails.stream().collect(Collectors.groupingBy(BizInstockplanDetail::getProductNo));
+        for (Map.Entry<String, List<BizInstockplanDetail>> entryP : inStockPlanProduct.entrySet()) {
+            List<BizInstockplanDetail> value = entryP.getValue();
+            long planOutStockSum = value.stream().mapToLong(BizInstockplanDetail::getPlanInstocknum).sum();
+            List<BizStockDetail> bizStockDetailList1 = groupProduct.get(entryP.getKey());
+            long stockSum = bizStockDetailList1.stream().mapToLong(BizStockDetail::getValidStock).sum();
+            if (planOutStockSum > stockSum) {
+                throw new CommonException(Constants.ERROR_CODE, "可用库存不足，无法满足该申请的换货需求，请核对！");
             }
         }
         // 用来存储新的有效库存和占用库存
         List<BizStockDetail> bizStockDetailLists = Lists.newArrayList();
-        List<BizStockDetail> ValidStockDetail = bizStockDetailList.stream().filter(item -> item.getValidStock() > 0).collect(Collectors.toList());
-        Map<String, List<BizStockDetail>> byProductGroupStockDetail = ValidStockDetail.stream().collect(Collectors.groupingBy(BizStockDetail::getProductNo));
-        for(BizInstockplanDetail in : instockplanDetails){
-            // 计划入库数量
-            Long planInstocknum = in.getPlanInstocknum();
-            List<BizStockDetail> actualStockDetailList = byProductGroupStockDetail.get(in.getProductNo());
-            for (BizStockDetail stockDetail : actualStockDetailList) {
-                BizOutstockplanDetail outstockplanPlatform;
-                outstockplanPlatform = buildBizOutstockplanDetail(in);
-                outstockplanPlatform.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
-                Optional<AllocateapplyDetailBO> applyFilter = details.stream() .filter(applyDetail -> in.getProductNo().equals(applyDetail.getProductNo())) .findFirst();
-                if (applyFilter.isPresent()) {
-                    outstockplanPlatform.setApplyDetailId(applyFilter.get().getId());//申请单详单id
-                }
+        // 以商品分组，并计算商品库存
+        List<BizStockDetail> validStockList = bizStockDetailList.stream().filter(item -> item.getValidStock() > 0).collect(Collectors.toList());
+        Map<String, List<BizStockDetail>> validStockProduct = validStockList.stream().collect(Collectors.groupingBy(BizStockDetail::getProductNo));
+        for (Map.Entry<String, List<BizStockDetail>> entry : validStockProduct.entrySet()) {
+            List<BizStockDetail> productStockDetail = entry.getValue();
+            List<BizInstockplanDetail> bizInstockplanDetails = inStockPlanProduct.get(entry.getKey());
+            BizInstockplanDetail bizInstockplanDetail = bizInstockplanDetails.get(0);
+            // 获取入库计划中的每个商品的计划入库总数量
+            long inStockPlanSum = bizInstockplanDetails.stream().mapToLong(BizInstockplanDetail::getPlanInstocknum).sum();
+            for (BizStockDetail stockDetail : productStockDetail) {
                 // 获取商品库存数量
                 Long validStock = stockDetail.getValidStock();
-                // 申请的数量小于库存的数量
-                if (planInstocknum <= validStock) {
+                BizOutstockplanDetail outstockplanPlatform = new BizOutstockplanDetail();
+                if (inStockPlanSum <= validStock) {
                     // 设置新的有效库存数量和占用库存数量
-                    stockDetail.setValidStock(validStock - planInstocknum);
-                    stockDetail.setOccupyStock(planInstocknum);
+                    stockDetail.setValidStock(inStockPlanSum);
+                    stockDetail.setOccupyStock(inStockPlanSum);
                     bizStockDetailLists.add(stockDetail);
-                    outstockplanPlatform.setOutRepositoryNo(stockDetail.getRepositoryNo());// 平台仓库编号
-                    outstockplanPlatform.setPlanOutstocknum(planInstocknum);// 计划出库数量applyNum
-                    outstockplanPlatform.setOutOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 平台code
-                    outstockplanPlatform.setStockId(stockDetail.getId());// 库存编号id
-                    outstockplanPlatform.setCostPrice(in.getCostPrice());// 成本价
+                    outstockplanPlatform.setPlanOutstocknum(inStockPlanSum);
+                    buildOutStockPlan(bizInstockplanDetail,stockDetail, outstockplanPlatform);
+                    outstockplanPlatform.setCostPrice(stockDetail.getCostPrice());
                     outstockplanDetails.add(outstockplanPlatform);
                     break;
                 } else {
                     // 申请的数量大于库存的数量
-                    stockDetail.setValidStock(0L);
+                    stockDetail.setValidStock(validStock);
                     stockDetail.setOccupyStock(validStock);
-                    planInstocknum = planInstocknum - validStock;
+                    inStockPlanSum = inStockPlanSum - validStock;
                     bizStockDetailLists.add(stockDetail);
-                    outstockplanPlatform.setOutRepositoryNo(stockDetail.getRepositoryNo());// 平台仓库编号
-                    outstockplanPlatform.setPlanOutstocknum(validStock);// 计划出库数量applyNum
-                    outstockplanPlatform.setOutOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);// 平台code
-                    outstockplanPlatform.setStockId(stockDetail.getId());// 库存编号id
-                    outstockplanPlatform.setCostPrice(in.getCostPrice());// 成本价
+                    outstockplanPlatform.setPlanOutstocknum(validStock);
+                    buildOutStockPlan(bizInstockplanDetail,stockDetail, outstockplanPlatform);
+                    outstockplanPlatform.setCostPrice(stockDetail.getCostPrice());
                     outstockplanDetails.add(outstockplanPlatform);
-                    if (planInstocknum <= 0) {
+                    if (inStockPlanSum <= 0) {
                         break;
                     }
                 }
-
             }
         }
         // 更新库存表
         bizStockDetailDao.updateValidStockByOutStockPlan(bizStockDetailLists);
         return outstockplanDetails;
+    }
+
+
+    /**
+     * 根据平台出库计划构建机构入库计划
+     * @param apply 申请单
+     * @param outstockplans 平台出库计划
+     * @author liuduo
+     * @date 2018-11-10 00:31:03
+     */
+    private List<BizInstockplanDetail> buildOrgInStockPlan(BizAllocateApply apply, List<BizOutstockplanDetail> outstockplans) {
+        List<BizInstockplanDetail> instockplanDetailList = Lists.newArrayList();
+        for (BizOutstockplanDetail outstockplan : outstockplans) {
+            BizInstockplanDetail bizInstockplanDetail = new BizInstockplanDetail();
+            bizInstockplanDetail.setProductNo(outstockplan.getProductNo());
+            bizInstockplanDetail.setProductType(outstockplan.getProductType());
+            bizInstockplanDetail.setProductCategoryname(outstockplan.getProductCategoryname());
+            bizInstockplanDetail.setProductName(outstockplan.getProductName());
+            bizInstockplanDetail.setProductUnit(outstockplan.getProductUnit());
+            bizInstockplanDetail.setTradeNo(String.valueOf(apply.getApplyNo()));
+            bizInstockplanDetail.setCompleteStatus(StockPlanStatusEnum.DOING.toString());
+            bizInstockplanDetail.preInsert(userHolder.getLoggedUserId());
+            bizInstockplanDetail.setInstockRepositoryNo(apply.getInRepositoryNo());
+            bizInstockplanDetail.setInstockOrgno(apply.getApplyorgNo());
+            bizInstockplanDetail.setSellerOrgno(apply.getOutstockOrgno());
+            bizInstockplanDetail.setInstockType(InstockTypeEnum.BARTER.name());
+            bizInstockplanDetail.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
+            bizInstockplanDetail.setCostPrice(outstockplan.getCostPrice());
+            bizInstockplanDetail.setPlanInstocknum(outstockplan.getPlanOutstocknum());
+            bizInstockplanDetail.setSupplierNo(outstockplan.getSupplierNo());
+            instockplanDetailList.add(bizInstockplanDetail);
+        }
+        return instockplanDetailList;
+    }
+
+
+    /**
+     * 构建平台出库计划
+     * @param stockDetail 库存详情
+     * @param outstockplanPlatform 出库计划
+     * @author liuduo
+     * @date 2018-11-10 00:24:15
+     */
+    private void buildOutStockPlan(BizInstockplanDetail bizInstockplanDetail, BizStockDetail stockDetail, BizOutstockplanDetail outstockplanPlatform) {
+        outstockplanPlatform.setOutRepositoryNo(stockDetail.getRepositoryNo());
+        outstockplanPlatform.setOutOrgno(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
+        outstockplanPlatform.setStockId(stockDetail.getId());
+        outstockplanPlatform.setOutstockType(OutstockTypeEnum.BARTER.toString());
+        outstockplanPlatform.setProductNo(bizInstockplanDetail.getProductNo());
+        outstockplanPlatform.setProductType(bizInstockplanDetail.getProductType());
+        outstockplanPlatform.setProductCategoryname(bizInstockplanDetail.getProductCategoryname());
+        outstockplanPlatform.setProductName(bizInstockplanDetail.getProductName());
+        outstockplanPlatform.setProductUnit(bizInstockplanDetail.getProductUnit());
+        outstockplanPlatform.setTradeNo(bizInstockplanDetail.getTradeNo());
+        outstockplanPlatform.setSupplierNo(stockDetail.getSupplierNo());
+        outstockplanPlatform.setSalesPrice(BigDecimal.ZERO);
+        outstockplanPlatform.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
+        outstockplanPlatform.setPlanStatus(StockPlanStatusEnum.DOING.toString());
+        outstockplanPlatform.preInsert(userHolder.getLoggedUserId());
     }
 
     /**

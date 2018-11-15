@@ -134,6 +134,12 @@ public class BizInstockplanDetail extends AftersaleCommonEntity{
     @ApiModelProperty(name = "sellerOrgno", value = "卖方机构的编号")
     private String sellerOrgno;
 
+    /**
+     *  采购信息
+     */
+    @ApiModelProperty(name = "purchaseInfo", value = "采购信息(目前包含采购价格和采购时间)")
+    private String purchaseInfo;
+
     public double getTotalPrice(){
         if(costPrice != null){
             return actualInstocknum * costPrice.doubleValue();
@@ -331,5 +337,13 @@ public class BizInstockplanDetail extends AftersaleCommonEntity{
 
     public void setSellerOrgno(String sellerOrgno) {
         this.sellerOrgno = sellerOrgno;
+    }
+
+    public String getPurchaseInfo() {
+        return purchaseInfo;
+    }
+
+    public void setPurchaseInfo(String purchaseInfo) {
+        this.purchaseInfo = purchaseInfo;
     }
 }

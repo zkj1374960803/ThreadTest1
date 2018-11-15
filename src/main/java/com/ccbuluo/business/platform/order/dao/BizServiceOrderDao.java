@@ -292,18 +292,16 @@ public class BizServiceOrderDao extends BaseDao<BizServiceOrder> {
     }
 
     /**
-     * 根据工时code查询公司是否被引用
-     * @param maintainitemCode 工时code
-     * @return 工时是否被引用
+     * 根据商品的code查询物料是否被申请
+     * @param productNo 商品的code
+     * @return 物料是否被申请
      * @author liuduo
-     * @date 2018-09-18 14:36:12
+     * @date 2018-08-23 16:01:38
      */
-    public Boolean getByProductCode(String maintainitemCode) {
+    public Boolean checkProductRelOrder(String productNo) {
         Map<String, Object> params = Maps.newHashMap();
-        params.put("maintainitemCode", maintainitemCode);
-
-        String sql = "SELECT COUNT(id) > 0 FROM biz_serviceorder_detail WHERE product_no = :maintainitemCode";
-
+        params.put("productNo", productNo);
+        String sql = "SELECT COUNT(id) > 0 FROM biz_serviceorder_detail WHERE product_no = :productNo";
         return findForObject(sql, params, Boolean.class);
     }
 

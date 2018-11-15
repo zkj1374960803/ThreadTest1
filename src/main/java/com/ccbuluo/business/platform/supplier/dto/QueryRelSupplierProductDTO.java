@@ -22,7 +22,7 @@ public class QueryRelSupplierProductDTO {
     /**
      * 供应商code
      */
-    @ApiModelProperty(name = "supplierCode", value = "供应商code", hidden = true)
+    @ApiModelProperty(name = "supplierCode", value = "供应商code")
     private String supplierCode;
 
     /**
@@ -36,6 +36,11 @@ public class QueryRelSupplierProductDTO {
      */
     @ApiModelProperty(name = "productCode", value = "商品的code", hidden = true)
     private String productCode;
+    /**
+     * 供应商代码
+     */
+    @ApiModelProperty(name = "supplierMarkno", value = "供应商代码", hidden = true)
+    private String supplierMarkno;
     /**
      * 商品的名称
      */
@@ -88,6 +93,14 @@ public class QueryRelSupplierProductDTO {
 
     public void setProductName(String productName) {
         this.productName = productName;
+    }
+
+    public String getSupplierMarkno() {
+        return supplierMarkno;
+    }
+
+    public void setSupplierMarkno(String supplierMarkno) {
+        this.supplierMarkno = supplierMarkno;
     }
 
     public enum ProductTypeEnum {

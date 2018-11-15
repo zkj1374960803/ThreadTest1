@@ -342,4 +342,11 @@ public interface AllocateApplyService {
      * @date 2018-11-05 15:17:08
      */
     void findOrgName(Page<QueryAllocateApplyListDTO> page);
+    /**
+     * 构建出库计划实体（填充零配件的信息）
+     * @param instockplansByApplyNo 入库计划
+     * @author zhangkangjian
+     * @date 2018-11-14 10:19:00
+     */
+    void buildStockPlanDetail(List<BizOutstockplanDetail> instockplansByApplyNo);
 }

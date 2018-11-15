@@ -7,10 +7,7 @@ import com.ccbuluo.business.entity.BizOutstockplanDetail;
 import com.ccbuluo.business.platform.allocateapply.dto.*;
 import com.ccbuluo.business.platform.allocateapply.service.AllocateApplyService;
 import com.ccbuluo.business.platform.custmanager.service.CustmanagerService;
-import com.ccbuluo.core.annotation.validate.ValidateGroup;
-import com.ccbuluo.core.annotation.validate.ValidateNotBlank;
-import com.ccbuluo.core.annotation.validate.ValidatePattern;
-import com.ccbuluo.core.annotation.validate.ValidateRange;
+import com.ccbuluo.core.annotation.validate.*;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.validate.ValidateUtils;
 import com.ccbuluo.db.Page;
@@ -207,7 +204,7 @@ public class ServiceAllocateApplyController extends BaseController {
     @GetMapping("/queryinandoutstockplan")
     @ApiOperation(value = "查询出入库计划", notes = "【张康健】")
     @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query")
-    public StatusDto<Map<String, Object>> queryInStockplan(String applyNo) {
+    public StatusDto<Map<String, Object>> queryInStockplan(@ValidateNotNull String applyNo) {
         Map<String, Object> map = allocateApplyServiceImpl.queryListByApplyNoAndInReNo(applyNo);
         return StatusDto.buildDataSuccessStatusDto(map);
     }

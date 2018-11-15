@@ -217,32 +217,6 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
         return null;
     }
 
-    /**
-     *  根据类型查询服务中心的code
-     * @param type 机构的类型
-     * @return List<String> 机构的code
-     * @author zhangkangjian
-     * @date 2018-08-20 16:17:55
-     */
-    private List<String> getOrgCodesByOrgType(String type) {
-        if(StringUtils.isBlank(type)){
-            return Collections.emptyList();
-        }
-        if(OrganizationTypeEnum.PLATFORM.name().equals(type)){
-            return List.of(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM);
-        }
-        QueryOrgDTO orgDTO = new QueryOrgDTO();
-        orgDTO.setOrgType(type);
-        orgDTO.setStatus(Constants.FREEZE_STATUS_YES);
-        StatusDtoThriftList<BasicUserOrganization> basicUserOrganization = basicUserOrganizationService.queryOrgListByOrgType(type, true);
-        StatusDto<List<BasicUserOrganization>> resolve = StatusDtoThriftUtils.resolve(basicUserOrganization, BasicUserOrganization.class);
-        List<BasicUserOrganization> data = resolve.getData();
-        List<String> orgCode = null;
-        if(data != null && data.size() > 0){
-            orgCode = data.stream().map(BasicUserOrganization::getOrgCode).collect(Collectors.toList());
-        }
-        return orgCode;
-    }
 
     /**
      * 查询退换货申请单详情（处理）
@@ -302,7 +276,8 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
      */
     private ArrayList<QueryAllocateapplyDetailDTO> setingProblemDetailList(String applyNo, FindAllocateApplyDTO allocateApplyDTO) {
         String applyorgNo = allocateApplyDTO.getApplyorgNo();
-        List<BizOutstockplanDetail> bizOutstockplanDetails = bizOutstockplanDetailDao.queryOutstockplan(applyNo, null, null, applyorgNo);
+        List<BizOutstockplanDetail> bizOutstockplanDetails = bizOutstockplanDetailDao.queryOutstockplan(applyNo, null, null, null);
+        allocateApplyServiceImpl.buildStockPlanDetail(bizOutstockplanDetails);
         ArrayList<QueryAllocateapplyDetailDTO> allocateapplyDetailList = Lists.newArrayList();
         List<QueryAllocateapplyDetailDTO> queryAllocateapplyDetailDTO = allocateApplyDTO.getQueryAllocateapplyDetailDTO();
         if(queryAllocateapplyDetailDTO != null && queryAllocateapplyDetailDTO.size() > 0){
@@ -317,6 +292,11 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
                         QuerySupplierInfoDTO querySupplierInfoDTO =
                             bizServiceSupplierDao.querySupplierInfoByCode(a.getSupplierNo());
                         cloneAllocateapply.setSupplierName(querySupplierInfoDTO.getSupplierName());
+                        cloneAllocateapply.setCarpartsMarkno(a.getCarpartsMarkno());
+                        cloneAllocateapply.setProductName(a.getProductName());
+                        cloneAllocateapply.setUnit(a.getProductUnit());
+                        cloneAllocateapply.setCarpartsImage(a.getCarpartsImage());
+                        cloneAllocateapply.setCostPrice(a.getCostPrice());
                         allocateapplyDetailList.add(cloneAllocateapply);
                     } catch (Exception e) {
                         throw new CommonException(Constants.ERROR_CODE, "拷贝失败！");

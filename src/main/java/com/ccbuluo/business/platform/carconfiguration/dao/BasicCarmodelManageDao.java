@@ -253,15 +253,15 @@ public class BasicCarmodelManageDao extends BaseDao<CarmodelManage> {
      * @Date 2018-06-21 18:43:05
      */
     public List<CarmodelManage> queryPartModel(List<Long> carmodelId) {
+        Map<String, Object> params = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT ")
             .append(SQL_BUILD)
             .append(" FROM basic_carmodel_manage ");
         if (null != carmodelId && carmodelId.size() > 0) {
+            params.put("carmodelId", carmodelId);
             sql.append(" WHERE id in (:carmodelId) ");
         }
-        Map<String, Object> params = Maps.newHashMap();
-        params.put("carmodelId", carmodelId);
         return super.queryListBean(CarmodelManage.class, sql.toString(), params);
     }
     /**
