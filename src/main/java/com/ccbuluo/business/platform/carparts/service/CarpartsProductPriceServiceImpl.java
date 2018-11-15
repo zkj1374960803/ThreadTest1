@@ -10,6 +10,7 @@ import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarmodelManageDao
 import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelManage;
 import com.ccbuluo.business.platform.carconfiguration.service.BasicCarmodelManageService;
 import com.ccbuluo.business.platform.carparts.dao.CarpartsProductPriceDao;
+import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
@@ -26,6 +27,7 @@ import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.SaveBasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
+import com.ccbuluo.usercoreintf.dto.QueryNameByUseruuidsDTO;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -69,6 +71,8 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     private BizServiceSupplierDao bizServiceSupplierDao;
     @Resource
     private BizServiceOrderDao bizServiceOrderDao;
+    @Resource
+    private BizServiceEquipmentDao bizServiceEquipmentDao;
 
     /**
      * 查询零配件的信息和价格
@@ -281,14 +285,21 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
      * @date 2018-11-13 10:07:23
      */
     @Override
-    public StatusDto<List<BasicCarpartsProductDTO>> queryCarparts(String keyword) {
+    public StatusDto<List<BasicCarpartsProductDTO>> queryCarparts(String keyword, RelProductPrice.PriceLevelEnum priceLevelEnum) {
         StatusDto<Page<BasicCarpartsProductDTO>> list = StatusDtoThriftUtils.resolve(carpartsProductService.queryCarpartsProductList(keyword, 0, Integer.MAX_VALUE),BasicCarpartsProductDTO.class);
         Page<BasicCarpartsProductDTO> data = list.getData();
         List<BasicCarpartsProductDTO> basicCarpartsProductDTOS = Lists.newArrayList();
         if(data != null){
             basicCarpartsProductDTOS = data.getRows();
         }
-        return StatusDto.buildDataSuccessStatusDto(basicCarpartsProductDTOS);
+        // 查找所有有价格的
+        Map<String, Object> suggestedPriceMap = bizServiceEquipmentDao.findSuggestedPrice(null , priceLevelEnum.getPriceLevel());
+        List<BasicCarpartsProductDTO> collect = basicCarpartsProductDTOS.stream().filter(a -> {
+            String carpartsCode = a.getCarpartsCode();
+            Object obj = suggestedPriceMap.get(carpartsCode);
+            return !(obj == null);
+        }).collect(Collectors.toList());
+        return StatusDto.buildDataSuccessStatusDto(collect);
 
     }
 

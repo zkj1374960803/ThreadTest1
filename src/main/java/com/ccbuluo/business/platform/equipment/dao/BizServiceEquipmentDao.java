@@ -224,12 +224,18 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
     public Map<String, Object> findSuggestedPrice(List<String> productNo, Long priceLevel) {
         StringBuffer sql = new StringBuffer();
         Map<String, Object> params = Maps.newHashMap();
-        params.put("productNo", productNo);
-        params.put("priceLevel", priceLevel);
        sql.append(" SELECT b.`product_no`,b.`suggested_price`  ")
-           .append(" FROM (SELECT MAX(a.id) AS 'id' FROM rel_product_price a WHERE a.product_no IN (:productNo) AND a.`price_level` = :priceLevel ")
-           .append(" GROUP BY a.price_level,a.product_no) a LEFT JOIN rel_product_price b ON a.id = b.id ");
-        List<Map<String, Object>> maps = queryListMap(sql.toString(), params);
+           .append(" FROM (SELECT MAX(a.id) AS 'id' FROM rel_product_price a WHERE 1 = 1   ");
+       if(productNo != null && productNo.size() > 0){
+           params.put("productNo", productNo);
+           sql.append(" AND a.product_no IN (:productNo) ");
+       }
+       if(priceLevel != null){
+           params.put("priceLevel", priceLevel);
+           sql.append(" AND a.price_level = :priceLevel ");
+       }
+       sql.append(" GROUP BY a.price_level,a.product_no) a LEFT JOIN rel_product_price b ON a.id = b.id ");
+       List<Map<String, Object>> maps = queryListMap(sql.toString(), params);
        if(maps != null){
             params.clear();
             maps.forEach(map ->{

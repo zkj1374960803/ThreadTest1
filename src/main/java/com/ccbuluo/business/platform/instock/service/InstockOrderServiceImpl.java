@@ -23,9 +23,12 @@ import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftList;
 import com.ccbuluo.http.StatusDtoThriftUtils;
+import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
+import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.ccbuluo.usercoreintf.dto.QueryNameByUseruuidsDTO;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import com.google.common.collect.Lists;
+import com.sun.xml.bind.v2.TODO;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +79,8 @@ public class InstockOrderServiceImpl implements InstockOrderService {
     private StockInOutCallBackContext stockInOutCallBackContext;
     @Autowired
     private ServiceLogService serviceLogService;
+    @ThriftRPCClient("BasicMerchandiseSer")
+    private CarpartsProductService carpartsProductService;
 
     /**
      * 根据类型查询申请单
@@ -320,11 +325,38 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         instockorderDetailDTOS.forEach(item -> {
             item.setCostTotalPrice(item.getCostPrice().multiply(new BigDecimal(item.getInstockNum())));
         });
+        // 设置零配件基础信息
+        buildStockPlanDetail(instockorderDetailDTOS);
         BigDecimal reduce = instockorderDetailDTOS.stream().map(InstockorderDetailDTO::getCostTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
         bizInstockOrderDTO.setCostTotalPrice(reduce);
         bizInstockOrderDTO.setInstockorderDetailDTOList(instockorderDetailDTOS);
-
         return bizInstockOrderDTO;
+    }
+
+    /**
+     * 设置零配件基础信息
+     * @param instockorderDetailDTOS 入库计划
+     * @author zhangkangjian
+     * @date 2018-11-15 21:07:58
+     */
+    private void buildStockPlanDetail(List<InstockorderDetailDTO> instockorderDetailDTOS) {
+        if(instockorderDetailDTOS != null && instockorderDetailDTOS.size() > 0){
+            List<String> collect = instockorderDetailDTOS.stream().map(InstockorderDetailDTO::getProductNo).collect(Collectors.toList());
+            StatusDtoThriftList<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThriftList = carpartsProductService.queryCarpartsProductListByCarpartsCodes(collect);
+            StatusDto<List<BasicCarpartsProductDTO>> resolve = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOStatusDtoThriftList, BasicCarpartsProductDTO.class);
+            List<BasicCarpartsProductDTO> data = resolve.getData();
+            if(data != null && data.size() > 0){
+                Map<String, BasicCarpartsProductDTO> basicCarpartsProductDTOMap = data.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, a -> a, (k1, k2) -> k1));
+                instockorderDetailDTOS.forEach(item ->{
+                    BasicCarpartsProductDTO bizOutstockplanDetail = basicCarpartsProductDTOMap.get(item.getProductNo());
+                    item.setProductName(bizOutstockplanDetail.getCarpartsName());
+                    item.setCarpartsMarkno(bizOutstockplanDetail.getCarpartsMarkno());
+                    item.setCarpartsImage(bizOutstockplanDetail.getCarpartsImage());
+                    item.setUsedAmount(bizOutstockplanDetail.getUsedAmount());
+                    item.setUnit(bizOutstockplanDetail.getUnitName());
+                });
+            }
+        }
     }
 
     /**

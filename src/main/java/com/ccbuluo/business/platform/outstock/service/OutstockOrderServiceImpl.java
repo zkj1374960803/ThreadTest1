@@ -39,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
@@ -83,6 +84,8 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     private ServiceLogService serviceLogService;
     @Autowired
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
+    @Resource
+    private AllocateApplyService allocateApplyServiceImpl;
 
     /**
      * 自动保存出库单
@@ -331,7 +334,9 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      */
     @Override
     public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String productType) {
-        return outStockPlanService.queryOutstockplanList(applyNo, userHolder.getLoggedUser().getOrganization().getOrgCode(), productType);
+        List<BizOutstockplanDetail> bizOutstockplanDetails = outStockPlanService.queryOutstockplanList(applyNo, userHolder.getLoggedUser().getOrganization().getOrgCode(), productType);
+        allocateApplyServiceImpl.buildStockPlanDetail(bizOutstockplanDetails);
+        return bizOutstockplanDetails;
     }
 
     /**

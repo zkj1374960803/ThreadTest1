@@ -247,10 +247,21 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         List<AllocateapplyDetailDTO> allocateapplyDetailList = allocateApplyDTO.getAllocateapplyDetailList();
         // 过滤掉申请数量小于零的
         List<AllocateapplyDetailDTO> filterAllocateapply = allocateapplyDetailList.stream().filter(dto -> dto.getApplyNum() > 0).collect(Collectors.toList());
+        // 查询阶梯价格
+        List<AllocateapplyDetailDTO> allocateapplyDetailList1 = allocateApplyDTO.getAllocateapplyDetailList();
+        List<String> collect = allocateapplyDetailList1.stream().map(AllocateapplyDetailDTO::getProductNo).collect(Collectors.toList());
+        StatusDtoThriftBean<BasicUserOrganization> outstockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getInstockOrgno());
+        StatusDto<BasicUserOrganization> resolve = StatusDtoThriftUtils.resolve(outstockOrgName, BasicUserOrganization.class);
+        BasicUserOrganization data = resolve.getData();
+        String orgType = data.getOrgType();
+        long priceLevel = RelProductPrice.PriceLevelEnum.valueOf(orgType).getPriceLevel();
+        Map<String, Object> suggestedPriceMap = bizServiceEquipmentDao.findSuggestedPrice(collect, priceLevel);
+
         filterAllocateapply.forEach(a -> {
             a.setApplyNo(allocateApplyDTO.getApplyNo());
             a.setOperator(loggedUserId);
             a.setCreator(loggedUserId);
+            a.setSellPrice(new BigDecimal((Double)suggestedPriceMap.get(a.getProductNo())));
             if(AllocateApplyTypeEnum.BARTER.name().equals(processType)
                 || AllocateApplyTypeEnum.REFUND.name().equals(processType)
                 || AllocateApplyTypeEnum.PLATFORMBARTER.name().equals(processType)
@@ -259,6 +270,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }else {
                 a.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
             }
+
+
         });
         bizAllocateApplyDao.batchInsertForapplyDetailList(filterAllocateapply);
     }

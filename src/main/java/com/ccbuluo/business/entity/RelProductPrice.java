@@ -88,7 +88,7 @@ public class RelProductPrice {
     }*/
 
     public enum PriceLevelEnum{
-        USER(4L),CUSTMANAGER(3L),SERVERCENTER(2L);
+        USER(4L),CUSTMANAGER(3L),SERVICECENTER(2L);
         private long priceLevel;
         PriceLevelEnum(long priceLevel) {
             this.priceLevel = priceLevel;
