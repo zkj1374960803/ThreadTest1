@@ -231,6 +231,8 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
                     outstockplanSeller.setPlanOutstocknum(ro.getOccupyNum());
                     // 卖方仓库编号（根据机构和商品编号查询的库存）
                     outstockplanSeller.setOutRepositoryNo(stockDetail.getRepositoryNo());
+                    // 批次号，用来生成买方入库计划
+                    outstockplanSeller.setBatchNum(stockDetail.getTradeNo());
                     // 库存编号id
                     outstockplanSeller.setStockId(stockDetail.getId());
                     // 成本价
@@ -281,7 +283,7 @@ public class SameLevelApplyHandleStrategy extends DefaultApplyHandleStrategy {
             }
         }
         // 根据商品编号 和供应商的 组合分组，每个分组要生成一个入库计划
-        Map<String, List<BizOutstockplanDetail>> collect = outList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getProdNoAndSupplyNo));
+        Map<String, List<BizOutstockplanDetail>> collect = outList.stream().collect(Collectors.groupingBy(BizOutstockplanDetail::getProdNoAndSupplyNoAndBatchNum));
         for (Map.Entry<String, List<BizOutstockplanDetail>> entryP : collect.entrySet()) {
             List<BizOutstockplanDetail> valueS = entryP.getValue();
             BizInstockplanDetail inPlan = buildBizInstockplanDetail(valueS.get(0));

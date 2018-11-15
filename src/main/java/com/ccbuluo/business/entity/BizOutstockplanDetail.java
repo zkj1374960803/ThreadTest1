@@ -157,6 +157,8 @@ public class BizOutstockplanDetail extends AftersaleCommonEntity{
     @ApiModelProperty(name = "usedAmount", value = "单车使用配件的个数", required = true)
     private Long usedAmount;
 
+    private String batchNum;
+
     public String getCarpartsImage() {
         return carpartsImage;
     }
@@ -182,8 +184,8 @@ public class BizOutstockplanDetail extends AftersaleCommonEntity{
     }
 
     @JsonIgnore
-    public String getProdNoAndSupplyNo(){
-        return StringUtils.defaultIfBlank(productNo, "") + "@" + StringUtils.defaultIfBlank(supplierNo, "");
+    public String getProdNoAndSupplyNoAndBatchNum(){
+        return StringUtils.defaultIfBlank(productNo, "") + "@" + StringUtils.defaultIfBlank(supplierNo, "")+ "@" + StringUtils.defaultIfBlank(batchNum, "");
     }
 
     public String getOutOrgName() {
@@ -407,5 +409,13 @@ public class BizOutstockplanDetail extends AftersaleCommonEntity{
 
     public void setPurchaseInfo(String purchaseInfo) {
         this.purchaseInfo = purchaseInfo;
+    }
+
+    public String getBatchNum() {
+        return batchNum;
+    }
+
+    public void setBatchNum(String batchNum) {
+        this.batchNum = batchNum;
     }
 }
