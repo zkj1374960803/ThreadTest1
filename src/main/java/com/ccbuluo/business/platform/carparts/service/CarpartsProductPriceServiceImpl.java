@@ -293,6 +293,9 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
             basicCarpartsProductDTOS = data.getRows();
         }
         // 查找所有有价格的
+        if(priceLevelEnum.getPriceLevel() == 0){
+            return StatusDto.buildDataSuccessStatusDto(basicCarpartsProductDTOS);
+        }
         Map<String, Object> suggestedPriceMap = bizServiceEquipmentDao.findSuggestedPrice(null , priceLevelEnum.getPriceLevel());
         List<BasicCarpartsProductDTO> collect = basicCarpartsProductDTOS.stream().filter(a -> {
             String carpartsCode = a.getCarpartsCode();
