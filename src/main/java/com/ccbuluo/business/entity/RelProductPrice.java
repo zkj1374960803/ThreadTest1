@@ -253,5 +253,13 @@ public class RelProductPrice {
         this.remark = remark;
     }
 
+    public RelProductPrice(String productNo, String productType, Double suggestedPrice, Long priceLevel) {
+        this.productNo = productNo;
+        this.productType = productType;
+        this.suggestedPrice = suggestedPrice;
+        this.priceLevel = priceLevel;
+    }
 
+    public RelProductPrice() {
+    }
 }
