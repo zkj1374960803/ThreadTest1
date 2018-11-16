@@ -74,18 +74,19 @@ public class StockManagementServiceImpl implements StockManagementService {
                 return findFtingStockDetailDTO(productNo);
             }
         }
-        StatusDtoThriftBean<SaveBasicCarpartsProductDTO> carpartsProductdetail = carpartsProductService.findCarpartsProductdetail(productNo);
-        StatusDto<SaveBasicCarpartsProductDTO> resolve = StatusDtoThriftUtils.resolve(carpartsProductdetail, SaveBasicCarpartsProductDTO.class);
-        SaveBasicCarpartsProductDTO carpartsProductDTO = resolve.getData();
-        findStockDetailDTO.setProductName(carpartsProductDTO.getCarpartsName());
-        findStockDetailDTO.setCarpartsMarkno(carpartsProductDTO.getCarpartsMarkno());
-        findStockDetailDTO.setUnit(carpartsProductDTO.getCarpartsUnit());
-        findStockDetailDTO.setCarpartsImage(carpartsProductDTO.getCarpartsImage());
+        if(Constants.PRODUCT_TYPE_FITTINGS.equals(productType)){
+            StatusDtoThriftBean<SaveBasicCarpartsProductDTO> carpartsProductdetail = carpartsProductService.findCarpartsProductdetail(productNo);
+            StatusDto<SaveBasicCarpartsProductDTO> resolve = StatusDtoThriftUtils.resolve(carpartsProductdetail, SaveBasicCarpartsProductDTO.class);
+            SaveBasicCarpartsProductDTO carpartsProductDTO = resolve.getData();
+            if(carpartsProductDTO != null){
+                findStockDetailDTO.setProductName(carpartsProductDTO.getCarpartsName());
+                findStockDetailDTO.setCarpartsMarkno(carpartsProductDTO.getCarpartsMarkno());
+                findStockDetailDTO.setUnit(carpartsProductDTO.getCarpartsUnit());
+                findStockDetailDTO.setCarpartsImage(carpartsProductDTO.getCarpartsImage());
+            }
+        }
         // 查询正常件
         FindProductDetailDTO findProductDetailDTO = bizStockDetailDao.findProductDetail(productNo, productType, orgDTOList, code);
-        // 查询可调拨库存的数量
-//        Long transferInventoryNum = bizStockDetailDao.findTransferInventory(productNo, productType, orgDTOList, BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM, code);
-//        findProductDetailDTO.setTransferInventory(transferInventoryNum);
         // 查询问题件
         FindProductDetailDTO findProblemStock = bizStockDetailDao.findProblemStock(productNo, productType, orgDTOList, code);
         // 查询损坏件
