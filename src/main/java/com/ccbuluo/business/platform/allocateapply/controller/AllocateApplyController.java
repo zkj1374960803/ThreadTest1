@@ -156,8 +156,8 @@ public class AllocateApplyController extends BaseController {
      * @author zhangkangjian
      * @date 2018-08-10 11:24:53
      */
-    @ApiOperation(value = "提交申请单（填报价格）", notes = "【张康健】")
-    @PostMapping("/processapply")
+//    @ApiOperation(value = "提交申请单（填报价格）", notes = "【张康健】")
+//    @PostMapping("/processapply")
     public StatusDto<String> processApply(@ApiParam(name = "processApplyDTO", value = "json数据格式", required = true) @RequestBody @ValidateGroup(MyGroup.Edit.class) ProcessApplyDTO processApplyDTO){
         allocateApplyServiceImpl.processApply(processApplyDTO);
         return StatusDto.buildSuccessStatusDto();
@@ -171,7 +171,7 @@ public class AllocateApplyController extends BaseController {
      * @date 2018-09-12 16:02:08
      */
     @ApiOperation(value = "保存申请单（填报价格）", notes = "【张康健】")
-    @PostMapping("/saveprocessapply")
+//    @PostMapping("/saveprocessapply")
     public StatusDto<String> saveProcessApply(@ApiParam(name = "processApplyDetailDTO", value = "json数组数据格式", required = true) @RequestBody List<ProcessApplyDetailDTO> processApplyDetailDTO){ ;
         ValidateUtils.validate(processApplyDetailDTO, null);
         allocateApplyServiceImpl.saveProcessApply(processApplyDetailDTO);

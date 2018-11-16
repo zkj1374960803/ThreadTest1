@@ -372,7 +372,6 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         rows.forEach(item -> {
             item.setOutstockOperatorName(collect.get(item.getOutstockOperator()));
         });
-
         return bizOutstockOrderPage;
     }
 

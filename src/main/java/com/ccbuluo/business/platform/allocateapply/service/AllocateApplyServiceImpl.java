@@ -233,6 +233,11 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             || AllocateApplyTypeEnum.PLATFORMREFUND.name().equals(processType)){
             applyHandleContext.applyHandle(allocateApplyDTO.getApplyNo());
         }
+        // 如果是平台创建的调拨申请，自动处理为等待付款状态
+        if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(userOrgCode)
+            && AllocateApplyTypeEnum.SAMELEVEL.name().equals(allocateApplyDTO.getApplyType())){
+            processOutStockOrg(allocateApplyDTO.getApplyNo(), allocateApplyDTO.getOutstockOrgno());
+        }
 
     }
     /**
@@ -584,7 +589,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         Long versionNo = bizAllocateApplyDao.findVersionNo(processApplyDTO.getApplyNo());
         processApplyDTO.setVersionNo(versionNo);
         bizAllocateApplyDao.updateAllocateApply(processApplyDTO);
-        saveProcessApply(processApplyDTO.getProcessApplyDetailDTO());
+//        saveProcessApply(processApplyDTO.getProcessApplyDetailDTO());
         // 生成出入库计划
         applyHandleContext.applyHandle(processApplyDTO.getApplyNo());
     }
@@ -616,6 +621,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         Long versionNo = bizAllocateApplyDao.findVersionNo(processApplyDTO.getApplyNo());
         processApplyDTO.setVersionNo(versionNo);
         bizAllocateApplyDao.updateAllocateApply(processApplyDTO);
+        // 提交处理请求
+        processApply(processApplyDTO);
     }
 
     /**
