@@ -1,8 +1,6 @@
 package com.ccbuluo.business.platform.order.service.fifohandle;
 
-import com.ccbuluo.business.constants.BusinessPropertyHolder;
-import com.ccbuluo.business.constants.OutstockTypeEnum;
-import com.ccbuluo.business.constants.StockPlanStatusEnum;
+import com.ccbuluo.business.constants.*;
 import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.entity.BizInstockplanDetail;
 import com.ccbuluo.business.entity.BizOutstockplanDetail;
@@ -18,6 +16,8 @@ import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.http.StatusDto;
 import com.google.common.collect.Lists;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +39,8 @@ import java.util.stream.Collectors;
  */
 @Service
 public class BarterStockInOutCallBack implements StockInOutCallBack{
+
+    Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private BizAllocateApplyDao bizAllocateApplyDao;

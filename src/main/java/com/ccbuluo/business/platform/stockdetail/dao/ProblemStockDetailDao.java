@@ -35,16 +35,15 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
 
     /**
      * 带条件分页查询本机构所有零配件的问题库存
-     *  @param type 物料或是零配件
-     *  @param type 物料或是零配件
+     * @param type 物料或是零配件
+     * @param keyword 物料或是零配件
      * @param orgCode 组织机构code
-     * @param productNames 物料或是零配件名称
      * @param offset 起始数
      * @param pageSize 每页数量
      * @author weijb
      * @date 2018-08-14 21:59:51
      */
-    public Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(boolean category, String type, String orgCode, List<String> productNames, String keyword, Integer offset, Integer pageSize){
+    public Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(String type, String orgCode, String keyword, Integer offset, Integer pageSize){
         Map<String, Object> param = Maps.newHashMap();
         param.put("deleteFlag", Constants.DELETE_FLAG_NORMAL);
         StringBuilder sql = new StringBuilder();
@@ -58,27 +57,10 @@ public class ProblemStockDetailDao extends BaseDao<BizStockDetail> {
                 sql.append(" GROUP BY product_no) as t1  ")
                 .append(" LEFT JOIN biz_outstock_order t2 on t1.trade_no=t2.trade_docno LEFT JOIN biz_instock_order t3 on t1.trade_no=t3.trade_docno  ")
                 .append(" WHERE t1.delete_flag = :deleteFlag and t1.problem_stock>0 ");
-        // 物料类型
-        if (null != productNames && productNames.size() > 0) {
-            param.put("productNames", productNames);
-            sql.append(" AND t1.product_name IN(:productNames)");
-        }
-        // 关键字查询
-        if (StringUtils.isNotBlank(keyword)) {
-            param.put("keyword", keyword);
-            //根据编号或名称查询
-            sql.append(" AND (t1.product_no LIKE CONCAT('%',:keyword,'%') OR t1.product_name LIKE CONCAT('%',:keyword,'%'))");
-        }
         // 区分零配件和物料
         if (StringUtils.isNotBlank(type)) {
             param.put("type", type);
             sql.append(" AND t1.product_type = :type ");
-        }
-
-        sql.append(" GROUP BY t1.product_no ORDER BY t1.create_time DESC");
-        // 如果选择了类型，并且这个类型下没有查询到商品就返回null
-        if(category && (null == productNames || productNames.size() == 0)){
-            return new Page<>(offset,pageSize);
         }
         return super.queryPageForBean(StockBizStockDetailDTO.class, sql.toString(), param,offset,pageSize);
     }

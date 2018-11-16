@@ -497,7 +497,7 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
             sql.append(" AND  a.org_no = :orgNo ");
         }
         sql.append(" GROUP BY a.product_no ")
-        .append(" HAVING  sum(ifnull(a.valid_stock,0) + ifnull(a.occupy_stock,0) + ifnull(a.problem_stock,0) + ifnull(a.damaged_stock,0) + ifnull(a.transit_stock,0) + ifnull(a.freeze_stock,0)) > 0");
+        .append(" HAVING  sum(ifnull(a.valid_stock,0) + ifnull(a.occupy_stock,0)) > 0");
         return queryPageForBean(FindStockListDTO.class, sql.toString(), map, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
     }
 
@@ -806,5 +806,41 @@ public class BizAllocateApplyDao extends BaseDao<AllocateApplyDTO> {
         params.put("productNo", productNo);
         String sql = "SELECT COUNT(id) > 0 FROM biz_stock_detail WHERE product_no = :productNo";
         return findForObject(sql, params, Boolean.class);
+    }
+    /**
+     * 查询问题件的库存列表
+     * @param
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-11-15 15:03:18
+     */
+    public Page<FindStockListDTO> findProblemStockList(FindStockListDTO findStockListDTO, List<String> productCode, List<String> orgCode) {
+        HashMap<String, Object> map = Maps.newHashMap();
+        StringBuilder sql = new StringBuilder();
+        sql.append(" SELECT a.id,a.product_no,sum(ifnull(a.problem_stock,0)) as 'total',a.product_name as 'productName',a.product_categoryname as 'productCategoryname',a.product_unit as 'unit'")
+            .append(" FROM biz_stock_detail a ")
+            .append(" WHERE 1 = 1 ");
+        if(productCode != null && productCode.size() > 0){
+            map.put("productCode", productCode);
+            sql.append(" AND  a.product_no in (:productCode)");
+        }
+        String productNo = findStockListDTO.getProductNo();
+        if(StringUtils.isNotBlank(productNo)){
+            map.put("productNo", productNo);
+            sql.append(" AND  a.product_no like concat('%',:productNo,'%') ");
+        }
+        if(orgCode != null && orgCode.size() > 0){
+            map.put("orgCode", orgCode);
+            sql.append(" AND  a.org_no in (:orgCode) ");
+        }
+        String orgNo = findStockListDTO.getOrgNo();
+        if(StringUtils.isNotBlank(orgNo)){
+            map.put("orgNo", orgNo);
+            sql.append(" AND  a.org_no = :orgNo ");
+        }
+        sql.append(" GROUP BY a.product_no ")
+            .append(" HAVING  sum(a.problem_stock) > 0");
+        return queryPageForBean(FindStockListDTO.class, sql.toString(), map, findStockListDTO.getOffset(), findStockListDTO.getPageSize());
     }
 }

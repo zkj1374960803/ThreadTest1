@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.stockdetail.service;
 
 
+import com.ccbuluo.business.platform.allocateapply.dto.FindStockListDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.ProblemStockBizStockDetailDTO;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
 import com.ccbuluo.db.Page;
@@ -20,16 +21,11 @@ public interface ProblemStockDetailService {
 
     /**
      * 带条件分页查询所有零配件的问题库存
-     * @param category 是否根据类型查询
-     *  @param type 物料或是零配件
-     * @param productCategory 物料类型
-     * @param productList 商品
-     * @param offset 起始数
-     * @param pageSize 每页数量
+
      * @author weijb
      * @date 2018-08-14 21:59:51
      */
-    Page<StockBizStockDetailDTO> queryStockBizStockDetailDTOList(String orgCode,boolean category, String type, String productCategory, List<BasicCarpartsProductDTO> productList, String keyword, Integer offset, Integer pageSize);
+    Page<FindStockListDTO> queryStockBizStockDetailDTOList(FindStockListDTO findStockListDTO);
     /**
      * 带条件分页查询本机构所有零配件的问题库存
      * @param category 是否根据类型查询
@@ -102,4 +98,14 @@ public interface ProblemStockDetailService {
      * @date 2018-10-29 16:59:30
      */
     StatusDto problemHandle(String applyNo, String recedeType);
+
+    /**
+     * 构建库存（填充零配件信息）
+     * @param findStockListDTO 配件基础信息条件
+     * @param carpartsProductDTOList 配件信息
+     * @param stockPage 库存分页信息
+     * @author zhangkangjian
+     * @date 2018-11-15 16:31:07
+     */
+    void buildStockPage(FindStockListDTO findStockListDTO, List<BasicCarpartsProductDTO> carpartsProductDTOList, Page<FindStockListDTO> stockPage);
 }
