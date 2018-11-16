@@ -19,6 +19,11 @@ import com.ccbuluo.core.entity.UploadFileInfo;
 import com.ccbuluo.core.service.UploadService;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
+import com.ccbuluo.excel.imports.ExcelReaderUtils;
+import com.ccbuluo.excel.imports.ExcelRowReaderBean;
+import com.ccbuluo.excel.readpic.ExcelPictruePos;
+import com.ccbuluo.excel.readpic.ExcelPictruesUtils;
+import com.ccbuluo.excel.readpic.ExcelShapeSaveLocal;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftBean;
 import com.ccbuluo.http.StatusDtoThriftPage;
@@ -31,6 +36,7 @@ import com.ccbuluo.usercoreintf.dto.QueryNameByUseruuidsDTO;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
@@ -337,6 +343,50 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
         carpartsProductService.deleteCarpartsProduct(productNo);
         return StatusDto.buildSuccessStatusDto();
 
+    }
+
+    /**
+     * 导入零配件
+     *
+     * @param multipartFile
+     * @return StatusDto<String>
+     * @author zhangkangjian
+     * @date 2018-11-16 11:46:02
+     */
+    @Override
+    public StatusDto<String> importCarparts(MultipartFile multipartFile) throws Exception {
+//        StatusDto<UploadFileInfo> carpartsexcel = uploadService.simpleUpload(multipartFile, "carpartsexcel");
+//        UploadFileInfo data = carpartsexcel.getData();
+
+        Map<String, Collection<ExcelPictruePos>> allDate = ExcelPictruesUtils.getAllDate("C:\\Users\\Ezreal\\Desktop", 2, new ExcelShapeSaveLocal("C:\\Users\\Ezreal\\Desktop\\haha"));
+
+        // 列映射，实体字段，对应的excel列索引
+        ExcelRowReaderBean<BasicCarpartsProductDTO> readerBean = new ExcelRowReaderBean<BasicCarpartsProductDTO>(BasicCarpartsProductDTO.class) {
+            @Override
+            public boolean checkRow(int sheetIndex, int curRow, List<String> rowlist) {
+                if (curRow > 1) { // 标题行放过
+                    return false;
+                }
+                String join = StringUtils.join(rowlist, ',');
+                System.out.println(join + " rowLength:\t " + rowlist.size());
+                return true;
+            }
+
+        };
+        // 以下条件与checkRow效果相同，均可实现跳过某行类型的数据
+        // 设置开始读取的行，之前的行被跳过
+        readerBean.setStartRow(2);
+        // 调协列的宽度，小于宽度的列被跳过
+        readerBean.setTargetColLength(4);
+        // 读取excel
+        ExcelReaderUtils.readExcel(readerBean, "D:\\aa\\xxx.xlsx");
+        // 获取读取的结果结果
+        List<BasicCarpartsProductDTO> productList = readerBean.getData();
+        System.out.println("data.size():\t" + productList.size());
+        // 后续处理
+        productList.forEach(System.out::println);
+
+        return null;
     }
 
     /**
