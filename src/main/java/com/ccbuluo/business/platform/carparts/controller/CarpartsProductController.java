@@ -7,6 +7,7 @@ import com.ccbuluo.business.platform.carconfiguration.service.BasicCarmodelManag
 import com.ccbuluo.business.platform.carparts.service.CarpartsProductPriceService;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.business.vehiclelease.entity.BizOrderChannelprice;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.entity.UploadFileInfo;
@@ -199,7 +200,7 @@ public class CarpartsProductController extends BaseController {
      */
     @ApiOperation(value = "查询零配件信息",notes = "【张康健】")
     @PostMapping("/querycarparts")
-    public StatusDto<List<BasicCarpartsProductDTO>> queryCarpartsByCode(String keyword, RelProductPrice.PriceLevelEnum priceLevelEnum){
+    public StatusDto<List<BasicCarpartsProductDTO>> queryCarpartsByCode(String keyword, @ValidateNotNull RelProductPrice.PriceLevelEnum priceLevelEnum){
         return carpartsProductServiceImpl.queryCarparts(keyword, priceLevelEnum);
     }
 
