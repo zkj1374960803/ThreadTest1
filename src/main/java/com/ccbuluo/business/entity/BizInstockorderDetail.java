@@ -94,6 +94,7 @@ public class BizInstockorderDetail extends AftersaleCommonEntity{
     private Long stockId;
     private String remark;
 
+
     public void setInstockOrderno(String instockOrderno) {
         this.instockOrderno = instockOrderno;
     }

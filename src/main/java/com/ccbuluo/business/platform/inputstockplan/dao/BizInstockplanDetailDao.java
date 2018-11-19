@@ -69,7 +69,7 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
     public List<BizInstockplanDetail> queryListByApplyNo(String applyNo, String status,  String inRepositoryNo) {
         Map<String, Object> params = Maps.newHashMap();
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,instock_type,product_no,product_name,product_type,product_categoryname,")
+        sql.append("SELECT id,instock_type,product_no,product_name,product_type,product_categoryname,purchase_info,")
             .append("trade_no,supplier_no,instock_repository_no,cost_price,")
             .append("IFNULL(plan_instocknum,0) AS planInstocknum,IFNULL(actual_instocknum,0) AS actualInstocknum,complete_status,complete_time,")
             .append("outstock_planid")
