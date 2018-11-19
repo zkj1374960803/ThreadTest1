@@ -1,5 +1,6 @@
 package com.ccbuluo.business.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -127,6 +128,7 @@ public class BizStockDetail extends AftersaleCommonEntity{
     /**
      *  采购信息
      */
+    @JsonIgnore
     @ApiModelProperty(name = "purchaseInfo", value = "采购信息(目前包含采购价格和采购时间)")
     private String purchaseInfo;
 

@@ -98,7 +98,7 @@ public class BizOutstockplanDetailDao extends BaseDao<BizOutstockplanDetail> {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,outstock_type,stock_id,product_no,product_type,trade_no,")
             .append("supplier_no,apply_detail_id,cost_price,sales_price,out_repository_no,")
-            .append("plan_outstocknum,actual_outstocknum,plan_status,complete_time,")
+            .append("plan_outstocknum,IFNULL(actual_outstocknum,0) AS actualOutstocknum,plan_status,complete_time,")
             .append("creator,create_time,operator,operate_time,delete_flag,remark,version_no,")
             .append("product_categoryname FROM biz_outstockplan_detail WHERE 1 = 1 ");
         if(StringUtils.isNotBlank(applyNo)){

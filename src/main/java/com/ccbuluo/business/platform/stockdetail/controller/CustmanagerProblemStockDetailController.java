@@ -94,7 +94,7 @@ public class CustmanagerProblemStockDetailController extends BaseController {
     @GetMapping("/problemdetail/{id}")
     @ApiImplicitParam(name = "id", value = "库存批次id", required = true, paramType = "path")
     public StatusDto<ProblemStockBizStockDetailDTO> getProblemStockDetail(@PathVariable @ValidateNotNull(message = "id(库存批次id)不能为空") Long id){
-        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.getProblemStockDetail(id));
+        return StatusDto.buildDataSuccessStatusDto(problemStockDetailService.getProblemStockDetailById(id));
     }
 
 }
