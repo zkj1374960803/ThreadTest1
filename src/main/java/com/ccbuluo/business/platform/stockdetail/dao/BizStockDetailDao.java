@@ -159,7 +159,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
     public List<BizStockDetail> getStockDetailListByOrgAndProduct(String sellerOrgNo, List<String> codes){
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT id,repository_no,org_no,product_no,product_type,trade_no,product_categoryname,product_name,product_unit,")
-                .append("supplier_no,valid_stock,occupy_stock,problem_stock,damaged_stock,")
+                .append("supplier_no,valid_stock,occupy_stock,problem_stock,damaged_stock,purchase_info,")
                 .append("transit_stock,freeze_stock,seller_orgno,IFNULL(cost_price,0) AS costPrice,instock_planid,")
                 .append("latest_correct_time,creator,create_time,operator,operate_time,")
                 .append("delete_flag,remark,version_no FROM biz_stock_detail WHERE delete_flag = :deleteFlag and org_no= :sellerOrgNo and product_no IN(:codes) and (valid_stock > 0 or problem_stock > 0)")
