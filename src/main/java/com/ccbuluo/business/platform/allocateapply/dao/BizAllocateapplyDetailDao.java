@@ -5,6 +5,7 @@ import com.ccbuluo.business.constants.StockPlanStatusEnum;
 import com.ccbuluo.business.custmanager.allocateapply.dto.QueryPendingMaterialsDTO;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
+import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.dao.BaseDao;
 import com.ccbuluo.db.Page;
 import com.google.common.collect.Maps;
@@ -13,8 +14,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *  dao
@@ -206,4 +206,88 @@ public class BizAllocateapplyDetailDao extends BaseDao<AllocateapplyDetailDTO> {
         return queryListBean(QueryPendingMaterialsDTO.class, sql.toString(), map);
     }
 
+    /**
+     * 根据申请的状态查询申请单的单号
+     * @param applyStatusList 申请单状态的列表
+     * @param applyType 申请单的类型
+     * @return List<String> 申请单的单号
+     * @author zhangkangjian
+     * @date 2018-11-19 15:36:27
+     */
+    public List<String> queryApplyNo(List<String> applyStatusList, String applyType, List<String> inStockNoList){
+        if(applyStatusList == null || applyStatusList.size() == 0 || StringUtils.isBlank(applyType)){
+            return Collections.emptyList();
+        }
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("applyStatusList", applyStatusList);
+        map.put("applyType", applyType);
+        map.put("inStockNoList", inStockNoList);
+        String sql = "SELECT a.apply_no FROM biz_allocate_apply a WHERE a.apply_type = :applyType AND a.apply_status IN (:applyStatusList) AND a.instock_orgno in (:inStockNoList)";
+        return querySingColum(String.class, sql, map);
+    }
+    /**
+     *  更新申请单详单的价格
+     * @param applyNoList 申请单编号
+     * @param productNo 商品的编号
+     * @param sellPrice 销售的价格
+     * @author zhangkangjian
+     * @date 2018-11-19 15:56:15
+     */
+    public void updateAllocateapplyDetail(List<String> applyNoList, String productNo, Double sellPrice) {
+        if(StringUtils.isAnyBlank(productNo) || sellPrice == null || applyNoList == null || applyNoList.size() == 0){
+            throw new CommonException(Constants.ERROR_CODE, "必填参数为null");
+        }
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("applyNo", applyNoList);
+        map.put("productNo", productNo);
+        map.put("sellPrice", sellPrice);
+        StringBuilder sql = new StringBuilder();
+        sql.append(" UPDATE biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ")
+            .append(" ON a.apply_no = b.apply_no SET b.sell_price = :sellPrice WHERE a.apply_no in (:applyNo) AND b.product_no = :productNo ");
+        updateForMap(sql.toString(), map);
+    }
+
+    /**
+     * 更新入库单的价格
+     * @param applyNoList 申请单编号
+     * @param productNo 商品的编号
+     * @param sellPrice 销售的价格
+     * @author zhangkangjian
+     * @date 2018-11-19 17:09:16
+     */
+    public void updateInstockorderDetail(List<String> applyNoList, String productNo, Double sellPrice) {
+        if(StringUtils.isAnyBlank(productNo) || sellPrice == null || applyNoList == null || applyNoList.size() == 0){
+            throw new CommonException(Constants.ERROR_CODE, "必填参数为null");
+        }
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("applyNo", applyNoList);
+        map.put("productNo", productNo);
+        map.put("sellPrice", sellPrice);
+        StringBuilder sql = new StringBuilder();
+        sql.append(" UPDATE biz_instockplan_detail a LEFT JOIN biz_instockorder_detail b ON a.id = b.instock_planid ")
+            .append(" SET a.cost_price = :sellPrice WHERE a.trade_no in (:applyNo)  AND a.product_no = :productNo ");
+        updateForMap(sql.toString(), map);
+    }
+
+    /**
+     * 更新出库单的价格
+     * @param applyNoList 申请单编号
+     * @param productNo 商品的编号
+     * @param sellPrice 销售的价格
+     * @author zhangkangjian
+     * @date 2018-11-19 17:09:16
+     */
+    public void updateOutstockorderDetail(List<String> applyNoList, String productNo, Double sellPrice) {
+        if(StringUtils.isAnyBlank(productNo) || sellPrice == null || applyNoList == null || applyNoList.size() == 0){
+            throw new CommonException(Constants.ERROR_CODE, "必填参数为null");
+        }
+        HashMap<String, Object> map = Maps.newHashMap();
+        map.put("applyNo", applyNoList);
+        map.put("productNo", productNo);
+        map.put("sellPrice", sellPrice);
+        StringBuilder sql = new StringBuilder();
+        sql.append(" UPDATE biz_outstockplan_detail a LEFT JOIN biz_outstockorder_detail b ON a.id = b.outstock_planid ")
+            .append(" SET a.cost_price = :sellPrice WHERE a.trade_no in (:applyNo)  AND a.product_no = :productNo ");
+        updateForMap(sql.toString(), map);
+    }
 }

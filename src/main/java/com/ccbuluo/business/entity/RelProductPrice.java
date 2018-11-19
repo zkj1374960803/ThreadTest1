@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author zhangkangjian
@@ -100,6 +102,13 @@ public class RelProductPrice {
 
         public void setPriceLevel(long priceLevel) {
             this.priceLevel = priceLevel;
+        }
+
+        public static Map<Long, PriceLevelEnum> map = new HashMap<Long, PriceLevelEnum>();
+        static {
+            for (PriceLevelEnum legEnum : PriceLevelEnum.values()) {
+                map.put(legEnum.priceLevel, legEnum);
+            }
         }
     }
 

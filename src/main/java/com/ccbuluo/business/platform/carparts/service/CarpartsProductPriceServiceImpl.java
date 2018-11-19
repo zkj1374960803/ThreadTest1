@@ -1,6 +1,8 @@
 package com.ccbuluo.business.platform.carparts.service;
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.constants.OrganizationTypeEnum;
+import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.entity.RelProductPrice;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
@@ -14,6 +16,7 @@ import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
+import com.ccbuluo.business.vehiclelease.entity.BizRequisition;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.UploadFileInfo;
 import com.ccbuluo.core.exception.CommonException;
@@ -28,15 +31,15 @@ import com.ccbuluo.excel.readpic.ExcelPictruePos;
 import com.ccbuluo.excel.readpic.ExcelPictruesUtils;
 import com.ccbuluo.excel.readpic.ExcelShapeSaveLocal;
 import com.ccbuluo.excel.readpic.ExcelTypeEnum;
-import com.ccbuluo.http.StatusDto;
-import com.ccbuluo.http.StatusDtoThriftBean;
-import com.ccbuluo.http.StatusDtoThriftPage;
-import com.ccbuluo.http.StatusDtoThriftUtils;
+import com.ccbuluo.http.*;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.SaveBasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.ccbuluo.usercoreintf.dto.QueryNameByUseruuidsDTO;
+import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
+import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
+import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.shaded.com.google.common.collect.Maps;
@@ -86,6 +89,10 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     private BizServiceOrderDao bizServiceOrderDao;
     @Resource
     private BizServiceEquipmentDao bizServiceEquipmentDao;
+    @ThriftRPCClient("UserCoreSerService")
+    private BasicUserOrganizationService basicUserOrganization;
+
+//queryOrgAndWorkInfo
 
     /**
      * 查询零配件的信息和价格
@@ -107,7 +114,7 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
 
     /**
      * 设置价格
-     * @param relProductPrice
+     * @param relProductPrice 价格信息
      * @author zhangkangjian
      * @date 2018-09-06 19:27:11
      */
@@ -121,6 +128,37 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
             item.setCreator(loggedUserId);
             item.setStartTime(new Date());
             carpartsProductPriceDao.save(item);
+            updateApplySellPrice(item.getProductNo(), item.getSuggestedPrice(), RelProductPrice.PriceLevelEnum.map.get(item.getPriceLevel()).name());
+        });
+    }
+
+    /**
+     * 更新申请单，出入库计划单价格
+     * @param productNo 申请单编号
+     * @param orgType 机构的类型
+     * @param sellPrice 销售的价格
+     * @author zhangkangjian
+     * @date 2018-11-19 17:21:52
+     */
+    private void updateApplySellPrice(String productNo, Double sellPrice, String orgType) {
+        // 根据类型查询机构编号
+        QueryOrgDTO queryOrgDTO = new QueryOrgDTO();
+        List<String> name = List.of(OrganizationTypeEnum.CUSTMANAGER.name(), OrganizationTypeEnum.SERVICECENTER.name());
+        queryOrgDTO.setOrgTypeList(name);
+        StatusDtoThriftList<QueryOrgDTO> queryOrgDTOStatusDtoThriftList = basicUserOrganization.queryOrgAndWorkInfo(queryOrgDTO);
+        StatusDto<List<QueryOrgDTO>> resolve = StatusDtoThriftUtils.resolve(queryOrgDTOStatusDtoThriftList, QueryOrgDTO.class);
+        Optional.ofNullable(resolve.getData()).ifPresent(a ->{
+            List<String> inStockNoList = a.stream().filter(b -> orgType.equals(b.getOrgType())).map(QueryOrgDTO::getOrgCode).collect(Collectors.toList());
+            // 查询等待付款前的申请单，修改价格
+            List<String> applyStatusList = List.of(BizAllocateApply.ApplyStatusEnum.PENDING.name(), BizAllocateApply.ApplyStatusEnum.WAITINGPAYMENT.name());
+            List<String> applyNoList = bizAllocateapplyDetailDao.queryApplyNo(applyStatusList, BizAllocateApply.AllocateApplyTypeEnum.SAMELEVEL.name(), inStockNoList);
+            // 更新申请单详单的价格
+            bizAllocateapplyDetailDao.updateAllocateapplyDetail(applyNoList, productNo, sellPrice);
+            // 更新入库计划
+            bizAllocateapplyDetailDao.updateInstockorderDetail(applyNoList, productNo, sellPrice);
+            // 更新出库计划
+            bizAllocateapplyDetailDao.updateOutstockorderDetail(applyNoList, productNo, sellPrice);
+
         });
     }
 
