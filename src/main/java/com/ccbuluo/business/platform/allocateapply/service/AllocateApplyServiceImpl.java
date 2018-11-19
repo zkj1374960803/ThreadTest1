@@ -612,11 +612,13 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }
         }
         ProcessApplyDTO processApplyDTO = new ProcessApplyDTO();
-        StatusDtoThriftBean<BasicUserOrganization> outstockOrg = basicUserOrganizationService.findOrgByCode(outstockOrgno);
-        StatusDto<BasicUserOrganization> basicUserOrganizationResolve = StatusDtoThriftUtils.resolve(outstockOrg, BasicUserOrganization.class);
-        BasicUserOrganization basicUserOrganization = basicUserOrganizationResolve.getData();
-        processApplyDTO.setOutstockOrgType(basicUserOrganization.getOrgType());
-        processApplyDTO.setOutstockOrgno(outstockOrgno);
+        if(outstockOrgno != null){
+            StatusDtoThriftBean<BasicUserOrganization> outstockOrg = basicUserOrganizationService.findOrgByCode(outstockOrgno);
+            StatusDto<BasicUserOrganization> basicUserOrganizationResolve = StatusDtoThriftUtils.resolve(outstockOrg, BasicUserOrganization.class);
+            BasicUserOrganization basicUserOrganization = basicUserOrganizationResolve.getData();
+            processApplyDTO.setOutstockOrgType(basicUserOrganization.getOrgType());
+            processApplyDTO.setOutstockOrgno(outstockOrgno);
+        }
         processApplyDTO.setApplyNo(applyNo);
         Long versionNo = bizAllocateApplyDao.findVersionNo(processApplyDTO.getApplyNo());
         processApplyDTO.setVersionNo(versionNo);

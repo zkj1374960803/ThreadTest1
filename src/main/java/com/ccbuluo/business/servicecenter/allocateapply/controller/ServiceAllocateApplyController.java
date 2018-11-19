@@ -51,6 +51,23 @@ public class ServiceAllocateApplyController extends BaseController {
     }
 
     /**
+     * 处理申请
+     * @param applyNo 申请单号
+     * @return StatusDto<String>
+     * @author zhangkangjian
+     * @date 2018-09-12 17:47:14
+     */
+    @ApiOperation(value = "处理申请",notes = "【张康健】")
+    @GetMapping("/processoutstockorg")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query"),
+    })
+    public StatusDto<String> processOutStockOrg(@ValidateNotBlank String applyNo){
+        allocateApplyServiceImpl.processOutStockOrg(applyNo, null);
+        return StatusDto.buildSuccessStatusDto();
+    }
+
+    /**
      * 查询申请单详情
      * @param applyNo 申请单号
      * @return StatusDto<FindAllocateApplyDTO>
