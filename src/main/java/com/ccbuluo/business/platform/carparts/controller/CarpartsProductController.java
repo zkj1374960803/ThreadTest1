@@ -7,6 +7,7 @@ import com.ccbuluo.business.platform.carconfiguration.service.BasicCarmodelManag
 import com.ccbuluo.business.platform.carparts.service.CarpartsProductPriceService;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.business.vehiclelease.entity.BizOrderChannelprice;
+import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.entity.UploadFileInfo;
@@ -186,6 +187,7 @@ public class CarpartsProductController extends BaseController {
      */
     @ApiOperation(value = "查询当前机构下所有的零配件（不限制数量，不限制是否设置价格）",notes = "【张康健】")
     @PostMapping("/queryallserviceproductlist")
+
     public StatusDto<Page<BasicCarpartsProductDTO>> queryAllServiceProductList(@ApiParam(name = "queryCarpartsProductDTO", value = "查询的条件", required = true) @RequestBody QueryCarpartsProductDTO queryCarpartsProductDTO){
         return carpartsProductServiceImpl.queryAllServiceProductList(queryCarpartsProductDTO);
     }
@@ -199,9 +201,26 @@ public class CarpartsProductController extends BaseController {
      */
     @ApiOperation(value = "查询零配件信息",notes = "【张康健】")
     @PostMapping("/querycarparts")
-    public StatusDto<List<BasicCarpartsProductDTO>> queryCarpartsByCode(String keyword, RelProductPrice.PriceLevelEnum priceLevelEnum){
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "keyword", value = "零配件编号/名称", required = false, paramType = "query"),
+        @ApiImplicitParam(name = "priceLevelEnum", value = "枚举值", required = true, paramType = "query"),
+    })
+    public StatusDto<List<BasicCarpartsProductDTO>> queryCarpartsByCode(String keyword, @ValidateNotNull RelProductPrice.PriceLevelEnum priceLevelEnum){
         return carpartsProductServiceImpl.queryCarparts(keyword, priceLevelEnum);
     }
 
+    /**
+     * 导入零配件
+     * @param
+     * @exception
+     * @return
+     * @author zhangkangjian
+     * @date 2018-11-16 11:44:02
+     */
+    @ApiOperation(value = "导入零配件",notes = "【张康健】")
+    @PostMapping("/importcarparts")
+    public StatusDto<String> importCarparts(MultipartFile multipartFile) throws Exception {
+        return carpartsProductServiceImpl.importCarparts(multipartFile);
+    }
 
 }

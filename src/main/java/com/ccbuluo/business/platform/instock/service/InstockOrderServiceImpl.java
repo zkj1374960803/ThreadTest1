@@ -266,7 +266,34 @@ public class InstockOrderServiceImpl implements InstockOrderService {
      */
     @Override
     public List<BizInstockplanDetail> queryInstockplan(String applyNo, String inRepositoryNo, String productType) {
-        return inputStockPlanService.queryInstockplan(applyNo, inRepositoryNo, productType);
+        List<BizInstockplanDetail> bizInstockplanDetails = inputStockPlanService.queryInstockplan(applyNo, inRepositoryNo, productType);
+        buildInstockplanDetail(bizInstockplanDetails);
+        return bizInstockplanDetails;
+    }
+
+    /**
+     * 设置零配件基础信息
+     * @param instockorderDetailDTOS 入库计划
+     * @author zhangkangjian
+     * @date 2018-11-15 21:07:58
+     */
+    private void buildInstockplanDetail(List<BizInstockplanDetail> instockorderDetailDTOS) {
+        if(instockorderDetailDTOS != null && instockorderDetailDTOS.size() > 0){
+            List<String> collect = instockorderDetailDTOS.stream().map(BizInstockplanDetail::getProductNo).collect(Collectors.toList());
+            StatusDtoThriftList<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThriftList = carpartsProductService.queryCarpartsProductListByCarpartsCodes(collect);
+            StatusDto<List<BasicCarpartsProductDTO>> resolve = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOStatusDtoThriftList, BasicCarpartsProductDTO.class);
+            List<BasicCarpartsProductDTO> data = resolve.getData();
+            if(data != null && data.size() > 0){
+                Map<String, BasicCarpartsProductDTO> basicCarpartsProductDTOMap = data.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, a -> a, (k1, k2) -> k1));
+                instockorderDetailDTOS.forEach(item ->{
+                    BasicCarpartsProductDTO bizOutstockplanDetail = basicCarpartsProductDTOMap.get(item.getProductNo());
+                    item.setProductName(bizOutstockplanDetail.getCarpartsName());
+                    item.setCarpartsMarkno(bizOutstockplanDetail.getCarpartsMarkno());
+                    item.setCarpartsImage(bizOutstockplanDetail.getCarpartsImage());
+                    item.setProductUnit(bizOutstockplanDetail.getUnitName());
+                });
+            }
+        }
     }
 
     /**

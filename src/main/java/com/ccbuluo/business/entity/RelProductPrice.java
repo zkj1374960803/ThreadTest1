@@ -88,7 +88,7 @@ public class RelProductPrice {
     }*/
 
     public enum PriceLevelEnum{
-        USER(4L),CUSTMANAGER(3L),SERVICECENTER(2L);
+        USER(4L),CUSTMANAGER(3L),SERVICECENTER(2L),PURCHASE(0L);
         private long priceLevel;
         PriceLevelEnum(long priceLevel) {
             this.priceLevel = priceLevel;
@@ -253,5 +253,13 @@ public class RelProductPrice {
         this.remark = remark;
     }
 
+    public RelProductPrice(String productNo, String productType, Double suggestedPrice, Long priceLevel) {
+        this.productNo = productNo;
+        this.productType = productType;
+        this.suggestedPrice = suggestedPrice;
+        this.priceLevel = priceLevel;
+    }
 
+    public RelProductPrice() {
+    }
 }
