@@ -21,6 +21,7 @@ import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.http.StatusDto;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -428,7 +429,31 @@ public class DefaultApplyHandleStrategy implements ApplyHandleStrategy {
         Long occupyStockNum = 0L;
         // 被占用库存（有效库存或问题库存）
         Long validStock = 0L;
-        // 库存的id已经被排序（先入先出）
+        if (StringUtils.isNotBlank(detail.getSupplierNo())) {
+            List<BizStockDetail> collect = stockDetail.stream().filter(item -> item.getSupplierNo().equals(detail.getSupplierNo())).collect(Collectors.toList());
+            applyNum = buildRelOrdstockOccupy(collect, detail, applyNum, applyType, relOrdstockOccupies, occupyStockNum, validStock);
+        } else {
+            // 库存的id已经被排序（先入先出）
+            applyNum = buildRelOrdstockOccupy(stockDetail, detail, applyNum, applyType, relOrdstockOccupies, occupyStockNum, validStock);
+        }
+        return applyNum;
+    }
+
+
+    /**
+     * 构建库存占用关系
+     * @param stockDetail 库存详情
+     * @param detail 申请单详单
+     * @param applyNum 申请数量
+     * @param applyType 申请类型
+     * @param relOrdstockOccupies 占用库存关系
+     * @param occupyStockNum 占用库存
+     * @param validStock 有效库存
+     * @return 申请数量
+     * @author liuduo
+     * @date 2018-11-16 10:07:24
+     */
+    private Long buildRelOrdstockOccupy(List<BizStockDetail> stockDetail, AllocateapplyDetailBO detail, Long applyNum, String applyType, List<RelOrdstockOccupy> relOrdstockOccupies, Long occupyStockNum, Long validStock) {
         for(BizStockDetail stock : stockDetail){
             if(applyNum.intValue() == 0 && stock.getProductNo().equals(detail.getProductNo())){
                 stock.setOccupyStock(0L);
