@@ -581,11 +581,23 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
             Map<String, List<RelProductPrice>> relProductPriceMap = a.stream().collect(Collectors.groupingBy(RelProductPrice::getProductNo));
             if(rows != null && rows.size() > 0){
                 rows.forEach(item ->{
+                    // 设置价格
                     buildCarpartsPrice(relProductPriceMap, item);
+                    // 把车型id转换成车型名字
+                    String fitCarmodel = item.getFitCarmodel();
+                    if(StringUtils.isBlank(fitCarmodel)){
+                        return;
+                    }
+                    List<String> fitCarmodelStrIds = Arrays.asList(fitCarmodel.split(Constants.COMMA));
+                    List<Long> fitCarmodelLongIds = fitCarmodelStrIds.stream().filter(StringUtils::isNotBlank).map(Long::parseLong).collect(Collectors.toList());
+                    if(fitCarmodelLongIds != null && fitCarmodelLongIds.size() > 0){
+                        List<CarmodelManage> carmodelManages = basicCarmodelManageDao.queryPartModel(fitCarmodelLongIds);
+                        String fitCarmodelName = StringUtils.join(carmodelManages.stream().map(CarmodelManage::getCarmodelName).toArray(), Constants.COMMA);
+                        item.setCarmodelName(fitCarmodelName);
+                    }
                 });
             }
         });
-        basicCarmodelManageService.buildCarModeName(basicCarpartsProductDTOResolve.getData().getRows());
         return basicCarpartsProductDTOResolve;
     }
 
