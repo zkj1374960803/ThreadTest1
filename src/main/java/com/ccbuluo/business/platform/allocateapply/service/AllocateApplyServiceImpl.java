@@ -265,7 +265,10 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             a.setApplyNo(allocateApplyDTO.getApplyNo());
             a.setOperator(loggedUserId);
             a.setCreator(loggedUserId);
-            a.setSellPrice(new BigDecimal((Double)suggestedPriceMap.get(a.getProductNo())));
+            Object obj = suggestedPriceMap.get(a.getProductNo());
+            if(obj != null){
+                a.setSellPrice(new BigDecimal((Double)obj));
+            }
             if(AllocateApplyTypeEnum.BARTER.name().equals(processType)
                 || AllocateApplyTypeEnum.REFUND.name().equals(processType)
                 || AllocateApplyTypeEnum.PLATFORMBARTER.name().equals(processType)
