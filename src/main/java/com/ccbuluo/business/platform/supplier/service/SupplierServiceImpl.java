@@ -323,7 +323,7 @@ public class SupplierServiceImpl implements SupplierService{
         products.stream().forEach(a ->{
             BasicCarpartsProductDTO basicCarpartsProductDTO = carpartsProduct.get(a.getProductCode());
             a.setProductName(basicCarpartsProductDTO.getCarpartsName());
-            a.setSupplierMarkno(basicCarpartsProductDTO.getCarpartsMarkno());
+            a.setCarpartsMarkno(basicCarpartsProductDTO.getCarpartsMarkno());
         });
         return queryRelSupplierProductPage;
     }

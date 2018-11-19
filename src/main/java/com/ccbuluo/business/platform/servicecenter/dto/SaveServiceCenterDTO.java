@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.servicecenter.dto;
 
 import com.ccbuluo.business.entity.IdEntity;
+import com.ccbuluo.core.annotation.validate.ValidateLength;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -15,6 +16,7 @@ public class SaveServiceCenterDTO{
     /**
      * 服务中心名称
      */
+    @ValidateLength(min = 0, max = 15, message = "服务中心名称不能超过15个字")
     @ApiModelProperty(name = "serviceCenterName", value = "服务中心名称", required = true)
     private String serviceCenterName;
     /**
