@@ -24,9 +24,12 @@ import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.excel.imports.ExcelReaderUtils;
 import com.ccbuluo.excel.imports.ExcelRowReaderBean;
+import com.ccbuluo.excel.imports.ExcelXlsReader;
+import com.ccbuluo.excel.imports.ExcelXlsxReader;
 import com.ccbuluo.excel.readpic.ExcelPictruePos;
 import com.ccbuluo.excel.readpic.ExcelPictruesUtils;
 import com.ccbuluo.excel.readpic.ExcelShapeSaveLocal;
+import com.ccbuluo.excel.readpic.ExcelTypeEnum;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftBean;
 import com.ccbuluo.http.StatusDtoThriftPage;
@@ -44,13 +47,16 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.junit.Assert;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.xml.sax.InputSource;
 
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
@@ -367,17 +373,34 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
      */
     @Override
     public StatusDto<String> importCarparts(MultipartFile multipartFile) throws Exception {
-        StatusDto<UploadFileInfo> carpartsexcel = uploadService.simpleUpload(multipartFile, "carpartsexcel");
-        if(Constants.SUCCESS_CODE.equals(carpartsexcel.getCode())){
-            throw new CommonException(Constants.ERROR_CODE, "上传失败");
+//        StatusDto<UploadFileInfo> carpartsexcel = uploadService.simpleUpload(multipartFile, "carpartsexcel");
+//        if(!Constants.SUCCESS_CODE.equals(carpartsexcel.getCode())){
+//            throw new CommonException(Constants.ERROR_CODE, "上传失败");
+//        }
+//        UploadFileInfo uploadFileInfo = carpartsexcel.getData();
+//        if(uploadFileInfo == null){
+//            throw new CommonException(Constants.ERROR_CODE, "上传文件后，数据异常");
+//        }
+//        String filepath = uploadFileInfo.getPath();
+//        String filepath = "C:\\Users\\Ezreal\\Desktop\\abc.xlsx";
+        InputStream inputStream = multipartFile.getInputStream();
+        String property = System.getProperty("user.dir") + "\\src\\main\\resources\\";
+        File file = new File(property + System.currentTimeMillis() + ".xlsx");
+        FileOutputStream outputStream = new FileOutputStream(file);
+        try {
+            byte temp[] = new byte[1024];
+            int size = -1;
+            while ((size = inputStream.read(temp)) != -1) { // 每次读取1KB，直至读完
+                outputStream.write(temp, 0, size);
+            }
+        }finally {
+            inputStream.close();
+            outputStream.close();
         }
-        UploadFileInfo uploadFileInfo = carpartsexcel.getData();
-        if(uploadFileInfo == null){
-            throw new CommonException(Constants.ERROR_CODE, "上传文件后，数据异常");
-        }
-        String filepath = uploadFileInfo.getPath();
+        String filepath = file.getPath();
         // 上传图片并获取的图片的路径
-        Map<String, Collection<ExcelPictruePos>> allDate = ExcelPictruesUtils.getAllDate(filepath, 1, new ExcelShapeSaveLocal("C:\\Users\\Ezreal\\Desktop\\haha"));
+        Map<String, Collection<ExcelPictruePos>> allDate = ExcelPictruesUtils.getAllDate( new FileInputStream(file), 1, new ExcelShapeSaveLocal("C:\\Users\\Ezreal\\Desktop\\haha"), ExcelTypeEnum.XLSX);
+
         // 读取excel，获取list的数据
         List<BasicCarpartsProductDTO> productList = geCarpartsProductList(filepath);
         if(productList == null || productList.size() == 0){
@@ -385,14 +408,15 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
         }
         // 名称转换成id
         conventNameById(productList);
-        // 保存零配件
-        carpartsProductService.batchSaveCarpartsProduct(productList);
         // 构建阶梯价格信息
         List<RelProductPrice> relProductPriceList = buildProductList(allDate, productList);
+        // 保存零配件
+        carpartsProductService.batchSaveCarpartsProduct(productList);
         // 保存阶梯价格
         carpartsProductServiceImpl.saveProductPrice(relProductPriceList);
         return StatusDto.buildSuccessStatusDto();
     }
+
     /**
      * 读取excel文件转换为list<BasicCarpartsProductDTO>
      * @param filepath excel的路径
@@ -416,7 +440,32 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
             @Override
             public boolean checkRow(int sheetIndex, int curRow, List<String> rowlist) {
                 // 标题行放过
-                return curRow >= 1;
+                Boolean boo = true;
+                if(!(curRow >= 1)){
+                    boo = false;
+                }
+                try {
+                    String usedAmount = rowlist.get(4);
+                    if(usedAmount != null){
+                        Long.parseLong(usedAmount);
+                    }
+                    String serverCarpartsPrice = rowlist.get(7);
+                    if(serverCarpartsPrice != null){
+                        Double.parseDouble(serverCarpartsPrice);
+                    }
+                    String custCarpartsPrice = rowlist.get(8);
+                    if(StringUtils.isNotBlank(custCarpartsPrice)){
+                        Double.parseDouble(custCarpartsPrice);
+                    }
+                    String carpartsPrice = rowlist.get(9);
+                    if(StringUtils.isNotBlank(carpartsPrice)){
+                        Double.parseDouble(carpartsPrice);
+                    }
+                }catch (Exception e){
+                    boo = false;
+                    e.printStackTrace();
+                }
+                return boo;
             }
         };
 
@@ -428,6 +477,8 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
         ExcelReaderUtils.readExcel(readerBean, filepath);
         // 获取读取的结果结果
         return readerBean.getData();
+
+
     }
 
     /**
@@ -439,18 +490,21 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
      * @date 2018-11-16 16:35:55
      */
     private List<RelProductPrice> buildProductList(Map<String, Collection<ExcelPictruePos>> pictrueListInfo, List<BasicCarpartsProductDTO> productList) {
+        String loggedUserId = userHolder.getLoggedUserId();
         List<RelProductPrice> relProductPriceList = Lists.newArrayList();
         productList.forEach(a ->{
+            a.setCreator(loggedUserId);
+            a.setOperator(loggedUserId);
             String carpartsMarkno = a.getCarpartsMarkno();
-            Collection<ExcelPictruePos> excelPictruePos = pictrueListInfo.get(carpartsMarkno);
-            List<ExcelPictruePos> list = new ArrayList<ExcelPictruePos>(excelPictruePos);
-            ExcelPictruePos excelPictruePos1 = list.get(0);
-            String path = excelPictruePos1.getPath();
+            Collection<ExcelPictruePos> excelPictruePosColl = pictrueListInfo.get(carpartsMarkno);
+            List<ExcelPictruePos> excelPictruePosList = new ArrayList<ExcelPictruePos>(excelPictruePosColl);
+            ExcelPictruePos excelPictruePos = excelPictruePosList.get(0);
+            String path = excelPictruePos.getPath();
             a.setCarpartsImage(path);
             // 生成零配件编号
             StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(BizServiceProjectcode.CodePrefixEnum.FP);
             String data = stringStatusDto.getData();
-            if(StringUtils.isNotBlank(data)){
+            if(StringUtils.isBlank(data)){
                 throw new CommonException(Constants.ERROR_CODE, "生成编号失败！");
             }
             a.setCarpartsCode(data);
@@ -477,24 +531,31 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     private void conventNameById(List<BasicCarpartsProductDTO> list){
         // 查出所有的车型
         List<Map<String, Object>> maps = basicCarmodelManageDao.queryAll();
-        Map<String, Object> map = Maps.newHashMap();
+        Map<String, Integer> map = Maps.newHashMap();
         maps.forEach(item->{
             String name = (String)item.get("name");
-            Long id = (Long)item.get("id");
+            Integer id = (Integer)item.get("id");
             map.put(name, id);
         });
-        ArrayList<Long> objects = Lists.newArrayList();
+        ArrayList<Integer> objects = Lists.newArrayList();
         list.forEach(item->{
+            String carpartsName = item.getCarpartsName();
+            if(StringUtils.isNotBlank(carpartsName)){
+                item.setCarpartsPinyinname(PinyinTool.getPinYinHeadChar(carpartsName));
+            }
             String carmodelName = item.getCarmodelName();
             if(StringUtils.isNotBlank(carmodelName)){
-                String[] split = carmodelName.split(Constants.COMMA);
-                List<String> strings = Arrays.asList(split);
-                strings.forEach(str->{
-                    Long id = (Long)map.get(str);
-                    objects.add(id);
+                String[] split = StringUtils.split(carmodelName, Constants.COMMA);
+                List<String> splitList = Arrays.asList(split);
+                splitList.forEach(str->{
+                    Integer id = (Integer)map.get(str);
+                    if(id != null){
+                        objects.add(id);
+                    }
                 });
                 String fitCarmodelId = StringUtils.join(objects, Constants.COMMA);
                 item.setFitCarmodel(fitCarmodelId);
+                objects.clear();
             }
         });
 
