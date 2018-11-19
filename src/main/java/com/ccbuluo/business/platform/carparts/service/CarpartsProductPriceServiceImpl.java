@@ -375,15 +375,18 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
         InputStream inputStream = multipartFile.getInputStream();
         String property = System.getProperty("user.dir") + "\\src\\main\\resources\\";
         File file = new File(property + System.currentTimeMillis() + ".xlsx");
-        try (inputStream; FileOutputStream outputStream = new FileOutputStream(file)) {
+        FileOutputStream outputStream = new FileOutputStream(file);
+        try {
             byte temp[] = new byte[1024];
             int size = -1;
             while ((size = inputStream.read(temp)) != -1) { // 每次读取1KB，直至读完
                 outputStream.write(temp, 0, size);
             }
+        }finally {
+            inputStream.close();
+            outputStream.close();
         }
         String filepath = file.getPath();
-        inputStream.close();
         // 上传图片并获取的图片的路径
         Map<String, Collection<ExcelPictruePos>> allDate = ExcelPictruesUtils.getAllDate( new FileInputStream(file), 1, new ExcelShapeSaveLocal("C:\\Users\\Ezreal\\Desktop\\haha"), ExcelTypeEnum.XLSX);
 
