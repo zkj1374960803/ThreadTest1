@@ -42,6 +42,11 @@ public class QueryRelSupplierProductDTO {
     @ApiModelProperty(name = "supplierMarkno", value = "供应商代码", hidden = true)
     private String supplierMarkno;
     /**
+     * 零配件代码
+     */
+    @ApiModelProperty(name = "carpartsMarkno", value = "零配件代码", hidden = true)
+    private String carpartsMarkno;
+    /**
      * 商品的名称
      */
     @ApiModelProperty(name = "productName", value = "商品的名称")
@@ -153,4 +158,11 @@ public class QueryRelSupplierProductDTO {
         this.productType = productType;
     }
 
+    public String getCarpartsMarkno() {
+        return carpartsMarkno;
+    }
+
+    public void setCarpartsMarkno(String carpartsMarkno) {
+        this.carpartsMarkno = carpartsMarkno;
+    }
 }
