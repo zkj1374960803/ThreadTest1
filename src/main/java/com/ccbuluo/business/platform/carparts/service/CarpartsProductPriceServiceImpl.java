@@ -10,14 +10,24 @@ import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarmodelManageDao
 import com.ccbuluo.business.platform.carconfiguration.entity.CarmodelManage;
 import com.ccbuluo.business.platform.carconfiguration.service.BasicCarmodelManageService;
 import com.ccbuluo.business.platform.carparts.dao.CarpartsProductPriceDao;
+import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
 import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.entity.UploadFileInfo;
+import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.service.UploadService;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
+import com.ccbuluo.excel.imports.ExcelReaderUtils;
+import com.ccbuluo.excel.imports.ExcelRowReaderBean;
+import com.ccbuluo.excel.imports.ExcelXlsReader;
+import com.ccbuluo.excel.imports.ExcelXlsxReader;
+import com.ccbuluo.excel.readpic.ExcelPictruePos;
+import com.ccbuluo.excel.readpic.ExcelPictruesUtils;
+import com.ccbuluo.excel.readpic.ExcelShapeSaveLocal;
+import com.ccbuluo.excel.readpic.ExcelTypeEnum;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftBean;
 import com.ccbuluo.http.StatusDtoThriftPage;
@@ -26,12 +36,17 @@ import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.SaveBasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
+import com.ccbuluo.usercoreintf.dto.QueryNameByUseruuidsDTO;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.curator.shaded.com.google.common.collect.Maps;
+import org.junit.Assert;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.xml.sax.InputSource;
 
 import javax.annotation.Resource;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -69,6 +84,8 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     private BizServiceSupplierDao bizServiceSupplierDao;
     @Resource
     private BizServiceOrderDao bizServiceOrderDao;
+    @Resource
+    private BizServiceEquipmentDao bizServiceEquipmentDao;
 
     /**
      * 查询零配件的信息和价格
@@ -281,14 +298,24 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
      * @date 2018-11-13 10:07:23
      */
     @Override
-    public StatusDto<List<BasicCarpartsProductDTO>> queryCarparts(String keyword) {
+    public StatusDto<List<BasicCarpartsProductDTO>> queryCarparts(String keyword, RelProductPrice.PriceLevelEnum priceLevelEnum) {
         StatusDto<Page<BasicCarpartsProductDTO>> list = StatusDtoThriftUtils.resolve(carpartsProductService.queryCarpartsProductList(keyword, 0, Integer.MAX_VALUE),BasicCarpartsProductDTO.class);
         Page<BasicCarpartsProductDTO> data = list.getData();
         List<BasicCarpartsProductDTO> basicCarpartsProductDTOS = Lists.newArrayList();
         if(data != null){
             basicCarpartsProductDTOS = data.getRows();
         }
-        return StatusDto.buildDataSuccessStatusDto(basicCarpartsProductDTOS);
+        // 查找所有有价格的
+        if(priceLevelEnum.getPriceLevel() == 0){
+            return StatusDto.buildDataSuccessStatusDto(basicCarpartsProductDTOS);
+        }
+        Map<String, Object> suggestedPriceMap = bizServiceEquipmentDao.findSuggestedPrice(null , priceLevelEnum.getPriceLevel());
+        List<BasicCarpartsProductDTO> collect = basicCarpartsProductDTOS.stream().filter(a -> {
+            String carpartsCode = a.getCarpartsCode();
+            Object obj = suggestedPriceMap.get(carpartsCode);
+            return !(obj == null);
+        }).collect(Collectors.toList());
+        return StatusDto.buildDataSuccessStatusDto(collect);
 
     }
 
@@ -325,6 +352,202 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
 
     }
 
+    /**
+     * 导入零配件
+     *
+     * @param multipartFile
+     * @return StatusDto<String>
+     * @author zhangkangjian
+     * @date 2018-11-16 11:46:02
+     */
+    @Override
+    public StatusDto<String> importCarparts(MultipartFile multipartFile) throws Exception {
+//        StatusDto<UploadFileInfo> carpartsexcel = uploadService.simpleUpload(multipartFile, "carpartsexcel");
+//        if(!Constants.SUCCESS_CODE.equals(carpartsexcel.getCode())){
+//            throw new CommonException(Constants.ERROR_CODE, "上传失败");
+//        }
+//        UploadFileInfo uploadFileInfo = carpartsexcel.getData();
+//        if(uploadFileInfo == null){
+//            throw new CommonException(Constants.ERROR_CODE, "上传文件后，数据异常");
+//        }
+//        String filepath = uploadFileInfo.getPath();
+        String filepath = "C:\\Users\\Ezreal\\Desktop\\abc.xlsx";
+        InputStream inputStream = multipartFile.getInputStream();
+//        File file = new File("C:\\Users\\Ezreal\\Desktop\\haha\\" + System.currentTimeMillis() + ".xlsx");
+//        try (inputStream; FileOutputStream outputStream = new FileOutputStream(file)) {
+//            byte temp[] = new byte[1024];
+//            int size = -1;
+//            while ((size = inputStream.read(temp)) != -1) { // 每次读取1KB，直至读完
+//                outputStream.write(temp, 0, size);
+//            }
+//        }
+
+
+        // 上传图片并获取的图片的路径
+        Map<String, Collection<ExcelPictruePos>> allDate = ExcelPictruesUtils.getAllDate(inputStream, 1, new ExcelShapeSaveLocal("C:\\Users\\Ezreal\\Desktop\\haha"), ExcelTypeEnum.XLSX);
+        inputStream.close();
+
+        // 读取excel，获取list的数据
+        List<BasicCarpartsProductDTO> productList = geCarpartsProductList(filepath);
+        if(productList == null || productList.size() == 0){
+            return StatusDto.buildFailureStatusDto("数据为空导入失败！");
+        }
+        // 名称转换成id
+        conventNameById(productList);
+        // 构建阶梯价格信息
+        List<RelProductPrice> relProductPriceList = buildProductList(allDate, productList);
+        // 保存零配件
+        carpartsProductService.batchSaveCarpartsProduct(productList);
+        // 保存阶梯价格
+        carpartsProductServiceImpl.saveProductPrice(relProductPriceList);
+        return StatusDto.buildSuccessStatusDto();
+    }
+
+    /**
+     * 读取excel文件转换为list<BasicCarpartsProductDTO>
+     * @param filepath excel的路径
+     * @return List<BasicCarpartsProductDTO> 零配件的列表
+     * @author zhangkangjian
+     * @date 2018-11-16 16:41:02
+     */
+    private List<BasicCarpartsProductDTO> geCarpartsProductList(String filepath) throws Exception {
+        Map<String, Integer> columnIndexMapperBeanField = Maps.newHashMap();
+        // 列映射，实体字段，对应的excel列索引
+        columnIndexMapperBeanField.put("carpartsMarkno", 1);
+        columnIndexMapperBeanField.put("carpartsName", 2);
+        columnIndexMapperBeanField.put("carpartsUnit", 3);
+        columnIndexMapperBeanField.put("usedAmount", 4);
+        columnIndexMapperBeanField.put("carmodelName", 6);
+        columnIndexMapperBeanField.put("serverCarpartsPrice", 7);
+        columnIndexMapperBeanField.put("custCarpartsPrice", 8);
+        columnIndexMapperBeanField.put("carpartsPrice", 9);
+        // 列映射，实体字段，对应的excel列索引
+        ExcelRowReaderBean<BasicCarpartsProductDTO> readerBean = new ExcelRowReaderBean<BasicCarpartsProductDTO>(BasicCarpartsProductDTO.class, columnIndexMapperBeanField) {
+            @Override
+            public boolean checkRow(int sheetIndex, int curRow, List<String> rowlist) {
+                // 标题行放过
+                Boolean boo = true;
+                if(!(curRow >= 1)){
+                    boo = false;
+                }
+                try {
+                    String usedAmount = rowlist.get(4);
+                    if(usedAmount != null){
+                        Long.parseLong(usedAmount);
+                    }
+                    String serverCarpartsPrice = rowlist.get(7);
+                    if(serverCarpartsPrice != null){
+                        Double.parseDouble(serverCarpartsPrice);
+                    }
+                    String custCarpartsPrice = rowlist.get(8);
+                    if(StringUtils.isNotBlank(custCarpartsPrice)){
+                        Double.parseDouble(custCarpartsPrice);
+                    }
+                    String carpartsPrice = rowlist.get(9);
+                    if(StringUtils.isNotBlank(carpartsPrice)){
+                        Double.parseDouble(carpartsPrice);
+                    }
+                }catch (Exception e){
+                    boo = false;
+                    e.printStackTrace();
+                }
+                return boo;
+            }
+        };
+
+        // 设置开始读取的行，之前的行被跳过
+        readerBean.setStartRow(2);
+        // 调协列的宽度，小于宽度的列被跳过
+        readerBean.setTargetColLength(4);
+        // 读取excel
+        ExcelReaderUtils.readExcel(readerBean, filepath);
+        // 获取读取的结果结果
+        return readerBean.getData();
+
+
+    }
+
+    /**
+     *  构建零配件信息和零配件价格信息
+     * @param pictrueListInfo 图片列表的信息
+     * @param productList 零配件的列表
+     * @return List<RelProductPrice> 零配件的价格列表
+     * @author zhangkangjian
+     * @date 2018-11-16 16:35:55
+     */
+    private List<RelProductPrice> buildProductList(Map<String, Collection<ExcelPictruePos>> pictrueListInfo, List<BasicCarpartsProductDTO> productList) {
+        String loggedUserId = userHolder.getLoggedUserId();
+        List<RelProductPrice> relProductPriceList = Lists.newArrayList();
+        productList.forEach(a ->{
+            a.setCreator(loggedUserId);
+            a.setOperator(loggedUserId);
+            String carpartsMarkno = a.getCarpartsMarkno();
+            Collection<ExcelPictruePos> excelPictruePosColl = pictrueListInfo.get(carpartsMarkno);
+            List<ExcelPictruePos> excelPictruePosList = new ArrayList<ExcelPictruePos>(excelPictruePosColl);
+            ExcelPictruePos excelPictruePos = excelPictruePosList.get(0);
+            String path = excelPictruePos.getPath();
+            a.setCarpartsImage(path);
+            // 生成零配件编号
+            StatusDto<String> stringStatusDto = generateProjectCodeService.grantCode(BizServiceProjectcode.CodePrefixEnum.FP);
+            String data = stringStatusDto.getData();
+            if(StringUtils.isBlank(data)){
+                throw new CommonException(Constants.ERROR_CODE, "生成编号失败！");
+            }
+            a.setCarpartsCode(data);
+            // 构建阶梯价格
+            RelProductPrice custProductPrice = new RelProductPrice(data,Constants.PRODUCT_TYPE_FITTINGS, a.getCustCarpartsPrice(), 3L);
+            relProductPriceList.add(custProductPrice);
+
+            RelProductPrice serProductPrice = new RelProductPrice(data,Constants.PRODUCT_TYPE_FITTINGS, a.getServerCarpartsPrice(), 2L);
+            relProductPriceList.add(serProductPrice);
+
+            RelProductPrice userProductPrice = new RelProductPrice(data,Constants.PRODUCT_TYPE_FITTINGS, a.getCarpartsPrice(), 4L);
+            relProductPriceList.add(userProductPrice);
+        });
+        return relProductPriceList;
+    }
+
+
+    /**
+     *  车型名称转换成车型id
+     * @param list 零配件列表
+     * @author zhangkangjian
+     * @date 2018-11-16 16:17:55
+     */
+    private void conventNameById(List<BasicCarpartsProductDTO> list){
+        // 查出所有的车型
+        List<Map<String, Object>> maps = basicCarmodelManageDao.queryAll();
+        Map<String, Integer> map = Maps.newHashMap();
+        maps.forEach(item->{
+            String name = (String)item.get("name");
+            Integer id = (Integer)item.get("id");
+            map.put(name, id);
+        });
+        ArrayList<Integer> objects = Lists.newArrayList();
+        list.forEach(item->{
+            String carpartsName = item.getCarpartsName();
+            if(StringUtils.isNotBlank(carpartsName)){
+                item.setCarpartsPinyinname(PinyinTool.getPinYinHeadChar(carpartsName));
+            }
+            String carmodelName = item.getCarmodelName();
+            if(StringUtils.isNotBlank(carmodelName)){
+                String[] split = StringUtils.split(carmodelName, Constants.COMMA);
+                List<String> splitList = Arrays.asList(split);
+                splitList.forEach(str->{
+                    Integer id = (Integer)map.get(str);
+                    if(id != null){
+                        objects.add(id);
+                    }
+                });
+                String fitCarmodelId = StringUtils.join(objects, Constants.COMMA);
+                item.setFitCarmodel(fitCarmodelId);
+                objects.clear();
+            }
+        });
+
+
+
+    }
     /**
      * 上传图片
      * @param base64   图片base64编码

@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.carparts.service;
 
 import com.ccbuluo.business.entity.RelProductPrice;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
+import com.ccbuluo.business.vehiclelease.entity.BizOrderChannelprice;
 import com.ccbuluo.core.entity.UploadFileInfo;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
@@ -11,6 +12,7 @@ import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.EditBasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.SaveBasicCarpartsProductDTO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -104,7 +106,7 @@ public interface CarpartsProductPriceService {
      * @author zhangkangjian
      * @date 2018-11-13 11:04:47
      */
-    StatusDto<List<BasicCarpartsProductDTO>> queryCarparts(String keyword);
+    StatusDto<List<BasicCarpartsProductDTO>> queryCarparts(String keyword, RelProductPrice.PriceLevelEnum priceLevelEnum);
     /**
      *  删除零配件
      * @param carpartsCode 零配件code
@@ -112,4 +114,13 @@ public interface CarpartsProductPriceService {
      * @date 2018-11-14 15:42:34
      */
     StatusDto<String> deleteCarpartsProduct(String carpartsCode);
+
+    /**
+     * 导入零配件
+     * @param multipartFile
+     * @return StatusDto<String>
+     * @author zhangkangjian
+     * @date 2018-11-16 11:46:02
+     */
+    StatusDto<String> importCarparts(MultipartFile multipartFile) throws Exception;
 }

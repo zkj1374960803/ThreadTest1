@@ -25,7 +25,10 @@ import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
+import com.ccbuluo.http.StatusDtoThriftBean;
+import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
+import com.ccbuluo.merchandiseintf.carparts.parts.dto.SaveBasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
@@ -227,6 +230,14 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
         // 查询本机构下面，本条记录所对应的商品的所有问题库存列表
         psd.setProblemDetailList(problemStockDetailDao.queryProblemStockBizStockList(orgCode, psd.getProductNo()));
         computerProblemProductCount(psd);
+        StatusDtoThriftBean<SaveBasicCarpartsProductDTO> carpartsProductdetail = carpartsProductService.findCarpartsProductdetail(psd.getProductNo());
+        StatusDto<SaveBasicCarpartsProductDTO> resolve = StatusDtoThriftUtils.resolve(carpartsProductdetail, SaveBasicCarpartsProductDTO.class);
+        SaveBasicCarpartsProductDTO data = resolve.getData();
+        if(data != null){
+            psd.setCarpartsMarkno(data.getCarpartsMarkno());
+            psd.setCarpartsImage(data.getCarpartsImage());
+            psd.setProductName(data.getCarpartsName());
+        }
         return psd;
     }
 
@@ -242,12 +253,21 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
     public ProblemStockBizStockDetailDTO findByProductno(String procudtType, String productNo) {
         // 根据商品编号查询基本信息
         ProblemStockBizStockDetailDTO problemStockBizStockDetailDTO = problemStockDetailDao.getByProductNo(productNo);
+        StatusDtoThriftBean<SaveBasicCarpartsProductDTO> carpartsProductdetail =
+            carpartsProductService.findCarpartsProductdetail(problemStockBizStockDetailDTO.getProductNo());
+        StatusDto<SaveBasicCarpartsProductDTO> resolve = StatusDtoThriftUtils.resolve(carpartsProductdetail, SaveBasicCarpartsProductDTO.class);
+        SaveBasicCarpartsProductDTO data = resolve.getData();
+        if(data != null){
+            problemStockBizStockDetailDTO.setCarpartsImage(data.getCarpartsImage());
+            problemStockBizStockDetailDTO.setCarpartsMarkno(data.getCarpartsMarkno());
+            problemStockBizStockDetailDTO.setProductName(data.getCarpartsName());
+        }
         //　查询该商品所有的库存
         List<StockDetailDTO> stockDetailDTOS = problemStockDetailDao.queryProblemStockByProduct(procudtType, productNo);
         // 取出问题件库存大于0的商品
         List<StockDetailDTO> collect = stockDetailDTOS.stream().filter(item -> item.getProblemStock() > 0).collect(Collectors.toList());
         // 取出所有机构
-        List<String> orgtNos = collect.stream().map(item -> item.getOrgNo()).collect(Collectors.toList());
+        List<String> orgtNos = collect.stream().map(StockDetailDTO::getOrgNo).collect(Collectors.toList());
         // 根据机构编号查询机构名字
         Map<String, BasicUserOrganization> stringBasicUserOrganizationMap = orgService.queryOrganizationByOrgCodes(orgtNos);
         for (StockDetailDTO stockDetailDTO : collect) {
@@ -256,12 +276,12 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
             stockDetailDTO.setOrgType(basicUserOrganization.getOrgType());
         }
         // 按照机构和供应商分组
-        Map<String, List<StockDetailDTO>> collect1 = collect.stream().collect(Collectors.groupingBy(item -> item.getOrgNoAndSupplierNo()));
+        Map<String, List<StockDetailDTO>> collect1 = collect.stream().collect(Collectors.groupingBy(StockDetailDTO::getOrgNoAndSupplierNo));
         List<StockDetailDTO> stockDetailDTOS1 = Lists.newArrayList();
         for (Map.Entry<String, List<StockDetailDTO>> entry : collect1.entrySet()) {
             List<StockDetailDTO> value = entry.getValue();
             StockDetailDTO stockDetailDTO1 = value.get(0);
-            long count = value.stream().map(item -> item.getProblemStock()).reduce((sum,item) -> sum + item).get();
+            long count = value.stream().map(StockDetailDTO::getProblemStock).reduce((sum, item) -> sum + item).get();
             StockDetailDTO stockDetailDTO = new StockDetailDTO();
             stockDetailDTO.setOrgType(stockDetailDTO1.getOrgType());
             stockDetailDTO.setOrgName(stockDetailDTO1.getOrgName());

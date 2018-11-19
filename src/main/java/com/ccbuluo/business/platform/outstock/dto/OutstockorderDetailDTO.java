@@ -94,7 +94,48 @@ public class OutstockorderDetailDTO extends AftersaleCommonEntity{
      */
     @ApiModelProperty(name = "actualTotalPrice", value = "销售总价")
     private BigDecimal actualTotalPrice;
+    private String unitName;
+    @ApiModelProperty(name = "carpartsImage",value = "零配件图片在服务端的相对路径",required = true
+    )
+    private String carpartsImage;
+    @ApiModelProperty(name = "carpartsMarkno",value = "零配件代码",required = true
+    )
+    private String carpartsMarkno;
+    @ApiModelProperty(name = "usedAmount",value = "单车使用配件的个数",required = true
+    )
+    private Long usedAmount;
 
+    public String getUnitName() {
+        return unitName;
+    }
+
+    public void setUnitName(String unitName) {
+        this.unitName = unitName;
+    }
+
+    public String getCarpartsImage() {
+        return carpartsImage;
+    }
+
+    public void setCarpartsImage(String carpartsImage) {
+        this.carpartsImage = carpartsImage;
+    }
+
+    public String getCarpartsMarkno() {
+        return carpartsMarkno;
+    }
+
+    public void setCarpartsMarkno(String carpartsMarkno) {
+        this.carpartsMarkno = carpartsMarkno;
+    }
+
+    public Long getUsedAmount() {
+        return usedAmount;
+    }
+
+    public void setUsedAmount(Long usedAmount) {
+        this.usedAmount = usedAmount;
+    }
 
     public void setOutstockOrderno(String outstockOrderno) {
         this.outstockOrderno = outstockOrderno;
