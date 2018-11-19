@@ -261,7 +261,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         String orgType = data.getOrgType();
         long priceLevel = RelProductPrice.PriceLevelEnum.valueOf(orgType).getPriceLevel();
         Map<String, Object> suggestedPriceMap = bizServiceEquipmentDao.findSuggestedPrice(collect, priceLevel);
-
         filterAllocateapply.forEach(a -> {
             a.setApplyNo(allocateApplyDTO.getApplyNo());
             a.setOperator(loggedUserId);
@@ -275,8 +274,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }else {
                 a.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
             }
-
-
         });
         bizAllocateApplyDao.batchInsertForapplyDetailList(filterAllocateapply);
     }

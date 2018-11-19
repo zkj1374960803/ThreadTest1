@@ -371,21 +371,21 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
 //            throw new CommonException(Constants.ERROR_CODE, "上传文件后，数据异常");
 //        }
 //        String filepath = uploadFileInfo.getPath();
-        String filepath = "C:\\Users\\Ezreal\\Desktop\\abc.xlsx";
+//        String filepath = "C:\\Users\\Ezreal\\Desktop\\abc.xlsx";
         InputStream inputStream = multipartFile.getInputStream();
-//        File file = new File("C:\\Users\\Ezreal\\Desktop\\haha\\" + System.currentTimeMillis() + ".xlsx");
-//        try (inputStream; FileOutputStream outputStream = new FileOutputStream(file)) {
-//            byte temp[] = new byte[1024];
-//            int size = -1;
-//            while ((size = inputStream.read(temp)) != -1) { // 每次读取1KB，直至读完
-//                outputStream.write(temp, 0, size);
-//            }
-//        }
-
+        String property = System.getProperty("user.dir") + "\\src\\main\\resources\\";
+        File file = new File(property + System.currentTimeMillis() + ".xlsx");
+        try (inputStream; FileOutputStream outputStream = new FileOutputStream(file)) {
+            byte temp[] = new byte[1024];
+            int size = -1;
+            while ((size = inputStream.read(temp)) != -1) { // 每次读取1KB，直至读完
+                outputStream.write(temp, 0, size);
+            }
+        }
+        String filepath = file.getPath();
 
         // 上传图片并获取的图片的路径
-        Map<String, Collection<ExcelPictruePos>> allDate = ExcelPictruesUtils.getAllDate(inputStream, 1, new ExcelShapeSaveLocal("C:\\Users\\Ezreal\\Desktop\\haha"), ExcelTypeEnum.XLSX);
-        inputStream.close();
+        Map<String, Collection<ExcelPictruePos>> allDate = ExcelPictruesUtils.getAllDate( new FileInputStream(file), 1, new ExcelShapeSaveLocal("C:\\Users\\Ezreal\\Desktop\\haha"), ExcelTypeEnum.XLSX);
 
         // 读取excel，获取list的数据
         List<BasicCarpartsProductDTO> productList = geCarpartsProductList(filepath);
