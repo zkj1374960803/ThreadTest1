@@ -383,7 +383,7 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
             }
         }
         String filepath = file.getPath();
-
+        inputStream.close();
         // 上传图片并获取的图片的路径
         Map<String, Collection<ExcelPictruePos>> allDate = ExcelPictruesUtils.getAllDate( new FileInputStream(file), 1, new ExcelShapeSaveLocal("C:\\Users\\Ezreal\\Desktop\\haha"), ExcelTypeEnum.XLSX);
 
