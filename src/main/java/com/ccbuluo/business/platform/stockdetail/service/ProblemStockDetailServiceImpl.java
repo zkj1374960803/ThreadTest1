@@ -230,6 +230,14 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
         // 查询本机构下面，本条记录所对应的商品的所有问题库存列表
         psd.setProblemDetailList(problemStockDetailDao.queryProblemStockBizStockList(orgCode, psd.getProductNo()));
         computerProblemProductCount(psd);
+        StatusDtoThriftBean<SaveBasicCarpartsProductDTO> carpartsProductdetail = carpartsProductService.findCarpartsProductdetail(psd.getProductNo());
+        StatusDto<SaveBasicCarpartsProductDTO> resolve = StatusDtoThriftUtils.resolve(carpartsProductdetail, SaveBasicCarpartsProductDTO.class);
+        SaveBasicCarpartsProductDTO data = resolve.getData();
+        if(data != null){
+            psd.setCarpartsMarkno(data.getCarpartsMarkno());
+            psd.setCarpartsImage(data.getCarpartsImage());
+            psd.setProductName(data.getCarpartsName());
+        }
         return psd;
     }
 

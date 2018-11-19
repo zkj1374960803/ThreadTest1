@@ -275,7 +275,6 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
      * @date 2018-11-09 15:02:32
      */
     private ArrayList<QueryAllocateapplyDetailDTO> setingProblemDetailList(String applyNo, FindAllocateApplyDTO allocateApplyDTO) {
-        String applyorgNo = allocateApplyDTO.getApplyorgNo();
         List<BizOutstockplanDetail> bizOutstockplanDetails = bizOutstockplanDetailDao.queryOutstockplan(applyNo, null, null, null);
         allocateApplyServiceImpl.buildStockPlanDetail(bizOutstockplanDetails);
         ArrayList<QueryAllocateapplyDetailDTO> allocateapplyDetailList = Lists.newArrayList();
