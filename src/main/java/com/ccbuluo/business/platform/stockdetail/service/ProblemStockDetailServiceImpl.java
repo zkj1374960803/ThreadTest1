@@ -205,6 +205,7 @@ public class ProblemStockDetailServiceImpl implements ProblemStockDetailService 
         computerProblemProductCount(psd);
         return psd;
     }
+
     private void computerProblemProductCount(ProblemStockBizStockDetailDTO psd){
         if(null == psd || null == psd.getProblemDetailList() || psd.getProblemDetailList().size() == 0){
             return;

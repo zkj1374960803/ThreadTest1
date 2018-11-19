@@ -1,6 +1,7 @@
 package com.ccbuluo.business.platform.carparts.service;
 
 import com.ccbuluo.business.constants.Constants;
+import com.ccbuluo.business.entity.BasicCarpartsProduct;
 import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.entity.RelProductPrice;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
@@ -38,17 +39,26 @@ import com.ccbuluo.merchandiseintf.carparts.parts.dto.SaveBasicCarpartsProductDT
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.ccbuluo.usercoreintf.dto.QueryNameByUseruuidsDTO;
 import com.google.common.collect.Lists;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.shaded.com.google.common.collect.Maps;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.junit.Assert;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.InputSource;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.io.*;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -371,21 +381,24 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
 //            throw new CommonException(Constants.ERROR_CODE, "上传文件后，数据异常");
 //        }
 //        String filepath = uploadFileInfo.getPath();
-        String filepath = "C:\\Users\\Ezreal\\Desktop\\abc.xlsx";
+//        String filepath = "C:\\Users\\Ezreal\\Desktop\\abc.xlsx";
         InputStream inputStream = multipartFile.getInputStream();
-//        File file = new File("C:\\Users\\Ezreal\\Desktop\\haha\\" + System.currentTimeMillis() + ".xlsx");
-//        try (inputStream; FileOutputStream outputStream = new FileOutputStream(file)) {
-//            byte temp[] = new byte[1024];
-//            int size = -1;
-//            while ((size = inputStream.read(temp)) != -1) { // 每次读取1KB，直至读完
-//                outputStream.write(temp, 0, size);
-//            }
-//        }
-
-
+        String property = System.getProperty("user.dir") + "\\src\\main\\resources\\";
+        File file = new File(property + System.currentTimeMillis() + ".xlsx");
+        FileOutputStream outputStream = new FileOutputStream(file);
+        try {
+            byte temp[] = new byte[1024];
+            int size = -1;
+            while ((size = inputStream.read(temp)) != -1) { // 每次读取1KB，直至读完
+                outputStream.write(temp, 0, size);
+            }
+        }finally {
+            inputStream.close();
+            outputStream.close();
+        }
+        String filepath = file.getPath();
         // 上传图片并获取的图片的路径
-        Map<String, Collection<ExcelPictruePos>> allDate = ExcelPictruesUtils.getAllDate(inputStream, 1, new ExcelShapeSaveLocal("C:\\Users\\Ezreal\\Desktop\\haha"), ExcelTypeEnum.XLSX);
-        inputStream.close();
+        Map<String, Collection<ExcelPictruePos>> allDate = ExcelPictruesUtils.getAllDate( new FileInputStream(file), 1, new ExcelShapeSaveLocal("C:\\Users\\Ezreal\\Desktop\\haha"), ExcelTypeEnum.XLSX);
 
         // 读取excel，获取list的数据
         List<BasicCarpartsProductDTO> productList = geCarpartsProductList(filepath);
@@ -578,11 +591,23 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
             Map<String, List<RelProductPrice>> relProductPriceMap = a.stream().collect(Collectors.groupingBy(RelProductPrice::getProductNo));
             if(rows != null && rows.size() > 0){
                 rows.forEach(item ->{
+                    // 设置价格
                     buildCarpartsPrice(relProductPriceMap, item);
+                    // 把车型id转换成车型名字
+                    String fitCarmodel = item.getFitCarmodel();
+                    if(StringUtils.isBlank(fitCarmodel)){
+                        return;
+                    }
+                    List<String> fitCarmodelStrIds = Arrays.asList(fitCarmodel.split(Constants.COMMA));
+                    List<Long> fitCarmodelLongIds = fitCarmodelStrIds.stream().filter(StringUtils::isNotBlank).map(Long::parseLong).collect(Collectors.toList());
+                    if(fitCarmodelLongIds != null && fitCarmodelLongIds.size() > 0){
+                        List<CarmodelManage> carmodelManages = basicCarmodelManageDao.queryPartModel(fitCarmodelLongIds);
+                        String fitCarmodelName = StringUtils.join(carmodelManages.stream().map(CarmodelManage::getCarmodelName).toArray(), Constants.COMMA);
+                        item.setCarmodelName(fitCarmodelName);
+                    }
                 });
             }
         });
-        basicCarmodelManageService.buildCarModeName(basicCarpartsProductDTOResolve.getData().getRows());
         return basicCarpartsProductDTOResolve;
     }
 
@@ -610,6 +635,101 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
                 }
             }
         }
+    }
+
+    @Override
+    public StatusDto exportCarparts() throws IOException {
+        // 查询所有零配件
+//        StatusDtoThriftPage<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThriftPage = carpartsProductService.queryCarpartsProductList(null, 0, Integer.MAX_VALUE);
+//        StatusDto<Page<BasicCarpartsProductDTO>> list = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOStatusDtoThriftPage, BasicCarpartsProductDTO.class);
+//        if (null == list.getData()) {
+//            return StatusDto.buildFailure("没有查询到零配件!");
+//        }
+//        // 查询零配件的价格
+//        QueryCarpartsProductDTO queryCarpartsProductDTO = new QueryCarpartsProductDTO();
+//        queryCarpartsProductDTO.setOffset(0);
+//        queryCarpartsProductDTO.setPageSize(Integer.MAX_VALUE);
+//        StatusDto<Page<BasicCarpartsProductDTO>> pageStatusDto = carpartsProductServiceImpl.queryCarpartsProductPriceList(queryCarpartsProductDTO);
+//        Page<BasicCarpartsProductDTO> data = pageStatusDto.getData();
+//        List<BasicCarpartsProductDTO> rows = data.getRows();
+//        Map<String, BasicCarpartsProductDTO> carpartsProductMap = rows.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, Function.identity()));
+//        Page<BasicCarpartsProductDTO> data1 = list.getData();
+//        List<BasicCarpartsProductDTO> exportData = data1.getRows();
+//        for (BasicCarpartsProductDTO exportDatum : exportData) {
+//            BasicCarpartsProductDTO basicCarpartsProductDTO = carpartsProductMap.get(exportDatum.getCarpartsCode());
+//            exportDatum.setServerCarpartsPrice(basicCarpartsProductDTO.getServerCarpartsPrice());
+//            exportDatum.setCarpartsPrice(basicCarpartsProductDTO.getCarpartsPrice());
+//            exportDatum.setCustCarpartsPrice(basicCarpartsProductDTO.getCustCarpartsPrice());
+//            // 图片
+//
+//        }
+
+
+
+        String fileFullPath = "d:/test.xls";
+        LinkedHashMap<String, String> headerMapper = com.google.common.collect.Maps.newLinkedHashMap();
+        List<Map<String, Object>> list = Lists.newArrayList();
+        ExportSingleUtils<Map<String, Object>> ex = new ExportSingleUtils<Map<String, Object>>(fileFullPath,
+            headerMapper, list);
+        int darwRow = ex.darwRow(0, new String[] { "序号", "件号", "名称", "计量单位","单车用量","图片","适用车型","服务中心价格","客户经理价格","用户销售价格" });
+        List<BasicCarpartsProduct> basicCarpartsProductList = Lists.newArrayList();
+        BasicCarpartsProduct basicCarpartsProduct = new BasicCarpartsProduct();
+        basicCarpartsProduct.setCarpartsMarkno("0261231204");
+        basicCarpartsProduct.setCarpartsName("爆震传感器");
+        basicCarpartsProduct.setCarpartsUnit("个");
+        basicCarpartsProduct.setUsedAmount(4L);
+        basicCarpartsProduct.setCarpartsImage("faqq");
+        basicCarpartsProduct.setCarmodelName("A型");
+        basicCarpartsProduct.setCustmanagerPrice(new BigDecimal(123));
+        basicCarpartsProduct.setServercenterPrice(new BigDecimal(123));
+        basicCarpartsProduct.setSellPrice(new BigDecimal(123));
+        BasicCarpartsProduct basicCarpartsProduct2 = new BasicCarpartsProduct();
+        basicCarpartsProduct2.setCarpartsMarkno("1001011KHAC");
+        basicCarpartsProduct2.setCarpartsName("左支架");
+        basicCarpartsProduct2.setCarpartsUnit("个");
+        basicCarpartsProduct2.setUsedAmount(1L);
+        basicCarpartsProduct2.setCarpartsImage("fa12131awseeqq");
+        basicCarpartsProduct2.setCarmodelName("B型");
+        basicCarpartsProduct2.setCustmanagerPrice(new BigDecimal(3423432));
+        basicCarpartsProduct2.setServercenterPrice(new BigDecimal(122343323));
+        basicCarpartsProduct2.setSellPrice(new BigDecimal(1243243223));
+        BasicCarpartsProduct basicCarpartsProduct3 = new BasicCarpartsProduct();
+        basicCarpartsProduct3.setCarpartsMarkno("0280750101");
+        basicCarpartsProduct3.setCarpartsName("电子节气门体");
+        basicCarpartsProduct3.setCarpartsUnit("个");
+        basicCarpartsProduct3.setUsedAmount(6L);
+        basicCarpartsProduct3.setCarpartsImage("fasdadasdqq");
+        basicCarpartsProduct3.setCarmodelName("C型");
+        basicCarpartsProduct3.setCustmanagerPrice(new BigDecimal(2133));
+        basicCarpartsProduct3.setServercenterPrice(new BigDecimal(3123123));
+        basicCarpartsProduct3.setSellPrice(new BigDecimal(11231323));
+        basicCarpartsProductList.add(basicCarpartsProduct3);
+        basicCarpartsProductList.add(basicCarpartsProduct2);
+        basicCarpartsProductList.add(basicCarpartsProduct);
+        for (int i = 1; i <= basicCarpartsProductList.size(); i++) {
+            BasicCarpartsProduct carpartsProduct = basicCarpartsProductList.get(i - 1);
+            ex.darwRow(i , new String[] { String.valueOf(i), carpartsProduct.getCarpartsMarkno(), carpartsProduct.getCarpartsName()
+                , carpartsProduct.getCarpartsUnit(),carpartsProduct.getUsedAmount().toString(),carpartsProduct.getCarpartsImage()
+                ,carpartsProduct.getCarmodelName(),carpartsProduct.getServercenterPrice().toString(),carpartsProduct.getCustmanagerPrice().toString()
+                ,carpartsProduct.getSellPrice().toString() });
+        }
+        ex.build(true);
+        export("test.xls", "d:/test.xls");
+
+
+        return null;
+    }
+
+    public ResponseEntity<byte[]> export(String fileName, String filePath) throws IOException {
+
+        HttpHeaders headers = new HttpHeaders();
+        File file = new File(filePath);
+
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", fileName);
+
+        return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file),
+            headers, HttpStatus.CREATED);
     }
 
 

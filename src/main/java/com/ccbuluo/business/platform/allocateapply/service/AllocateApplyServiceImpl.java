@@ -261,12 +261,14 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         String orgType = data.getOrgType();
         long priceLevel = RelProductPrice.PriceLevelEnum.valueOf(orgType).getPriceLevel();
         Map<String, Object> suggestedPriceMap = bizServiceEquipmentDao.findSuggestedPrice(collect, priceLevel);
-
         filterAllocateapply.forEach(a -> {
             a.setApplyNo(allocateApplyDTO.getApplyNo());
             a.setOperator(loggedUserId);
             a.setCreator(loggedUserId);
-            a.setSellPrice(new BigDecimal((Double)suggestedPriceMap.get(a.getProductNo())));
+            Object obj = suggestedPriceMap.get(a.getProductNo());
+            if(obj != null){
+                a.setSellPrice(new BigDecimal((Double)obj));
+            }
             if(AllocateApplyTypeEnum.BARTER.name().equals(processType)
                 || AllocateApplyTypeEnum.REFUND.name().equals(processType)
                 || AllocateApplyTypeEnum.PLATFORMBARTER.name().equals(processType)
@@ -275,8 +277,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }else {
                 a.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
             }
-
-
         });
         bizAllocateApplyDao.batchInsertForapplyDetailList(filterAllocateapply);
     }
