@@ -51,7 +51,7 @@ public class BizInstockorderDetailDao extends BaseDao<BizInstockorderDetail> {
      */
     public List<BizInstockorderDetail> queryListByinstockNo(String instockNo) {
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,instock_orderno,instock_planid,product_no,product_name,stock_type,")
+        sql.append("SELECT id,instock_orderno,instock_planid,product_no,product_name,stock_type,purchase_info,")
             .append("product_type,product_categoryname,supplier_no,instock_num,unit,cost_price")
             .append(" FROM biz_instockorder_detail WHERE instock_orderno= :instockNo");
         Map<String, Object> params = Maps.newHashMap();
