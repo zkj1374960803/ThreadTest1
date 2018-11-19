@@ -94,11 +94,6 @@ public class BizInstockorderDetail extends AftersaleCommonEntity{
     private Long stockId;
     private String remark;
 
-    /**
-     * 采购信息
-     */
-    @ApiModelProperty(name = "purchaseInfo", value = "采购信息")
-    private String purchaseInfo;
 
     public void setInstockOrderno(String instockOrderno) {
         this.instockOrderno = instockOrderno;
@@ -218,13 +213,5 @@ public class BizInstockorderDetail extends AftersaleCommonEntity{
 
     public void setSellerOrgno(String sellerOrgno) {
         this.sellerOrgno = sellerOrgno;
-    }
-
-    public String getPurchaseInfo() {
-        return purchaseInfo;
-    }
-
-    public void setPurchaseInfo(String purchaseInfo) {
-        this.purchaseInfo = purchaseInfo;
     }
 }
