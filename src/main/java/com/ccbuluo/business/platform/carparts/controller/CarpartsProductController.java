@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
@@ -221,6 +222,18 @@ public class CarpartsProductController extends BaseController {
     @PostMapping("/importcarparts")
     public StatusDto<String> importCarparts(MultipartFile multipartFile) throws Exception {
         return carpartsProductServiceImpl.importCarparts(multipartFile);
+    }
+
+
+    /**
+     * 导出零配件
+     * @author liuduo
+     * @date 2018-11-19 09:44:02
+     */
+    @ApiOperation(value = "导出零配件",notes = "【刘铎】")
+    @PostMapping("/exportcarparts")
+    public StatusDto exportCarparts()  throws IOException {
+        return carpartsProductServiceImpl.exportCarparts();
     }
 
 }
