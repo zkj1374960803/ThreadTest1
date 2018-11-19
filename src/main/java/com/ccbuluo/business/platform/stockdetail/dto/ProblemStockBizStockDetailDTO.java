@@ -52,6 +52,27 @@ public class ProblemStockBizStockDetailDTO extends IdEntity {
     @ApiModelProperty(name = "problemDetailList", value = "某商品问题件详情")
     private List<StockDetailDTO> problemDetailList;
 
+    @ApiModelProperty(name = "carpartsImage", value = "零配件图片在服务端的相对路径", required = true)
+    private String carpartsImage;
+    @ApiModelProperty(name = "carpartsMarkno", value = "零配件代码", required = true)
+    private String carpartsMarkno;
+
+    public String getCarpartsImage() {
+        return carpartsImage;
+    }
+
+    public void setCarpartsImage(String carpartsImage) {
+        this.carpartsImage = carpartsImage;
+    }
+
+    public String getCarpartsMarkno() {
+        return carpartsMarkno;
+    }
+
+    public void setCarpartsMarkno(String carpartsMarkno) {
+        this.carpartsMarkno = carpartsMarkno;
+    }
+
     public String getProductNo() {
         return productNo;
     }
