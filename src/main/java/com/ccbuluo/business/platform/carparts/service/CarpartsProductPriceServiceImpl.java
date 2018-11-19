@@ -129,6 +129,12 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
      */
     @Override
     public void saveProductPrice(List<RelProductPrice> relProductPrice) {
+        // 根据类型查询机构编号
+        QueryOrgDTO queryOrgDTO = new QueryOrgDTO();
+        List<String> name = List.of(OrganizationTypeEnum.CUSTMANAGER.name(), OrganizationTypeEnum.SERVICECENTER.name());
+        queryOrgDTO.setOrgTypeList(name);
+        StatusDtoThriftList<QueryOrgDTO> queryOrgDTOStatusDtoThriftList = basicUserOrganization.queryOrgAndWorkInfo(queryOrgDTO);
+        StatusDto<List<QueryOrgDTO>> resolve = StatusDtoThriftUtils.resolve(queryOrgDTOStatusDtoThriftList, QueryOrgDTO.class);
         // 查询商品最新一条的价格，并更新结束时间
         relProductPrice.forEach(item ->{
             carpartsProductPriceDao.updateProductEndTime(item);
@@ -137,7 +143,10 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
             item.setCreator(loggedUserId);
             item.setStartTime(new Date());
             carpartsProductPriceDao.save(item);
-            updateApplySellPrice(item.getProductNo(), item.getSuggestedPrice(), RelProductPrice.PriceLevelEnum.map.get(item.getPriceLevel()).name());
+            String priceLevelName = RelProductPrice.PriceLevelEnum.map.get(item.getPriceLevel()).name();
+            if(StringUtils.isNotBlank(priceLevelName)){
+                updateApplySellPrice(item.getProductNo(), item.getSuggestedPrice(), priceLevelName, resolve.getData());
+            }
         });
     }
 
@@ -149,15 +158,12 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
      * @author zhangkangjian
      * @date 2018-11-19 17:21:52
      */
-    private void updateApplySellPrice(String productNo, Double sellPrice, String orgType) {
-        // 根据类型查询机构编号
-        QueryOrgDTO queryOrgDTO = new QueryOrgDTO();
-        List<String> name = List.of(OrganizationTypeEnum.CUSTMANAGER.name(), OrganizationTypeEnum.SERVICECENTER.name());
-        queryOrgDTO.setOrgTypeList(name);
-        StatusDtoThriftList<QueryOrgDTO> queryOrgDTOStatusDtoThriftList = basicUserOrganization.queryOrgAndWorkInfo(queryOrgDTO);
-        StatusDto<List<QueryOrgDTO>> resolve = StatusDtoThriftUtils.resolve(queryOrgDTOStatusDtoThriftList, QueryOrgDTO.class);
-        Optional.ofNullable(resolve.getData()).ifPresent(a ->{
+    private void updateApplySellPrice(String productNo, Double sellPrice, String orgType,List<QueryOrgDTO> queryOrgDTOList) {
+        Optional.ofNullable(queryOrgDTOList).ifPresent(a ->{
             List<String> inStockNoList = a.stream().filter(b -> orgType.equals(b.getOrgType())).map(QueryOrgDTO::getOrgCode).collect(Collectors.toList());
+            if(inStockNoList == null || inStockNoList.size() == 0){
+                return;
+            }
             // 查询等待付款前的申请单，修改价格
             List<String> applyStatusList = List.of(BizAllocateApply.ApplyStatusEnum.PENDING.name(), BizAllocateApply.ApplyStatusEnum.WAITINGPAYMENT.name());
             List<String> applyNoList = bizAllocateapplyDetailDao.queryApplyNo(applyStatusList, BizAllocateApply.AllocateApplyTypeEnum.SAMELEVEL.name(), inStockNoList);
