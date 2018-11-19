@@ -190,6 +190,29 @@ public class FindAllocateApplyDTO {
     @ApiModelProperty(name = "platformInRepositoryName", value = "平台入库仓库", hidden = true)
     private String platformInRepositoryName;
 
+
+    @ApiModelProperty(name = "carpartsImage", value = "零配件图片在服务端的相对路径", required = true)
+    private String carpartsImage;
+
+    @ApiModelProperty(name = "carpartsMarkno", value = "零配件代码", required = true)
+    private String carpartsMarkno;
+
+    public String getCarpartsImage() {
+        return carpartsImage;
+    }
+
+    public void setCarpartsImage(String carpartsImage) {
+        this.carpartsImage = carpartsImage;
+    }
+
+    public String getCarpartsMarkno() {
+        return carpartsMarkno;
+    }
+
+    public void setCarpartsMarkno(String carpartsMarkno) {
+        this.carpartsMarkno = carpartsMarkno;
+    }
+
     public String getPlatformInRepositoryName() {
         return platformInRepositoryName;
     }

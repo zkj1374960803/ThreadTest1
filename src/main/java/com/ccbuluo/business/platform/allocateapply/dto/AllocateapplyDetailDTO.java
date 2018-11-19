@@ -47,7 +47,6 @@ public class AllocateapplyDetailDTO {
     /**
      * 做冗余，分类整个路径的名字，多级用逗号隔开
      */
-    @ValidateNotBlank(groups = MyGroup.Add.class)
     @ApiModelProperty(name = "productCategoryname", value = "做冗余，分类整个路径的名字，多级用逗号隔开")
     private String productCategoryname;
     /**

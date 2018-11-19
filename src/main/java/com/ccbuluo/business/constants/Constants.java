@@ -38,6 +38,7 @@ public class Constants {
      */
     public static final String CAR_COLON = ":";
     public static final String COMMA = ",";
+    public static final String COMMA_CHINESE = "，";
 
     public static final Long LONG_FLAG_ONE = 1L;
     public static final Long LONG_FLAG_ZERO = 0L;

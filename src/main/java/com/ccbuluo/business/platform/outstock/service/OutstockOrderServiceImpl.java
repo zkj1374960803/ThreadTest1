@@ -29,6 +29,8 @@ import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftList;
 import com.ccbuluo.http.StatusDtoThriftUtils;
+import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
+import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import com.ccbuluo.usercoreintf.dto.QueryNameByUseruuidsDTO;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import com.google.common.collect.Lists;
@@ -39,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
@@ -83,6 +86,10 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
     private ServiceLogService serviceLogService;
     @Autowired
     private BizOutstockplanDetailDao bizOutstockplanDetailDao;
+    @Resource
+    private AllocateApplyService allocateApplyServiceImpl;
+    @ThriftRPCClient("BasicMerchandiseSer")
+    CarpartsProductService carpartsProductService;
 
     /**
      * 自动保存出库单
@@ -331,7 +338,9 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
      */
     @Override
     public List<BizOutstockplanDetail> queryOutstockplan(String applyNo, String productType) {
-        return outStockPlanService.queryOutstockplanList(applyNo, userHolder.getLoggedUser().getOrganization().getOrgCode(), productType);
+        List<BizOutstockplanDetail> bizOutstockplanDetails = outStockPlanService.queryOutstockplanList(applyNo, userHolder.getLoggedUser().getOrganization().getOrgCode(), productType);
+        allocateApplyServiceImpl.buildStockPlanDetail(bizOutstockplanDetails);
+        return bizOutstockplanDetails;
     }
 
     /**
@@ -363,7 +372,6 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         rows.forEach(item -> {
             item.setOutstockOperatorName(collect.get(item.getOutstockOperator()));
         });
-
         return bizOutstockOrderPage;
     }
 
@@ -388,23 +396,50 @@ public class OutstockOrderServiceImpl implements OutstockOrderService {
         // 查询出库单详单
         List<OutstockorderDetailDTO> outstockorderDetailDTOList = outstockorderDetailService.queryListByOutstockNo(outstockNo);
         // 封装出库仓库
-        List<String> collect1 = outstockorderDetailDTOList.stream().map(OutstockorderDetailDTO::getOutRepositoryNo).collect(Collectors.toList());
-        List<QueryStorehouseDTO> bizServiceStorehouseList = storeHouseService.queryByCode(collect1);
+        List<String> outRepositoryNoList = outstockorderDetailDTOList.stream().map(OutstockorderDetailDTO::getOutRepositoryNo).collect(Collectors.toList());
+        List<QueryStorehouseDTO> bizServiceStorehouseList = storeHouseService.queryByCode(outRepositoryNoList);
         Map<String, String> storeHouse = bizServiceStorehouseList.stream().collect(Collectors.toMap(QueryStorehouseDTO::getStorehouseCode, QueryStorehouseDTO::getStorehouseName));
         outstockorderDetailDTOList.forEach(item -> {
             item.setOutRepositoryName(storeHouse.get(item.getOutRepositoryNo()));
             item.setCostTotalPrice(item.getCostPrice().multiply(new BigDecimal(item.getOutstockNum())));
             item.setActualTotalPrice(item.getActualPrice().multiply(new BigDecimal(item.getOutstockNum())));
         });
+        // 计算价格
         BigDecimal costTotalPrice = outstockorderDetailDTOList.stream().map(OutstockorderDetailDTO::getCostTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal actualTotalPrice = outstockorderDetailDTOList.stream().map(OutstockorderDetailDTO::getActualTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
         bizOutstockOrderDTO.setCostTotalPrice(costTotalPrice);
         bizOutstockOrderDTO.setActualTotalPrice(actualTotalPrice);
         bizOutstockOrderDTO.setOutstockorderDetailDTOList(outstockorderDetailDTOList);
-
+        // 构建出库计划实体（填充零配件的信息）
+        buildStockPlanDetail(outstockorderDetailDTOList);
         return bizOutstockOrderDTO;
     }
 
+    /**
+     * 构建出库计划实体（填充零配件的信息）
+     * @param outstockorderDetailDTOList 入库计划
+     * @author zhangkangjian
+     * @date 2018-11-14 10:19:00
+     */
+    public void buildStockPlanDetail(List<OutstockorderDetailDTO> outstockorderDetailDTOList) {
+        if(outstockorderDetailDTOList != null && outstockorderDetailDTOList.size() > 0){
+            List<String> collect = outstockorderDetailDTOList.stream().map(OutstockorderDetailDTO::getProductNo).collect(Collectors.toList());
+            StatusDtoThriftList<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThriftList = carpartsProductService.queryCarpartsProductListByCarpartsCodes(collect);
+            StatusDto<List<BasicCarpartsProductDTO>> resolve = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOStatusDtoThriftList, BasicCarpartsProductDTO.class);
+            List<BasicCarpartsProductDTO> data = resolve.getData();
+            if(data != null && data.size() > 0){
+                Map<String, BasicCarpartsProductDTO> basicCarpartsProductDTOMap = data.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, a -> a, (k1, k2) -> k1));
+                outstockorderDetailDTOList.forEach(item ->{
+                    BasicCarpartsProductDTO bizOutstockplanDetail = basicCarpartsProductDTOMap.get(item.getProductNo());
+                    item.setProductName(bizOutstockplanDetail.getCarpartsName());
+                    item.setCarpartsMarkno(bizOutstockplanDetail.getCarpartsMarkno());
+                    item.setCarpartsImage(bizOutstockplanDetail.getCarpartsImage());
+                    item.setUsedAmount(bizOutstockplanDetail.getUsedAmount());
+                    item.setUnit(bizOutstockplanDetail.getUnitName());
+                });
+            }
+        }
+    }
     /**
      * 根据申请单号查询出库仓库
      *

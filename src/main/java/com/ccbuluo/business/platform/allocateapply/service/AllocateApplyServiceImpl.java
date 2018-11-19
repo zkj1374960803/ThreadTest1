@@ -31,6 +31,7 @@ import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateDocCodeService;
 import com.ccbuluo.business.platform.stockdetail.dto.StockBizStockDetailDTO;
+import com.ccbuluo.business.platform.stockdetail.service.ProblemStockDetailService;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.business.platform.supplier.dto.QuerySupplierInfoDTO;
@@ -116,6 +117,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
     private BarterStockInOutCallBack barterStockInOutCallBack;
     @Resource
     private BizServiceEquipmentDao bizServiceEquipmentDao;
+    @Resource
+    private ProblemStockDetailService problemStockDetailService;
 
 
 
@@ -230,6 +233,11 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             || AllocateApplyTypeEnum.PLATFORMREFUND.name().equals(processType)){
             applyHandleContext.applyHandle(allocateApplyDTO.getApplyNo());
         }
+        // 如果是平台创建的调拨申请，自动处理为等待付款状态
+        if(BusinessPropertyHolder.ORGCODE_AFTERSALE_PLATFORM.equals(userOrgCode)
+            && AllocateApplyTypeEnum.SAMELEVEL.name().equals(allocateApplyDTO.getApplyType())){
+            processOutStockOrg(allocateApplyDTO.getApplyNo(), allocateApplyDTO.getOutstockOrgno());
+        }
 
     }
     /**
@@ -244,10 +252,21 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         List<AllocateapplyDetailDTO> allocateapplyDetailList = allocateApplyDTO.getAllocateapplyDetailList();
         // 过滤掉申请数量小于零的
         List<AllocateapplyDetailDTO> filterAllocateapply = allocateapplyDetailList.stream().filter(dto -> dto.getApplyNum() > 0).collect(Collectors.toList());
+        // 查询阶梯价格
+        List<AllocateapplyDetailDTO> allocateapplyDetailList1 = allocateApplyDTO.getAllocateapplyDetailList();
+        List<String> collect = allocateapplyDetailList1.stream().map(AllocateapplyDetailDTO::getProductNo).collect(Collectors.toList());
+        StatusDtoThriftBean<BasicUserOrganization> outstockOrgName = basicUserOrganizationService.findOrgByCode(allocateApplyDTO.getInstockOrgno());
+        StatusDto<BasicUserOrganization> resolve = StatusDtoThriftUtils.resolve(outstockOrgName, BasicUserOrganization.class);
+        BasicUserOrganization data = resolve.getData();
+        String orgType = data.getOrgType();
+        long priceLevel = RelProductPrice.PriceLevelEnum.valueOf(orgType).getPriceLevel();
+        Map<String, Object> suggestedPriceMap = bizServiceEquipmentDao.findSuggestedPrice(collect, priceLevel);
+
         filterAllocateapply.forEach(a -> {
             a.setApplyNo(allocateApplyDTO.getApplyNo());
             a.setOperator(loggedUserId);
             a.setCreator(loggedUserId);
+            a.setSellPrice(new BigDecimal((Double)suggestedPriceMap.get(a.getProductNo())));
             if(AllocateApplyTypeEnum.BARTER.name().equals(processType)
                 || AllocateApplyTypeEnum.REFUND.name().equals(processType)
                 || AllocateApplyTypeEnum.PLATFORMBARTER.name().equals(processType)
@@ -256,6 +275,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             }else {
                 a.setStockType(BizStockDetail.StockTypeEnum.VALIDSTOCK.name());
             }
+
+
         });
         bizAllocateApplyDao.batchInsertForapplyDetailList(filterAllocateapply);
     }
@@ -356,7 +377,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
                             c.setProductName(basicCarpartsProductDTO.getCarpartsName());
                             c.setCarpartsImage(basicCarpartsProductDTO.getCarpartsImage());
                             c.setCarpartsMarkno(basicCarpartsProductDTO.getCarpartsMarkno());
-                            c.setUnit(basicCarpartsProductDTO.getUnitName());
+                            c.setUnit(basicCarpartsProductDTO.getCarpartsUnit());
                         }
                     });
                 });
@@ -568,7 +589,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         Long versionNo = bizAllocateApplyDao.findVersionNo(processApplyDTO.getApplyNo());
         processApplyDTO.setVersionNo(versionNo);
         bizAllocateApplyDao.updateAllocateApply(processApplyDTO);
-        saveProcessApply(processApplyDTO.getProcessApplyDetailDTO());
+//        saveProcessApply(processApplyDTO.getProcessApplyDetailDTO());
         // 生成出入库计划
         applyHandleContext.applyHandle(processApplyDTO.getApplyNo());
     }
@@ -600,6 +621,8 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         Long versionNo = bizAllocateApplyDao.findVersionNo(processApplyDTO.getApplyNo());
         processApplyDTO.setVersionNo(versionNo);
         bizAllocateApplyDao.updateAllocateApply(processApplyDTO);
+        // 提交处理请求
+        processApply(processApplyDTO);
     }
 
     /**
@@ -812,7 +835,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             StatusDtoThriftList<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThriftList = carpartsProductService.queryCarpartsProductListByCarpartsCodes(collect);
             StatusDto<List<BasicCarpartsProductDTO>> resolve = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOStatusDtoThriftList, BasicCarpartsProductDTO.class);
             List<BasicCarpartsProductDTO> data = resolve.getData();
-            if(data != null){
+            if(data != null && data.size() > 0){
                 Map<String, BasicCarpartsProductDTO> basicCarpartsProductDTOMap = data.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, a -> a, (k1, k2) -> k1));
                 instockplansByApplyNo.forEach(item ->{
                     BasicCarpartsProductDTO bizOutstockplanDetail = basicCarpartsProductDTOMap.get(item.getProductNo());
@@ -934,7 +957,6 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
      */
     @Override
     public Page<FindStockListDTO> findStockList(FindStockListDTO findStockListDTO) {
-        // 根据分类查询供应商的code
         List<BasicCarpartsProductDTO> carpartsProductDTOList = Lists.newArrayList();
         if(Constants.PRODUCT_TYPE_EQUIPMENT.equals(findStockListDTO.getProductType())){
             // 查询类型下所有的code
@@ -966,18 +988,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         }else {
             stockPage =  bizAllocateApplyDao.findStockList(findStockListDTO, productCode, null);
         }
-        List<FindStockListDTO> rows = stockPage.getRows();
-        if(rows != null){
-            Map<String, BasicCarpartsProductDTO> productMap = carpartsProductDTOList.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, a -> a,(k1,k2)->k1));
-            rows.forEach(item ->{
-                String productNo = item.getProductNo();
-                BasicCarpartsProductDTO basicCarparts = productMap.get(productNo);
-                item.setCarpartsImage(basicCarparts.getCarpartsImage());
-                item.setCarpartsMarkno(basicCarparts.getCarpartsMarkno());
-                item.setProductName(basicCarparts.getCarpartsName());
-                item.setUnit(basicCarparts.getUnitName());
-            });
-        }
+        problemStockDetailService.buildStockPage(findStockListDTO, carpartsProductDTOList, stockPage);
         return stockPage;
     }
 
