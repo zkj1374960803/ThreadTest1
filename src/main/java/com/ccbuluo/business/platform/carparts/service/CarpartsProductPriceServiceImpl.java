@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.carparts.service;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.OrganizationTypeEnum;
 import com.ccbuluo.business.entity.BizAllocateApply;
+import com.ccbuluo.business.entity.BasicCarpartsProduct;
 import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.entity.RelProductPrice;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
@@ -41,17 +42,26 @@ import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.google.common.collect.Lists;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.shaded.com.google.common.collect.Maps;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.junit.Assert;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.InputSource;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.io.*;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -92,7 +102,6 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     @ThriftRPCClient("UserCoreSerService")
     private BasicUserOrganizationService basicUserOrganization;
 
-//queryOrgAndWorkInfo
 
     /**
      * 查询零配件的信息和价格

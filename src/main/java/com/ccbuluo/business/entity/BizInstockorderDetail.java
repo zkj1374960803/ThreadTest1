@@ -48,7 +48,6 @@ public class BizInstockorderDetail extends AftersaleCommonEntity{
     /**
      * 商品分类名称,分类全路径，多个逗号隔开
      */
-    @ValidateNotBlank(message = "商品分类名称不能为空")
     @ApiModelProperty(name = "productCategoryname", value = "商品分类名称,分类全路径，多个逗号隔开")
     private String productCategoryname;
     /**

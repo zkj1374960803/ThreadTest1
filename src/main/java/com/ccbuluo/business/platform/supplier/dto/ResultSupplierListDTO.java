@@ -64,6 +64,11 @@ public class ResultSupplierListDTO {
      */
     @ApiModelProperty(name = "areaName", value = "区", required = true)
     private String areaName;
+    /**
+     * 供应商代码
+     */
+    @ApiModelProperty(name = "supplierMarkno", value = "供应商代码", required = true)
+    private String supplierMarkno;
 
     public Long getId() {
         return id;
@@ -143,5 +148,13 @@ public class ResultSupplierListDTO {
 
     public void setAreaName(String areaName) {
         this.areaName = areaName;
+    }
+
+    public String getSupplierMarkno() {
+        return supplierMarkno;
+    }
+
+    public void setSupplierMarkno(String supplierMarkno) {
+        this.supplierMarkno = supplierMarkno;
     }
 }
