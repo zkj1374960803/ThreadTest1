@@ -452,11 +452,50 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
         conventNameById(productList);
         // 构建阶梯价格信息
         List<RelProductPrice> relProductPriceList = buildProductList(allDate, productList);
-        // 保存零配件
-        carpartsProductService.batchSaveCarpartsProduct(productList);
+        // 批量保存或者更新零配件数据（如数据库中存在的零配件和productList中的零配件代码相同的数据，则更新数据，否则插入数据）
+        batchSaveOrUpdateProductList(productList);
+
+
+
+
         // 保存阶梯价格
         carpartsProductServiceImpl.saveProductPrice(relProductPriceList);
         return StatusDto.buildSuccessStatusDto();
+    }
+
+    /**
+     * 批量保存或者更新零配件数据（如果有更新数据，没有插入数据）
+     * @param productList 零配件的列表
+     * @author zhangkangjian
+     * @date 2018-11-20 10:42:24
+     */
+    private void batchSaveOrUpdateProductList(List<BasicCarpartsProductDTO> productList) {
+        // 查询所有的零配件
+        List<BasicCarpartsProductDTO> basicCarpartsProductDTOS = carpartsProductService.queryCarpartsProductListByCategoryCode(null);
+        Optional.ofNullable(basicCarpartsProductDTOS).ifPresent(carpartsProductItem ->{
+            Map<String, BasicCarpartsProductDTO> carpartsProductMap = carpartsProductItem.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, a -> a,(k1, k2)->k1));
+            Optional.of(productList).ifPresent(productItem ->{
+                List<BasicCarpartsProductDTO> saveProductList = Lists.newArrayList();
+                List<BasicCarpartsProductDTO> updateProductList = Lists.newArrayList();
+                productItem.forEach(a ->{
+                    String carpartsMarkno = a.getCarpartsMarkno();
+                    BasicCarpartsProductDTO basicCarpartsProductDTO = carpartsProductMap.get(carpartsMarkno);
+                    // 数据库中已存在该数据，更新即可。如不存在，需要插入新数据
+                    if(basicCarpartsProductDTO != null){
+                        String carpartsCode = basicCarpartsProductDTO.getCarpartsCode();
+                        a.setCarpartsCode(carpartsCode);
+                        updateProductList.add(a);
+                    }else {
+                        saveProductList.add(a);
+                    }
+                });
+                // 批量插入，保存零配件
+                carpartsProductService.batchSaveCarpartsProduct(saveProductList);
+                // 批量更新，更新零配件
+                carpartsProductService.batchUpdateCarpartsProduct(updateProductList);
+
+            });
+        });
     }
 
     /**
