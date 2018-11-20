@@ -3,7 +3,6 @@ package com.ccbuluo.business.platform.carparts.service;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.OrganizationTypeEnum;
 import com.ccbuluo.business.entity.BizAllocateApply;
-import com.ccbuluo.business.entity.BasicCarpartsProduct;
 import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.entity.RelProductPrice;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
@@ -684,82 +683,44 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     @Override
     public StatusDto exportCarparts(HttpServletResponse resp) throws IOException {
         // 查询所有零配件
-//        StatusDtoThriftPage<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThriftPage = carpartsProductService.queryCarpartsProductList(null, 0, Integer.MAX_VALUE);
-//        StatusDto<Page<BasicCarpartsProductDTO>> list = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOStatusDtoThriftPage, BasicCarpartsProductDTO.class);
-//        if (null == list.getData()) {
-//            return StatusDto.buildFailure("没有查询到零配件!");
-//        }
-//        // 查询零配件的价格
-//        QueryCarpartsProductDTO queryCarpartsProductDTO = new QueryCarpartsProductDTO();
-//        queryCarpartsProductDTO.setOffset(0);
-//        queryCarpartsProductDTO.setPageSize(Integer.MAX_VALUE);
-//        StatusDto<Page<BasicCarpartsProductDTO>> pageStatusDto = carpartsProductServiceImpl.queryCarpartsProductPriceList(queryCarpartsProductDTO);
-//        Page<BasicCarpartsProductDTO> data = pageStatusDto.getData();
-//        List<BasicCarpartsProductDTO> rows = data.getRows();
-//        Map<String, BasicCarpartsProductDTO> carpartsProductMap = rows.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, Function.identity()));
-//        Page<BasicCarpartsProductDTO> data1 = list.getData();
-//        List<BasicCarpartsProductDTO> exportData = data1.getRows();
-//        for (BasicCarpartsProductDTO exportDatum : exportData) {
-//            BasicCarpartsProductDTO basicCarpartsProductDTO = carpartsProductMap.get(exportDatum.getCarpartsCode());
-//            exportDatum.setServerCarpartsPrice(basicCarpartsProductDTO.getServerCarpartsPrice());
-//            exportDatum.setCarpartsPrice(basicCarpartsProductDTO.getCarpartsPrice());
-//            exportDatum.setCustCarpartsPrice(basicCarpartsProductDTO.getCustCarpartsPrice());
-//            // 图片
-//
-//        }
+        StatusDtoThriftPage<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThriftPage = carpartsProductService.queryCarpartsProductList(null, 0, Integer.MAX_VALUE);
+        StatusDto<Page<BasicCarpartsProductDTO>> list = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOStatusDtoThriftPage, BasicCarpartsProductDTO.class);
+        if (null == list.getData()) {
+            return StatusDto.buildFailure("没有查询到零配件!");
 
-
-
-//        String fileFullPath = "d:/text.xls";
-        LinkedHashMap<String, String> headerMapper = com.google.common.collect.Maps.newLinkedHashMap();
-        List<Map<String, Object>> list = Lists.newArrayList();
-        ExportSingleUtils<Map<String, Object>> ex = new ExportSingleUtils<Map<String, Object>>(
-            headerMapper, list);
-        int darwRow = ex.darwRow(0, new String[] { "序号", "件号", "名称", "计量单位","单车用量","图片","适用车型","服务中心价格","客户经理价格","用户销售价格" });
-        List<BasicCarpartsProduct> basicCarpartsProductList = Lists.newArrayList();
-        BasicCarpartsProduct basicCarpartsProduct = new BasicCarpartsProduct();
-        basicCarpartsProduct.setCarpartsMarkno("0261231204");
-        basicCarpartsProduct.setCarpartsName("爆震传感器");
-        basicCarpartsProduct.setCarpartsUnit("个");
-        basicCarpartsProduct.setUsedAmount(4L);
-        basicCarpartsProduct.setCarpartsImage("faqq");
-        basicCarpartsProduct.setCarmodelName("A型");
-        basicCarpartsProduct.setCustmanagerPrice(new BigDecimal(123));
-        basicCarpartsProduct.setServercenterPrice(new BigDecimal(123));
-        basicCarpartsProduct.setSellPrice(new BigDecimal(123));
-        BasicCarpartsProduct basicCarpartsProduct2 = new BasicCarpartsProduct();
-        basicCarpartsProduct2.setCarpartsMarkno("1001011KHAC");
-        basicCarpartsProduct2.setCarpartsName("左支架");
-        basicCarpartsProduct2.setCarpartsUnit("个");
-        basicCarpartsProduct2.setUsedAmount(1L);
-        basicCarpartsProduct2.setCarpartsImage("fa12131awseeqq");
-        basicCarpartsProduct2.setCarmodelName("B型");
-        basicCarpartsProduct2.setCustmanagerPrice(new BigDecimal(3423432));
-        basicCarpartsProduct2.setServercenterPrice(new BigDecimal(122343323));
-        basicCarpartsProduct2.setSellPrice(new BigDecimal(1243243223));
-        BasicCarpartsProduct basicCarpartsProduct3 = new BasicCarpartsProduct();
-        basicCarpartsProduct3.setCarpartsMarkno("0280750101");
-        basicCarpartsProduct3.setCarpartsName("电子节气门体");
-        basicCarpartsProduct3.setCarpartsUnit("个");
-        basicCarpartsProduct3.setUsedAmount(6L);
-        basicCarpartsProduct3.setCarpartsImage("fasdadasdqq");
-        basicCarpartsProduct3.setCarmodelName("C型");
-        basicCarpartsProduct3.setCustmanagerPrice(new BigDecimal(2133));
-        basicCarpartsProduct3.setServercenterPrice(new BigDecimal(3123123));
-        basicCarpartsProduct3.setSellPrice(new BigDecimal(11231323));
-        basicCarpartsProductList.add(basicCarpartsProduct3);
-        basicCarpartsProductList.add(basicCarpartsProduct2);
-        basicCarpartsProductList.add(basicCarpartsProduct);
-        for (int i = 1; i <= basicCarpartsProductList.size(); i++) {
-            BasicCarpartsProduct carpartsProduct = basicCarpartsProductList.get(i - 1);
-            ex.darwRow(i , new String[] { String.valueOf(i), carpartsProduct.getCarpartsMarkno(), carpartsProduct.getCarpartsName()
-                , carpartsProduct.getCarpartsUnit(),carpartsProduct.getUsedAmount().toString(),carpartsProduct.getCarpartsImage()
-                ,carpartsProduct.getCarmodelName(),carpartsProduct.getServercenterPrice().toString(),carpartsProduct.getCustmanagerPrice().toString()
-                ,carpartsProduct.getSellPrice().toString() });
         }
-        ex.build(true, resp);
-//        export("test.xls", fileFullPath + "test.xls");
-        return StatusDto.buildSuccessStatusDto();
+        // 查询零配件的价格
+        QueryCarpartsProductDTO queryCarpartsProductDTO = new QueryCarpartsProductDTO();
+        queryCarpartsProductDTO.setOffset(0);
+        queryCarpartsProductDTO.setPageSize(Integer.MAX_VALUE);
+        StatusDto<Page<BasicCarpartsProductDTO>> pageStatusDto = carpartsProductServiceImpl.queryCarpartsProductPriceList(queryCarpartsProductDTO);
+        Page<BasicCarpartsProductDTO> data = pageStatusDto.getData();
+        List<BasicCarpartsProductDTO> rows = data.getRows();
+        Map<String, BasicCarpartsProductDTO> carpartsProductMap = rows.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, Function.identity()));
+        Page<BasicCarpartsProductDTO> data1 = list.getData();
+        List<BasicCarpartsProductDTO> exportData = data1.getRows();
+        for (BasicCarpartsProductDTO exportDatum : exportData) {
+            BasicCarpartsProductDTO basicCarpartsProductDTO = carpartsProductMap.get(exportDatum.getCarpartsCode());
+            exportDatum.setServerCarpartsPrice(basicCarpartsProductDTO.getServerCarpartsPrice());
+            exportDatum.setCarpartsPrice(basicCarpartsProductDTO.getCarpartsPrice());
+            exportDatum.setCustCarpartsPrice(basicCarpartsProductDTO.getCustCarpartsPrice());
+            // 图片
+
+        }
+        String fileFullPath = "d:/text.xls";
+        LinkedHashMap<String, String> headerMapper = com.google.common.collect.Maps.newLinkedHashMap();
+        List<Map<String, Object>> list2 = Lists.newArrayList();
+        ExportSingleUtils<Map<String, Object>> ex = new ExportSingleUtils<Map<String, Object>>(
+            headerMapper, list2);
+        int darwRow = ex.darwRow(0, new String[] { "序号", "件号", "名称", "计量单位","单车用量","图片","适用车型","服务中心价格","客户经理价格","用户销售价格" });
+        for (int i = 1; i <= exportData.size(); i++) {
+            BasicCarpartsProductDTO carpartsProduct = exportData.get(i - 1);
+            ex.darwRow(i , new String[] { String.valueOf(i), carpartsProduct.getCarpartsMarkno(), carpartsProduct.getCarpartsName()
+                , carpartsProduct.getCarpartsUnit(),"0",carpartsProduct.getCarpartsImage()
+                ,carpartsProduct.getCarmodelName(),getPrice(carpartsProduct.getServerCarpartsPrice()),getPrice(carpartsProduct.getCustCarpartsPrice())
+                ,getPrice(carpartsProduct.getCarpartsPrice()) });
+        }
+        return ex.build(true, resp);
     }
 
     public ResponseEntity<byte[]> export(String fileName, String filePath) throws IOException {
@@ -774,5 +735,8 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
             headers, HttpStatus.CREATED);
     }
 
+    private String getPrice(Double price) {
+        return price == null ? "" : price.toString();
+    }
 
 }

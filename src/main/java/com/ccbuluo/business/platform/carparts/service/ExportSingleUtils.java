@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ccbuluo.http.StatusDto;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -61,25 +62,25 @@ public class ExportSingleUtils<T> {
 		return rowIndex++;
 	}
 
-	public void build(boolean result, HttpServletResponse resp) {
+	public StatusDto build(boolean result, HttpServletResponse resp) {
 		try {
 //			FileOutputStream outputStream = new FileOutputStream(this.fileFullPath);
 //			workbook.write(outputStream);
 //			outputStream.flush();
-
 			ServletOutputStream out = null;
 			resp.setContentType("application/x-msdownload");
-			resp.addHeader("Content-Disposition", "attachment; filename=\"" + java.net.URLEncoder.encode("零配件信息.xls", "UTF-8") + "\"");
+			resp.addHeader("Content-Disposition", "attachment; filename=\"" + new String("零配件.xls".getBytes(),"ISO-8859-1"));
+//			resp.setContentType("application/octet-stream;charset=utf-8");
+//			resp.setHeader("Content-Disposition", "attachment;filename=" + new String("零配件.xls".getBytes("utf-8"), "iso8859-1"));
+//			resp.addHeader("Pargam", "no-cache");
+//			resp.addHeader("Cache-Control", "no-cache");
 			out = resp.getOutputStream();
 			workbook.write(out);
 			out.close();
-
-
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return StatusDto.buildSuccessStatusDto();
 	}
 
 	@SuppressWarnings("unchecked")
