@@ -63,13 +63,11 @@ public class AllocateapplyDetailDTO {
     /**
      * 销售单价
      */
-    // todo
     @ApiModelProperty(name = "sellPrice", value = "销售单价")
     private BigDecimal sellPrice;
     /**
      * 成本单价
      */
-    // todo
     @ApiModelProperty(name = "costPrice", value = "成本单价")
     private BigDecimal costPrice;
     /**

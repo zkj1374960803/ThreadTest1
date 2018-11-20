@@ -1,5 +1,6 @@
 package com.ccbuluo.business.platform.carparts.service;
 
+import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.OrganizationTypeEnum;
 import com.ccbuluo.business.entity.BizAllocateApply;
@@ -16,6 +17,8 @@ import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
 import com.ccbuluo.core.common.UserHolder;
+import com.ccbuluo.core.constants.SystemPropertyHolder;
+import com.ccbuluo.core.entity.OSSClientProperties;
 import com.ccbuluo.core.entity.UploadFileInfo;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.service.UploadService;
@@ -25,6 +28,7 @@ import com.ccbuluo.excel.imports.ExcelReaderUtils;
 import com.ccbuluo.excel.imports.ExcelRowReaderBean;
 import com.ccbuluo.excel.readpic.ExcelPictruePos;
 import com.ccbuluo.excel.readpic.ExcelPictruesUtils;
+import com.ccbuluo.excel.readpic.ExcelShapeSaveAliyunOSS;
 import com.ccbuluo.excel.readpic.ExcelShapeSaveLocal;
 import com.ccbuluo.http.*;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
@@ -37,6 +41,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.shaded.com.google.common.collect.Maps;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -92,6 +97,8 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     private BizServiceEquipmentDao bizServiceEquipmentDao;
     @ThriftRPCClient("UserCoreSerService")
     private BasicUserOrganizationService basicUserOrganization;
+    @Autowired
+    private OSSClientProperties ossClientProperties;
 
 
     /**
@@ -419,17 +426,18 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
         File file = uploadFilesToLocal(multipartFile);
         String filepath = file.getPath();
 
-        // 4.读取excel，获取list的数据
+        // 3.读取excel，获取list的数据
         List<BasicCarpartsProductDTO> productList = geCarpartsProductList(filepath);
         if(productList == null || productList.size() == 0){
             return StatusDto.buildFailureStatusDto("数据为空导入失败！");
         }
-        // 5.车型名称转换成车型id
+        // 4.车型名称转换成车型id
         conventCarModelNameById(productList);
-        // 6.上传图片并把相对路径填充到 productList中
+        // 5.上传图片并把相对路径填充到 productList中
         uploadImgeAndSetImgePath(filepath, productList);
-        // 批量保存或者更新零配件数据（如数据库中存在的零配件和productList中的零配件代码相同的数据，则更新数据，否则插入数据）
+        // 6.批量保存或者更新零配件数据（如数据库中存在的零配件和productList中的零配件代码相同的数据，则更新数据，否则插入数据）
         batchSaveOrUpdateProductList(productList);
+        // 7.删除本地项目的文件
         new File(filepath).delete();
         return StatusDto.buildSuccessStatusDto();
     }
@@ -582,7 +590,13 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
      */
     private void uploadImgeAndSetImgePath(String filepath, List<BasicCarpartsProductDTO> productList) {
         // 上传图片并获取的图片的路径
-        Map<String, Collection<ExcelPictruePos>> pictrueListInfo = ExcelPictruesUtils.getAllDate(filepath, 1, new ExcelShapeSaveLocal("C:\\Users\\Ezreal\\Desktop\\haha"));
+        String accessKeyId = ossClientProperties.getAccessKeyId();
+        String accessKeySecret = ossClientProperties.getAccessKeySecret();
+        String bucketName = ossClientProperties.getBucketName();
+        String endpoint = ossClientProperties.getEndpoint();
+        String baseAppid = SystemPropertyHolder.getBaseAppid();
+        ExcelShapeSaveAliyunOSS excelShapeSaveAliyunOSS = new ExcelShapeSaveAliyunOSS(accessKeyId, accessKeySecret, bucketName, endpoint, baseAppid);
+        Map<String, Collection<ExcelPictruePos>> pictrueListInfo = ExcelPictruesUtils.getAllDate(filepath, 1, excelShapeSaveAliyunOSS);
         String loggedUserId = userHolder.getLoggedUserId();
         productList.forEach(a ->{
             a.setCreator(loggedUserId);
