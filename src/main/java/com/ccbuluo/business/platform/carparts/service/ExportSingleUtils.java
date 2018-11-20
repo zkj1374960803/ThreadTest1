@@ -20,6 +20,9 @@ import org.apache.poi.ss.usermodel.Cell;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * <dl>
  * <dd>Description: Excel导出工具类,数据集单页</dd>
@@ -42,8 +45,7 @@ public class ExportSingleUtils<T> {
 	private HSSFWorkbook workbook = null;
 	private HSSFSheet sheet = null;
 
-	public ExportSingleUtils(String fileFullPath, LinkedHashMap<String, String> headerMapper, List<T> list) {
-		this.fileFullPath = fileFullPath;
+	public ExportSingleUtils(LinkedHashMap<String, String> headerMapper, List<T> list) {
 		this.headerMapper = headerMapper;
 		this.list = list;
 		this.workbook = new HSSFWorkbook();
@@ -59,11 +61,20 @@ public class ExportSingleUtils<T> {
 		return rowIndex++;
 	}
 
-	public void build(boolean result) {
+	public void build(boolean result, HttpServletResponse resp) {
 		try {
-			FileOutputStream outputStream = new FileOutputStream(this.fileFullPath);
-			workbook.write(outputStream);
-			outputStream.flush();
+//			FileOutputStream outputStream = new FileOutputStream(this.fileFullPath);
+//			workbook.write(outputStream);
+//			outputStream.flush();
+
+			ServletOutputStream out = null;
+			resp.setContentType("application/x-msdownload");
+			resp.addHeader("Content-Disposition", "attachment; filename=\"" + java.net.URLEncoder.encode("零配件信息.xls", "UTF-8") + "\"");
+			out = resp.getOutputStream();
+			workbook.write(out);
+			out.close();
+
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -227,15 +238,5 @@ public class ExportSingleUtils<T> {
 		this.rowNumberTitle = rowNumberTitle;
 	}
 
-	public static void main(String[] args) {
-
-		String fileFullPath = "d:/test.xls";
-		LinkedHashMap<String, String> headerMapper = Maps.newLinkedHashMap();
-		List<Map<String, Object>> list = Lists.newArrayList();
-		ExportSingleUtils<Map<String, Object>> ex = new ExportSingleUtils<Map<String, Object>>(fileFullPath,
-				headerMapper, list);
-		int darwRow = ex.darwRow(0, new String[] { "1", "2", "3", "4" });
-		ex.build(true);
-	}
 
 }

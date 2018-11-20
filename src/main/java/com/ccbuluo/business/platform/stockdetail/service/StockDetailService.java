@@ -30,7 +30,7 @@ public interface StockDetailService {
      * @author liuduo
      * @date 2018-08-08 14:55:43
      */
-    Long getByinstockorderDeatil(String supplierNo, String productNo, BigDecimal costPrice, String inRepositoryNo, String applyNo);
+    Long getByinstockorderDeatil(String supplierNo, String productNo, BigDecimal costPrice, String inRepositoryNo, String applyNo, String purchaseInfo);
 
     /**
     * 修改有效库存

@@ -76,17 +76,18 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author liuduo
      * @date 2018-08-08 14:55:43
      */
-    public Long getByinstockorderDeatil(String supplierNo, String productNo, BigDecimal costPrice, String inRepositoryNo, String applyNo) {
+    public Long getByinstockorderDeatil(String supplierNo, String productNo, BigDecimal costPrice, String inRepositoryNo, String applyNo, String purchaseInfo) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("supplierNo", supplierNo);
         params.put("productNo", productNo);
         params.put("inRepositoryNo", inRepositoryNo);
         params.put("applyNo", applyNo);
         params.put("costPrice", costPrice);
+        params.put("purchaseInfo", purchaseInfo);
 
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT id FROM biz_stock_detail WHERE supplier_no = :supplierNo AND repository_no = :inRepositoryNo")
-            .append(" AND trade_no = :applyNo AND product_no = :productNo AND cost_price = :costPrice");
+            .append(" AND trade_no = :applyNo AND product_no = :productNo AND cost_price = :costPrice AND purchase_info = :purchaseInfo");
 
         return findForObject(sql.toString(), params, Long.class);
     }

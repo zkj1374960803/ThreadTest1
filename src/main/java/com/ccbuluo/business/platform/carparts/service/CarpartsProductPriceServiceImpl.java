@@ -55,6 +55,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.InputSource;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -675,7 +676,7 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     }
 
     @Override
-    public StatusDto exportCarparts() throws IOException {
+    public StatusDto exportCarparts(HttpServletResponse resp) throws IOException {
         // 查询所有零配件
 //        StatusDtoThriftPage<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThriftPage = carpartsProductService.queryCarpartsProductList(null, 0, Integer.MAX_VALUE);
 //        StatusDto<Page<BasicCarpartsProductDTO>> list = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOStatusDtoThriftPage, BasicCarpartsProductDTO.class);
@@ -703,10 +704,10 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
 
 
 
-        String fileFullPath = "d:/test.xls";
+//        String fileFullPath = "d:/text.xls";
         LinkedHashMap<String, String> headerMapper = com.google.common.collect.Maps.newLinkedHashMap();
         List<Map<String, Object>> list = Lists.newArrayList();
-        ExportSingleUtils<Map<String, Object>> ex = new ExportSingleUtils<Map<String, Object>>(fileFullPath,
+        ExportSingleUtils<Map<String, Object>> ex = new ExportSingleUtils<Map<String, Object>>(
             headerMapper, list);
         int darwRow = ex.darwRow(0, new String[] { "序号", "件号", "名称", "计量单位","单车用量","图片","适用车型","服务中心价格","客户经理价格","用户销售价格" });
         List<BasicCarpartsProduct> basicCarpartsProductList = Lists.newArrayList();
@@ -750,11 +751,9 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
                 ,carpartsProduct.getCarmodelName(),carpartsProduct.getServercenterPrice().toString(),carpartsProduct.getCustmanagerPrice().toString()
                 ,carpartsProduct.getSellPrice().toString() });
         }
-        ex.build(true);
-        export("test.xls", "d:/test.xls");
-
-
-        return null;
+        ex.build(true, resp);
+//        export("test.xls", fileFullPath + "test.xls");
+        return StatusDto.buildSuccessStatusDto();
     }
 
     public ResponseEntity<byte[]> export(String fileName, String filePath) throws IOException {

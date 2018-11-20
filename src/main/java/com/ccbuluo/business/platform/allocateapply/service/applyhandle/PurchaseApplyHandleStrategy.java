@@ -138,6 +138,7 @@ public class PurchaseApplyHandleStrategy extends DefaultApplyHandleStrategy {
             Map<String, Object> map = Maps.newHashMap();
             map.put("purchasePrice", ad.getSellPrice());
             map.put("purchaseDate", new Date());
+            map.put("purchaseApplyNo", ad.getApplyNo());
             instockplanPlatform.setPurchaseInfo(JsonUtils.writeValue(map));
             inList.add(instockplanPlatform);
         }
