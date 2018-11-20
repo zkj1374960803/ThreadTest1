@@ -72,7 +72,7 @@ public class BizServiceSupplier {
     /**
      * 成立时间
      */
-    @ValidateDateRange(pattern = "yyyy-MM-dd", excludeNull = true, groups = Group.Add.class, message = "成立时间格式不正确")
+    @ValidateDateRange(pattern = "yyyy-MM-dd", min = "1970-01-01 00:00:00", excludeNull = true, groups = Group.Add.class, message = "成立时间格式不正确")
     @ApiModelProperty(name = "establishTime", value = "成立时间 Sting类型 例：2018-07-02")
     private Date establishTime;
     /**

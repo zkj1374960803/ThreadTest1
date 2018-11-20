@@ -41,8 +41,8 @@ public class StockDetailServiceImpl implements StockDetailService{
      * @date 2018-08-08 14:55:43
      */
     @Override
-    public Long getByinstockorderDeatil(String supplierNo, String productNo, BigDecimal costPrice, String inRepositoryNo, String applyNo, String purchaseInfo) {
-        return bizStockDetailDao.getByinstockorderDeatil(supplierNo, productNo, costPrice, inRepositoryNo, applyNo, purchaseInfo);
+    public Long getByinstockorderDeatil(String supplierNo, String productNo, BigDecimal costPrice, String inRepositoryNo, String applyNo, String purchaseNo) {
+        return bizStockDetailDao.getByinstockorderDeatil(supplierNo, productNo, costPrice, inRepositoryNo, applyNo, purchaseNo);
     }
 
     /**

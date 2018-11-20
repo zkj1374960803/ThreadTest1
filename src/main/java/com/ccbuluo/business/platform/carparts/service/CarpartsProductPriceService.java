@@ -131,5 +131,5 @@ public interface CarpartsProductPriceService {
      * @author liuduo
      * @date 2018-11-19 09:44:02
      */
-    StatusDto exportCarparts(HttpServletResponse resp)  throws IOException;
+    void exportCarparts(HttpServletResponse resp)  throws IOException;
 }

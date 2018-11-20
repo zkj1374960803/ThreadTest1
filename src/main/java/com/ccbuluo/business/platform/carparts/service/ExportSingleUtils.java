@@ -46,7 +46,8 @@ public class ExportSingleUtils<T> {
 	private HSSFWorkbook workbook = null;
 	private HSSFSheet sheet = null;
 
-	public ExportSingleUtils(LinkedHashMap<String, String> headerMapper, List<T> list) {
+	public ExportSingleUtils(String fileFullPath, LinkedHashMap<String, String> headerMapper, List<T> list) {
+		this.fileFullPath = fileFullPath;
 		this.headerMapper = headerMapper;
 		this.list = list;
 		this.workbook = new HSSFWorkbook();
@@ -62,25 +63,14 @@ public class ExportSingleUtils<T> {
 		return rowIndex++;
 	}
 
-	public StatusDto build(boolean result, HttpServletResponse resp) {
+	public void build(boolean result) {
 		try {
-//			FileOutputStream outputStream = new FileOutputStream(this.fileFullPath);
-//			workbook.write(outputStream);
-//			outputStream.flush();
-			ServletOutputStream out = null;
-			resp.setContentType("application/x-msdownload");
-			resp.addHeader("Content-Disposition", "attachment; filename=\"" + new String("零配件.xls".getBytes(),"ISO-8859-1"));
-//			resp.setContentType("application/octet-stream;charset=utf-8");
-//			resp.setHeader("Content-Disposition", "attachment;filename=" + new String("零配件.xls".getBytes("utf-8"), "iso8859-1"));
-//			resp.addHeader("Pargam", "no-cache");
-//			resp.addHeader("Cache-Control", "no-cache");
-			out = resp.getOutputStream();
-			workbook.write(out);
-			out.close();
+			FileOutputStream outputStream = new FileOutputStream(this.fileFullPath);
+			workbook.write(outputStream);
+			outputStream.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return StatusDto.buildSuccessStatusDto();
 	}
 
 	@SuppressWarnings("unchecked")

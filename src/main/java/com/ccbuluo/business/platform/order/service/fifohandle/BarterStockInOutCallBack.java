@@ -206,6 +206,7 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
                     outstockplanPlatform.setPlanOutstocknum(inStockPlanSum);
                     buildOutStockPlan(bizInstockplanDetail,stockDetail, outstockplanPlatform);
                     outstockplanPlatform.setCostPrice(stockDetail.getCostPrice());
+                    outstockplanPlatform.setPurchaseInfo(stockDetail.getPurchaseInfo());
                     outstockplanDetails.add(outstockplanPlatform);
                     break;
                 } else {
@@ -217,6 +218,7 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
                     outstockplanPlatform.setPlanOutstocknum(validStock);
                     buildOutStockPlan(bizInstockplanDetail,stockDetail, outstockplanPlatform);
                     outstockplanPlatform.setCostPrice(stockDetail.getCostPrice());
+                    outstockplanPlatform.setPurchaseInfo(stockDetail.getPurchaseInfo());
                     outstockplanDetails.add(outstockplanPlatform);
                     if (inStockPlanSum <= 0) {
                         break;
@@ -257,6 +259,7 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
             bizInstockplanDetail.setCostPrice(outstockplan.getCostPrice());
             bizInstockplanDetail.setPlanInstocknum(outstockplan.getPlanOutstocknum());
             bizInstockplanDetail.setSupplierNo(outstockplan.getSupplierNo());
+            bizInstockplanDetail.setPurchaseInfo(outstockplan.getPurchaseInfo());
             instockplanDetailList.add(bizInstockplanDetail);
         }
         return instockplanDetailList;

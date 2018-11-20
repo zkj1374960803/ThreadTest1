@@ -233,8 +233,8 @@ public class CarpartsProductController extends BaseController {
      */
     @ApiOperation(value = "导出零配件",notes = "【刘铎】")
     @GetMapping("/exportcarparts")
-    public StatusDto exportCarparts(HttpServletResponse resp)  throws IOException {
-        return carpartsProductServiceImpl.exportCarparts(resp);
+    public void exportCarparts(HttpServletResponse resp)  throws IOException {
+        carpartsProductServiceImpl.exportCarparts(resp);
     }
 
 }

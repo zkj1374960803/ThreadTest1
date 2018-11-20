@@ -322,8 +322,10 @@ public class SupplierServiceImpl implements SupplierService{
         Map<String, BasicCarpartsProductDTO> carpartsProduct = data.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, Function.identity()));
         products.stream().forEach(a ->{
             BasicCarpartsProductDTO basicCarpartsProductDTO = carpartsProduct.get(a.getProductCode());
-            a.setProductName(basicCarpartsProductDTO.getCarpartsName());
-            a.setCarpartsMarkno(basicCarpartsProductDTO.getCarpartsMarkno());
+            if (null != basicCarpartsProductDTO) {
+                a.setProductName(basicCarpartsProductDTO.getCarpartsName());
+                a.setCarpartsMarkno(basicCarpartsProductDTO.getCarpartsMarkno());
+            }
         });
         return queryRelSupplierProductPage;
     }

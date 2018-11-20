@@ -507,7 +507,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
         Map<Long, BizInstockplanDetail> inStockPlan = bizInstockplanDetails.stream().collect(Collectors.toMap(BizInstockplanDetail::getId, Function.identity()));
         bizInstockorderDetailList.forEach(item -> {
             BizInstockplanDetail bizInstockplanDetail = inStockPlan.get(item.getInstockPlanid());
-            Long id = stockDetailService.getByinstockorderDeatil(item.getSupplierNo(), item.getProductNo(), item.getCostPrice(), inRepositoryNo, applyNo, bizInstockplanDetail.getPurchaseInfo());
+            Long id = stockDetailService.getByinstockorderDeatil(item.getSupplierNo(), item.getProductNo(), item.getCostPrice(), inRepositoryNo, applyNo, bizInstockplanDetail.getPurchaseNo());
             if (null != id) {
                 // 根据id查询乐观锁
                 Integer versionNoById1 = stockDetailService.getVersionNoById(id);
@@ -548,6 +548,7 @@ public class InstockOrderServiceImpl implements InstockOrderService {
                 bizStockDetail.setProductUnit(item.getUnit());
                 bizStockDetail.preInsert(userHolder.getLoggedUserId());
                 bizStockDetail.setPurchaseInfo(bizInstockplanDetail.getPurchaseInfo());
+                bizStockDetail.setPurchaseTradeNo(bizInstockplanDetail.getPurchaseNo());
                 Long stockDetailId = stockDetailService.saveStockDetail(bizStockDetail);
                 stockIds.add(stockDetailId);
                 // 把库存id回填到入库详单中

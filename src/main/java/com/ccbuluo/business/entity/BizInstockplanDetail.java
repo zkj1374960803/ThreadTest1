@@ -1,12 +1,15 @@
 package com.ccbuluo.business.entity;
 
 import com.ccbuluo.business.constants.StockPlanStatusEnum;
+import com.ccbuluo.json.JsonUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 入库计划实体
@@ -152,6 +155,11 @@ public class BizInstockplanDetail extends AftersaleCommonEntity{
             return actualInstocknum * costPrice.doubleValue();
         }
         return 0D;
+    }
+
+    public String getPurchaseNo() {
+        Map<String, String> map = JsonUtils.readValue(purchaseInfo, HashMap.class);
+        return map.get("purchaseApplyNo");
     }
 
 

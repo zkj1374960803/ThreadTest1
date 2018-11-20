@@ -54,12 +54,12 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         sql.append("INSERT INTO biz_stock_detail ( repository_no,org_no,product_no,product_name,product_unit,product_categoryname,")
             .append("product_type,trade_no,supplier_no,valid_stock,occupy_stock,")
             .append("problem_stock,damaged_stock,transit_stock,freeze_stock,seller_orgno,")
-            .append("cost_price,instock_planid,latest_correct_time,purchase_info,creator,create_time,")
+            .append("cost_price,instock_planid,latest_correct_time,purchase_info,purchase_trade_no,creator,create_time,")
             .append("operator,operate_time,delete_flag,remark ) VALUES (  :repositoryNo,")
             .append(" :orgNo, :productNo, :productName,:productUnit,:productCategoryname, :productType, :tradeNo, :supplierNo,")
             .append(" :validStock, :occupyStock, :problemStock, :damagedStock,")
             .append(" :transitStock, :freezeStock, :sellerOrgno, :costPrice,")
-            .append(" :instockPlanid, :latestCorrectTime, :purchaseInfo,:creator, :createTime,")
+            .append(" :instockPlanid, :latestCorrectTime, :purchaseInfo,:purchaseTradeNo,:creator, :createTime,")
             .append(" :operator, :operateTime, :deleteFlag, :remark )");
         return super.saveRid(sql.toString(), entity);
     }
@@ -76,18 +76,18 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
      * @author liuduo
      * @date 2018-08-08 14:55:43
      */
-    public Long getByinstockorderDeatil(String supplierNo, String productNo, BigDecimal costPrice, String inRepositoryNo, String applyNo, String purchaseInfo) {
+    public Long getByinstockorderDeatil(String supplierNo, String productNo, BigDecimal costPrice, String inRepositoryNo, String applyNo, String purchaseNo) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("supplierNo", supplierNo);
         params.put("productNo", productNo);
         params.put("inRepositoryNo", inRepositoryNo);
         params.put("applyNo", applyNo);
         params.put("costPrice", costPrice);
-        params.put("purchaseInfo", purchaseInfo);
+        params.put("purchaseTradeNo", purchaseNo);
 
         StringBuilder sql = new StringBuilder();
         sql.append(" SELECT id FROM biz_stock_detail WHERE supplier_no = :supplierNo AND repository_no = :inRepositoryNo")
-            .append(" AND trade_no = :applyNo AND product_no = :productNo AND cost_price = :costPrice AND purchase_info = :purchaseInfo");
+            .append(" AND trade_no = :applyNo AND product_no = :productNo AND cost_price = :costPrice AND purchase_trade_no = :purchaseTradeNo");
 
         return findForObject(sql.toString(), params, Long.class);
     }
@@ -664,7 +664,7 @@ public class BizStockDetailDao extends BaseDao<BizStockDetail> {
         params.put("orgCode", orgCode);
 
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT id,product_no,IFNULL(valid_stock,0) AS validStock,repository_no,cost_price,supplier_no FROM biz_stock_detail WHERE product_no IN(:products) AND org_no = :orgCode");
+        sql.append("SELECT id,product_no,IFNULL(valid_stock,0) AS validStock,repository_no,cost_price,supplier_no,purchase_info FROM biz_stock_detail WHERE product_no IN(:products) AND org_no = :orgCode");
 
         return queryListBean(BizStockDetail.class, sql.toString(), params);
     }

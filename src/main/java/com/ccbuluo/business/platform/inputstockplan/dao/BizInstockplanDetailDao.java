@@ -175,7 +175,7 @@ public class BizInstockplanDetailDao extends BaseDao<BizInstockplanDetail> {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT bid.id,bid.instock_type,bid.product_no,bid.product_name,bid.product_type,bid.product_categoryname,bid.product_unit,")
             .append(" bid.trade_no,bid.supplier_no,bid.seller_orgno,bid.cost_price,bid.stock_type,IFNULL(bid.plan_instocknum,0) AS planInstocknum,")
-            .append(" IFNULL(bid.actual_instocknum,0) AS actualInstocknum,bss.supplier_name FROM biz_instockplan_detail AS bid")
+            .append(" IFNULL(bid.actual_instocknum,0) AS actualInstocknum,bss.supplier_name,bid.purchase_info FROM biz_instockplan_detail AS bid")
             .append(" LEFT JOIN biz_service_supplier AS bss ON bss.supplier_code = bid.supplier_no")
             .append("  WHERE bid.trade_no= :applyNo AND bid.product_type = :productType AND instock_repository_no = :inRepositoryNo");
 

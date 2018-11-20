@@ -2,6 +2,7 @@ package com.ccbuluo.business.platform.supplier.dto;
 
 import com.ccbuluo.core.annotation.validate.ValidateLength;
 import com.ccbuluo.core.validate.Group;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -63,6 +64,7 @@ public class ResultFindSupplierDetailDTO {
     /**
      * 成立时间
      */
+    @JsonFormat(timezone = "GMT+8")
     @ApiModelProperty(name = "establishTime", value = "成立时间 Sting类型 例：2018-07-02")
     private Date establishTime;
     /**
