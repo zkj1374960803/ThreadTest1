@@ -187,6 +187,23 @@ public class CustAllocateApplyController extends BaseController {
     }
 
     /**
+     * 处理申请
+     * @param applyNo 申请单号
+     * @return StatusDto<String>
+     * @author zhangkangjian
+     * @date 2018-09-12 17:47:14
+     */
+    @ApiOperation(value = "处理申请",notes = "【张康健】")
+    @GetMapping("/processoutstockorg")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "applyNo", value = "申请单号", required = true, paramType = "query")
+    })
+    public StatusDto<String> processOutStockOrg(@ValidateNotBlank String applyNo){
+        allocateApplyServiceImpl.processOutStockOrg(applyNo, null);
+        return StatusDto.buildSuccessStatusDto();
+    }
+
+    /**
      * 问题件申请查询(创建问题件，查询问题件列表)
      * @param orgCode 机构的code
      * @return StatusDto<List<StockBizStockDetailDTO>>
