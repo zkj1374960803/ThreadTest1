@@ -40,7 +40,7 @@ public class CarpartsProductPriceDao extends BaseDao<CarpartsProductPriceDao> {
         sql.append("SELECT a.product_no,a.suggested_price,a.price_level FROM rel_product_price a  ")
             .append(" INNER JOIN ( ")
             .append(" SELECT MAX(a.id) AS 'id' FROM rel_product_price a  GROUP BY a.price_level, a.product_no ")
-            .append(" ) b ON a.id = b.id WHERE 1 = 1 ");
+            .append(" ) b ON a.id = b.id WHERE 1 = 1 AND a.end_time IS NULL ");
         if(StringUtils.isNotBlank(productType)){
             map.put("productType", productType);
             sql.append(" AND a.product_type = :productType ");
