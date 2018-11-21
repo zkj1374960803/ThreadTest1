@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -71,23 +72,22 @@ public class RelProductPrice {
     @ApiModelProperty(name = "deleteFlag", value = "", hidden = true)
     private int deleteFlag;
 
-    //备注
+    // 备注
     @ApiModelProperty(name = "remark", value = "", hidden = true)
     private String remark;
 
-/*    @ApiModelProperty(name = "priceLevelEnum", value = " USER,CUSTMANAGER,SERVERCENTER")
-    private PriceLevelEnum priceLevelEnum;*/
+    // 申请单的编号
+    @ApiModelProperty(name = "applyNoList", value = "申请单的编号", hidden = true)
+    private List<String> applyNoList;
 
-/*    public PriceLevelEnum getPriceLevelEnum() {
-        return priceLevelEnum;
+
+    public List<String> getApplyNoList() {
+        return applyNoList;
     }
 
-    public void setPriceLevelEnum(String priceLevelEnumStr) {
-        PriceLevelEnum priceLevelEnum = PriceLevelEnum.valueOf(priceLevelEnumStr);
-        long resulPriceLevel = priceLevelEnum.getPriceLevel();
-        priceLevel = resulPriceLevel;
-        this.priceLevelEnum = priceLevelEnum;
-    }*/
+    public void setApplyNoList(List<String> applyNoList) {
+        this.applyNoList = applyNoList;
+    }
 
     public enum PriceLevelEnum{
         USER(4L),CUSTMANAGER(3L),SERVICECENTER(2L),PURCHASE(0L),PLATFORM(0L);
