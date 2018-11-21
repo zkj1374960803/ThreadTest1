@@ -84,9 +84,9 @@ public class CarpartsProductPriceDao extends BaseDao<CarpartsProductPriceDao> {
         StringBuilder sql = new StringBuilder();
         sql.append(" INSERT INTO rel_product_price (product_no,product_type,suggested_price,up_rate,down_rate, ")
             .append(" price_level,start_time,creator,create_time,operator,operate_time,delete_flag,remark)  ")
-            .append(" VALUES(product_no,product_type,suggested_price,up_rate,down_rate, ")
-            .append(" price_level,start_time,creator,create_time, ")
-            .append(" operator,operate_time,delete_flag,remark) ");
+            .append(" VALUES(:productNo,:productType,:suggestedPrice,:upRate,:downRate, ")
+            .append(" :priceLevel,:startTime,:creator,:createTime, ")
+            .append(" :operator,:operateTime,:deleteFlag,:remark) ");
         batchSaveForListBean(sql.toString(), saveRelProductPriceList);
     }
 }

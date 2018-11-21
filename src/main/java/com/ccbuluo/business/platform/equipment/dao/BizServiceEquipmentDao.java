@@ -241,7 +241,9 @@ public class BizServiceEquipmentDao extends BaseDao<BizServiceEquipment> {
             maps.forEach(map -> {
                 String productNoStr = (String) map.get("product_no");
                 BigDecimal suggestedPrice = (BigDecimal) map.get("suggested_price");
-                hashMap.put(productNoStr, suggestedPrice.doubleValue());
+                if(suggestedPrice != null){
+                    hashMap.put(productNoStr, suggestedPrice.doubleValue());
+                }
             });
         }
         return hashMap;
