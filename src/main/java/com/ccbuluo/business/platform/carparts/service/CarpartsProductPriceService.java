@@ -118,18 +118,23 @@ public interface CarpartsProductPriceService {
     StatusDto<String> deleteCarpartsProduct(String carpartsCode);
 
     /**
-     * 导入零配件
-     * @param multipartFile
-     * @return StatusDto<String>
-     * @author zhangkangjian
-     * @date 2018-11-16 11:46:02
-     */
-    StatusDto<String> importCarparts(MultipartFile multipartFile) throws Exception;
-
-    /**
      * 导出零配件
      * @author liuduo
      * @date 2018-11-19 09:44:02
      */
     void exportCarparts(HttpServletResponse resp)  throws IOException;
+    /**
+     * 批量更新零配件价格结束时间
+     * @param updateRelProductPriceList 零配件价格列表
+     * @author zhangkangjian
+     * @date 2018-11-21 13:45:40
+     */
+    void batchUpdateProductPrice(List<RelProductPrice> updateRelProductPriceList);
+    /**
+     * 批量插入零件价格列表
+     * @param saveRelProductPriceList 零配件价格列表
+     * @author zhangkangjian
+     * @date 2018-11-21 14:30:32
+     */
+    void batchSaveProductPrice(List<RelProductPrice> saveRelProductPriceList);
 }

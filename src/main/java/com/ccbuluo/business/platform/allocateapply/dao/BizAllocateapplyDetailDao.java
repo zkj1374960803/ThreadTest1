@@ -3,6 +3,7 @@ package com.ccbuluo.business.platform.allocateapply.dao;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.StockPlanStatusEnum;
 import com.ccbuluo.business.custmanager.allocateapply.dto.QueryPendingMaterialsDTO;
+import com.ccbuluo.business.entity.RelProductPrice;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailBO;
 import com.ccbuluo.business.platform.allocateapply.dto.AllocateapplyDetailDTO;
 import com.ccbuluo.core.exception.CommonException;
@@ -289,5 +290,38 @@ public class BizAllocateapplyDetailDao extends BaseDao<AllocateapplyDetailDTO> {
         sql.append(" UPDATE biz_outstockplan_detail a LEFT JOIN biz_outstockorder_detail b ON a.id = b.outstock_planid ")
             .append(" SET a.cost_price = :sellPrice WHERE a.trade_no in (:applyNo)  AND a.product_no = :productNo ");
         updateForMap(sql.toString(), map);
+    }
+
+    /**
+     * 批量更新申请单的详单价格
+     * @param updateRelProductPriceList 零配件价格信息
+     * @author zhangkangjian
+     * @date 2018-11-21 15:03:09
+     */
+    public void batchUpdateAllocateapplyDetail(List<RelProductPrice> updateRelProductPriceList) {
+        StringBuilder sql = new StringBuilder();
+        sql.append(" UPDATE biz_allocate_apply a LEFT JOIN biz_allocateapply_detail b ")
+            .append(" ON a.apply_no = b.apply_no SET b.sell_price = :suggestedPrice WHERE a.apply_no in (:applyNoList) AND b.product_no = :productNo ");
+        batchUpdateForListBean(sql.toString(), updateRelProductPriceList);
+    }
+    /**
+     * 批量更新入库计划价格
+     * @param updateRelProductPriceList 零配件价格信息
+     * @author zhangkangjian
+     * @date 2018-11-21 15:03:09
+     */
+    public void batchUpdateInstockorderDetail(List<RelProductPrice> updateRelProductPriceList) {
+        StringBuilder sql = new StringBuilder();
+        sql.append(" UPDATE biz_instockplan_detail a LEFT JOIN biz_instockorder_detail b ON a.id = b.instock_planid ")
+            .append(" SET a.cost_price = :suggestedPrice WHERE a.trade_no in (:applyNoList)  AND a.product_no = :productNo ");
+        batchUpdateForListBean(sql.toString(), updateRelProductPriceList);
+    }
+
+    public void batchUpdateOutstockorderDetail(List<RelProductPrice> updateRelProductPriceList) {
+
+        StringBuilder sql = new StringBuilder();
+        sql.append(" UPDATE biz_outstockplan_detail a LEFT JOIN biz_outstockorder_detail b ON a.id = b.outstock_planid ")
+            .append(" SET a.cost_price = :suggestedPrice WHERE a.trade_no in (:applyNoList)  AND a.product_no = :productNo ");
+        batchUpdateForListBean(sql.toString(), updateRelProductPriceList);
     }
 }

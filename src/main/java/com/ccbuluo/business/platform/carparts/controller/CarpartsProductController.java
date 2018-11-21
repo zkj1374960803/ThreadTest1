@@ -5,6 +5,7 @@ import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.entity.RelProductPrice;
 import com.ccbuluo.business.platform.carconfiguration.service.BasicCarmodelManageService;
 import com.ccbuluo.business.platform.carparts.service.CarpartsProductPriceService;
+import com.ccbuluo.business.platform.carparts.service.ImportCarpartsProductService;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.business.vehiclelease.entity.BizOrderChannelprice;
 import com.ccbuluo.core.annotation.validate.ValidateNotNull;
@@ -55,7 +56,7 @@ public class CarpartsProductController extends BaseController {
     @Resource(name = "carpartsProductPriceServiceImpl")
     private CarpartsProductPriceService carpartsProductServiceImpl;
     @Resource
-    private CarpartsProductPriceService carpartsProductPriceService;
+    private ImportCarpartsProductService importCarpartsProductServiceImpl;
 
     /**
      * 添加零配件
@@ -68,7 +69,7 @@ public class CarpartsProductController extends BaseController {
     @PostMapping("/savecarpartsproduct")
     public StatusDto<String> saveCarpartsProduct(@ApiParam(name = "saveBasicCarpartsProductDTO对象", value = "传入json格式", required = true)
                                                  @RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO){
-        return carpartsProductPriceService.saveCarpartsProduct(saveBasicCarpartsProductDTO);
+        return carpartsProductServiceImpl.saveCarpartsProduct(saveBasicCarpartsProductDTO);
     }
 
     /**
@@ -82,7 +83,7 @@ public class CarpartsProductController extends BaseController {
     @PostMapping("/editcarpartsproduct")
     public StatusDto<String> editCarpartsProduct(@ApiParam(name = "saveBasicCarpartsProductDTO", value = "传入json格式", required = true)@RequestBody SaveBasicCarpartsProductDTO saveBasicCarpartsProductDTO) {
         saveBasicCarpartsProductDTO.setOperator(userHolder.getLoggedUserId());
-        return carpartsProductPriceService.editCarpartsProduct(saveBasicCarpartsProductDTO);
+        return carpartsProductServiceImpl.editCarpartsProduct(saveBasicCarpartsProductDTO);
     }
     /**
      * 删除零部件
@@ -96,7 +97,7 @@ public class CarpartsProductController extends BaseController {
     @GetMapping("/deletecarpartsproduct/{carpartsCode}")
     @ApiImplicitParam(name = "carpartsCode", value = "零部件Code", required = true, dataType = "String", paramType = "path")
     public StatusDto deleteCarpartsProduct(@PathVariable String carpartsCode) {
-        return carpartsProductPriceService.deleteCarpartsProduct(carpartsCode);
+        return carpartsProductServiceImpl.deleteCarpartsProduct(carpartsCode);
     }
 
     /**
@@ -222,7 +223,7 @@ public class CarpartsProductController extends BaseController {
     @ApiOperation(value = "导入零配件",notes = "【张康健】")
     @PostMapping("/importcarparts")
     public StatusDto<String> importCarparts(MultipartFile multipartFile) throws Exception {
-        return carpartsProductServiceImpl.importCarparts(multipartFile);
+        return importCarpartsProductServiceImpl.importCarparts(multipartFile);
     }
 
 

@@ -60,4 +60,33 @@ public class CarpartsProductPriceDao extends BaseDao<CarpartsProductPriceDao> {
             .append(" LEFT JOIN rel_product_price a ON a.id = b.id  SET a.end_time = NOW() ");
         updateForBean(sql.toString(), relProductPrice);
     }
+
+    /**
+     * 更新零配件价格结束时间
+     * @param updateRelProductPriceList 零配件的信息
+     * @author zhangkangjian
+     * @date 2018-11-21 14:15:09
+     */
+    public void batchUpdateProductPrice(List<RelProductPrice> updateRelProductPriceList) {
+        StringBuffer sql = new StringBuffer();
+        sql.append(" UPDATE (SELECT a.id FROM rel_product_price a WHERE a.product_no = :productNo AND a.product_type = :productType AND a.price_level = :priceLevel ORDER BY a.create_time DESC LIMIT 1) b  ")
+            .append(" LEFT JOIN rel_product_price a ON a.id = b.id  SET a.end_time = NOW() ");
+        batchUpdateForListBean(sql.toString(), updateRelProductPriceList);
+    }
+
+    /**
+     * 批量插入零配件价格列表
+     * @param saveRelProductPriceList 列配件的价格列表
+     * @author zhangkangjian
+     * @date 2018-11-21 14:31:38
+     */
+    public void batchSaveProductPrice(List<RelProductPrice> saveRelProductPriceList) {
+        StringBuilder sql = new StringBuilder();
+        sql.append(" INSERT INTO rel_product_price (product_no,product_type,suggested_price,up_rate,down_rate, ")
+            .append(" price_level,start_time,creator,create_time,operator,operate_time,delete_flag,remark)  ")
+            .append(" VALUES(product_no,product_type,suggested_price,up_rate,down_rate, ")
+            .append(" price_level,start_time,creator,create_time, ")
+            .append(" operator,operate_time,delete_flag,remark) ");
+        batchSaveForListBean(sql.toString(), saveRelProductPriceList);
+    }
 }
