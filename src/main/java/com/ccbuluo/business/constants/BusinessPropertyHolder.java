@@ -1,5 +1,7 @@
 package com.ccbuluo.business.constants;
 
+import com.ccbuluo.core.entity.OSSClientProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -11,6 +13,9 @@ import org.springframework.stereotype.Component;
 @Component
 
 public class BusinessPropertyHolder {
+
+    @Autowired
+    private OSSClientProperties ossClientProperties;
 
     // 用户中心token key前缀名称
     public static String PROJECTCODE_REDIS_KEYPERFIX;
@@ -54,5 +59,17 @@ public class BusinessPropertyHolder {
     @Value("${oss.bucket-name}")
     public void setFilePath(String filePath) {
         FILE_PATH = filePath;
+    }
+
+
+    public String getPathPrefix(String bucket) {
+        // 获取base-web-code的oss.endpoint
+        String endpoint = ossClientProperties.getEndpoint();
+        // 截取 http://
+        String substring = endpoint.substring(endpoint.lastIndexOf("/")+1);
+        StringBuilder http = new StringBuilder("http://");
+        StringBuilder point = new StringBuilder(".");
+        StringBuilder slash = new StringBuilder("/");
+        return http.append(bucket).append(point).append(substring).append(slash).toString();
     }
 }

@@ -45,6 +45,9 @@ import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.shaded.com.google.common.collect.Maps;
+import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -735,15 +738,16 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
         }
     }
 
+
+
     @Override
     public void exportCarparts(HttpServletResponse resp) throws IOException {
         // 查询所有零配件
         StatusDtoThriftPage<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThriftPage = carpartsProductService.queryCarpartsProductList(null, 0, 10);
         StatusDto<Page<BasicCarpartsProductDTO>> list = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOStatusDtoThriftPage, BasicCarpartsProductDTO.class);
-//        if (null == list.getData()) {
-//            return StatusDto.buildFailure("没有查询到零配件!");
-//
-//        }
+        if (null == list.getData()) {
+            throw new CommonException("0", "没有查询到零配件!");
+        }
         // 查询零配件的价格
         QueryCarpartsProductDTO queryCarpartsProductDTO = new QueryCarpartsProductDTO();
         queryCarpartsProductDTO.setOffset(0);
@@ -754,8 +758,6 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
         Map<String, BasicCarpartsProductDTO> carpartsProductMap = rows.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, Function.identity()));
         Page<BasicCarpartsProductDTO> data1 = list.getData();
         List<BasicCarpartsProductDTO> exportData = data1.getRows();
-        // 获取到要下载的零配件的图片路径
-        List<String> images = exportData.stream().map(BasicCarpartsProductDTO::getCarpartsImage).collect(Collectors.toList());
         for (BasicCarpartsProductDTO exportDatum : exportData) {
             BasicCarpartsProductDTO basicCarpartsProductDTO = carpartsProductMap.get(exportDatum.getCarpartsCode());
             exportDatum.setServerCarpartsPrice(basicCarpartsProductDTO.getServerCarpartsPrice());
@@ -763,63 +765,27 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
             exportDatum.setCustCarpartsPrice(basicCarpartsProductDTO.getCustCarpartsPrice());
         }
 
-        Map<String, BasicCarpartsProductDTO> collect = exportData.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsMarkno, Function.identity()));
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet();
 
-        String fileFullPath = "d:/text.xls";
-        LinkedHashMap<String, String> headerMapper = com.google.common.collect.Maps.newLinkedHashMap();
-        List<Map<String, Object>> list2 = Lists.newArrayList();
-        ExportSingleUtils<Map<String, Object>> ex = new ExportSingleUtils<Map<String, Object>>(
-            headerMapper, list2);
-        ex.darwRow(0, new String[] { "序号", "件号", "名称", "计量单位","单车用量","图片","适用车型","服务中心价格","客户经理价格","用户销售价格" });
+        ExportSingleUtils<Map<String, Object>> ex2 = new ExportSingleUtils<Map<String, Object>>(workbook, sheet);
+        ex2.darwRow(0, new String[] { "序号", "件号", "名称", "计量单位","单车用量","图片","适用车型","服务中心价格","客户经理价格","用户销售价格" }, null, null);
         for (int i = 1; i <= exportData.size(); i++) {
             BasicCarpartsProductDTO carpartsProduct = exportData.get(i - 1);
-            ex.darwRow(i , new String[] { String.valueOf(i), carpartsProduct.getCarpartsMarkno(), carpartsProduct.getCarpartsName()
-                , carpartsProduct.getCarpartsUnit(),"0",""
-                ,carpartsProduct.getCarmodelName(),getPrice(carpartsProduct.getServerCarpartsPrice()),getPrice(carpartsProduct.getCustCarpartsPrice())
-                ,getPrice(carpartsProduct.getCarpartsPrice()) });
+            HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 255, 255, (short) 5, i, (short) 5,i);
+            anchor.setAnchorType(2);
+            ex2.darwRow(i , new String[] { String.valueOf(i), getObject(carpartsProduct.getCarpartsMarkno()), getObject(carpartsProduct.getCarpartsName())
+                , getObject(carpartsProduct.getCarpartsUnit()),getObject(carpartsProduct.getUsedAmount()), carpartsProduct.getCarpartsImage()
+                ,getObject(carpartsProduct.getCarmodelName()),getObject(carpartsProduct.getServerCarpartsPrice()),getObject(carpartsProduct.getCustCarpartsPrice())
+                ,getObject(carpartsProduct.getCarpartsPrice()) }, anchor, carpartsProduct.getCarpartsImage());
         }
-        ex.build(true,  resp);
-
-//        String fileFullPath2 =  "d:/text222.xls";
-//        LinkedHashMap<String, String> headerMapper2 = com.google.common.collect.Maps.newLinkedHashMap();
-//        List<Map<String, Object>> list3 = Lists.newArrayList();
-//        ExportSingleUtils<Map<String, Object>> ex2 = new ExportSingleUtils<Map<String, Object>>(fileFullPath2,
-//            headerMapper2, list3);
-//        ex2.darwRow(0, new String[] { "序号", "件号", "名称", "计量单位","单车用量","图片","适用车型","服务中心价格","客户经理价格","用户销售价格" });
-//        for (int i = 1; i <= exportData.size(); i++) {
-//            BasicCarpartsProductDTO carpartsProduct = exportData.get(i - 1);
-//            ex2.darwRow(i , new String[] { String.valueOf(i), carpartsProduct.getCarpartsMarkno(), carpartsProduct.getCarpartsName()
-//                , carpartsProduct.getCarpartsUnit(),"0",carpartsProduct.getCarpartsImage()
-//                ,carpartsProduct.getCarmodelName(),getPrice(carpartsProduct.getServerCarpartsPrice()),getPrice(carpartsProduct.getCustCarpartsPrice())
-//                ,getPrice(carpartsProduct.getCarpartsPrice()) });
-//        }
-//        ex2.build(true);
-//
-//        String accessKeyId = ossClientProperties.getAccessKeyId();
-//        String accessKeySecret = ossClientProperties.getAccessKeySecret();
-//        String endpoint = ossClientProperties.getEndpoint();
-//        String bucketName = ossClientProperties.getBucketName();
-//        // 获取到图片在阿里云的全路径
-//        List<String> carpartsimage = OSSFileUtils.batchDownloadObjectByMatch(accessKeyId, accessKeySecret, endpoint, bucketName, BusinessPropertyHolder.FILE_PATH, "41f8d25f461e471cb8ffb756012a4f36/ldpng", a -> true);
-
-//        ExcelPictruePos excelPictruePos = new ExcelPictruePos();
-
-
-//        ExcelPictruePos excelPictruePos = new ExcelPictruePos();
-//        ExcelPictruesUtils.writePic(fileFullPath, fileFullPath2, images);
-
-
-
-//        System.out.println(carpartsimage);
+        ex2.build(resp);
     }
 
 
-    private String getPrice(Double price) {
-        return price == null ? "" : price.toString();
+    private String getObject(Object object) {
+        return object == null ? "" : object.toString();
     }
 
-    public static void main(String[] args) {
-
-    }
 
 }
