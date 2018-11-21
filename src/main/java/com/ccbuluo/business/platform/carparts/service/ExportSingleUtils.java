@@ -46,8 +46,7 @@ public class ExportSingleUtils<T> {
 	private HSSFWorkbook workbook = null;
 	private HSSFSheet sheet = null;
 
-	public ExportSingleUtils(String fileFullPath, LinkedHashMap<String, String> headerMapper, List<T> list) {
-		this.fileFullPath = fileFullPath;
+	public ExportSingleUtils(LinkedHashMap<String, String> headerMapper, List<T> list) {
 		this.headerMapper = headerMapper;
 		this.list = list;
 		this.workbook = new HSSFWorkbook();
@@ -63,11 +62,19 @@ public class ExportSingleUtils<T> {
 		return rowIndex++;
 	}
 
-	public void build(boolean result) {
+	public void build(boolean result, HttpServletResponse resp) {
 		try {
-			FileOutputStream outputStream = new FileOutputStream(this.fileFullPath);
-			workbook.write(outputStream);
-			outputStream.flush();
+//			FileOutputStream outputStream = new FileOutputStream(this.fileFullPath);
+//			workbook.write(outputStream);
+//			outputStream.flush();
+
+			ServletOutputStream out = null;
+			resp.setContentType("application/x-msdownload");
+			resp.addHeader("Content-Disposition", "attachment; filename=\"" + java.net.URLEncoder.encode("零配件信息表.xls", "UTF-8") + "\"");
+			out = resp.getOutputStream();
+			workbook.write(out);
+			out.close();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

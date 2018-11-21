@@ -2,7 +2,6 @@ package com.ccbuluo.business.platform.allocateapply.service;
 
 import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
-import com.ccbuluo.business.constants.OrganizationTypeEnum;
 import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.entity.BizOutstockplanDetail;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
@@ -17,7 +16,6 @@ import com.ccbuluo.business.platform.outstock.dao.BizOutstockOrderDao;
 import com.ccbuluo.business.platform.outstock.dto.BizOutstockOrderDTO;
 import com.ccbuluo.business.platform.outstockplan.dao.BizOutstockplanDetailDao;
 import com.ccbuluo.business.platform.stockdetail.dao.ProblemStockDetailDao;
-import com.ccbuluo.business.platform.stockdetail.dto.StockDetailDTO;
 import com.ccbuluo.business.platform.storehouse.dao.BizServiceStorehouseDao;
 import com.ccbuluo.business.platform.storehouse.dto.QueryStorehouseDTO;
 import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
@@ -30,11 +28,8 @@ import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftBean;
-import com.ccbuluo.http.StatusDtoThriftList;
 import com.ccbuluo.http.StatusDtoThriftUtils;
-import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 import com.ccbuluo.usercoreintf.dto.UserInfoDTO;
-import com.ccbuluo.usercoreintf.model.BasicUserOrganization;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.ccbuluo.usercoreintf.service.InnerUserInfoService;
 import com.google.common.collect.Lists;
@@ -261,7 +256,7 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
             }
         }
         // 设置问题件详单
-        ArrayList<QueryAllocateapplyDetailDTO> allocateapplyDetailList = setingProblemDetailList(applyNo, allocateApplyDTO);
+        ArrayList<QueryAllocateapplyDetailDTO> allocateapplyDetailList = settingProblemDetailList(applyNo, allocateApplyDTO);
         allocateApplyDTO.setQueryAllocateapplyDetailDTO(allocateapplyDetailList);
         return allocateApplyDTO;
     }
@@ -274,10 +269,10 @@ public class ProblemAllocateApplyImpl implements ProblemAllocateApply {
      * @author zhangkangjian
      * @date 2018-11-09 15:02:32
      */
-    private ArrayList<QueryAllocateapplyDetailDTO> setingProblemDetailList(String applyNo, FindAllocateApplyDTO allocateApplyDTO) {
+    private ArrayList<QueryAllocateapplyDetailDTO> settingProblemDetailList(String applyNo, FindAllocateApplyDTO allocateApplyDTO) {
         // 查询申请单详单
-        String outstockOrgno = allocateApplyDTO.getOutstockOrgno();
-        List<BizOutstockplanDetail> bizOutstockplanDetails = bizOutstockplanDetailDao.queryOutstockplan(applyNo, null, null, outstockOrgno);
+        String applyorgNo = allocateApplyDTO.getApplyorgNo();
+        List<BizOutstockplanDetail> bizOutstockplanDetails = bizOutstockplanDetailDao.queryOutstockplan(applyNo, null, null, applyorgNo);
         allocateApplyServiceImpl.buildStockPlanDetail(bizOutstockplanDetails);
         ArrayList<QueryAllocateapplyDetailDTO> allocateapplyDetailList = Lists.newArrayList();
         List<QueryAllocateapplyDetailDTO> queryAllocateapplyDetailDTO = allocateApplyDTO.getQueryAllocateapplyDetailDTO();

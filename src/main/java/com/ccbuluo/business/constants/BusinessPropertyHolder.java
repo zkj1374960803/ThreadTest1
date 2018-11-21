@@ -47,4 +47,12 @@ public class BusinessPropertyHolder {
     public void setOrgcodeAftersalePlatform(String orgcodeAftersalePlatform) {
         ORGCODE_AFTERSALE_PLATFORM = orgcodeAftersalePlatform;
     }
+
+
+    // 文件临时目录
+    public static String FILE_PATH;
+    @Value("${oss.bucket-name}")
+    public void setFilePath(String filePath) {
+        FILE_PATH = filePath;
+    }
 }
