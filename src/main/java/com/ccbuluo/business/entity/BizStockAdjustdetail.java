@@ -43,7 +43,6 @@ public class BizStockAdjustdetail extends AftersaleCommonEntity {
     /**
      * 商品分类的全路径名称
      */
-    @ValidateNotBlank(message = "商品分类的全路径名称不能为空")
     @ApiModelProperty(name = "productCategoryname", value = "商品分类的全路径名称")
     private String productCategoryname;
     /**
