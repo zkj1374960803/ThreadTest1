@@ -78,14 +78,14 @@ public class RelProductPrice {
 
     // 申请单的编号
     @ApiModelProperty(name = "applyNoList", value = "申请单的编号", hidden = true)
-    private List<String> applyNoList;
+    private String applyNoList;
 
 
-    public List<String> getApplyNoList() {
+    public String getApplyNoList() {
         return applyNoList;
     }
 
-    public void setApplyNoList(List<String> applyNoList) {
+    public void setApplyNoList(String applyNoList) {
         this.applyNoList = applyNoList;
     }
 

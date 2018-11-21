@@ -5,15 +5,9 @@ import com.ccbuluo.business.constants.OrganizationTypeEnum;
 import com.ccbuluo.business.entity.BizAllocateApply;
 import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.entity.RelProductPrice;
-import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateApplyDao;
 import com.ccbuluo.business.platform.allocateapply.dao.BizAllocateapplyDetailDao;
 import com.ccbuluo.business.platform.carconfiguration.dao.BasicCarmodelManageDao;
-import com.ccbuluo.business.platform.carconfiguration.service.BasicCarmodelManageService;
-import com.ccbuluo.business.platform.carparts.dao.CarpartsProductPriceDao;
-import com.ccbuluo.business.platform.equipment.dao.BizServiceEquipmentDao;
-import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
-import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
 import com.ccbuluo.core.common.UserHolder;
 import com.ccbuluo.core.constants.SystemPropertyHolder;
 import com.ccbuluo.core.entity.OSSClientProperties;
@@ -23,6 +17,8 @@ import com.ccbuluo.core.service.UploadService;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.excel.imports.ExcelReaderUtils;
 import com.ccbuluo.excel.imports.ExcelRowReaderBean;
+import com.ccbuluo.excel.readpic.ExcelPictruePos;
+import com.ccbuluo.excel.readpic.ExcelPictruesUtils;
 import com.ccbuluo.excel.readpic.ExcelShapeSaveAliyunOSS;
 import com.ccbuluo.http.StatusDto;
 import com.ccbuluo.http.StatusDtoThriftList;
@@ -46,6 +42,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 /**
  * @author zhangkangjian
  * @date 2018-11-21 15:12:25
@@ -58,14 +55,6 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
     @Resource
     private GenerateProjectCodeService generateProjectCodeService;
     @Resource
-    private UserHolder userHolder;
-    @Resource
-    private BasicCarmodelManageService basicCarmodelManageService;
-    @Resource
-    private CarpartsProductPriceDao carpartsProductPriceDao;
-    @Resource
-    private BizAllocateApplyDao bizAllocateApplyDao;
-    @Resource
     private UploadService uploadService;
     @Resource
     private BasicCarmodelManageDao basicCarmodelManageDao;
@@ -73,16 +62,12 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
     private CarpartsProductPriceService carpartsProductServiceImpl;
     @Resource
     private BizAllocateapplyDetailDao bizAllocateapplyDetailDao;
-    @Resource
-    private BizServiceSupplierDao bizServiceSupplierDao;
-    @Resource
-    private BizServiceOrderDao bizServiceOrderDao;
-    @Resource
-    private BizServiceEquipmentDao bizServiceEquipmentDao;
     @ThriftRPCClient("UserCoreSerService")
     private BasicUserOrganizationService basicUserOrganization;
     @Autowired
     private OSSClientProperties ossClientProperties;
+    @Resource
+    private UserHolder userHolder;
 
     /**
      * 导入零配件
@@ -259,23 +244,22 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
         String bucketName = ossClientProperties.getBucketName();
         String endpoint = ossClientProperties.getEndpoint();
         String baseAppid = SystemPropertyHolder.getBaseAppid();
-//        String property = System.getProperty("user.dir") + "\\src\\main\\resources\\imge";
         ExcelShapeSaveAliyunOSS excelShapeSaveAliyunOSS = new ExcelShapeSaveAliyunOSS(accessKeyId, accessKeySecret, bucketName, endpoint, baseAppid);
 
-//        Map<String, Collection<ExcelPictruePos>> pictrueListInfo = ExcelPictruesUtils.getAllDate(filepath, 1, excelShapeSaveAliyunOSS);
-//        String loggedUserId = userHolder.getLoggedUserId();
-//        productList.forEach(a ->{
-//            a.setCreator(loggedUserId);
-//            a.setOperator(loggedUserId);
-//            String carpartsMarkno = a.getCarpartsMarkno();
-//            Collection<ExcelPictruePos> excelPictruePosColl = pictrueListInfo.get(carpartsMarkno);
-//            if(excelPictruePosColl != null){
-//                List<ExcelPictruePos> excelPictruePosList = new ArrayList<ExcelPictruePos>(excelPictruePosColl);
-//                ExcelPictruePos excelPictruePos = excelPictruePosList.get(0);
-//                String ossKey = excelPictruePos.getOssKey();
-//                a.setCarpartsImage(ossKey);
-//            }
-//        });
+        Map<String, Collection<ExcelPictruePos>> pictrueListInfo = ExcelPictruesUtils.getAllDate(filepath, 1, excelShapeSaveAliyunOSS);
+        String loggedUserId = userHolder.getLoggedUserId();
+        productList.forEach(a ->{
+            a.setCreator(loggedUserId);
+            a.setOperator(loggedUserId);
+            String carpartsMarkno = a.getCarpartsMarkno();
+            Collection<ExcelPictruePos> excelPictruePosColl = pictrueListInfo.get(carpartsMarkno);
+            if(excelPictruePosColl != null){
+                List<ExcelPictruePos> excelPictruePosList = new ArrayList<ExcelPictruePos>(excelPictruePosColl);
+                ExcelPictruePos excelPictruePos = excelPictruePosList.get(0);
+                String ossKey = excelPictruePos.getOssKey();
+                a.setCarpartsImage(ossKey);
+            }
+        });
     }
 
     /**
@@ -335,15 +319,18 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
                 // 批量更新零配件价格时间
                 carpartsProductServiceImpl.batchUpdateProductPrice(updateRelProductPriceList);
                 // 更新申请单详单的价格
-                bizAllocateapplyDetailDao.batchUpdateAllocateapplyDetail(updateRelProductPriceList);
+                List<RelProductPrice> collect = updateRelProductPriceList.stream().filter(a -> {
+                    return a.getPriceLevel() != 4L;
+
+                }).collect(Collectors.toList());
+                bizAllocateapplyDetailDao.batchUpdateAllocateapplyDetail(collect);
                 // 更新入库计划
-                bizAllocateapplyDetailDao.batchUpdateInstockorderDetail(updateRelProductPriceList);
+                bizAllocateapplyDetailDao.batchUpdateInstockorderDetail(collect);
                 // 更新出库计划
-                bizAllocateapplyDetailDao.batchUpdateOutstockorderDetail(updateRelProductPriceList);
+                bizAllocateapplyDetailDao.batchUpdateOutstockorderDetail(collect);
                 saveRelProductPriceList.addAll(updateRelProductPriceList);
                 // 批量插入零配件价格列表
                 carpartsProductServiceImpl.batchSaveProductPrice(saveRelProductPriceList);
-
             });
         });
     }
@@ -360,14 +347,27 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
     private void buildProductPrice(List<String> serApplyNoList, List<String> custApplyNoList, List<RelProductPrice> relProductPriceList, BasicCarpartsProductDTO basicCarpartsProductDTO, String productCode) {
         // 构建阶梯价格
         RelProductPrice custProductPrice = new RelProductPrice(productCode,Constants.PRODUCT_TYPE_FITTINGS, basicCarpartsProductDTO.getCustCarpartsPrice(), 3L);
-        custProductPrice.setApplyNoList(custApplyNoList);
+        String substring = getApplyNoString(custApplyNoList);
+        custProductPrice.setApplyNoList(substring);
+        custProductPrice.setStartTime(new Date());
         relProductPriceList.add(custProductPrice);
 
         RelProductPrice serProductPrice = new RelProductPrice(productCode,Constants.PRODUCT_TYPE_FITTINGS, basicCarpartsProductDTO.getServerCarpartsPrice(), 2L);
-        serProductPrice.setApplyNoList(serApplyNoList);
+        String applyNoString = getApplyNoString(serApplyNoList);
+        serProductPrice.setApplyNoList(applyNoString);
+        serProductPrice.setStartTime(new Date());
         relProductPriceList.add(serProductPrice);
 
         RelProductPrice userProductPrice = new RelProductPrice(productCode,Constants.PRODUCT_TYPE_FITTINGS, basicCarpartsProductDTO.getCarpartsPrice(), 4L);
+        userProductPrice.setStartTime(new Date());
         relProductPriceList.add(userProductPrice);
+    }
+
+    private String getApplyNoString(List<String> custApplyNoList) {
+        StringBuilder sb = new StringBuilder();
+        for (String str :  custApplyNoList) {
+            sb.append("'").append(str).append("'").append(",");
+        }
+        return sb.toString().substring(0, sb.toString().length() - 1);
     }
 }
