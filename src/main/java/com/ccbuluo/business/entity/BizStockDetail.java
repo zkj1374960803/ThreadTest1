@@ -141,8 +141,8 @@ public class BizStockDetail extends AftersaleCommonEntity{
     @ApiModelProperty(name = "purchaseTradeNo", value = "采购单号")
     private String purchaseTradeNo;
 
-    public String getPurchasePrice() {
-        Map<String, String> map = JsonUtils.readValue(purchaseInfo, HashMap.class);
+    public Double getPurchasePrice() {
+        Map<String, Double> map = JsonUtils.readValue(purchaseInfo, HashMap.class);
         return map.get("purchasePrice");
     }
 
