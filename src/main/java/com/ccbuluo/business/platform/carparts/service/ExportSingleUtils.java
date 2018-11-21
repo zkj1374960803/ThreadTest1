@@ -26,6 +26,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
@@ -38,6 +39,7 @@ import javax.servlet.http.HttpServletResponse;
  * <dd>@author：hqbzl</dd>
  * </dl>
  */
+@Service
 public class ExportSingleUtils<T> {
 	private HSSFWorkbook workbook = null;
 	private HSSFSheet sheet = null;
@@ -46,12 +48,16 @@ public class ExportSingleUtils<T> {
     private BusinessPropertyHolder businessPropertyHolder;
 
 
-	public ExportSingleUtils( HSSFWorkbook workbook, HSSFSheet sheet) {
-		this.workbook = workbook;
-		this.sheet = sheet;
-	}
+//	public ExportSingleUtils( HSSFWorkbook workbook, HSSFSheet sheet) {
+//		this.workbook = workbook;
+//		this.sheet = sheet;
+//	}
 
 	public int darwRow(int rowIndex, String[] values, HSSFClientAnchor anchor, String image) throws MalformedURLException {
+
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet();
+
         HSSFRow row = sheet.createRow(rowIndex);
         row.setHeight((short) 1000);
 		if (StringUtils.isBlank(image)) {
@@ -66,7 +72,8 @@ public class ExportSingleUtils<T> {
             }
         } else {
             HSSFPatriarch patriarch = sheet.createDrawingPatriarch();
-            URL url = new URL(businessPropertyHolder.getPathPrefix(BusinessPropertyHolder.FILE_PATH) + image);
+            String s = businessPropertyHolder.getPathPrefix(BusinessPropertyHolder.FILE_PATH) + image;
+            URL url = new URL(s);
             ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
             try {
                 BufferedImage bufferImg = ImageIO.read(url);

@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
  * @date 2018-05-08 10:25:37
  */
 @Component
-
 public class BusinessPropertyHolder {
 
     @Autowired
