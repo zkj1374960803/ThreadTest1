@@ -170,7 +170,7 @@ public class PlatformBarterApplyHandleStrategy extends DefaultApplyHandleStrateg
                     // 库存编号id
                     outstockplanPurchaser.setStockId(bd.getId());
                     // 成本价
-                    outstockplanPurchaser.setCostPrice(bd.getCostPrice());
+                    outstockplanPurchaser.setCostPrice(new BigDecimal(bd.getPurchasePrice()));
                     // 交易类型
                     outstockplanPurchaser.setOutstockType(OutstockTypeEnum.BARTER.toString());
                     outstockplanPurchaser.setPurchaseInfo(bd.getPurchaseInfo());

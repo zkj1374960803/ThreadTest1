@@ -496,48 +496,6 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     }
 
 
-
-    @Override
-    public void exportCarparts(HttpServletResponse resp) throws IOException {
-        // 查询所有零配件
-        StatusDtoThriftPage<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThriftPage = carpartsProductService.queryCarpartsProductList(null, 0, Integer.MAX_VALUE);
-        StatusDto<Page<BasicCarpartsProductDTO>> list = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOStatusDtoThriftPage, BasicCarpartsProductDTO.class);
-        if (null == list.getData()) {
-            throw new CommonException("0", "没有查询到零配件!");
-        }
-        // 查询零配件的价格
-        QueryCarpartsProductDTO queryCarpartsProductDTO = new QueryCarpartsProductDTO();
-        queryCarpartsProductDTO.setOffset(0);
-        queryCarpartsProductDTO.setPageSize(Integer.MAX_VALUE);
-        StatusDto<Page<BasicCarpartsProductDTO>> pageStatusDto = carpartsProductServiceImpl.queryCarpartsProductPriceList(queryCarpartsProductDTO);
-        Page<BasicCarpartsProductDTO> data = pageStatusDto.getData();
-        List<BasicCarpartsProductDTO> rows = data.getRows();
-        Map<String, BasicCarpartsProductDTO> carpartsProductMap = rows.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, Function.identity()));
-        Page<BasicCarpartsProductDTO> data1 = list.getData();
-        List<BasicCarpartsProductDTO> exportData = data1.getRows();
-        for (BasicCarpartsProductDTO exportDatum : exportData) {
-            BasicCarpartsProductDTO basicCarpartsProductDTO = carpartsProductMap.get(exportDatum.getCarpartsCode());
-            exportDatum.setServerCarpartsPrice(basicCarpartsProductDTO.getServerCarpartsPrice());
-            exportDatum.setCarpartsPrice(basicCarpartsProductDTO.getCarpartsPrice());
-            exportDatum.setCustCarpartsPrice(basicCarpartsProductDTO.getCustCarpartsPrice());
-        }
-
-
-
-        ExportSingleUtils<Map<String, Object>> ex2 = new ExportSingleUtils<Map<String, Object>>();
-        ex2.darwRow(0, new String[] { "序号", "件号", "名称", "计量单位","单车用量","图片","适用车型","服务中心价格","客户经理价格","用户销售价格" }, null, null);
-        for (int i = 1; i <= exportData.size(); i++) {
-            BasicCarpartsProductDTO carpartsProduct = exportData.get(i - 1);
-            HSSFClientAnchor anchor = new HSSFClientAnchor(255, 255, 255, 255, (short) 5, i, (short) 5,i);
-            anchor.setAnchorType(2);
-            ex2.darwRow(i , new String[] { String.valueOf(i), getObject(carpartsProduct.getCarpartsMarkno()), getObject(carpartsProduct.getCarpartsName())
-                , getObject(carpartsProduct.getCarpartsUnit()),getObject(carpartsProduct.getUsedAmount()), carpartsProduct.getCarpartsImage()
-                ,getObject(carpartsProduct.getCarmodelName()),getObject(carpartsProduct.getServerCarpartsPrice()),getObject(carpartsProduct.getCustCarpartsPrice())
-                ,getObject(carpartsProduct.getCarpartsPrice()) }, anchor, "bc1559ffeead46d7b864ab7a651aa3bb/png/2018/11/20/b362ff45fa3544e1a0364ed6f3a77cfa.png");
-        }
-        ex2.build(resp);
-    }
-
     /**
      * 批量更新零配件价格结束时间
      * @param updateRelProductPriceList 零配件价格列表
@@ -563,13 +521,5 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
         // 批量插入零件价格列表
         carpartsProductPriceDao.batchSaveProductPrice(saveRelProductPriceList);
     }
-
-
-
-    private String getObject(Object object) {
-        return object == null ? "" : object.toString();
-    }
-
-
 
 }

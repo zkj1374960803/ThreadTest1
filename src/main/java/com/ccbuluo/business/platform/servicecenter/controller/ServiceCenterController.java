@@ -5,6 +5,7 @@ import com.ccbuluo.business.platform.servicecenter.dto.SaveServiceCenterDTO;
 import com.ccbuluo.business.platform.servicecenter.dto.SearchListDTO;
 import com.ccbuluo.business.platform.servicecenter.service.ServiceCenterService;
 import com.ccbuluo.business.platform.servicecenter.servicecenterenum.ServiceCenterEnum;
+import com.ccbuluo.core.annotation.validate.ValidateLength;
 import com.ccbuluo.core.annotation.validate.ValidateNotNull;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
@@ -91,7 +92,8 @@ public class ServiceCenterController extends BaseController {
         @ApiImplicitParam(name = "labelIds", value = "标签ids", paramType = "query"),})
     @GetMapping("/edit")
     public StatusDto<String> editServiceCenter(@RequestParam @ValidateNotNull(message = "serviceCenterCode(服务中心code)不能为空") String serviceCenterCode,
-                                               @RequestParam @ValidateNotNull(message = "serviceCenterName(服务中心名字)不能为空") String serviceCenterName,
+                                               @RequestParam @ValidateNotNull(message = "serviceCenterName(服务中心名字)不能为空")
+                                                             @ValidateLength(min = 0, max = 15, message = "服务中心名称不能超过15个字") String serviceCenterName,
                                                @RequestParam(required = false) String labelIds) {
 
         return serviceCenterService.editServiceCenter(serviceCenterCode, serviceCenterName, labelIds);

@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -205,7 +206,7 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
                     bizStockDetailLists.add(stockDetail);
                     outstockplanPlatform.setPlanOutstocknum(inStockPlanSum);
                     buildOutStockPlan(bizInstockplanDetail,stockDetail, outstockplanPlatform);
-                    outstockplanPlatform.setCostPrice(stockDetail.getCostPrice());
+                    outstockplanPlatform.setCostPrice(new BigDecimal(BigInteger.ZERO));
                     outstockplanPlatform.setPurchaseInfo(stockDetail.getPurchaseInfo());
                     outstockplanDetails.add(outstockplanPlatform);
                     break;
@@ -217,7 +218,7 @@ public class BarterStockInOutCallBack implements StockInOutCallBack{
                     bizStockDetailLists.add(stockDetail);
                     outstockplanPlatform.setPlanOutstocknum(validStock);
                     buildOutStockPlan(bizInstockplanDetail,stockDetail, outstockplanPlatform);
-                    outstockplanPlatform.setCostPrice(stockDetail.getCostPrice());
+                    outstockplanPlatform.setCostPrice(new BigDecimal(BigInteger.ZERO));
                     outstockplanPlatform.setPurchaseInfo(stockDetail.getPurchaseInfo());
                     outstockplanDetails.add(outstockplanPlatform);
                     if (inStockPlanSum <= 0) {

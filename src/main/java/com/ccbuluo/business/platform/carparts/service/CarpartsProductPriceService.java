@@ -118,12 +118,6 @@ public interface CarpartsProductPriceService {
     StatusDto<String> deleteCarpartsProduct(String carpartsCode);
 
     /**
-     * 导出零配件
-     * @author liuduo
-     * @date 2018-11-19 09:44:02
-     */
-    void exportCarparts(HttpServletResponse resp)  throws IOException;
-    /**
      * 批量更新零配件价格结束时间
      * @param updateRelProductPriceList 零配件价格列表
      * @author zhangkangjian
