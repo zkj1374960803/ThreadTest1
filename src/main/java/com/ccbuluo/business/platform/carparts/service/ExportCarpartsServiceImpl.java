@@ -58,7 +58,7 @@ public class ExportCarpartsServiceImpl implements ExportCarpartsService{
     @Override
     public void exportCarparts(HttpServletResponse resp) throws IOException {
         // 查询所有零配件
-        StatusDtoThriftPage<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThriftPage = carpartsProductService.queryCarpartsProductList(null, 0, Integer.MAX_VALUE);
+        StatusDtoThriftPage<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThriftPage = carpartsProductService.queryCarpartsProductList(null, 0, 10);
         StatusDto<Page<BasicCarpartsProductDTO>> list = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOStatusDtoThriftPage, BasicCarpartsProductDTO.class);
         if (null == list.getData()) {
             throw new CommonException("0", "没有查询到零配件!");
@@ -84,7 +84,7 @@ public class ExportCarpartsServiceImpl implements ExportCarpartsService{
         // 填充数据
         for (int i = 1; i <= exportData.size(); i++) {
             BasicCarpartsProductDTO carpartsProduct = exportData.get(i - 1);
-            HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 255, 255, (short) 5, i, (short) 5,i);
+            HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 800, 255, (short) 5, i, (short) 5,i);
             anchor.setAnchorType(2);
             darwRow(i , new String[] { String.valueOf(i), getObject(carpartsProduct.getCarpartsMarkno()), getObject(carpartsProduct.getCarpartsName())
                 , getObject(carpartsProduct.getCarpartsUnit()),getObject(carpartsProduct.getUsedAmount()), ""
