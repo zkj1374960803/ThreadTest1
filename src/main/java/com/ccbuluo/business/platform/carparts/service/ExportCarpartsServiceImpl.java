@@ -76,6 +76,7 @@ public class ExportCarpartsServiceImpl implements ExportCarpartsService{
             exportDatum.setServerCarpartsPrice(basicCarpartsProductDTO.getServerCarpartsPrice());
             exportDatum.setCarpartsPrice(basicCarpartsProductDTO.getCarpartsPrice());
             exportDatum.setCustCarpartsPrice(basicCarpartsProductDTO.getCustCarpartsPrice());
+            exportDatum.setCarmodelName(basicCarpartsProductDTO.getCarmodelName());
         }
 
         HSSFWorkbook workbook = new HSSFWorkbook();
