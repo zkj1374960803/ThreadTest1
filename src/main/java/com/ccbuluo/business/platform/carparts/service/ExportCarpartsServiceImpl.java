@@ -171,6 +171,7 @@ public class ExportCarpartsServiceImpl implements ExportCarpartsService{
             resp.addHeader("Content-Disposition", "attachment; filename=\"" + java.net.URLEncoder.encode("零配件信息.xls", "UTF-8") + "\"");
             out = resp.getOutputStream();
             workbook.write(out);
+            out.flush();
             out.close();
         } catch (Exception e) {
             e.printStackTrace();
