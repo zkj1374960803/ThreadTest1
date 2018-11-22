@@ -1,5 +1,8 @@
 package com.ccbuluo.business.platform.carparts.service;
 
+import com.aliyun.oss.OSSClient;
+import com.aliyun.oss.model.DeleteObjectsRequest;
+import com.aliyun.oss.model.DeleteObjectsResult;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.OrganizationTypeEnum;
 import com.ccbuluo.business.entity.BizAllocateApply;
@@ -25,14 +28,17 @@ import com.ccbuluo.http.StatusDtoThriftList;
 import com.ccbuluo.http.StatusDtoThriftUtils;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
+import com.ccbuluo.upload.aliyun.OSSFileUtils;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.shaded.com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -41,6 +47,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
@@ -71,6 +80,12 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
     @Resource
     private UserHolder userHolder;
 
+    private <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Map<Object,Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+    }
+
+
     /**
      * 导入零配件
      *
@@ -80,6 +95,7 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
      * @date 2018-11-16 11:46:02
      */
     @Override
+    @Transactional
     public StatusDto<String> importCarparts(MultipartFile multipartFile) throws Exception {
         // 1.导入的文件上传阿里云
         StatusDto<UploadFileInfo> carpartsexcel = uploadService.simpleUpload(multipartFile, "carpartsexcel");
@@ -91,10 +107,8 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
         String filepath = file.getPath();
 
         // 3.读取excel，获取list的数据
-        List<BasicCarpartsProductDTO> productList = geCarpartsProductList(filepath);
-        if(productList == null || productList.size() == 0){
-            return StatusDto.buildFailureStatusDto("数据为空导入失败！");
-        }
+        List<BasicCarpartsProductDTO> productList = getCarpartsProductListByExcel(filepath);
+
         // 4.车型名称转换成车型id
         conventCarModelNameById(productList);
         // 5.上传图片并把相对路径填充到 productList中
@@ -138,7 +152,7 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
      * @author zhangkangjian
      * @date 2018-11-16 16:41:02
      */
-    private List<BasicCarpartsProductDTO> geCarpartsProductList(String filepath) throws Exception {
+    private List<BasicCarpartsProductDTO> getCarpartsProductListByExcel(String filepath) throws Exception {
         Map<String, Integer> columnIndexMapperBeanField = Maps.newHashMap();
         // 列映射，实体字段，对应的excel列索引
         columnIndexMapperBeanField.put("carpartsMarkno", 1);
@@ -177,7 +191,6 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
                     }
                 }catch (Exception e){
                     boo = false;
-//                    e.printStackTrace();
                 }
                 return boo;
             }
@@ -190,7 +203,12 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
         // 读取excel
         ExcelReaderUtils.readExcel(readerBean, filepath);
         // 获取读取的结果结果
-        return readerBean.getData();
+        List<BasicCarpartsProductDTO> productList = readerBean.getData();
+        if(productList == null || productList.size() == 0){
+            throw new CommonException(Constants.ERROR_CODE, "数据为空导入失败!");
+        }
+        // 去重返回
+        return productList.stream().filter(distinctByKey(BasicCarpartsProductDTO::getCarpartsMarkno)).collect(Collectors.toList());
     }
 
     /**
@@ -240,7 +258,7 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
      * @date 2018-11-16 16:35:55
      */
     private void uploadImgeAndSetImgePath(String filepath, List<BasicCarpartsProductDTO> productList) {
-        // 上传图片并获取的图片的路径
+
         String accessKeyId = ossClientProperties.getAccessKeyId();
         String accessKeySecret = ossClientProperties.getAccessKeySecret();
         String bucketName = ossClientProperties.getBucketName();
@@ -270,7 +288,8 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
      * @author zhangkangjian
      * @date 2018-11-20 10:42:24
      */
-    private void batchSaveOrUpdateProductList(List<BasicCarpartsProductDTO> productList) {
+    @Transactional
+    void batchSaveOrUpdateProductList(List<BasicCarpartsProductDTO> productList) {
         // 根据类型查询机构编号
         QueryOrgDTO queryOrgDTO = new QueryOrgDTO();
         List<String> name = List.of(OrganizationTypeEnum.CUSTMANAGER.name(), OrganizationTypeEnum.SERVICECENTER.name());
@@ -318,13 +337,11 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
                 carpartsProductService.batchSaveCarpartsProduct(saveProductList);
                 // 批量更新，更新零配件
                 carpartsProductService.batchUpdateCarpartsProduct(updateProductList);
+                deleteOSSImge(updateProductList);
                 // 批量更新零配件价格时间
                 carpartsProductServiceImpl.batchUpdateProductPrice(updateRelProductPriceList);
                 // 更新申请单详单的价格
-                List<RelProductPrice> collect = updateRelProductPriceList.stream().filter(a -> {
-                    return a.getPriceLevel() != 4L;
-
-                }).collect(Collectors.toList());
+                List<RelProductPrice> collect = updateRelProductPriceList.stream().filter(a -> a.getPriceLevel() != 4L).collect(Collectors.toList());
                 bizAllocateapplyDetailDao.batchUpdateAllocateapplyDetail(collect);
                 // 更新入库计划
                 bizAllocateapplyDetailDao.batchUpdateInstockorderDetail(collect);
@@ -335,6 +352,29 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
                 carpartsProductServiceImpl.batchSaveProductPrice(saveRelProductPriceList);
             });
         });
+    }
+
+    /**
+     * 删除OSS图片
+     * @param updateProductList 需要更新的零配件列表
+     * @author zhangkangjian
+     * @date 2018-11-22 15:45:51
+     */
+    private void deleteOSSImge(List<BasicCarpartsProductDTO> updateProductList) {
+        String accessKeyId = ossClientProperties.getAccessKeyId();
+        String accessKeySecret = ossClientProperties.getAccessKeySecret();
+        String bucketName = ossClientProperties.getBucketName();
+        String endpoint = ossClientProperties.getEndpoint();
+        List<String> carpartsImageList = updateProductList.stream().map(BasicCarpartsProductDTO::getCarpartsImage).collect(Collectors.toList());
+        OSSClient ossClient = new OSSClient(endpoint, accessKeyId, accessKeySecret);
+        try {
+            List<List<String>> partition = Lists.partition(carpartsImageList, 1000);
+            partition.forEach(item ->{
+                ossClient.deleteObjects(new DeleteObjectsRequest(bucketName).withKeys(item));
+            });
+        } finally {
+            ossClient.shutdown();
+        }
     }
 
     /**
