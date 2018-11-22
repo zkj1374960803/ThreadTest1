@@ -1175,7 +1175,7 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
         String userOrgCode = getUserOrgCode();
         // 查询商品的库存数量
         Page<FindStockListDTO> stockList = bizAllocateApplyDao.findStockList(findStockListDTO, productCode, List.of(userOrgCode));
-        if(findStockListDTO.getProductType().equals(Constants.PRODUCT_TYPE_EQUIPMENT)){
+        if(!findStockListDTO.getProductType().equals(Constants.PRODUCT_TYPE_EQUIPMENT)){
             List<FindStockListDTO> rows = stockList.getRows();
             if(rows != null && rows.size() > 0){
                 Map<String, BasicCarpartsProductDTO> basicCarpartsProductDTOMap = carpartsProductDTOList.stream().collect(Collectors.toMap(BasicCarpartsProductDTO::getCarpartsCode, a -> a,(k1,k2)->k1));
