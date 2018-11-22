@@ -31,6 +31,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.shaded.com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -59,6 +60,7 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
     @Resource
     private BasicCarmodelManageDao basicCarmodelManageDao;
     @Resource(name = "carpartsProductPriceServiceImpl")
+    @Lazy
     private CarpartsProductPriceService carpartsProductServiceImpl;
     @Resource
     private BizAllocateapplyDetailDao bizAllocateapplyDetailDao;
@@ -346,21 +348,31 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
      */
     private void buildProductPrice(List<String> serApplyNoList, List<String> custApplyNoList, List<RelProductPrice> relProductPriceList, BasicCarpartsProductDTO basicCarpartsProductDTO, String productCode) {
         // 构建阶梯价格
-        RelProductPrice custProductPrice = new RelProductPrice(productCode,Constants.PRODUCT_TYPE_FITTINGS, basicCarpartsProductDTO.getCustCarpartsPrice(), 3L);
-        String substring = getApplyNoString(custApplyNoList);
-        custProductPrice.setApplyNoList(substring);
-        custProductPrice.setStartTime(new Date());
-        relProductPriceList.add(custProductPrice);
+        Double custCarpartsPrice = basicCarpartsProductDTO.getCustCarpartsPrice();
+        if(custCarpartsPrice != null){
+            RelProductPrice custProductPrice = new RelProductPrice(productCode,Constants.PRODUCT_TYPE_FITTINGS, custCarpartsPrice, 3L);
+            String substring = getApplyNoString(custApplyNoList);
+            custProductPrice.setApplyNoList(substring);
+            custProductPrice.setStartTime(new Date());
+            relProductPriceList.add(custProductPrice);
+        }
 
-        RelProductPrice serProductPrice = new RelProductPrice(productCode,Constants.PRODUCT_TYPE_FITTINGS, basicCarpartsProductDTO.getServerCarpartsPrice(), 2L);
-        String applyNoString = getApplyNoString(serApplyNoList);
-        serProductPrice.setApplyNoList(applyNoString);
-        serProductPrice.setStartTime(new Date());
-        relProductPriceList.add(serProductPrice);
+        Double serverCarpartsPrice = basicCarpartsProductDTO.getServerCarpartsPrice();
+        if(serverCarpartsPrice != null){
+            RelProductPrice serProductPrice = new RelProductPrice(productCode,Constants.PRODUCT_TYPE_FITTINGS, serverCarpartsPrice, 2L);
+            String applyNoString = getApplyNoString(serApplyNoList);
+            serProductPrice.setApplyNoList(applyNoString);
+            serProductPrice.setStartTime(new Date());
+            relProductPriceList.add(serProductPrice);
+        }
 
-        RelProductPrice userProductPrice = new RelProductPrice(productCode,Constants.PRODUCT_TYPE_FITTINGS, basicCarpartsProductDTO.getCarpartsPrice(), 4L);
-        userProductPrice.setStartTime(new Date());
-        relProductPriceList.add(userProductPrice);
+        Double carpartsPrice = basicCarpartsProductDTO.getCarpartsPrice();
+        if(carpartsPrice != null){
+            RelProductPrice userProductPrice = new RelProductPrice(productCode,Constants.PRODUCT_TYPE_FITTINGS, carpartsPrice, 4L);
+            userProductPrice.setStartTime(new Date());
+            relProductPriceList.add(userProductPrice);
+        }
+
     }
 
     private String getApplyNoString(List<String> custApplyNoList) {

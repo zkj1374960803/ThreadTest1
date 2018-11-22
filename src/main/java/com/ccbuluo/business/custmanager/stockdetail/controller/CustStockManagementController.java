@@ -22,6 +22,7 @@ import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 import io.swagger.annotations.*;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -42,9 +43,8 @@ public class CustStockManagementController extends BaseController {
     @Resource(name = "allocateApplyServiceImpl")
     private AllocateApplyService allocateApplyServiceImpl;
     @Resource(name = "carpartsProductPriceServiceImpl")
+    @Lazy
     private CarpartsProductPriceService carpartsProductServiceImpl;
-
-
     /**
      * 查看物料调拨库存
      * @param findStockListDTO 查询条件
@@ -290,5 +290,4 @@ public class CustStockManagementController extends BaseController {
     public StatusDto<Page<BasicCarpartsProductDTO>> queryServiceProductList(@ApiIgnore QueryCarpartsProductDTO queryCarpartsProductDTO) {
         return carpartsProductServiceImpl.queryServiceProductList(queryCarpartsProductDTO);
     }
-
 }

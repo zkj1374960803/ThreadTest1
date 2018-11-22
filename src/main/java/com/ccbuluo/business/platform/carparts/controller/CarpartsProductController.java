@@ -24,6 +24,7 @@ import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.SaveBasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
 import io.swagger.annotations.*;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
@@ -54,6 +55,7 @@ public class CarpartsProductController extends BaseController {
     @Resource
     private BasicCarmodelManageService basicCarmodelManageService;
     @Resource(name = "carpartsProductPriceServiceImpl")
+    @Lazy
     private CarpartsProductPriceService carpartsProductServiceImpl;
     @Resource
     private ImportCarpartsProductService importCarpartsProductServiceImpl;

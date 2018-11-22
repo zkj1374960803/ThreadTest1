@@ -1,7 +1,5 @@
 package com.ccbuluo.business.platform.carparts.service;
 
-import com.aliyun.oss.internal.OSSUtils;
-import com.ccbuluo.business.constants.BusinessPropertyHolder;
 import com.ccbuluo.business.constants.Constants;
 import com.ccbuluo.business.constants.OrganizationTypeEnum;
 import com.ccbuluo.business.entity.BizAllocateApply;
@@ -18,55 +16,34 @@ import com.ccbuluo.business.platform.order.dao.BizServiceOrderDao;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.business.platform.supplier.dao.BizServiceSupplierDao;
 import com.ccbuluo.core.common.UserHolder;
-import com.ccbuluo.core.constants.SystemPropertyHolder;
 import com.ccbuluo.core.entity.OSSClientProperties;
 import com.ccbuluo.core.entity.UploadFileInfo;
 import com.ccbuluo.core.exception.CommonException;
 import com.ccbuluo.core.service.UploadService;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.db.Page;
-import com.ccbuluo.excel.imports.ExcelField;
-import com.ccbuluo.excel.imports.ExcelReaderUtils;
-import com.ccbuluo.excel.imports.ExcelRowReaderBean;
-import com.ccbuluo.excel.readpic.ExcelPictruePos;
-import com.ccbuluo.excel.readpic.ExcelPictruesUtils;
-import com.ccbuluo.excel.readpic.ExcelShapeSaveAliyunOSS;
-import com.ccbuluo.excel.readpic.ExcelShapeSaveLocal;
 import com.ccbuluo.http.*;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.BasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.QueryCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.dto.SaveBasicCarpartsProductDTO;
 import com.ccbuluo.merchandiseintf.carparts.parts.service.CarpartsProductService;
-import com.ccbuluo.upload.aliyun.OSSFileUtils;
-import com.ccbuluo.usercoreintf.dto.QueryNameByUseruuidsDTO;
 import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.google.common.collect.Lists;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.curator.shaded.com.google.common.collect.Maps;
-import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.hssf.usermodel.HSSFClientAnchor;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.io.*;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -97,6 +74,7 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     @Resource
     private BasicCarmodelManageDao basicCarmodelManageDao;
     @Resource(name = "carpartsProductPriceServiceImpl")
+    @Lazy
     private CarpartsProductPriceService carpartsProductServiceImpl;
     @Resource
     private BizAllocateapplyDetailDao bizAllocateapplyDetailDao;
@@ -546,6 +524,7 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
      * @date 2018-11-21 13:45:40
      */
     @Override
+    @Async
     public void batchUpdateProductPrice(List<RelProductPrice> updateRelProductPriceList) {
         // 批量更新零配件价格结束时间
         carpartsProductPriceDao.batchUpdateProductPrice(updateRelProductPriceList);
@@ -560,6 +539,7 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
      * @date 2018-11-21 14:30:32
      */
     @Override
+    @Async
     public void batchSaveProductPrice(List<RelProductPrice> saveRelProductPriceList) {
         // 批量插入零件价格列表
         carpartsProductPriceDao.batchSaveProductPrice(saveRelProductPriceList);
