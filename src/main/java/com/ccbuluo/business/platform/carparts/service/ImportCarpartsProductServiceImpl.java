@@ -20,6 +20,8 @@ import com.ccbuluo.core.service.UploadService;
 import com.ccbuluo.core.thrift.annotation.ThriftRPCClient;
 import com.ccbuluo.excel.imports.ExcelReaderUtils;
 import com.ccbuluo.excel.imports.ExcelRowReaderBean;
+import com.ccbuluo.excel.imports.ExcelXlsReader;
+import com.ccbuluo.excel.imports.ExcelXlsxReader;
 import com.ccbuluo.excel.readpic.ExcelPictruePos;
 import com.ccbuluo.excel.readpic.ExcelPictruesUtils;
 import com.ccbuluo.excel.readpic.ExcelShapeSaveAliyunOSS;
@@ -33,7 +35,9 @@ import com.ccbuluo.usercoreintf.dto.QueryOrgDTO;
 import com.ccbuluo.usercoreintf.service.BasicUserOrganizationService;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.curator.shaded.com.google.common.collect.Maps;
+import org.apache.poi.ss.usermodel.PictureData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
@@ -51,6 +55,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import static com.ccbuluo.excel.imports.ExcelReaderUtils.EXCEL03_EXTENSION;
+import static com.ccbuluo.excel.imports.ExcelReaderUtils.EXCEL07_EXTENSION;
 
 
 /**
@@ -105,18 +112,21 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
         // 2.上传文件到本地（注： ExcelReaderUtils.readExcel(readerBean, filepath) 导入需要filePath）
         File file = uploadFilesToLocal(multipartFile);
         String filepath = file.getPath();
-
-        // 3.读取excel，获取list的数据
-        List<BasicCarpartsProductDTO> productList = getCarpartsProductListByExcel(filepath);
-
-        // 4.车型名称转换成车型id
-        conventCarModelNameById(productList);
-        // 5.上传图片并把相对路径填充到 productList中
-        uploadImgeAndSetImgePath(filepath, productList);
-        // 6.批量保存或者更新零配件数据（如数据库中存在的零配件和productList中的零配件代码相同的数据，则更新数据，否则插入数据）
-        batchSaveOrUpdateProductList(productList);
-        // 7.删除本地项目的文件
-        new File(filepath).delete();
+        try {
+            // 3.读取excel，获取list的数据
+            List<BasicCarpartsProductDTO> productList = getCarpartsProductListByExcel(filepath);
+            // 4.车型名称转换成车型id
+            conventCarModelNameById(productList);
+            // 5.上传图片并把相对路径填充到 productList中
+            uploadImgeAndSetImgePath(filepath, productList);
+            // 6.批量保存或者更新零配件数据（如数据库中存在的零配件和productList中的零配件代码相同的数据，则更新数据，否则插入数据）
+            batchSaveOrUpdateProductList(productList);
+        }catch (Exception e){
+            // 7.删除本地项目的文件
+            e.printStackTrace();
+            new File(filepath).delete();
+            throw e;
+        }
         return StatusDto.buildSuccessStatusDto();
     }
 
@@ -130,7 +140,18 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
     private File uploadFilesToLocal(MultipartFile multipartFile) throws IOException {
         InputStream inputStream = multipartFile.getInputStream();
         String property = System.getProperty("user.dir") + "\\src\\main\\resources\\";
-        File file = new File(property + System.currentTimeMillis() + ".xlsx");
+        String originalFilename = multipartFile.getOriginalFilename();
+        if (originalFilename == null) {
+            throw new CommonException(Constants.ERROR_CODE, "文件名称不能为空");
+        }
+        if (originalFilename.endsWith(EXCEL03_EXTENSION)) {
+            property += System.currentTimeMillis() + EXCEL03_EXTENSION;
+        } else if (originalFilename.endsWith(EXCEL07_EXTENSION)) {
+            property += System.currentTimeMillis() + EXCEL07_EXTENSION;
+        } else {
+            throw new CommonException(Constants.ERROR_CODE, "文件格式错误，fileName的扩展名只能是xls或xlsx。");
+        }
+        File file = new File(property);
         FileOutputStream outputStream = new FileOutputStream(file);
         try {
             byte temp[] = new byte[1024];
@@ -138,7 +159,7 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
             while ((size = inputStream.read(temp)) != -1) { // 每次读取1KB，直至读完
                 outputStream.write(temp, 0, size);
             }
-        }finally {
+        } finally {
             inputStream.close();
             outputStream.close();
         }
@@ -173,21 +194,44 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
                     boo = false;
                 }
                 try {
+                    String carpartsMarkno = rowlist.get(1);
+                    // 不允许出现中文
+                    boolean matches = carpartsMarkno.matches("[^\\u4e00-\\u9fa5]+");
+                    if(carpartsMarkno.length() > 20 || matches || StringUtils.isBlank(carpartsMarkno)){
+                        throw new IllegalArgumentException();
+                    }
+
+                    String carpartsName = rowlist.get(2);
+                    if(StringUtils.isBlank(carpartsName) || carpartsName.length() > 20){
+                        throw new IllegalArgumentException();
+                    }
+
                     String usedAmount = rowlist.get(4);
                     if(usedAmount != null){
-                        Long.parseLong(usedAmount);
+                        long usedAmountLong = Long.parseLong(usedAmount);
+                        if(usedAmountLong > 999){
+                            throw new IllegalArgumentException();
+                        }
                     }
+
+                    double serverCarpartsPriceD = 0;
                     String serverCarpartsPrice = rowlist.get(7);
                     if(StringUtils.isNotBlank(serverCarpartsPrice)){
-                        Double.parseDouble(serverCarpartsPrice);
+                        serverCarpartsPriceD = Double.parseDouble(serverCarpartsPrice);
                     }
+                    double custCarpartsPriceD = 0;
                     String custCarpartsPrice = rowlist.get(8);
                     if(StringUtils.isNotBlank(custCarpartsPrice)){
-                        Double.parseDouble(custCarpartsPrice);
+                        custCarpartsPriceD = Double.parseDouble(custCarpartsPrice);
                     }
+                    double carpartsPriceD = 0;
                     String carpartsPrice = rowlist.get(9);
                     if(StringUtils.isNotBlank(carpartsPrice)){
-                        Double.parseDouble(carpartsPrice);
+                        carpartsPriceD = Double.parseDouble(carpartsPrice);
+                    }
+                    double maxPrice = 9999999.99;
+                    if(serverCarpartsPriceD > maxPrice || custCarpartsPriceD > maxPrice || carpartsPriceD > maxPrice){
+                        throw new IllegalArgumentException();
                     }
                 }catch (Exception e){
                     boo = false;
@@ -207,7 +251,7 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
         if(productList == null || productList.size() == 0){
             throw new CommonException(Constants.ERROR_CODE, "数据为空导入失败!");
         }
-        // 去重返回
+        // 去重
         return productList.stream().filter(distinctByKey(BasicCarpartsProductDTO::getCarpartsMarkno)).collect(Collectors.toList());
     }
 
