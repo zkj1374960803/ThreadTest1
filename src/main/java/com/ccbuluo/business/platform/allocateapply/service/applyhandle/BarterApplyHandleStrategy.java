@@ -201,7 +201,7 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
                     // 库存编号id
                     outstockplanPurchaser.setStockId(bd.getId());
                     // 成本价
-                    outstockplanPurchaser.setCostPrice(new BigDecimal(BigInteger.ZERO));
+                    outstockplanPurchaser.setCostPrice(bd.getCostPrice());
                     // 交易类型
                     outstockplanPurchaser.setOutstockType(OutstockTypeEnum.BARTER.toString());
                     outstockplanPurchaser.setPurchaseInfo(bd.getPurchaseInfo());
@@ -334,7 +334,7 @@ public class BarterApplyHandleStrategy extends DefaultApplyHandleStrategy {
         inPlan.setProductUnit(bd.getProductUnit());// 商品计量单位
         inPlan.setTradeNo(bd.getTradeNo());// 交易批次号（申请单编号）
         inPlan.setSupplierNo(bd.getSupplierNo());//供应商编号
-        inPlan.setCostPrice(new BigDecimal(BigInteger.ZERO));// 成本价
+        inPlan.setCostPrice(bd.getCostPrice());// 成本价
         inPlan.setPlanInstocknum(bd.getPlanOutstocknum());// 计划入库数量
         inPlan.setCompleteStatus(StockPlanStatusEnum.DOING.toString());// 完成状态（计划执行中）
         inPlan.preInsert(userHolder.getLoggedUserId());
