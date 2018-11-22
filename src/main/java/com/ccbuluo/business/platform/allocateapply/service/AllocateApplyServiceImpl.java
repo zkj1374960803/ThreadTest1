@@ -216,12 +216,9 @@ public class AllocateApplyServiceImpl implements AllocateApplyService {
             allocateApplyDTO.setOutstockOrgtype(outOrgType);
             allocateApplyDTO.setProcessOrgtype(outOrgType);
         }
-        // 如果是退款类型，没有入库机构，不需要查询机构类型
-        if(!AllocateApplyTypeEnum.REFUND.name().equals(processType)){
             // 入库仓库查询入库组织机构
             String orgCode = bizServiceStorehouseDao.getOrgCodeByStoreHouseCode(allocateApplyDTO.getInRepositoryNo());
             allocateApplyDTO.setInstockOrgno(orgCode);
-        }
         // 保存申请单基础数据
         bizAllocateApplyDao.saveEntity(allocateApplyDTO);
         // 保存申请单详情数据
