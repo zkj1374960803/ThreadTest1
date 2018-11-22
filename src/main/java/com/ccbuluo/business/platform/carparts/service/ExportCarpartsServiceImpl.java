@@ -79,8 +79,12 @@ public class ExportCarpartsServiceImpl implements ExportCarpartsService{
             exportDatum.setCarpartsPrice(basicCarpartsProductDTO.getCarpartsPrice());
             exportDatum.setCustCarpartsPrice(basicCarpartsProductDTO.getCustCarpartsPrice());
         }
+        HSSFCellStyle style = workbook.createCellStyle();//设置列样式
+        style.setAlignment(HSSFCellStyle.ALIGN_CENTER);// 水平居中
+        style.setVerticalAlignment(HSSFCellStyle.ALIGN_CENTER);
+        style.setWrapText(true);
         // 设置表头
-        darwRow(0, new String[] { "序号", "件号", "名称", "计量单位","单车用量","图片","适用车型","服务中心价格","客户经理价格","用户销售价格" }, null, null);
+        darwRow(0, new String[] { "序号", "件号", "名称", "计量单位","单车用量","图片","适用车型","服务中心价格","客户经理价格","用户销售价格" }, null, null, style);
         // 填充数据
         for (int i = 1; i <= exportData.size(); i++) {
             BasicCarpartsProductDTO carpartsProduct = exportData.get(i - 1);
@@ -89,7 +93,7 @@ public class ExportCarpartsServiceImpl implements ExportCarpartsService{
             darwRow(i , new String[] { String.valueOf(i), getObject(carpartsProduct.getCarpartsMarkno()), getObject(carpartsProduct.getCarpartsName())
                 , getObject(carpartsProduct.getCarpartsUnit()),getObject(carpartsProduct.getUsedAmount()), ""
                 ,getObject(carpartsProduct.getCarmodelName()),getObject(carpartsProduct.getServerCarpartsPrice()),getObject(carpartsProduct.getCustCarpartsPrice())
-                ,getObject(carpartsProduct.getCarpartsPrice()) }, anchor, carpartsProduct.getCarpartsImage());
+                ,getObject(carpartsProduct.getCarpartsPrice()) }, anchor, carpartsProduct.getCarpartsImage(), style);
         }
         build(resp);
     }
@@ -114,12 +118,8 @@ public class ExportCarpartsServiceImpl implements ExportCarpartsService{
      * @author liuduo
      * @date 2018-11-21 16:44:13
      */
-    public int darwRow(int rowIndex, String[] values, HSSFClientAnchor anchor, String image) throws MalformedURLException {
+    public int darwRow(int rowIndex, String[] values, HSSFClientAnchor anchor, String image, HSSFCellStyle style) throws MalformedURLException {
         HSSFRow row = sheet.createRow(rowIndex);
-        HSSFCellStyle style = workbook.createCellStyle();//设置列样式
-        style.setAlignment(HSSFCellStyle.ALIGN_CENTER);// 水平居中
-        style.setVerticalAlignment(HSSFCellStyle.ALIGN_CENTER);
-        style.setWrapText(true);
         row.setHeight((short) 1520);
         if (StringUtils.isBlank(image)) {
             for (int i = 0; i < values.length; i++) {
