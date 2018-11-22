@@ -46,8 +46,6 @@ public class ExportCarpartsServiceImpl implements ExportCarpartsService{
     private CarpartsProductPriceService carpartsProductServiceImpl;
     @Autowired
     private OSSClientProperties ossClientProperties;
-    private HSSFWorkbook workbook = new HSSFWorkbook();
-    private HSSFSheet sheet = workbook.createSheet();
 
     /**
      * 导出零配件
@@ -79,12 +77,15 @@ public class ExportCarpartsServiceImpl implements ExportCarpartsService{
             exportDatum.setCarpartsPrice(basicCarpartsProductDTO.getCarpartsPrice());
             exportDatum.setCustCarpartsPrice(basicCarpartsProductDTO.getCustCarpartsPrice());
         }
+
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet();
         HSSFCellStyle style = workbook.createCellStyle();//设置列样式
         style.setAlignment(HSSFCellStyle.ALIGN_CENTER);// 水平居中
         style.setVerticalAlignment(HSSFCellStyle.ALIGN_CENTER);
         style.setWrapText(true);
         // 设置表头
-        darwRow(0, new String[] { "序号", "件号", "名称", "计量单位","单车用量","图片","适用车型","服务中心价格","客户经理价格","用户销售价格" }, null, null, style);
+        darwRow(0, new String[] { "序号", "件号", "名称", "计量单位","单车用量","图片","适用车型","服务中心价格","客户经理价格","用户销售价格" }, null, null, style, workbook, sheet);
         // 填充数据
         for (int i = 1; i <= exportData.size(); i++) {
             BasicCarpartsProductDTO carpartsProduct = exportData.get(i - 1);
@@ -93,9 +94,9 @@ public class ExportCarpartsServiceImpl implements ExportCarpartsService{
             darwRow(i , new String[] { String.valueOf(i), getObject(carpartsProduct.getCarpartsMarkno()), getObject(carpartsProduct.getCarpartsName())
                 , getObject(carpartsProduct.getCarpartsUnit()),getObject(carpartsProduct.getUsedAmount()), ""
                 ,getObject(carpartsProduct.getCarmodelName()),getObject(carpartsProduct.getServerCarpartsPrice()),getObject(carpartsProduct.getCustCarpartsPrice())
-                ,getObject(carpartsProduct.getCarpartsPrice()) }, anchor, carpartsProduct.getCarpartsImage(), style);
+                ,getObject(carpartsProduct.getCarpartsPrice()) }, anchor, carpartsProduct.getCarpartsImage(), style, workbook, sheet);
         }
-        build(resp);
+        build(resp, workbook);
     }
 
     /**
@@ -118,7 +119,7 @@ public class ExportCarpartsServiceImpl implements ExportCarpartsService{
      * @author liuduo
      * @date 2018-11-21 16:44:13
      */
-    public int darwRow(int rowIndex, String[] values, HSSFClientAnchor anchor, String image, HSSFCellStyle style) throws MalformedURLException {
+    public int darwRow(int rowIndex, String[] values, HSSFClientAnchor anchor, String image, HSSFCellStyle style, HSSFWorkbook workbook, HSSFSheet sheet) throws MalformedURLException {
         HSSFRow row = sheet.createRow(rowIndex);
         row.setHeight((short) 1520);
         if (StringUtils.isBlank(image)) {
@@ -164,17 +165,18 @@ public class ExportCarpartsServiceImpl implements ExportCarpartsService{
      * @author liuduo
      * @date 2018-11-21 16:45:06
      */
-    public void build(HttpServletResponse resp) {
+    public void build(HttpServletResponse resp, HSSFWorkbook workbook) throws IOException {
+        ServletOutputStream out = resp.getOutputStream();
         try {
-            ServletOutputStream out = null;
             resp.setContentType("application/x-msdownload");
             resp.addHeader("Content-Disposition", "attachment; filename=\"" + java.net.URLEncoder.encode("零配件信息.xls", "UTF-8") + "\"");
-            out = resp.getOutputStream();
             workbook.write(out);
-            out.flush();
-            out.close();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            out.flush();
+            out.close();
+            workbook.close();
         }
     }
 
