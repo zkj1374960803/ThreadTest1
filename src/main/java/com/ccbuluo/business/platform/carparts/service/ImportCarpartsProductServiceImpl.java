@@ -311,12 +311,17 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
                 List<BasicCarpartsProductDTO> updateProductList = Lists.newArrayList();
                 List<RelProductPrice> updateRelProductPriceList = Lists.newArrayList();
                 List<RelProductPrice> saveRelProductPriceList = Lists.newArrayList();
+                List<String> carpartsImageList = Lists.newArrayList();
                 productItem.forEach(a ->{
                     String carpartsMarkno = a.getCarpartsMarkno();
                     BasicCarpartsProductDTO basicCarpartsProductDTO = carpartsProductMap.get(carpartsMarkno);
                     // 数据库中已存在该数据，更新即可。如不存在，需要插入新数据
                     if(basicCarpartsProductDTO != null){
                         String carpartsCode = basicCarpartsProductDTO.getCarpartsCode();
+                        String carpartsImage = basicCarpartsProductDTO.getCarpartsImage();
+                        if(StringUtils.isNotBlank(carpartsImage)){
+                            carpartsImageList.add(carpartsImage);
+                        }
                         a.setCarpartsCode(carpartsCode);
                         updateProductList.add(a);
                         buildProductPrice(serApplyNoList, custApplyNoList, updateRelProductPriceList, a, carpartsCode);
@@ -337,7 +342,7 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
                 carpartsProductService.batchSaveCarpartsProduct(saveProductList);
                 // 批量更新，更新零配件
                 carpartsProductService.batchUpdateCarpartsProduct(updateProductList);
-                deleteOSSImge(updateProductList);
+                deleteOSSImge(carpartsImageList);
                 // 批量更新零配件价格时间
                 carpartsProductServiceImpl.batchUpdateProductPrice(updateRelProductPriceList);
                 // 更新申请单详单的价格
@@ -360,15 +365,14 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
      * @author zhangkangjian
      * @date 2018-11-22 15:45:51
      */
-    private void deleteOSSImge(List<BasicCarpartsProductDTO> updateProductList) {
+    private void deleteOSSImge(List<String> updateProductList) {
         String accessKeyId = ossClientProperties.getAccessKeyId();
         String accessKeySecret = ossClientProperties.getAccessKeySecret();
         String bucketName = ossClientProperties.getBucketName();
         String endpoint = ossClientProperties.getEndpoint();
-        List<String> carpartsImageList = updateProductList.stream().map(BasicCarpartsProductDTO::getCarpartsImage).collect(Collectors.toList());
         OSSClient ossClient = new OSSClient(endpoint, accessKeyId, accessKeySecret);
         try {
-            List<List<String>> partition = Lists.partition(carpartsImageList, 1000);
+            List<List<String>> partition = Lists.partition(updateProductList, 1000);
             partition.forEach(item ->{
                 ossClient.deleteObjects(new DeleteObjectsRequest(bucketName).withKeys(item));
             });
