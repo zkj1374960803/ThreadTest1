@@ -1,11 +1,14 @@
 package com.ccbuluo.business.entity;
 
+import com.ccbuluo.json.JsonUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 批次库存表，由交易批次号、供应商、仓库等多维度唯一主键 区分的库存表实体
@@ -137,6 +140,11 @@ public class BizStockDetail extends AftersaleCommonEntity{
     @JsonIgnore
     @ApiModelProperty(name = "purchaseTradeNo", value = "采购单号")
     private String purchaseTradeNo;
+
+    public Double getPurchasePrice() {
+        Map<String, Double> map = JsonUtils.readValue(purchaseInfo, HashMap.class);
+        return map.get("purchasePrice");
+    }
 
     public void setRepositoryNo(String repositoryNo) {
         this.repositoryNo = repositoryNo;

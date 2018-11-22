@@ -11,11 +11,7 @@ import org.springframework.stereotype.Component;
  * @date 2018-05-08 10:25:37
  */
 @Component
-
 public class BusinessPropertyHolder {
-
-    @Autowired
-    private OSSClientProperties ossClientProperties;
 
     // 用户中心token key前缀名称
     public static String PROJECTCODE_REDIS_KEYPERFIX;
@@ -62,10 +58,15 @@ public class BusinessPropertyHolder {
     }
 
 
-    public String getPathPrefix(String bucket) {
-        // 获取base-web-code的oss.endpoint
-        String endpoint = ossClientProperties.getEndpoint();
-        // 截取 http://
+    /**
+     * 拼接阿里云图片路径前缀
+     * @param bucket 桶名，用来和oss前缀拼接
+     * @param endpoint oss前缀
+     * @return 阿里云图片路径前缀
+     * @author liuduo
+     * @date 2018-11-21 17:22:48
+     */
+    public static String getPathPrefix(String bucket, String endpoint) {
         String substring = endpoint.substring(endpoint.lastIndexOf("/")+1);
         StringBuilder http = new StringBuilder("http://");
         StringBuilder point = new StringBuilder(".");

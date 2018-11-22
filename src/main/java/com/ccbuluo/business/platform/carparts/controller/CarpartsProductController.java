@@ -5,6 +5,7 @@ import com.ccbuluo.business.entity.BizServiceProjectcode;
 import com.ccbuluo.business.entity.RelProductPrice;
 import com.ccbuluo.business.platform.carconfiguration.service.BasicCarmodelManageService;
 import com.ccbuluo.business.platform.carparts.service.CarpartsProductPriceService;
+import com.ccbuluo.business.platform.carparts.service.ExportCarpartsService;
 import com.ccbuluo.business.platform.carparts.service.ImportCarpartsProductService;
 import com.ccbuluo.business.platform.projectcode.service.GenerateProjectCodeService;
 import com.ccbuluo.business.vehiclelease.entity.BizOrderChannelprice;
@@ -59,6 +60,8 @@ public class CarpartsProductController extends BaseController {
     private CarpartsProductPriceService carpartsProductServiceImpl;
     @Resource
     private ImportCarpartsProductService importCarpartsProductServiceImpl;
+    @Resource
+    private ExportCarpartsService exportCarpartsService;
 
     /**
      * 添加零配件
@@ -237,7 +240,7 @@ public class CarpartsProductController extends BaseController {
     @ApiOperation(value = "导出零配件",notes = "【刘铎】")
     @GetMapping("/exportcarparts")
     public void exportCarparts(HttpServletResponse resp)  throws IOException {
-        carpartsProductServiceImpl.exportCarparts(resp);
+        exportCarpartsService.exportCarparts(resp);
     }
 
 }
