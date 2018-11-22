@@ -58,7 +58,7 @@ public class ExportCarpartsServiceImpl implements ExportCarpartsService{
     @Override
     public void exportCarparts(HttpServletResponse resp) throws IOException {
         // 查询所有零配件
-        StatusDtoThriftPage<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThriftPage = carpartsProductService.queryCarpartsProductList(null, 0, 10);
+        StatusDtoThriftPage<BasicCarpartsProductDTO> basicCarpartsProductDTOStatusDtoThriftPage = carpartsProductService.queryCarpartsProductList(null, 0, Integer.MAX_VALUE);
         StatusDto<Page<BasicCarpartsProductDTO>> list = StatusDtoThriftUtils.resolve(basicCarpartsProductDTOStatusDtoThriftPage, BasicCarpartsProductDTO.class);
         if (null == list.getData()) {
             throw new CommonException("0", "没有查询到零配件!");
@@ -84,8 +84,8 @@ public class ExportCarpartsServiceImpl implements ExportCarpartsService{
         // 填充数据
         for (int i = 1; i <= exportData.size(); i++) {
             BasicCarpartsProductDTO carpartsProduct = exportData.get(i - 1);
-            HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 800, 255, (short) 5, i, (short) 5,i);
-            anchor.setAnchorType(2);
+            HSSFClientAnchor anchor = new HSSFClientAnchor(0, 0, 1023, 255, (short) 5, i, (short) 5,i);
+            anchor.setAnchorType(0);
             darwRow(i , new String[] { String.valueOf(i), getObject(carpartsProduct.getCarpartsMarkno()), getObject(carpartsProduct.getCarpartsName())
                 , getObject(carpartsProduct.getCarpartsUnit()),getObject(carpartsProduct.getUsedAmount()), ""
                 ,getObject(carpartsProduct.getCarmodelName()),getObject(carpartsProduct.getServerCarpartsPrice()),getObject(carpartsProduct.getCustCarpartsPrice())
@@ -118,8 +118,9 @@ public class ExportCarpartsServiceImpl implements ExportCarpartsService{
         HSSFRow row = sheet.createRow(rowIndex);
         HSSFCellStyle style = workbook.createCellStyle();//设置列样式
         style.setAlignment(HSSFCellStyle.ALIGN_CENTER);// 水平居中
+        style.setVerticalAlignment(HSSFCellStyle.ALIGN_CENTER);
         style.setWrapText(true);
-        row.setHeight((short) 1000);
+        row.setHeight((short) 1520);
         if (StringUtils.isBlank(image)) {
             for (int i = 0; i < values.length; i++) {
                 sheet.setColumnWidth((short) i, (short) 4500);
