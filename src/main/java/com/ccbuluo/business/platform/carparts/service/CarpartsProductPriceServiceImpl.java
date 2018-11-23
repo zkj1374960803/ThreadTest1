@@ -37,6 +37,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -45,6 +46,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -483,6 +486,9 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
     @Override
     @Async
     public void batchUpdateProductPrice(List<RelProductPrice> updateRelProductPriceList) {
+//        if(true){
+//            throw new RuntimeException();
+//        }
         // 批量更新零配件价格结束时间
         carpartsProductPriceDao.batchUpdateProductPrice(updateRelProductPriceList);
 
@@ -497,9 +503,16 @@ public class CarpartsProductPriceServiceImpl implements CarpartsProductPriceServ
      */
     @Override
     @Async
-    public void batchSaveProductPrice(List<RelProductPrice> saveRelProductPriceList) {
+    public Future<String> batchSaveProductPrice(List<RelProductPrice> saveRelProductPriceList) {
+        if(true){
+            throw new RuntimeException();
+        }
         // 批量插入零件价格列表
         carpartsProductPriceDao.batchSaveProductPrice(saveRelProductPriceList);
+
+
+        return new AsyncResult<String>("发送消息用了"+1+"秒");
     }
+
 
 }

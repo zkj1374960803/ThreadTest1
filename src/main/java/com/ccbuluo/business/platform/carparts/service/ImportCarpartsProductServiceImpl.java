@@ -40,9 +40,15 @@ import org.apache.curator.shaded.com.google.common.collect.Maps;
 import org.apache.poi.ss.usermodel.PictureData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.web.context.ContextLoader;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -52,6 +58,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -86,6 +93,8 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
     private OSSClientProperties ossClientProperties;
     @Resource
     private UserHolder userHolder;
+    @Autowired
+    ApplicationContext applicationContext;
 
     private <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
         Map<Object,Boolean> seen = new ConcurrentHashMap<>();
@@ -197,7 +206,7 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
                     String carpartsMarkno = rowlist.get(1);
                     // 不允许出现中文
                     boolean matches = carpartsMarkno.matches("[^\\u4e00-\\u9fa5]+");
-                    if(carpartsMarkno.length() > 20 || matches || StringUtils.isBlank(carpartsMarkno)){
+                    if(carpartsMarkno.length() > 20 || !matches || StringUtils.isBlank(carpartsMarkno)){
                         throw new IllegalArgumentException();
                     }
 
@@ -234,6 +243,7 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
                         throw new IllegalArgumentException();
                     }
                 }catch (Exception e){
+                    e.printStackTrace();
                     boo = false;
                 }
                 return boo;
@@ -388,17 +398,53 @@ public class ImportCarpartsProductServiceImpl implements ImportCarpartsProductSe
                 carpartsProductService.batchUpdateCarpartsProduct(updateProductList);
                 deleteOSSImge(carpartsImageList);
                 // 批量更新零配件价格时间
-                carpartsProductServiceImpl.batchUpdateProductPrice(updateRelProductPriceList);
-                // 更新申请单详单的价格
-                List<RelProductPrice> collect = updateRelProductPriceList.stream().filter(a -> a.getPriceLevel() != 4L).collect(Collectors.toList());
-                bizAllocateapplyDetailDao.batchUpdateAllocateapplyDetail(collect);
-                // 更新入库计划
-                bizAllocateapplyDetailDao.batchUpdateInstockorderDetail(collect);
-                // 更新出库计划
-                bizAllocateapplyDetailDao.batchUpdateOutstockorderDetail(collect);
-                saveRelProductPriceList.addAll(updateRelProductPriceList);
+//                carpartsProductServiceImpl.batchUpdateProductPrice(updateRelProductPriceList);
+//                // 更新申请单详单的价格
+//                List<RelProductPrice> collect = updateRelProductPriceList.stream().filter(a -> a.getPriceLevel() != 4L).collect(Collectors.toList());
+//                bizAllocateapplyDetailDao.batchUpdateAllocateapplyDetail(collect);
+//                // 更新入库计划
+//                bizAllocateapplyDetailDao.batchUpdateInstockorderDetail(collect);
+//                // 更新出库计划
+//                bizAllocateapplyDetailDao.batchUpdateOutstockorderDetail(collect);
+//                saveRelProductPriceList.addAll(updateRelProductPriceList);
                 // 批量插入零配件价格列表
-                carpartsProductServiceImpl.batchSaveProductPrice(saveRelProductPriceList);
+                Future<String> stringFuture = carpartsProductServiceImpl.batchSaveProductPrice(saveRelProductPriceList);
+//                stringFuture.get()
+
+                List<TransactionStatus> transactionStatuses = Collections.synchronizedList(new ArrayList<TransactionStatus>());
+                new Thread(() -> {
+                    DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+                    def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+                    PlatformTransactionManager txManager = applicationContext.getBean(PlatformTransactionManager.class);
+                    TransactionStatus stauts = txManager.getTransaction(def);
+                    transactionStatuses.add(stauts);
+                    try {
+                        carpartsProductServiceImpl.batchUpdateProductPrice(updateRelProductPriceList);
+                    } catch (Exception e) {
+                        for (TransactionStatus transactionStatus:transactionStatuses) {
+                            transactionStatus.setRollbackOnly();
+                        }
+                    }
+                }).start();
+
+
+                new Thread(() -> {
+                    DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+                    def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+                    PlatformTransactionManager txManager = applicationContext.getBean(PlatformTransactionManager.class);
+                    TransactionStatus stauts = txManager.getTransaction(def);
+                    transactionStatuses.add(stauts);
+                    try {
+                        carpartsProductServiceImpl.batchSaveProductPrice(saveRelProductPriceList);
+                    } catch (Exception e) {
+                        for (TransactionStatus transactionStatus:transactionStatuses) {
+                            transactionStatus.setRollbackOnly();
+                        }
+                    }
+                }).start();
+
+
+
             });
         });
     }

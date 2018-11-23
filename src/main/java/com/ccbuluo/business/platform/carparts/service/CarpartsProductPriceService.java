@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.concurrent.Future;
 
 /**
  * 零配件价格service
@@ -131,5 +132,5 @@ public interface CarpartsProductPriceService {
      * @author zhangkangjian
      * @date 2018-11-21 14:30:32
      */
-    void batchSaveProductPrice(List<RelProductPrice> saveRelProductPriceList);
+    Future<String> batchSaveProductPrice(List<RelProductPrice> saveRelProductPriceList);
 }
