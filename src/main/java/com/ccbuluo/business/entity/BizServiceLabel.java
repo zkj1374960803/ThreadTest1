@@ -49,6 +49,14 @@ public class BizServiceLabel {
     @ApiModelProperty(name = "deleteFlag", value = "删除标识", hidden = true)
     private Long deleteFlag = 0L;
 
+
+    public BizServiceLabel(String labelName) {
+        this.labelName = labelName;
+    }
+
+    public BizServiceLabel() {
+    }
+
     public void setId(Long id) {
         this.id = id;
     }

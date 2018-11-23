@@ -3,9 +3,12 @@ package com.ccbuluo.business.platform.label.controller;
 import com.ccbuluo.business.entity.BizServiceLabel;
 import com.ccbuluo.business.platform.label.dto.ListLabelDTO;
 import com.ccbuluo.business.platform.label.service.LabelService;
+import com.ccbuluo.business.platform.multi.DemoService;
+import com.ccbuluo.business.platform.multi.MultiExecutor;
 import com.ccbuluo.core.controller.BaseController;
 import com.ccbuluo.http.StatusDto;
 import io.swagger.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * 标签controller
@@ -26,6 +31,8 @@ import java.util.List;
 @RequestMapping("/label/label")
 public class ServiceLabelController extends BaseController {
 
+    @Autowired
+    private DemoService demoService;
     @Resource(name = "labelServiceImpl")
     private LabelService labelServiceImpl;
 
@@ -85,6 +92,29 @@ public class ServiceLabelController extends BaseController {
     })
     public StatusDto<String> editlabel(Long id, String labelName){
         labelServiceImpl.editlabel(id, labelName);
+        return StatusDto.buildSuccessStatusDto();
+    }
+
+
+
+    @ApiOperation(value = "编辑标签",notes = "【张康健】")
+    @PostMapping("/test")
+
+    public StatusDto<String> test() throws ExecutionException, InterruptedException {
+        ArrayList<BizServiceLabel> noteCheckBalances = new ArrayList<BizServiceLabel>();
+        for (int i = 0; i < 10; i++) {
+
+            if(i == 2){
+                noteCheckBalances.add(new BizServiceLabel("李二" + "【"+ i +"】"));
+            }else if(i == 1){
+                noteCheckBalances.add(new BizServiceLabel("王一" + "【"+ i +"】"));
+            }else {
+                noteCheckBalances.add(new BizServiceLabel("张零" + "【"+ i +"】"));
+            }
+        }
+        String name = Thread.currentThread().getName();
+        System.out.println(name);
+        MultiExecutor.exec(demoService, noteCheckBalances,3);
         return StatusDto.buildSuccessStatusDto();
     }
 
